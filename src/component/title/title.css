@@ -1,0 +1,71 @@
+.titleBox{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    box-shadow: 2px 2px 7px 2px #00000040;
+    background-color: #44546A;
+}
+
+.titleBox .logo{
+    height: calc(100% - 16px);
+    width: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #FFFFFF;
+    border-right: 5px solid #D6DCE5;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+
+.titleBox .menuList{
+    height: 100%;
+    background-color: #44546A;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    font-size: 20px;
+    font-family: 'KoPubWorld돋움체_Pro_Bold';
+    color: white;
+    flex-grow: 1;
+}
+
+
+.titleBox .tabList{
+    height: 100%;
+    width: calc(100% - 550px);
+    background-color: #44546A;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    font-size: 20px;
+    font-family: 'KoPubWorld돋움체_Pro_Bold';
+    color: white;
+}
+
+.titleBox .tabList .tab{
+    width: 210px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'NotoSansKR-Regular';
+}
+
+.titleBox .tabList .tab.select{
+    height: calc(100% - 5px);
+    border-bottom: 3px solid #FEBF00;
+    font-family: 'NotoSansKR-Regular';
+}
+
+.titleBox .userInfo{
+    height: 100%;
+    width: 300px;
+}
+
+
+.titleBox .logo img{
+    height: 100%;
+}

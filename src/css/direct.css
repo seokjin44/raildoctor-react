@@ -1,0 +1,21 @@
+.MR5{
+    margin-right: 5px;
+}
+
+.FS10{
+    font-size: 10px;
+}
+
+.ALIGN_TOP{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.TA_LEFT{
+    text-align: left;
+}
+
+.COL_P{
+    color: #8c8aff;
+}

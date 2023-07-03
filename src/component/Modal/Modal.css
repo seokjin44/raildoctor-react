@@ -1,0 +1,12 @@
+.modalButton {
+    background-color: white;
+    border: 1px solid #bfbfbf;
+    border-radius: 5px;
+    font-size: 12px;
+    padding: 1px;
+    padding-left: 9px;
+    padding-right: 8px;
+    margin-right: 5px;
+    cursor: pointer;
+    font-family: 'KoPubWorld돋움체_Pro_Bold';
+}

@@ -1,0 +1,18 @@
+.checkBox{
+    width: 10px;
+    height: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.checkBox.check::after{
+    background-color: #626ed4;
+    width: 6px;
+    height: 6px;
+    top: 2px;
+    left: 2px;
+    content: "";
+    position: absolute;
+    border-radius: 1px;
+}
