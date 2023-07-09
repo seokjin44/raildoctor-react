@@ -34,9 +34,12 @@ function Login( props ) {
         </div>
         <div id="login">
           <div className="line subject">Username</div>
-          <div className="line"><input className="loginInput" id="id" placeholder="Enter username"/></div>
+          <div className="line"><input className="loginInput" id="id" placeholder="Enter username" 
+                onKeyUp={(e)=>{ if(e.key === "Enter" ){ document.getElementById("password").focus() } }} /></div>
           <div className="line subject">Password</div>
-          <div className="line"><input type="password" className="loginInput" id="password" placeholder="Enter password"/></div>
+          <div className="line"><input type="password" className="loginInput" id="password" placeholder="Enter password"
+                onKeyUp={(e)=>{ if(e.key === "Enter" ){ login() } }} 
+              /></div>
           <div className="line flexEnd">
             <div className="remeberMe">
               <div className="checkBox MR5"></div>

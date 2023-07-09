@@ -23,8 +23,8 @@
 
 .main .content{
     width: 100%;
-    flex-grow: 1;
     display: flex;
     justify-content: center;
     align-items: center;
+    height: calc(100% - 55px);
 }

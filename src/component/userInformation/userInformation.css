@@ -5,7 +5,6 @@
     display: flex;
     justify-content: end;
     align-items: center;
-    font-family: 'NotoSansKR-Regular';
     color: white;
 }
 
@@ -23,7 +22,7 @@
 
 .userInfoBox .userDetail{
     margin-right: 20px;
-    font-size: 12px;
+    font-size: 10px;
     margin-left: 10px;
     display: flex;
     justify-content: center;

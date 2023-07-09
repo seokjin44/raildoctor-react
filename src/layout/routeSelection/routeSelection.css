@@ -1,4 +1,4 @@
-.main{
+.routeSelection{
     width: 100%;
     height: 100%;
     display: flex;
@@ -7,24 +7,43 @@
     flex-direction: column;
 }
 
-.main .titleContainer{
-    background-color: black;
-    height: 55px;
-    width: 100%;
-}
-
-.main .footer{
-    height: 15px;
-    width: 100%;
-    background-color: #44546A;
-    color: white;
-    line-height: 30px;
-}
-
-.main .content{
-    width: 100%;
-    flex-grow: 1;
+.routeSelection .routeLine{
+    margin-top: 5px;
+    margin-bottom: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.routeSelection .routeLine .route{
+    width: 400px;
+    height: 300px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    font-weight: bold;
+    box-shadow: 1px 1px 8px 1px #0000004d;
+    background-position: center;
+    color: white;
+    text-shadow: 1px 1px black;
+    background-size: 158%;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.routeSelection .routeLine .route.img1{
+    background-image: url(../../assets/picture/central-station-g759d5f30b_1280.jpg);
+}
+.routeSelection .routeLine .route.img2{
+    background-image: url(../../assets/picture/station-g971b227b2_1280.jpg);
+}
+.routeSelection .routeLine .route.img3{
+    background-image: url(../../assets/picture/train-g0f519217a_1280.jpg);
+}
+.routeSelection .routeLine .route.img4{
+    background-image: url(../../assets/picture/train-gdcb406ccf_1280.jpg);
 }

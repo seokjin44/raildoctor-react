@@ -4,9 +4,14 @@ import { BrowserRouter as Router,
   Routes, 
   Route,
   Navigate,
+  useLocation,
 } from 'react-router-dom';
 import Login from "../../component/login/login";
 import RouteSelection from "../routeSelection/routeSelection";
+import { useState } from "react";
+import Monitoring from "../monitoring/monitoring";
+import CumulativeThroughput from "../cumulativeThroughput/cumulativeThroughput";
+import WearMaintenance from "../wearMaintenance/wearMaintenance";
 
 const ProtectedRoute = ({ user, children }) => {
   const isAuth = () => {
@@ -25,6 +30,7 @@ const ProtectedRoute = ({ user, children }) => {
 };
 
 function Main( props ) {
+  const [selectRoute, setSelectRoute] = useState(0);
 
   return (
     <Router >
@@ -37,7 +43,12 @@ function Main( props ) {
               <Route path="/" element={<ProtectedRoute>
                 <Navigate to="/routeSelection" replace />
               </ProtectedRoute>} />
-              <Route path="/routeSelection" element={<ProtectedRoute><RouteSelection/></ProtectedRoute>} />
+              <Route path="/routeSelection" element={<ProtectedRoute>
+                <RouteSelection />
+              </ProtectedRoute>} />
+              <Route path="/monitoring" element={<ProtectedRoute><Monitoring/></ProtectedRoute>} />
+              <Route path="/wearMaintenance" element={<ProtectedRoute><WearMaintenance/></ProtectedRoute>} />
+              <Route path="/cumulativeThroughput" element={<ProtectedRoute><CumulativeThroughput/></ProtectedRoute>} />
               <Route path="/login" element={<Login memberList={props.memberList} />} />
           </Routes> 
         </div>

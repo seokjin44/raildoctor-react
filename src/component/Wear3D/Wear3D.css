@@ -33,5 +33,6 @@
     flex-direction: row;
     justify-content: space-between;
     margin-right: 15px;
-    width: 10%;
+    width: 15%;
+    margin-top: 10px;
 }

@@ -28,11 +28,26 @@
     justify-content: end;
     align-items: center;
     font-size: 20px;
-    font-family: 'KoPubWorld돋움체_Pro_Bold';
+    /* font-family: 'KoPubWorld돋움체_Pro_Bold'; */
     color: white;
     flex-grow: 1;
 }
 
+.titleBox .menuList .menu{
+    font-size: 15px;
+    margin-right: 45px;
+    padding: 5px 10px 5px 10px;
+    cursor: pointer;
+}
+
+.titleBox .menuList .menu:last-child{
+    margin-right: 0;
+}
+
+.titleBox .menuList .menu.active{
+    border-bottom: 1px solid #ff9900;
+    padding-bottom: 4px;
+}
 
 .titleBox .tabList{
     height: 100%;
@@ -51,13 +66,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'NotoSansKR-Regular';
 }
 
 .titleBox .tabList .tab.select{
     height: calc(100% - 5px);
     border-bottom: 3px solid #FEBF00;
-    font-family: 'NotoSansKR-Regular';
 }
 
 .titleBox .userInfo{

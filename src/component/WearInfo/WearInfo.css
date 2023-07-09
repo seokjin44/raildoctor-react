@@ -1,0 +1,9 @@
+.wearInfoBox{
+    width: 100%;
+    height: 100%;
+}
+
+#directWearInfo, #sideWearInfo {
+    width: 100%;
+    height: 100%;
+} 
