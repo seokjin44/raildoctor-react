@@ -9,7 +9,7 @@
 
 .railStatusContainer{
     height: 135px;
-    width: 100%;
+    width: calc(100% - 2px); 
 }
 
 .pointContainer{
@@ -25,9 +25,10 @@
     justify-content: space-between;
     align-items: center;
     padding-left: 15px;
-    height: 25px;
+    height: 23px;
     width: calc(100% - 15px);
     font-size: 14px;
+    padding-top: 2px;
 }
 
 .componentBox{
@@ -93,6 +94,7 @@
 }
 
 .mamoGraphContainer{
+    margin-top: 10px;
     width: 100%;
     display: flex;
     justify-content: center;

@@ -1,0 +1,143 @@
+.cumulativeThroughput{
+    width: calc(100% - 40px);
+    height: calc(100% - 40px);
+    display: flex;
+    justify-content: left;
+    align-items: baseline;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.cumulativeThroughput .componentBox{
+    padding: 10px;
+    width: calc(100% - 20px);
+    height: calc( 100% - 25px - 20px);
+}
+
+.cumulativeThroughput .componentBox .radioButtons{
+    width: 200px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+}
+
+.cumulativeThroughput .componentBox .distanceSearch{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    height: 100%;
+}
+
+.cumulativeThroughput .componentBox .distanceSearch input.local {
+    border: none;
+    border-bottom: 1px solid #cccccc;
+    margin-right: 10px;
+    margin-left: 10px;
+    width: 70px;
+    text-align: center;
+    font-size: 17px;
+    font-family: 'NEO_R';
+}
+
+.cumulativeThroughput .componentBox .position{
+    width: 300px;
+    height: 100%;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    margin-right: 5px;
+    border-radius: 5px;
+    border: 1px solid #cccccc;
+}
+
+.componentBox.section{
+    justify-content: left;
+    /* align-items: center; */
+}
+
+.optionBox .optionTitle{
+    width: 127px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid #cccccc;
+    color: #414141;
+}
+
+.optionBox .optionValue{
+    width: calc(100% - 55px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.optionBox .optionValue .icon{
+    width: 17px;
+    margin-right: 10px;
+    padding-top: 3px;
+}
+
+.optionBox .optionValue .icon img{
+    width: 100%;
+}
+
+.cumulativeThroughput .componentBox .curDate{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    height: 100%;
+}
+
+.optionBox .optionValue .verticalValue{
+    width: 300px;
+}
+
+.optionBox .optionValue .verticalValue .verticalValueBox{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 55px;
+    position: relative;
+    border: 1px solid #70AD47;
+    border-radius: 5px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+.optionBox .optionValue .verticalValue .verticalValueBox:first-child{
+    margin-top: 0;
+}
+
+.optionBox .optionValue .verticalValue .verticalValueBox:last-child{
+    margin-bottom: 0px;
+}
+
+.optionBox .optionValue .verticalValue .verticalValueBox .boxTitle{
+    position: absolute;
+    top: -8px;
+    left: 10px;
+    background: white;
+    font-size: 12px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.h75,
+.cumulativeThroughput .componentBox .optionBox.h75{
+    height: 75px;
+}
+
+.cumulativeThroughput .componentBox .optionBox.borderColorGreen{
+    border-color: #70AD47;
+}

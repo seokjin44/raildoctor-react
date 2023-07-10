@@ -9,7 +9,7 @@ function Title() {
   const navigate = useNavigate();
   console.log(location);
 
-
+  
   return (
     <div className="titleBox">
         <div className="logo">
@@ -19,10 +19,12 @@ function Title() {
           <div className={ classnames("menu",{ active : location.pathname.indexOf("monitoring") > -1 }) } onClick={()=>{navigate("/monitoring");}}>선로모니터링</div>
           <div className={ classnames("menu",{ active : location.pathname.indexOf("wearMaintenance") > -1 }) } onClick={()=>{navigate("/wearMaintenance");}}>마모유지관리</div>
           <div className={ classnames("menu",{ active : location.pathname.indexOf("cumulativeThroughput") > -1 }) } onClick={()=>{navigate("/cumulativeThroughput",{});}} >누적통과톤수</div>
-          <div className="menu">궤도틀림</div>
-          <div className="menu">궤도거동계측 </div>
-          <div className="menu">온/습도</div>
+          <div className={ classnames("menu",{ active : location.pathname.indexOf("trackDeviation") > -1 }) } onClick={()=>{navigate("/trackDeviation",{});}} >궤도틀림</div>
+          <div className={ classnames("menu",{ active : location.pathname.indexOf("trackGeometryMeasurement") > -1 }) } onClick={()=>{navigate("/trackGeometryMeasurement",{});}} >궤도거동계측 </div>
+          <div className={ classnames("menu",{ active : location.pathname.indexOf("MeasuringTemperatureHumidity") > -1 }) } onClick={()=>{navigate("/MeasuringTemperatureHumidity",{});}} >온/습도</div>
           <div className="menu">레일프로파일</div>
+          <div className="menu">레일직진도</div>
+          <div className="menu">레일조도</div>
         </div>
         <div className="userInfo">
             <UserInformation userId={""}></UserInformation>

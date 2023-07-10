@@ -45,7 +45,7 @@
 
 
 .railStatusBox .pointer .pointerText{
-    font-family: 'NotoSansKR-Regular';
+    /* font-family: 'NotoSansKR-Regular'; */
     position: absolute;
     word-break: keep-all;
     transform: rotate(-52deg);
@@ -54,6 +54,6 @@
     width: 100%;
     left: -1px;
     top: -15px;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 500;
 }

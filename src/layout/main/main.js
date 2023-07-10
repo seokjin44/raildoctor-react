@@ -12,6 +12,9 @@ import { useState } from "react";
 import Monitoring from "../monitoring/monitoring";
 import CumulativeThroughput from "../cumulativeThroughput/cumulativeThroughput";
 import WearMaintenance from "../wearMaintenance/wearMaintenance";
+import TrackGeometryMeasurement from "../trackGeometryMeasurement/trackGeometryMeasurement";
+import TrackDeviation from "../trackDeviation/trackDeviation";
+import MeasuringTemperatureHumidity from "../measuringTemperatureHumidity/measuringTemperatureHumidity";
 
 const ProtectedRoute = ({ user, children }) => {
   const isAuth = () => {
@@ -49,6 +52,11 @@ function Main( props ) {
               <Route path="/monitoring" element={<ProtectedRoute><Monitoring/></ProtectedRoute>} />
               <Route path="/wearMaintenance" element={<ProtectedRoute><WearMaintenance/></ProtectedRoute>} />
               <Route path="/cumulativeThroughput" element={<ProtectedRoute><CumulativeThroughput/></ProtectedRoute>} />
+              <Route path="/trackGeometryMeasurement" element={<ProtectedRoute><TrackGeometryMeasurement/></ProtectedRoute>} />
+              <Route path="/trackDeviation" element={<ProtectedRoute><TrackDeviation/></ProtectedRoute>} />
+
+              <Route path="/measuringTemperatureHumidity" element={<ProtectedRoute><MeasuringTemperatureHumidity/></ProtectedRoute>} />
+
               <Route path="/login" element={<Login memberList={props.memberList} />} />
           </Routes> 
         </div>

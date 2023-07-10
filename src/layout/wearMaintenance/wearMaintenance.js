@@ -1467,7 +1467,7 @@ const directWearInfo = [
     "point_id": 13,
     "wear_type": 0
   },
-  {
+  /*{
     "NO": 30,
     "track_type": 0,
     "reg_date": "2020/05/06",
@@ -8046,7 +8046,7 @@ const directWearInfo = [
     "mgt": 413,
     "point_id": 75,
     "wear_type": 0
-  }
+  } */
 ];
 const sideWearInfo = [
 		{
@@ -8091,7 +8091,7 @@ const sideWearInfo = [
 			"point_id": 10,
 			"wear_type": 1
 		},
-		{
+		 {
 			"NO": 4,
 			"track_type": 0,
 			"reg_date": "2017/11/21",
@@ -8469,7 +8469,7 @@ const sideWearInfo = [
 			"point_id": 13,
 			"wear_type": 1
 		},
-		{
+		/*{
 			"NO": 31,
 			"track_type": 0,
 			"reg_date": "2020/08/19",
@@ -15034,7 +15034,7 @@ const sideWearInfo = [
 			"mgt": 413,
 			"point_id": 75,
 			"wear_type": 1
-		}
+		} */
 	];
 
 const getInstrumentationPoint = (select) => {
@@ -15283,7 +15283,7 @@ const getInstrumentationPoint = (select) => {
 
         </div>
       </div>
-      <div className="contentBox wearContainer">
+      <div className="contentBox wearContainer" style={{marginLeft : 0}}>
         <div className="containerTitle bothEnds">
           <div>마모정보</div>
           <div className="flex">
