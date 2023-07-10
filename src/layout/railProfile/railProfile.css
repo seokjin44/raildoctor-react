@@ -1,0 +1,106 @@
+.railProfile .componentBox .radioButtons {
+    width: 200px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+}
+
+.railProfile .componentBox .distanceSearch {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    height: 100%;
+}
+
+.railProfile .componentBox .distanceSearch input.local {
+    border: none;
+    border-bottom: 1px solid #cccccc;
+    margin-right: 10px;
+    margin-left: 10px;
+    width: 70px;
+    text-align: center;
+    font-size: 17px;
+    font-family: 'NEO_R';
+}
+
+.railProfile .componentBox .profile {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.railProfile .componentBox .profile:first-child{
+    margin-left: 0;
+}
+
+.railProfile .componentBox .profile:last-child{
+    margin-right: 0;
+}
+
+.profileSlider{
+    width: calc(60% - 40px);
+    height: calc(80% - 40px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-right: 25px;
+    margin-left: 25px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.profileSlider img{
+    width: 65%;
+}
+
+.railProfile .table{
+    height: auto;
+}
+
+.table .tableHeader .tr .td.colspan3{
+    border-bottom: 0;
+}
+.table .tableHeader .tr .td .colspan3{
+    width: 100%;
+    height: 300%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+}
+
+.table .tableHeader .tr .td.rowspan7{
+    border-right: 0;
+}
+
+.table .tableHeader .tr .td .rowspan7{
+    width: 700%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    left: 0;
+}
+
+.table .tableHeader .tr .td.measurementDate,
+.table .tableBody .tr .td.measurementDate{
+    width: 20%;
+}
+
+.table .tableHeader .tr .td.mamo,
+.table .tableBody .tr .td.mamo{
+    width: 12%;
+}

@@ -15,6 +15,9 @@ import WearMaintenance from "../wearMaintenance/wearMaintenance";
 import TrackGeometryMeasurement from "../trackGeometryMeasurement/trackGeometryMeasurement";
 import TrackDeviation from "../trackDeviation/trackDeviation";
 import MeasuringTemperatureHumidity from "../measuringTemperatureHumidity/measuringTemperatureHumidity";
+import RailProfile from "../railProfile/railProfile";
+import RailRoughness from "../railRoughness/railRoughness";
+import RailTrackAlignment from "../railTrackAlignment/railTrackAlignment";
 
 const ProtectedRoute = ({ user, children }) => {
   const isAuth = () => {
@@ -54,8 +57,11 @@ function Main( props ) {
               <Route path="/cumulativeThroughput" element={<ProtectedRoute><CumulativeThroughput/></ProtectedRoute>} />
               <Route path="/trackGeometryMeasurement" element={<ProtectedRoute><TrackGeometryMeasurement/></ProtectedRoute>} />
               <Route path="/trackDeviation" element={<ProtectedRoute><TrackDeviation/></ProtectedRoute>} />
-
               <Route path="/measuringTemperatureHumidity" element={<ProtectedRoute><MeasuringTemperatureHumidity/></ProtectedRoute>} />
+
+              <Route path="/railProfile" element={<ProtectedRoute><RailProfile/></ProtectedRoute>} />
+              <Route path="/railRoughness" element={<ProtectedRoute><RailRoughness/></ProtectedRoute>} />
+              <Route path="/railTrackAlignment" element={<ProtectedRoute><RailTrackAlignment/></ProtectedRoute>} />
 
               <Route path="/login" element={<Login memberList={props.memberList} />} />
           </Routes> 
