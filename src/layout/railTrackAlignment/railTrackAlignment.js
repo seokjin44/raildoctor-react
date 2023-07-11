@@ -1,11 +1,15 @@
 import "./railTrackAlignment.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PositionTestImage from "../../assets/2023-07-09_21_48_42.png";
 import RailStatus from "../../component/railStatus/railStatus";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/ko';
+import Position from "../../assets/zodo.png";
+import Radio from '@mui/joy/Radio';
+import RadioGroup from '@mui/joy/RadioGroup';
+import IncheonTrackImg from "../../assets/track/incheon_track.png";
 
 import Box from '@mui/material/Box';
 import ChartAuto from 'chart.js/auto';
@@ -539,66 +543,139 @@ const railroadSection = [
 
 function RailTrackAlignment( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
+  const [trackDetailDragging, setTrackDetailDragging] = useState(false);
+  const [trackDetailPosition, setTrackDetailPosition] = useState({x: 0, y: 0});
+  const [scale, setScale] = useState(1);
+  const [lastPos, setLastPos] = useState(null);
   const pathClick = (select) => {
     console.log(select);
     //getInstrumentationPoint(select);
     setSelectedPath(select);
   }
 
+  const trackDetailCanvasRef = useRef(null);
+  const trackDetailHandleMouseDown = (e) => {
+    setTrackDetailDragging(true);
+    setLastPos({x: e.clientX, y: e.clientY});
+  };
+  const trackDetailHandleMouseUp = () => {
+    setTrackDetailDragging(false);
+    setLastPos(null);
+  };
+  const trackDetailHandleMouseMove = (e) => {
+    if (trackDetailDragging) {
+      const newPos = {x: e.clientX, y: e.clientY};
+      const canvas = trackDetailCanvasRef.current;
+      const img = new Image();
+      img.src = IncheonTrackImg; // replace with your image url
+  
+      img.onload = function() {
+        const newPosX = trackDetailPosition.x + newPos.x - lastPos.x;
+        const newWidth = img.width * scale;
+        
+        // Check if the new position is outside the canvas
+        if (newPosX <= 0 && newPosX + newWidth >= canvas.width) {
+          setTrackDetailPosition({
+            x: newPosX,
+            y: trackDetailPosition.y
+          });
+        }
+        setLastPos(newPos);
+      };
+    }
+  };
+
+  const trackDetailDrawImage = () => {
+    const canvas = trackDetailCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    //img.src = 'https://example.com/image.jpg'; // replace with your image url
+    img.src= IncheonTrackImg;
+    img.onload = function() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+      ctx.save(); // Save the current state of the context
+      ctx.translate(trackDetailPosition.x, trackDetailPosition.y); // Apply translation
+      ctx.scale(scale, scale); // Apply scaling 
+      ctx.drawImage(img, 0, 0, img.width, img.height); // Draw the image
+      ctx.restore(); // Restore the context to its saved state
+    };
+  }
+
   useEffect(() => {
   }, []);
+
+  useEffect(() => {
+
+    let trackDetailContainer = document.getElementById("trackCanvas");
+    let trackDetailCanvas = trackDetailCanvasRef.current;
+    trackDetailCanvas.width = trackDetailContainer.clientWidth;
+    trackDetailCanvas.height = trackDetailContainer.clientHeight;
+
+  }, []);
+
+  useEffect(() => {
+    trackDetailDrawImage();
+  }, [trackDetailPosition, scale]);
   
   return (
-    <div className="trackDeviation" >
+    <div className="trackDeviation railTrackAlignment" >
       <div className="railStatusContainer">
         <RailStatus railroadSection={railroadSection} pathClick={pathClick}></RailStatus>
       </div>
       <div className="contentBox" >
         <div className="containerTitle">검토구간</div>
-        <div className="componentBox flex section ">
+        <div className="componentBox flex section " style={{ height: "130px"}} >
 
-          <div className="position optionBox h75">
-            <div className="optionTitle">측정분기</div>
-            <div className="optionValue">
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">측정분기</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  //value={age}
-                  label="데이터 선택"
-                  //onChange={handleChange}
-                >
-                  <MenuItem>2022.1분기</MenuItem>
-                  <MenuItem>2022.2분기</MenuItem>
-                  <MenuItem>2022.3분기</MenuItem>
-                  <MenuItem>2022.4분기</MenuItem>
-                </Select>
-              </FormControl>
-            </div>
-          </div>
-
-          <div className="position optionBox h75">
-            <div className="optionTitle">측정일자</div>
-            <div className="optionValue">
-              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
-                <DatePicker label="측정일"  />
-              </LocalizationProvider>
-            </div>
-          </div>
-
-          <div className="position optionBox borderColorGreen">
+          <div className="position optionBox borderColorGreen" style={{width: "935px"}} >
             <div className="optionTitle">위치</div>
-            <div className="optionValue">인천터미널 - 문학경기장</div>
+            <div className="optionValue">
+              <img src={Position} />
+            </div>
+          </div>
+
+          <div className="radioButtons optionBox ">
+            <RadioGroup defaultValue="outlined" name="radio-buttons-group" 
+              orientation="horizontal" 
+              size="sm"  
+              variant="outlined" style={{border : 0}}
+            >
+              <Radio value="outlined" label="상선" />
+              <Radio value="soft" label="하선" />
+            </RadioGroup>
+
+          </div>
+
+          <div className="radioButtons optionBox ">
+            <RadioGroup defaultValue="outlined" name="radio-buttons-group" 
+              orientation="horizontal" 
+              size="sm"  
+              variant="outlined" style={{border : 0}}
+            >
+              <Radio value="outlined" label="좌레일" />
+              <Radio value="soft" label="우레일" />
+            </RadioGroup>
           </div>
 
         </div>
       </div>
 
-      <div className="contentBox" style={{marginTop:"10px", height: "575px"}}>
+      <div className="contentBox" style={{marginTop:"10px", height: "520px"}}>
         <div className="containerTitle">Chart</div>
         <div className="componentBox chartBox flex">
-          <Chart type='bar' data={data} />
+          <div id="trackCanvas" className="trackBox">
+            <div className="curLine"></div>
+            <canvas id="trackDetailCanvas"
+                  ref={trackDetailCanvasRef}
+                  onMouseDown={(e)=>{trackDetailHandleMouseDown(e)}}
+                  onMouseUp={(e)=>{trackDetailHandleMouseUp()}}
+                  onMouseMove={(e)=>{trackDetailHandleMouseMove(e)}}
+                  //onWheel={trackDetailHandleWheel}
+              />
+          </div>
+          <div className="chartBox">
+            <div className="curLine"></div>
+            <Chart type='bar' data={data} />
+          </div>
         </div>
       </div>
 

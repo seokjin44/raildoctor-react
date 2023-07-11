@@ -6,6 +6,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/ko';
+import PositionImg from "../../assets/position.png";
+import Radio from '@mui/joy/Radio';
+import RadioGroup from '@mui/joy/RadioGroup';
+import ReportIcon from "../../assets/icon/1291748_magnify_magnifying glass_marketing_report_financial_icon.svg";
+import ReportImg from "../../assets/ReportImg.png";
 
 import Box from '@mui/material/Box';
 import ChartAuto from 'chart.js/auto';
@@ -27,6 +32,7 @@ import {
 } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 import faker from 'faker';
+import Modal from '@mui/material/Modal';
 
 ChartJS.register(
   LinearScale,
@@ -537,70 +543,124 @@ const railroadSection = [
   }
 ]
 
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  //width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  //p: 4,
+};
+
+
 function RailRoughness( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
+  const [open, setOpen] = useState(false);
   const pathClick = (select) => {
     console.log(select);
     //getInstrumentationPoint(select);
     setSelectedPath(select);
   }
 
+  const handleClose = () => {
+    setOpen(false);
+  }
+
   useEffect(() => {
   }, []);
   
   return (
-    <div className="trackDeviation" >
+    <div className="trackDeviation railRoughness" >
       <div className="railStatusContainer">
         <RailStatus railroadSection={railroadSection} pathClick={pathClick}></RailStatus>
       </div>
-      <div className="contentBox" >
+      <div className="contentBox" style={{ height: "220px"}} >
         <div className="containerTitle">검토구간</div>
         <div className="componentBox flex section ">
 
-          <div className="position optionBox h75">
-            <div className="optionTitle">측정분기</div>
+          <div className="position optionBox borderColorGreen" style={{width: "935px"}} >
+            <div className="optionTitle">위치</div>
             <div className="optionValue">
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">측정분기</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  //value={age}
-                  label="데이터 선택"
-                  //onChange={handleChange}
-                >
-                  <MenuItem>2022.1분기</MenuItem>
-                  <MenuItem>2022.2분기</MenuItem>
-                  <MenuItem>2022.3분기</MenuItem>
-                  <MenuItem>2022.4분기</MenuItem>
-                </Select>
-              </FormControl>
+              <img src={PositionImg} />
             </div>
           </div>
+          
+          <div className="radioButtons optionBox ">
+            <RadioGroup defaultValue="outlined" name="radio-buttons-group" 
+              orientation="horizontal" 
+              size="sm"  
+              variant="outlined" style={{border : 0}}
+            >
+              <Radio value="outlined" label="상선" />
+              <Radio value="soft" label="하선" />
+            </RadioGroup>
 
-          <div className="position optionBox h75">
+          </div>
+          <div className="distanceSearch optionBox">
+            <div className="optionTitle">KP</div>
+            <input className="local" id="kilometerStart" />
+            <div className="textK">K</div>
+            <input className="local" id="kilometerEnd"/>
+          </div>
+
+          {/* <div className="position optionBox h75">
             <div className="optionTitle">측정일자</div>
             <div className="optionValue">
               <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
                 <DatePicker label="측정일"  />
               </LocalizationProvider>
             </div>
-          </div>
-
-          <div className="position optionBox borderColorGreen">
-            <div className="optionTitle">위치</div>
-            <div className="optionValue">인천터미널 - 문학경기장</div>
-          </div>
-
+          </div> */}
         </div>
       </div>
 
-      <div className="contentBox" style={{marginTop:"10px", height: "575px"}}>
-        <div className="containerTitle">Chart</div>
+      <div className="contentBox" style={{marginTop:"10px", height: "485px"}}>
+        <div className="containerTitle">보고서 목록</div>
         <div className="componentBox chartBox flex">
-          <Chart type='bar' data={data} />
+          <div className="table" style={{ justifyContent: "flex-start" }} >
+              <div className="tableHeader">
+                <div className="tr">
+                  <div className="td no">No.</div>
+                  <div className="td regDate">측정일자</div>
+                  <div className="td track">Track</div>
+                  <div className="td rail">Rail</div>
+                  <div className="td station">Station/tag</div>
+                  <div className="td weld">Type of weld</div>
+                  <div className="td viewBtn"></div>
+                </div>
+              </div>
+              <div className="tableBody">
+                <div className="tr">
+                  <div className="td no">1</div>
+                  <div className="td regDate">23/5/31 2:10</div>
+                  <div className="td track">Left</div>
+                  <div className="td rail">Right</div>
+                  <div className="td station">15K242</div>
+                  <div className="td weld">TMW</div>
+                  <div className="td viewBtn">
+                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
+                      <img src={ReportIcon} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
         </div>
       </div>
+
+      <Modal
+        open={open}
+        onClose={(e)=>{console.log(e);handleClose()}}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style} >
+          <img src={ReportImg} />
+        </Box>
+      </Modal>
 
     </div>
   );

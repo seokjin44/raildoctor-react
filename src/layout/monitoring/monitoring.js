@@ -206,15 +206,6 @@ function Monitoring( props ) {
   };
 
   const trackDetailHandleMouseMove = (e) => {
-/*     if (trackDetailDragging) {
-      const newPos = {x: e.clientX, y: e.clientY};
-      setTrackDetailPosition({
-        x: trackDetailPosition.x + newPos.x - lastPos.x,
-        y: trackDetailPosition.y // keep the y position constant
-      });
-      setLastPos(newPos);
-    } */
-
     if (trackDetailDragging) {
       const newPos = {x: e.clientX, y: e.clientY};
       const canvas = canvasRef.current;
