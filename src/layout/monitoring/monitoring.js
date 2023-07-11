@@ -3,14 +3,15 @@ import "./monitoring.css";
 import TrackMapImg from "../../assets/picture/faJXt8QKy8mr186zQSroiaIYmWERjuTAk3YzXaw1rWNLPFabugakna_P5Fr3YNAD4yfP0oKB1Yle4RsZHHQwc4SgYoyq_hbnms8-Otm3YP9POJBloQ2bFzXqmZsvc4MQfGBSbNU61XDKkcVsPN0m7g.svg";
 import SearchIcon from "../../assets/icon/magnifier.svg";
 import DistanceIcon from "../../assets/icon/distance__.svg";
-import CalendarIcon from "../../assets/icon/calendar.svg";
-import PinIcon from "../../assets/icon/353397_circle_map_marker_pin_icon.svg";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/ko';
 import { useEffect, useRef, useState } from "react";
 import { Map } from 'react-kakao-maps-sdk';
+import CalendarIcon from "../../assets/icon/299092_calendar_icon.png";
+import PinIcon from "../../assets/icon/pin_white.png";
+import Speed from "../../assets/demo/speed.png";
 
 import IncheonTrackPDF from "../../assets/pdf/INCHEON_TRACK.pdf";
 import IncheonTrackImg from "../../assets/track/incheon_track2.png";
@@ -35,24 +36,24 @@ function Monitoring( props ) {
      ["인천시청"], ["예술회관"], ["인천","터미널"], ["문학","경기장"], ["선학"], ["신연수"], ["원인재"],
      ["동춘"], ["동막"], ["캠퍼스","타운"], ["테크노","파크"], ["지식정보","단지"], ["인천대","입구"],
      ["센트럴","파크"], ["국제업무","지구"], ["송도달빛","축제공원"]];
-    let x = 50;
+    let x = 20;
     for( let routeName of route ){
         let y = hiehgt / 2;
         y -= routeName.length * 15;
         for( let line of routeName ){
             ctx.beginPath();
             ctx.fillStyle = "#000000"; 
-            ctx.arc(x, hiehgt / 2, 10, 0, Math.PI * 2);
+            ctx.arc(x, hiehgt / 2 + 10, 10, 0, Math.PI * 2);
             ctx.fill();
-            ctx.font = "12px Arial";
-            ctx.fillText(line, x - (ctx.measureText(line).width/2), y);
+            ctx.font = "10px Arial";
+            ctx.fillText(line, x - (ctx.measureText(line).width/2), y + 10);
             y += 15;
         }
         x = x + 50;
     }
   }
 
-  const [position, setPosition] = useState({x: 38, y: 44});
+  const [position, setPosition] = useState({x: 38, y: 5});
   const [dragging, setDragging] = useState(false);
   const [relPos, setRelPos] = useState({x: 0, y: 0});
   const canvasRef = useRef(null);
@@ -63,7 +64,7 @@ function Monitoring( props ) {
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
     //ctx.fillStyle = '#000000';
     ctx.strokeStyle = 'red';
-    ctx.rect(x, y, 100, 100);  // Draw rectangle
+    ctx.rect(x, y, 100, 70);  // Draw rectangle
     ctx.stroke();
   }
 
@@ -77,7 +78,7 @@ function Monitoring( props ) {
     const rect = canvasRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    if (x >= position.x && x <= position.x + 100 && y >= position.y && y <= position.y + 100) {
+    if (x >= position.x && x <= position.x + 100 && y >= position.y && y <= position.y + 70) {
       setDragging(true);
       setRelPos({x: x - position.x, y: y - position.y});
     }
@@ -99,13 +100,13 @@ function Monitoring( props ) {
       setPosition({
         x: positionX,
         //y: e.clientY - rect.top - relPos.y
-        y: 44
+        y: 5
       });
     }
   };
 
   useEffect(() => {
-    let minimapContainer = document.getElementById("minimapContainer");
+     let minimapContainer = document.getElementById("minimapContainer");
     let canvas = canvasRef.current;
     canvas.width = minimapContainer.clientWidth;
     canvas.height = minimapContainer.clientHeight;
@@ -116,8 +117,7 @@ function Monitoring( props ) {
     trackDetailCanvas.height = trackDetailContainer.clientHeight;
 
     drawRect(position.x, position.y);
-    minimapDrawing();
-    //drawCanvas();
+    minimapDrawing(); 
   }, []);
 
   //const trackDetailCanvasRef = useRef(null);
@@ -185,8 +185,8 @@ function Monitoring( props ) {
       ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
       ctx.save(); // Save the current state of the context
       ctx.translate(trackDetailPosition.x, trackDetailPosition.y); // Apply translation
-      ctx.scale(scale, 0.5); // Apply scaling 
-      ctx.drawImage(img, 0, 50, img.width, img.height); // Draw the image
+      ctx.scale(scale, 0.35); // Apply scaling 
+      ctx.drawImage(img, 0, 0, img.width, img.height); // Draw the image
       ctx.restore(); // Restore the context to its saved state
     };
   }
@@ -250,28 +250,63 @@ function Monitoring( props ) {
   };
 
   return (
-    <div className="monitoringContainer">
-        <div className="trackBox">
+    <div className="monitoringContainer container">
+        {/* <div className="trackBox">
             <div className="boxTitle">
               지도
             </div>
             <div className="track">
-                {/* <img src={TrackMapImg} /> */}
                 <Map
                   center={{ lat: 33.5563, lng: 126.79581 }}
                   style={{ width: "100%", height: "100%" }}
                 >
                 </Map>
             </div>
+        </div> */}
+        <div className="searchBar">
+          <div className="boxProto minimap searchOption">
+            <div className="minimapContainer" id="minimapContainer">
+              <canvas id="minimapCanvas"
+                  ref={canvasRef}
+                  onMouseDown={handleMouseDown}
+                  onMouseUp={handleMouseUp}
+                  onMouseMove={handleMouseMove}
+              ></canvas>
+            </div>
+          </div>
+          <div className="boxProto dataSearch searchOption">
+            <div className="icon">
+              <img src={CalendarIcon} />
+            </div>
+            <div className="dateText" >
+              2023.05.05 ~ 2023.05.06
+            </div>
+          </div>
         </div>
-        <div className="trackDetailBox">
+
+        <div className="trackContent">
+          <div className="guideLine">
+            <div className="KP">
+              <img src={PinIcon} />15K205
+            </div>
+          </div>
+          <div className="boxProto track" id="trackDetailContainer">
+            <canvas id="trackDetailCanvas"
+                ref={trackDetailCanvasRef}
+                onMouseDown={(e)=>{trackDetailHandleMouseDown(e)}}
+                onMouseUp={(e)=>{trackDetailHandleMouseUp()}}
+                onMouseMove={(e)=>{trackDetailHandleMouseMove(e)}}
+            />
+          </div>
+          <div className="boxProto speed" id="trackDetailContainer">
+            <img src={Speed} />
+          </div>
+        </div>
+        {/* <div className="trackDetailBox">
             <div className="search">
               <div className="optionBox w100p">
                 <div className="optionTitle">
-                    <div className="label">
-                        {/* <div className="icon">
-                            <img src={DistanceIcon} />
-                        </div> */} 거리
+                    <div className="label"> 거리
                     </div>
                 </div>
                 <div className="distanceSearch">
@@ -286,10 +321,7 @@ function Monitoring( props ) {
               </div>
               <div className="optionBox w100p">
                 <div className="optionTitle">
-                    <div className="label">
-                        {/* <div className="icon">
-                                <img style={{width:'79%'}} src={CalendarIcon} />
-                        </div> */} 날짜
+                    <div className="label">날짜
                     </div>
                 </div>
                 <div className="dateSearch">
@@ -302,29 +334,15 @@ function Monitoring( props ) {
                     </LocalizationProvider>
                 </div>
               </div>
-                {/* <div className="searchBtn">
-                    <img src={SearchIcon}/>
-                </div> */}
             </div>
             <div id="minimapContainer" className="minimap">
-                <div className="boxTitle">
-                    {/* <div className="icon">
-                        <img src={PinIcon} />
-                    </div> */}미니맵
+                <div className="boxTitle">미니맵
                 </div>
 
-                <canvas id="minimapCanvas"
-                    ref={canvasRef}
-                    onMouseDown={handleMouseDown}
-                    onMouseUp={handleMouseUp}
-                    onMouseMove={handleMouseMove}
-                ></canvas>
+
             </div>
             <div id="trackDetailContainer" className="trackDetail">
-              <div className="boxTitle">
-                  {/* <div className="icon">
-                      <img src={PinIcon} />
-                  </div> */}선로열람도
+              <div className="boxTitle">선로열람도
               </div>
 
               <canvas id="trackDetailCanvas"
@@ -332,17 +350,13 @@ function Monitoring( props ) {
                   onMouseDown={(e)=>{trackDetailHandleMouseDown(e)}}
                   onMouseUp={(e)=>{trackDetailHandleMouseUp()}}
                   onMouseMove={(e)=>{trackDetailHandleMouseMove(e)}}
-                  //onWheel={trackDetailHandleWheel}
               />
             </div>
             <div className="trackDataMap">
-              <div className="boxTitle">
-                  {/* <div className="icon">
-                      <img src={PinIcon} />
-                  </div> */}데이터 여부
+              <div className="boxTitle">데이터 여부
               </div>
             </div>
-        </div>
+        </div> */}
     </div>
   );
 }

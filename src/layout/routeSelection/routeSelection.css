@@ -30,20 +30,34 @@
     background-position: center;
     color: white;
     text-shadow: 1px 1px black;
-    background-size: 158%;
+    background-size: 90%;
     background-repeat: no-repeat;
     cursor: pointer;
+    position: relative;
 }
 
 .routeSelection .routeLine .route.img1{
-    background-image: url(../../assets/picture/central-station-g759d5f30b_1280.jpg);
+    background-image: url(../../assets/logo/ictr.jpg);
 }
 .routeSelection .routeLine .route.img2{
-    background-image: url(../../assets/picture/station-g971b227b2_1280.jpg);
+    background-image: url(../../assets/logo/seoulmetro2.png);
 }
 .routeSelection .routeLine .route.img3{
-    background-image: url(../../assets/picture/train-g0f519217a_1280.jpg);
+    background-image: url(../../assets/logo/k_n_railway.png),
+        url(../../assets/logo/k_r_r_institute.svg);
+    background-position: 50% 28%, 50% 74%;
+    background-size: 108%, 90%;
 }
 .routeSelection .routeLine .route.img4{
-    background-image: url(../../assets/picture/train-gdcb406ccf_1280.jpg);
+    background-image: url(../../assets/logo/korail.png);
+}
+
+.routeSelection .routeLine .route .text{
+    position: absolute;
+    left: 12px;
+    top: 13px;
+    font-size: 15px;
+    background: #44546a;
+    border-radius: 5px;
+    padding: 6px;
 }
