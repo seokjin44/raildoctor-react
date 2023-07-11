@@ -15,8 +15,29 @@
     background: white;
     box-shadow: 1px 1px 8px #00000036;
     margin-bottom: 10px;
+    position: relative;
 }
 
 .boxProto:last-child{
     margin-bottom: 0;
+}
+
+.boxProto .title{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 7px;
+    border-radius: 5px;
+    /* background-color: #44546a; */
+    background-color: #44546ad1;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.boxProto .title img{
+    width: 15px;
+    margin-right: 3px;
 }

@@ -12,6 +12,7 @@ import { Map } from 'react-kakao-maps-sdk';
 import CalendarIcon from "../../assets/icon/299092_calendar_icon.png";
 import PinIcon from "../../assets/icon/pin_white.png";
 import Speed from "../../assets/demo/speed.png";
+import InfoIcon from "../../assets/icon/info_white.png";
 
 import IncheonTrackPDF from "../../assets/pdf/INCHEON_TRACK.pdf";
 import IncheonTrackImg from "../../assets/track/incheon_track2.png";
@@ -291,6 +292,9 @@ function Monitoring( props ) {
             </div>
           </div>
           <div className="boxProto track" id="trackDetailContainer">
+            <div className="title">
+              <img src={InfoIcon} />
+              선로열람도</div>
             <canvas id="trackDetailCanvas"
                 ref={trackDetailCanvasRef}
                 onMouseDown={(e)=>{trackDetailHandleMouseDown(e)}}
@@ -299,7 +303,10 @@ function Monitoring( props ) {
             />
           </div>
           <div className="boxProto speed" id="trackDetailContainer">
-            <img src={Speed} />
+            <div className="title">
+              <img src={InfoIcon} />
+              속도정보</div>
+            <img className="speedDemo" src={Speed} />
           </div>
         </div>
         {/* <div className="trackDetailBox">
