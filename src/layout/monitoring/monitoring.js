@@ -10,9 +10,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/ko';
 import { useEffect, useRef, useState } from "react";
+import { Map } from 'react-kakao-maps-sdk';
 
 import IncheonTrackPDF from "../../assets/pdf/INCHEON_TRACK.pdf";
-import IncheonTrackImg from "../../assets/track/incheon_track.png";
+import IncheonTrackImg from "../../assets/track/incheon_track2.png";
 import * as PDFJS from "pdfjs-dist/build/pdf";
 import * as pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 window.PDFJS = PDFJS;
@@ -184,8 +185,8 @@ function Monitoring( props ) {
       ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
       ctx.save(); // Save the current state of the context
       ctx.translate(trackDetailPosition.x, trackDetailPosition.y); // Apply translation
-      ctx.scale(scale, scale); // Apply scaling 
-      ctx.drawImage(img, 0, 0, img.width, img.height); // Draw the image
+      ctx.scale(scale, 0.5); // Apply scaling 
+      ctx.drawImage(img, 0, 50, img.width, img.height); // Draw the image
       ctx.restore(); // Restore the context to its saved state
     };
   }
@@ -251,13 +252,21 @@ function Monitoring( props ) {
   return (
     <div className="monitoringContainer">
         <div className="trackBox">
+            <div className="boxTitle">
+              지도
+            </div>
             <div className="track">
-                <img src={TrackMapImg} />
+                {/* <img src={TrackMapImg} /> */}
+                <Map
+                  center={{ lat: 33.5563, lng: 126.79581 }}
+                  style={{ width: "100%", height: "100%" }}
+                >
+                </Map>
             </div>
         </div>
         <div className="trackDetailBox">
             <div className="search">
-              <div className="optionBox">
+              <div className="optionBox w100p">
                 <div className="optionTitle">
                     <div className="label">
                         {/* <div className="icon">
@@ -275,7 +284,7 @@ function Monitoring( props ) {
                     <input className="local" id="kilometerEnd"/>
                 </div>
               </div>
-              <div className="optionBox">
+              <div className="optionBox w100p">
                 <div className="optionTitle">
                     <div className="label">
                         {/* <div className="icon">

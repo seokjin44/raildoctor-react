@@ -9,7 +9,7 @@ import 'dayjs/locale/ko';
 import Position from "../../assets/zodo.png";
 import Radio from '@mui/joy/Radio';
 import RadioGroup from '@mui/joy/RadioGroup';
-import IncheonTrackImg from "../../assets/track/incheon_track.png";
+import IncheonTrackImg from "../../assets/incheon_track2.png";
 
 import Box from '@mui/material/Box';
 import ChartAuto from 'chart.js/auto';

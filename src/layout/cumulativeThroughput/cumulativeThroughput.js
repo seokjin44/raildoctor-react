@@ -14,7 +14,7 @@ function CumulativeThroughput( props ) {
   const location = useLocation();
   return (
     <div className="cumulativeThroughput" >
-      <div className="contentBox" style={{height:"100px", width : "1180px"}} >
+      <div className="contentBox" style={{height:"100px"}} >
         <div className="containerTitle">검토구간</div>
         <div className="componentBox flex section ">
           <div className="radioButtons optionBox ">

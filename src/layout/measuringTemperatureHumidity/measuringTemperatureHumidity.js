@@ -590,7 +590,7 @@ function MeasuringTemperatureHumidity( props ) {
           </div>
         </div>
 
-        <div className="contentBox" style={{marginTop:"10px", height: "575px"}}>
+        <div className="contentBox" style={{marginTop:"10px", height: "485px"}}>
           <div className="containerTitle">Chart</div>
           <div className="componentBox chartBox flex">
             <Chart type='bar' data={data} />
