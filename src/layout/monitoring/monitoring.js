@@ -54,13 +54,13 @@ function Monitoring( props ) {
         trainDraw(ctx, x, hiehgt / 2 + 10);
         ctx.strokeStyle = "black";
         ctx.beginPath();
-        ctx.moveTo(x, y+10);
-        ctx.lineTo(x+50, y+10);
+        ctx.moveTo(x, y+14);
+        ctx.lineTo(x+50, y+14);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(x, y+7);
-        ctx.lineTo(x+50, y+7);
+        ctx.moveTo(x, y+11);
+        ctx.lineTo(x+50, y+11);
         ctx.stroke();
         x = x + 50;
     }
