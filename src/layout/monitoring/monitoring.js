@@ -13,6 +13,7 @@ import CalendarIcon from "../../assets/icon/299092_calendar_icon.png";
 import PinIcon from "../../assets/icon/pin_white.png";
 import Speed from "../../assets/demo/speed.png";
 import InfoIcon from "../../assets/icon/info_white.png";
+import TrainIcon from "../../assets/icon/4047310_car_metro_monochrome_monorail_train_icon.png";
 
 import IncheonTrackPDF from "../../assets/pdf/INCHEON_TRACK.pdf";
 import IncheonTrackImg from "../../assets/track/incheon_track2.png";
@@ -24,7 +25,7 @@ window.PDFJS = PDFJS;
 function Monitoring( props ) {
   const location = useLocation();
   PDFJS.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-
+  const [trainImg, setTrainImg] = useState(new Image());
 
   const minimapDrawing = () => {
     
@@ -42,16 +43,31 @@ function Monitoring( props ) {
         let y = hiehgt / 2;
         y -= routeName.length * 15;
         for( let line of routeName ){
-            ctx.beginPath();
-            ctx.fillStyle = "#000000"; 
-            ctx.arc(x, hiehgt / 2 + 10, 10, 0, Math.PI * 2);
-            ctx.fill();
+            /* ctx.beginPath(); */
+            /* ctx.fillStyle = "#000000"; 
+            ctx.arc(x, hiehgt / 2 + 10, 10, 0, Math.PI * 2); */
+            /* ctx.fill(); */
             ctx.font = "10px Arial";
             ctx.fillText(line, x - (ctx.measureText(line).width/2), y + 10);
             y += 15;
         }
+        trainDraw(ctx, x, hiehgt / 2 + 10);
+        ctx.strokeStyle = "black";
+        ctx.beginPath();
+        ctx.moveTo(x, y+10);
+        ctx.lineTo(x+50, y+10);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(x, y+7);
+        ctx.lineTo(x+50, y+7);
+        ctx.stroke();
         x = x + 50;
     }
+  }
+
+  const trainDraw = (ctx, x, y) => {
+    ctx.drawImage(trainImg, x-15, y-20, 35, 35); // Draw the image
   }
 
   const [position, setPosition] = useState({x: 38, y: 5});
@@ -70,6 +86,7 @@ function Monitoring( props ) {
   }
 
   useEffect(() => {
+    trainImg.src= TrainIcon;
     console.log(position);
     drawRect(position.x, position.y);
     minimapDrawing();
