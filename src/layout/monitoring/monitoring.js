@@ -302,12 +302,13 @@ function Monitoring( props ) {
           </div>
         </div>
 
-        <div className="trackContent">
-          <div className="guideLine">
-            <div className="KP">
-              <img src={PinIcon} />15K205
-            </div>
+        <div className="guideLine">
+          <div className="KP">
+            <img src={PinIcon} />15K205
           </div>
+        </div>
+
+        <div className="trackContent">
           <div className="boxProto track" id="trackDetailContainer">
             <div className="title">
               <img src={InfoIcon} />
@@ -324,6 +325,68 @@ function Monitoring( props ) {
               <img src={InfoIcon} />
               속도정보</div>
             <img className="speedDemo" src={Speed} />
+          </div>
+          <div className="boxProto datafinder" id="trackDetailContainer">
+            {/* <div className="title">
+              <img src={InfoIcon} />
+              데이터 여부</div> */}
+            <div className="dataList">
+              <div className="line" >
+                <div className="dataName">통과톤수</div>
+                <div className="dataBar">
+                  <div className="detailBtn" style={{left:"0.5%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"9.5%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"12.5%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"81.5%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"78.5%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"65.5%"}}>상세보기</div>
+                </div>
+              </div>
+              <div className="line" >
+                <div className="dataName">마모 유지관리</div>
+                <div className="dataBar">
+                  <div className="detailBtn" style={{left:"3%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"35%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"12%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"28%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"59%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"91%"}}>상세보기</div>
+                </div>
+              </div>
+              <div className="line" >
+                <div className="dataName">궤도틀림</div>
+                <div className="dataBar">
+                  <div className="detailBtn" style={{left:"4.5%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"97%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"65%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"71%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"50%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"41%"}}>상세보기</div>
+                </div>
+              </div>
+              <div className="line" >
+                <div className="dataName">궤도거동계측</div>
+                <div className="dataBar">
+                  <div className="detailBtn" style={{left:"77%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"6%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"51%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"31%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"39%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"81"}}>상세보기</div>
+                </div>
+              </div>
+              <div className="line" >
+                <div className="dataName">온/습도 측정</div>
+                <div className="dataBar">
+                  <div className="detailBtn" style={{left:"8%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"88%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"77%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"66%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"55%"}}>상세보기</div>
+                  <div className="detailBtn" style={{left:"44%"}}>상세보기</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         {/* <div className="trackDetailBox">
