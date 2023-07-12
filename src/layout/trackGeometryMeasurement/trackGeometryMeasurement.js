@@ -1127,7 +1127,7 @@ function TrackGeometryMeasurement( props ) {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="weight" fill="#0041DC" />
+              <Bar dataKey="weight" name="윤중" fill="#0041DC" />
             </BarChart>
           </ResponsiveContainer>
           <ResponsiveContainer width="100%" height="100%">
@@ -1147,7 +1147,7 @@ function TrackGeometryMeasurement( props ) {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="weight" fill="#0041DC" />
+              <Bar dataKey="weight" name="윤중" fill="#0041DC" />
             </BarChart>
           </ResponsiveContainer>
         </div>
