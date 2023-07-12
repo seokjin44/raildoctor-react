@@ -1,0 +1,9 @@
+.linearInfoBox{
+    width: 100%;
+    height: 100%;
+}
+
+.linearInfoBox canvas{
+    width: 100%;
+    height: 100%;
+}

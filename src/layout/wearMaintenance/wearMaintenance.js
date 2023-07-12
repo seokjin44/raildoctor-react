@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { Radio, Slider, DatePicker, Space, TimePicker } from "antd";
 import Modal from "../../component/Modal/Modal";
 import WearInfo from "../../component/WearInfo/WearInfo";
+import LinearInfo from "../../component/LinearInfo/LinearInfo";
+import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 
 const railroadSection = [
   {
@@ -15037,6 +15039,160 @@ const sideWearInfo = [
 		} */
 	];
 
+const linearInfo = [{
+  x: 10,
+  y: 50,
+  name: "1",
+  type: "line"
+}, {
+  x: 20,
+  y: 100,
+  name: "2",
+  type: "line"
+}, {
+  x: 30,
+  y: 100,
+  name: "3",
+  type: "dash"
+}, {
+  x: 35,
+  y: 80,
+  name: "4",
+  type: "line"
+}, {
+  x: 40,
+  y: 80,
+  name: "5",
+  type: "line"
+}, {
+  x: 50,
+  y: 60,
+  name: "6",
+  type: "line"
+}, {
+  x: 60,
+  y: 60,
+  name: "7",
+  type: "line"
+}, {
+  x: 70,
+  y: 0,
+  name: "8",
+  type: "line"
+}, {
+  x: 75,
+  y: 0,
+  name: "9",
+  type: "dash"
+}, {
+  x: 80,
+  y: 60,
+  name: "10",
+  type: "line"
+}, {
+  x: 85,
+  y: 60,
+  name: "11",
+  type: "line"
+}, {
+  x: 95,
+  y: 80,
+  name: "12",
+  type: "line"
+}, {
+  x: 100,
+  y: 80,
+  name: "13",
+  type: "line"
+}];
+
+const trackSpeed = [
+  {
+    trackType: -1,
+    data: [{
+      x: 0,
+      y: 40,
+      name: "14b687"
+    }, {
+      x: 10,
+      y: 40,
+      name: "14b687"
+    }, {
+      x: 30,
+      y: 40,
+      name: "14b687"
+    }, {
+      x: 40,
+      y: 0,
+      name: "14b687"
+    }, {
+      x: 50,
+      y: 40,
+      name: "14b687"
+    }, {
+      x: 60,
+      y: 40,
+      name: "14b687"
+    }, {
+      x: 70,
+      y: 50,
+      name: "14b687"
+    }, {
+      x: 75,
+      y: 50,
+      name: "14b687"
+    }, {
+      x: 80,
+      y: 42,
+      name: "14b687"
+    }, {
+      x: 85,
+      y: 42,
+      name: "14b687"
+    }, {
+      x: 95,
+      y: 0,
+      name: "14b687"
+    }, {
+      x: 100,
+      y: 30,
+      name: "14b687"
+    }]
+  },
+  {
+    trackType: 1,
+    data: [{
+      x: 20,
+      y: 25,
+      name: "14b687"
+    }, {
+      x: 40,
+      y: 75,
+      name: "14b687"
+    }, {
+      x: 60,
+      y: 75,
+      name: "14b687"
+    }, {
+      x: 80,
+      y: 45,
+      name: "14b687"
+    }, {
+      x: 100,
+      y: 65,
+      name: "14b687"
+    }, {
+      x: 120,
+      y: 40,
+      name: "14b687"
+    }, {
+      x: 140,
+      y: 35,
+      name: "14b687"
+    }]
+  }
+];
+
 const getInstrumentationPoint = (select) => {
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -15220,6 +15376,21 @@ const getInstrumentationPoint = (select) => {
       <div className="railStatusContainer">
         <RailStatus railroadSection={railroadSection} pathClick={pathClick}></RailStatus>
       </div>
+
+      <div className="graphGroup">
+        <div className="contentBox linearContainer mr15">
+          <div className="containerTitle tab">
+            <div className="tab select">선형정보</div>
+            <div className="tab">구배</div>
+          </div>
+          <div className="componentBox"><LinearInfo data={linearInfo}></LinearInfo></div>
+        </div>
+        <div className="contentBox speedContainer">
+          <div className="containerTitle">통과속도 정보</div>
+          <div className="componentBox"><TrackSpeed data={trackSpeed}></TrackSpeed></div>
+        </div>
+      </div>
+
       {/* <div className="graphLine h30 mb15"> */}
         <div className="contentBox pointContainer">
           <div className="containerTitle">지점정보</div>
