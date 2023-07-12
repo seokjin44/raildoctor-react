@@ -87,9 +87,10 @@ function Monitoring( props ) {
 
   useEffect(() => {
     trainImg.src= TrainIcon;
-    console.log(position);
-    drawRect(position.x, position.y);
-    minimapDrawing();
+    trainImg.onload = ()=>{
+      drawRect(position.x, position.y);
+      minimapDrawing();
+    };
   }, [position]);
 
   const handleMouseDown = (e) => {
@@ -197,7 +198,6 @@ function Monitoring( props ) {
     const canvas = trackDetailCanvasRef.current;
     const ctx = canvas.getContext('2d');
     const img = new Image();
-    //img.src = 'https://example.com/image.jpg'; // replace with your image url
     img.src= IncheonTrackImg;
     img.onload = function() {
       ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
