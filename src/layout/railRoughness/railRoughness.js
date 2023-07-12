@@ -646,6 +646,97 @@ function RailRoughness( props ) {
                     </div>
                   </div>
                 </div>
+                <div className="tr">
+                  <div className="td no">1</div>
+                  <div className="td regDate">23/5/31 4:20</div>
+                  <div className="td track">Left</div>
+                  <div className="td rail">Right</div>
+                  <div className="td station">15K242</div>
+                  <div className="td weld">TMW</div>
+                  <div className="td viewBtn">
+                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
+                      <img src={ReportIcon} />
+                    </div>
+                  </div>
+                </div>
+                <div className="tr">
+                  <div className="td no">2</div>
+                  <div className="td regDate">23/6/1 3:51</div>
+                  <div className="td track">Left</div>
+                  <div className="td rail">Right</div>
+                  <div className="td station">15K242</div>
+                  <div className="td weld">TMW</div>
+                  <div className="td viewBtn">
+                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
+                      <img src={ReportIcon} />
+                    </div>
+                  </div>
+                </div>
+                <div className="tr">
+                  <div className="td no">3</div>
+                  <div className="td regDate">23/6/12 1:15</div>
+                  <div className="td track">Left</div>
+                  <div className="td rail">Right</div>
+                  <div className="td station">15K242</div>
+                  <div className="td weld">TMW</div>
+                  <div className="td viewBtn">
+                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
+                      <img src={ReportIcon} />
+                    </div>
+                  </div>
+                </div>
+                <div className="tr">
+                  <div className="td no">4</div>
+                  <div className="td regDate">23/6/15 5:26</div>
+                  <div className="td track">Left</div>
+                  <div className="td rail">Right</div>
+                  <div className="td station">15K242</div>
+                  <div className="td weld">TMW</div>
+                  <div className="td viewBtn">
+                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
+                      <img src={ReportIcon} />
+                    </div>
+                  </div>
+                </div>
+                <div className="tr">
+                  <div className="td no">5</div>
+                  <div className="td regDate">23/6/17 5:17</div>
+                  <div className="td track">Left</div>
+                  <div className="td rail">Right</div>
+                  <div className="td station">15K242</div>
+                  <div className="td weld">TMW</div>
+                  <div className="td viewBtn">
+                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
+                      <img src={ReportIcon} />
+                    </div>
+                  </div>
+                </div>
+                <div className="tr">
+                  <div className="td no">6</div>
+                  <div className="td regDate">23/7/1 4:17</div>
+                  <div className="td track">Left</div>
+                  <div className="td rail">Right</div>
+                  <div className="td station">15K242</div>
+                  <div className="td weld">TMW</div>
+                  <div className="td viewBtn">
+                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
+                      <img src={ReportIcon} />
+                    </div>
+                  </div>
+                </div>
+                <div className="tr">
+                  <div className="td no">7</div>
+                  <div className="td regDate">23/7/10 4:28</div>
+                  <div className="td track">Left</div>
+                  <div className="td rail">Right</div>
+                  <div className="td station">15K242</div>
+                  <div className="td weld">TMW</div>
+                  <div className="td viewBtn">
+                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
+                      <img src={ReportIcon} />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
         </div>
