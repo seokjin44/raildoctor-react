@@ -6,6 +6,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/ko';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, 
+  ScatterChart, Scatter
+} from 'recharts';
 
 import Box from '@mui/material/Box';
 import Chart from 'chart.js/auto';
@@ -13,7 +16,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import {
+/* import {
   Chart as ChartJS,
   LinearScale,
   CategoryScale,
@@ -38,9 +41,9 @@ ChartJS.register(
   Tooltip,
   LineController,
   BarController
-);
+); */
 
-const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+/* const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
 export const optionsBar1 = {
   responsive: true,
   plugins: {
@@ -91,7 +94,6 @@ export const options = {
 export const data = {
   datasets: [
     {
-      /* label: 'A dataset', */
       data: Array.from({ length: 100 }, () => ({
         x: Faker.datatype.number({ min: 0, max: 500 }),
         y: Faker.datatype.number({ min: -100, max: 100 }),
@@ -99,7 +101,107 @@ export const data = {
       backgroundColor: '#0041DC',
     },
   ],
-};
+}; */
+
+const data1 = [
+  {
+    name: 'Page A',
+    uv: 4000,
+    pv: 2400,
+    amt: 2400,
+  },
+  {
+    name: 'Page B',
+    uv: 3000,
+    pv: 1398,
+    amt: 2210,
+  },
+  {
+    name: 'Page C',
+    uv: 2000,
+    pv: 9800,
+    amt: 2290,
+  },
+  {
+    name: 'Page D',
+    uv: 2780,
+    pv: 3908,
+    amt: 2000,
+  },
+  {
+    name: 'Page E',
+    uv: 1890,
+    pv: 4800,
+    amt: 2181,
+  },
+  {
+    name: 'Page F',
+    uv: 2390,
+    pv: 3800,
+    amt: 2500,
+  },
+  {
+    name: 'Page G',
+    uv: 3490,
+    pv: 4300,
+    amt: 2100,
+  },
+];
+
+
+const data2 = [
+  {
+    name: 'Page A',
+    uv: 4000,
+    pv: 2400,
+    amt: 2400,
+  },
+  {
+    name: 'Page B',
+    uv: 3000,
+    pv: 1398,
+    amt: 2210,
+  },
+  {
+    name: 'Page C',
+    uv: 2000,
+    pv: 9800,
+    amt: 2290,
+  },
+  {
+    name: 'Page D',
+    uv: 2780,
+    pv: 3908,
+    amt: 2000,
+  },
+  {
+    name: 'Page E',
+    uv: 1890,
+    pv: 4800,
+    amt: 2181,
+  },
+  {
+    name: 'Page F',
+    uv: 2390,
+    pv: 3800,
+    amt: 2500,
+  },
+  {
+    name: 'Page G',
+    uv: 3490,
+    pv: 4300,
+    amt: 2100,
+  },
+];
+
+const data3 = [
+  { x: 100, y: 200, z: 200 },
+  { x: 120, y: 100, z: 260 },
+  { x: 170, y: 300, z: 400 },
+  { x: 140, y: 250, z: 280 },
+  { x: 150, y: 400, z: 500 },
+  { x: 110, y: 280, z: 200 },
+];
 
 const railroadSection = [
   {
@@ -580,7 +682,7 @@ function TrackGeometryMeasurement( props ) {
   }, []);
   
   return (
-    <div className="trackDeviation" >
+    <div className="trackDeviation trackGeometryMeasurement" >
       <div className="railStatusContainer">
         <RailStatus railroadSection={railroadSection} pathClick={pathClick}></RailStatus>
       </div>
@@ -646,13 +748,13 @@ function TrackGeometryMeasurement( props ) {
         </div>
       </div>
       <div className="contentBoxGroup" style={{width: "100%", height: "238px", marginTop:"10px"}}>
-        <div className="contentBox" style={{marginRight: "0", width: "calc(100% - 20px - 600px - 330px - 60px)", height: "100%"}}>
+        <div className="contentBox" style={{marginRight: "10px", width: "calc(100% - 20px - 600px - 330px - 7px)", height: "100%"}}>
           <div className="containerTitle">측정위치</div>
           <div className="componentBox">
             <img src={PositionTestImage} style={{width:"100%", height:"100%"}} />
           </div>
         </div>
-        <div className="contentBox" style={{width:"600px", height:"100%", marginRight:"0"}}>
+        <div className="contentBox" style={{width:"600px", height:"100%", marginRight:"10px"}}>
           <div className="containerTitle">단기계측</div>
           <div className="componentBox">
             <div className="table" >
@@ -810,9 +912,65 @@ function TrackGeometryMeasurement( props ) {
       <div className="contentBox" style={{marginTop:"10px", height:"330px"}}>
         <div className="containerTitle">Chart</div>
         <div className="componentBox flex flexEnd">
-          <Scatter options={optionsScatter} data={data} />
+          {/* <Scatter options={optionsScatter} data={data} />
           <Bar options={optionsBar1} data={dataBar} />
-          <Bar options={optionsBar2} data={dataBar} />
+          <Bar options={optionsBar2} data={dataBar} /> */}
+          <ResponsiveContainer width="100%" height="100%">
+            <ScatterChart
+              margin={{
+                top: 20,
+                right: 20,
+                bottom: 20,
+                left: 20,
+              }}
+            >
+              <CartesianGrid />
+              <XAxis type="number" dataKey="x" name="stature" unit="cm" />
+              <YAxis type="number" dataKey="y" name="weight" unit="kg" />
+              <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+              <Scatter name="A school" data={data3} fill="#0041DC" />
+            </ScatterChart>
+          </ResponsiveContainer>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              width={500}
+              height={300}
+              data={data2}
+              margin={{
+                top: 5,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="pv" fill="#0041DC" />
+            </BarChart>
+          </ResponsiveContainer>
+          <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+              width={500}
+              height={300}
+              data={data2}
+              margin={{
+                top: 5,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="pv" fill="#0041DC" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 

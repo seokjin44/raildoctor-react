@@ -10,6 +10,7 @@ import Position from "../../assets/zodo.png";
 import Radio from '@mui/joy/Radio';
 import RadioGroup from '@mui/joy/RadioGroup';
 import IncheonTrackImg from "../../assets/incheon_track2.png";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 import Box from '@mui/material/Box';
 import ChartAuto from 'chart.js/auto';
@@ -17,7 +18,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import {
+/* import {
   Chart as ChartJS,
   LinearScale,
   CategoryScale,
@@ -73,6 +74,52 @@ export const data = {
     },
   ],
 };
+ */
+
+const data1 = [
+  {
+    name: 'Page A',
+    uv: 4000,
+    pv: 2400,
+    amt: 2400,
+  },
+  {
+    name: 'Page B',
+    uv: 3000,
+    pv: 1398,
+    amt: 2210,
+  },
+  {
+    name: 'Page C',
+    uv: 2000,
+    pv: 9800,
+    amt: 2290,
+  },
+  {
+    name: 'Page D',
+    uv: 2780,
+    pv: 3908,
+    amt: 2000,
+  },
+  {
+    name: 'Page E',
+    uv: 1890,
+    pv: 4800,
+    amt: 2181,
+  },
+  {
+    name: 'Page F',
+    uv: 2390,
+    pv: 3800,
+    amt: 2500,
+  },
+  {
+    name: 'Page G',
+    uv: 3490,
+    pv: 4300,
+    amt: 2100,
+  },
+];
 
 const railroadSection = [
   {
@@ -595,7 +642,7 @@ function RailTrackAlignment( props ) {
       ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
       ctx.save(); // Save the current state of the context
       ctx.translate(trackDetailPosition.x, trackDetailPosition.y); // Apply translation
-      ctx.scale(scale, scale); // Apply scaling 
+      ctx.scale(scale, 0.285); // Apply scaling 
       ctx.drawImage(img, 0, 0, img.width, img.height); // Draw the image
       ctx.restore(); // Restore the context to its saved state
     };
@@ -674,7 +721,28 @@ function RailTrackAlignment( props ) {
           </div>
           <div className="chartBox">
             <div className="curLine"></div>
-            <Chart type='bar' data={data} />
+            {/* <Chart type='bar' data={data} /> */}
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                width={500}
+                height={300}
+                data={data1}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
+                <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>

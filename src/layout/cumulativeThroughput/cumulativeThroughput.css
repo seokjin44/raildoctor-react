@@ -141,3 +141,18 @@
 .cumulativeThroughput .componentBox .optionBox.borderColorGreen{
     border-color: #70AD47;
 }
+
+.cumulativeThroughput .componentBox .searchOption{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.cumulativeThroughput .table .tableHeader .tr .td, 
+.cumulativeThroughput .table .tableBody .tr .td {
+    width: 100%;
+}
+.cumulativeThroughput .table .tableBody{
+    display: block;
+    overflow: auto;
+}
