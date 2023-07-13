@@ -8,6 +8,7 @@ import Modal from "../../component/Modal/Modal";
 import WearInfo from "../../component/WearInfo/WearInfo";
 import LinearInfo from "../../component/LinearInfo/LinearInfo";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
+import Speed from "../../assets/demo/speed.png";
 
 const railroadSection = [
   {
@@ -492,14 +493,14 @@ const instrumentationPoint = [
     "track_type": 0,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 5,
     "name": "Point4",
     "location": 950,
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 6,
     "name": "Point5",
@@ -540,7 +541,7 @@ const instrumentationPoint = [
     "track_type": 0,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 11,
     "name": "Point11",
     "location": 14860,
@@ -555,7 +556,7 @@ const instrumentationPoint = [
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 13,
     "name": "Point13",
@@ -564,22 +565,22 @@ const instrumentationPoint = [
     "track_type": 0,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 14,
     "name": "Point14",
     "location": 14909,
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
-  {
+  }, */
+  /* {
     "id": 15,
     "name": "Point15",
     "location": 14920,
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 16,
     "name": "Point16",
@@ -588,14 +589,14 @@ const instrumentationPoint = [
     "track_type": 0,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 17,
     "name": "Point17",
     "location": 14965,
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 18,
     "name": "Point18",
@@ -604,7 +605,7 @@ const instrumentationPoint = [
     "track_type": 0,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 19,
     "name": "Point19",
     "location": 15000,
@@ -619,7 +620,7 @@ const instrumentationPoint = [
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 21,
     "name": "Point21",
@@ -628,14 +629,14 @@ const instrumentationPoint = [
     "track_type": 0,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 22,
     "name": "Point22",
     "location": 15100,
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 23,
     "name": "Point23",
@@ -644,14 +645,14 @@ const instrumentationPoint = [
     "track_type": 0,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 24,
     "name": "Point24",
     "location": 15180,
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 25,
     "name": "Point25",
@@ -676,23 +677,23 @@ const instrumentationPoint = [
     "track_type": 0,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 28,
     "name": "Point28",
     "location": 15350,
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
-  {
+  }, */
+  /* {
     "id": 29,
     "name": "Point29",
     "location": 15400,
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
-  {
+  }, */
+  /* {
     "id": 30,
     "name": "Point30",
     "location": 15450,
@@ -707,7 +708,7 @@ const instrumentationPoint = [
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 32,
     "name": "Point32",
@@ -716,14 +717,14 @@ const instrumentationPoint = [
     "track_type": 0,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 33,
     "name": "Point33",
     "location": 15560,
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 34,
     "name": "Point34",
@@ -740,22 +741,22 @@ const instrumentationPoint = [
     "track_type": 0,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 36,
     "name": "Point36",
     "location": 15650,
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
-  {
+  }, */
+  /* {
     "id": 37,
     "name": "Point37",
     "location": 15680,
     "updated": "2022-11-25 00:00:00",
     "track_type": 0,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 38,
     "name": "Point38",
@@ -812,31 +813,31 @@ const instrumentationPoint = [
     "track_type": 1,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 45,
     "name": "Point52",
     "location": 14863,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
-  {
+  }, */
+  /* {
     "id": 46,
     "name": "Point53",
     "location": 14900,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
-  {
+  }, */
+  /* {
     "id": 47,
     "name": "Point54",
     "location": 14909,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
-  {
+  }, */
+  /* {
     "id": 48,
     "name": "Point55",
     "location": 14920,
@@ -851,7 +852,7 @@ const instrumentationPoint = [
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 50,
     "name": "Point57",
@@ -860,22 +861,22 @@ const instrumentationPoint = [
     "track_type": 1,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 51,
     "name": "Point58",
     "location": 14998,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
-  {
+  }, */
+  /* {
     "id": 52,
     "name": "Point59",
     "location": 15000,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 53,
     "name": "Point60",
@@ -892,14 +893,14 @@ const instrumentationPoint = [
     "track_type": 1,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 55,
     "name": "Point62",
     "location": 15100,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 56,
     "name": "Point63",
@@ -908,22 +909,22 @@ const instrumentationPoint = [
     "track_type": 1,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 57,
     "name": "Point64",
     "location": 15180,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
-  {
+  }, */
+  /* {
     "id": 58,
     "name": "Point65",
     "location": 15200,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 59,
     "name": "Point66",
@@ -940,23 +941,23 @@ const instrumentationPoint = [
     "track_type": 1,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 61,
     "name": "Point68",
     "location": 15350,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
-  {
+  }, */
+  /* {
     "id": 62,
     "name": "Point69",
     "location": 15400,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
-  {
+  }, */
+  /* {
     "id": 63,
     "name": "Point70",
     "location": 15450,
@@ -971,15 +972,15 @@ const instrumentationPoint = [
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
-  {
+  }, */
+  /* {
     "id": 65,
     "name": "Point72",
     "location": 15550,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 66,
     "name": "Point73",
@@ -996,22 +997,22 @@ const instrumentationPoint = [
     "track_type": 1,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 68,
     "name": "Point75",
     "location": 15640,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
-  {
+  }, */
+  /* {
     "id": 69,
     "name": "Point76",
     "location": 15650,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 70,
     "name": "Point77",
@@ -1020,14 +1021,14 @@ const instrumentationPoint = [
     "track_type": 1,
     "railroad_id": 0
   },
-  {
+  /* {
     "id": 71,
     "name": "Point78",
     "location": 15700,
     "updated": "2022-11-25 00:00:00",
     "track_type": 1,
     "railroad_id": 0
-  },
+  }, */
   {
     "id": 72,
     "name": "Point79",
@@ -15387,7 +15388,10 @@ const getInstrumentationPoint = (select) => {
         </div>
         <div className="contentBox speedContainer">
           <div className="containerTitle">통과속도 정보</div>
-          <div className="componentBox"><TrackSpeed data={trackSpeed}></TrackSpeed></div>
+          <div className="componentBox">
+            {/* <TrackSpeed data={trackSpeed}></TrackSpeed> */}
+            <img src={Speed} />
+          </div>
         </div>
       </div>
 

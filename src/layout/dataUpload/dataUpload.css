@@ -1,0 +1,191 @@
+.dataUpload{
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    padding: 10px;
+    background-color: #F2F3F8;
+}
+
+.dataUpload .uploadMenu{
+    width: 300px;
+    height: 100%;
+    box-shadow: 1px 1px 8px #00000021;
+    background-color: white;
+    border-radius: 5px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+}
+
+.dataUpload .uploadMenu .title{
+    height: 80px;
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #5f5f5f;
+}
+
+.dataUpload .uploadMenu .title img{
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+}
+
+.dataUpload .uploadMenu .line{
+    height: 1px;
+    width: 80%;
+    background-color: #cccccc;
+}
+
+.dataUpload .uploadMenu .menu{
+    width: calc(60% - 30px);
+    height: 40px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    background-color: #f5f5f5;
+    border-radius: 20px;
+    margin-top: 15px;
+    padding-left: 45px;
+
+    background-image: url(../../assets/icon/arrow_b2.png);
+    background-position: 12% 50%;
+    background-size: 20px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+
+.dataUpload .uploadMenu .menu.active{
+    background-image: url(../../assets/icon/arrow_w.png);
+    background-color: #44546a;
+    color: white;
+}
+
+
+.dataUpload .uploadMenu .menu img{
+    width: 20px;
+    margin-right: 5px;
+}
+
+.dataUpload .uploadHistory{
+    width: calc(100% - 300px);
+    margin-left: 10px;
+    height: calc(100% - 110px);
+    box-shadow: 1px 1px 8px #00000021;
+    background-color: white;
+    border-radius: 5px;
+    position: relative;
+    padding-top: 110px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dataUpload .uploadHistory .title{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.dataUpload .uploadHistory .uploadBtn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #44546a;
+    width: 120px;
+    height: 30px;
+    border-radius: 15px;
+    position: absolute;
+    right: 15px;
+    top: 80px;
+    color: white;
+}
+
+.dataUpload .uploadHistory .uploadBtn img{
+    width: 20px;
+    margin-right: 5px;
+}
+
+.table3{
+    width: calc(100% - 0px);
+    height: calc(100% - 40px);
+    border-radius: 5px;
+    border: 1px solid #cccccc;
+    padding: 10px 0px 10px 0px;
+    margin: 10px;
+}
+
+.table3 .tableHeader{
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.table3 .tableHeader .tr,
+.table3 .tableBody .tr{
+    width: 100%;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    height: 32px;
+    border-bottom: 1px solid #cccccc73;
+}
+
+.table3 .tableHeader .tr .td.no,
+.table3 .tableBody .tr .td.no{
+    width: 5%;
+}
+
+.table3 .tableHeader .tr .td.upload,
+.table3 .tableBody .tr .td.upload{
+    width: 20%;
+}
+
+.table3 .tableHeader .tr .td.member,
+.table3 .tableBody .tr .td.member{
+    width: 20%;
+}
+
+.table3 .tableHeader .tr .td.file,
+.table3 .tableBody .tr .td.file{
+    width: 20%;
+}
+
+.table3 .tableHeader .tr .td.download,
+.table3 .tableBody .tr .td.download{
+    width: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.table3 .tableBody .tr{
+    height: 50px;
+}
+
+.donwloadBtn{
+    width: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #44546a;
+    width: 100px;
+    height: 30px;
+    border-radius: 15px;
+    color: white;
+}
+
+.donwloadBtn img{
+    width: 20px;
+    height: 20px;
+}

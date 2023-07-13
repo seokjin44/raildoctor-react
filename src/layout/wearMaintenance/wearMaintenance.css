@@ -119,6 +119,18 @@
     width: 50%;
     height: 100%;
 }
+.graphGroup .speedContainer .componentBox{
+    margin-right: 5px;
+    width: calc(100% - 5px);
+    overflow: hidden;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    height: calc(100% - 35px);
+}
+
+.graphGroup .speedContainer .componentBox img{
+    height: 100%;
+}
 
 .linearContainer .containerTitle.tab{
     padding-left: 5px;
