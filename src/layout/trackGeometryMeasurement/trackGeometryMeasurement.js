@@ -1,6 +1,6 @@
 import "./trackGeometryMeasurement.css";
 import { useEffect, useState } from "react";
-import PositionTestImage from "../../assets/2023-07-09_21_48_42.png";
+import PositionTestImage from "../../assets/2023-07-13_13_55_48.png";
 import RailStatus from "../../component/railStatus/railStatus";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -895,8 +895,7 @@ function TrackGeometryMeasurement( props ) {
                   <MenuItem>윤중</MenuItem>
                   <MenuItem>횡압</MenuItem>
                   <MenuItem>레일저부응력</MenuItem>
-                  <MenuItem>레일수평범위</MenuItem>
-                  <MenuItem>레일수직범위</MenuItem>
+                  <MenuItem>레일수평변위</MenuItem>
                   <MenuItem>레일수직변위</MenuItem>
                   <MenuItem>레일수직가속도</MenuItem>
                   <MenuItem>열차속도</MenuItem>
@@ -927,13 +926,13 @@ function TrackGeometryMeasurement( props ) {
         </div>
       </div>
       <div className="contentBoxGroup" style={{width: "100%", height: "238px", marginTop:"10px"}}>
-        <div className="contentBox" style={{marginRight: "10px", width: "calc(100% - 20px - 600px - 330px - 7px)", height: "100%"}}>
+        <div className="contentBox" style={{marginRight: "10px", width: "calc(100% - 20px - 800px - 330px - 7px)", height: "100%"}}>
           <div className="containerTitle">측정위치</div>
           <div className="componentBox">
             <img src={PositionTestImage} style={{width:"100%", height:"100%"}} />
           </div>
         </div>
-        <div className="contentBox" style={{width:"600px", height:"100%", marginRight:"10px"}}>
+        <div className="contentBox" style={{width:"800px", height:"100%", marginRight:"10px"}}>
           <div className="containerTitle">단기계측</div>
           <div className="componentBox">
             <div className="table" >
@@ -944,21 +943,33 @@ function TrackGeometryMeasurement( props ) {
                   <div className="td point"></div>
                   <div className="td point rowspan2"><div className="rowspan2">(하)15k503</div></div>
                   <div className="td point"></div>
+                  <div className="td point rowspan2"><div className="rowspan2">(하)15k065</div></div>
+                  <div className="td point"></div>
                   <div className="td point rowspan2"><div className="rowspan2">(상)15k110</div></div>
                   <div className="td point"></div>
-                  <div className="td point rowspan2"><div className="rowspan2">(하)16k065</div></div>
+                  <div className="td point rowspan2"><div className="rowspan2">(상)15k230</div></div>
+                  <div className="td point"></div>
+                  <div className="td point rowspan2"><div className="rowspan2">(상)15k290</div></div>
+                  <div className="td point"></div>
+                  <div className="td point rowspan2"><div className="rowspan2">(하)15k400</div></div>
                   <div className="td point"></div>
                 </div>
                 <div className="tr">
                   <div className="td detail"></div>
-                  <div className="td point">point 8</div>
-                  <div className="td point">point 7</div>
-                  <div className="td point">point 6</div>
-                  <div className="td point">point 5</div>
-                  <div className="td point">point 4</div>
-                  <div className="td point">point 3</div>
-                  <div className="td point">point 2</div>
-                  <div className="td point">point 1</div>
+                  <div className="td point">좌 </div>
+                  <div className="td point">우</div>
+                  <div className="td point">좌</div>
+                  <div className="td point">우</div>
+                  <div className="td point">좌</div>
+                  <div className="td point">우</div>
+                  <div className="td point">좌</div>
+                  <div className="td point">우</div>
+                  <div className="td point">좌</div>
+                  <div className="td point">우</div>
+                  <div className="td point">좌</div>
+                  <div className="td point">우</div>
+                  <div className="td point">좌</div>
+                  <div className="td point">우</div>
                 </div>
               </div>
               <div className="tableBody">
@@ -972,6 +983,12 @@ function TrackGeometryMeasurement( props ) {
                   <div className="td point">1</div>
                   <div className="td point">1</div>
                   <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
                 </div>
                 <div className="tr">
                   <div className="td detail">횡압(L)</div>
@@ -981,6 +998,12 @@ function TrackGeometryMeasurement( props ) {
                   <div className="td point">1</div>
                   <div className="td point">1</div>
                   <div className="td point">1</div>
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
                   <div className="td point">1</div>
                   <div className="td point">1</div> 
                 </div>
@@ -994,11 +1017,17 @@ function TrackGeometryMeasurement( props ) {
                   <div className="td point">1</div>
                   <div className="td point">1</div>
                   <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
                 </div>
 
                 <div className="tr">
                   <div className="td detail">레일수평변위</div>
-                  <div className="td point">1(외측)</div>
+                  <div className="td point" style={{ fontSize: "1px"}} >1(외측)</div>
                   <div className="td point">-</div>
                   <div className="td point">1</div>
                   <div className="td point">1</div>
@@ -1006,10 +1035,16 @@ function TrackGeometryMeasurement( props ) {
                   <div className="td point">1</div>
                   <div className="td point">1</div>
                   <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div>
+                  <div className="td point">1</div>
+                  <div className="td point">1</div>  
                 </div>
                 <div className="tr">
                   <div className="td detail">레일수직변위</div>
-                  <div className="td point">1(외측)</div>
+                  <div className="td point" style={{ fontSize: "1px"}} >1(외측)</div>
                   <div className="td point">-</div>
                   <div className="td point">1</div>
                   <div className="td point">1</div>
@@ -1017,15 +1052,27 @@ function TrackGeometryMeasurement( props ) {
                   <div className="td point">1</div>
                   <div className="td point">1</div>
                   <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
                 </div>
                 <div className="tr">
-                  <div className="td detail">레일수직가속도</div>
+                  <div className="td detail" style={{fontSize: "12px"}}>레일수직가속도</div>
                   <div className="td point">1</div>
                   <div className="td point">1</div>
                   <div className="td point">1</div>
                   <div className="td point">1</div>
                   <div className="td point">1</div>
                   <div className="td point">1</div>
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
+                  <div className="td point">1</div>
+                  <div className="td point">1</div> 
                   <div className="td point">1</div>
                   <div className="td point">1</div> 
                 </div>
@@ -1048,9 +1095,9 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail2"></div>
                   <div className="td point2">좌</div>
-                  <div className="td point2">point 3</div>
-                  <div className="td point2">point 2</div>
-                  <div className="td point2">point 1</div>
+                  <div className="td point2">우</div>
+                  <div className="td point2">좌</div>
+                  <div className="td point2">우</div>
                 </div>
               </div>
               <div className="tableBody">
