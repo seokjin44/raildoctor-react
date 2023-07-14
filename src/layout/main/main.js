@@ -18,6 +18,7 @@ import MeasuringTemperatureHumidity from "../measuringTemperatureHumidity/measur
 import RailProfile from "../railProfile/railProfile";
 import RailRoughness from "../railRoughness/railRoughness";
 import RailTrackAlignment from "../railTrackAlignment/railTrackAlignment";
+import DataUpload from "../dataUpload/dataUpload";
 
 const ProtectedRoute = ({ user, children }) => {
   const isAuth = () => {
@@ -63,7 +64,7 @@ function Main( props ) {
               <Route path="/railRoughness" element={<ProtectedRoute><RailRoughness/></ProtectedRoute>} />
               <Route path="/railTrackAlignment" element={<ProtectedRoute><RailTrackAlignment/></ProtectedRoute>} />
 
-              <Route path="/login" element={<Login memberList={props.memberList} />} />
+              <Route path="/dataUpload" element={<ProtectedRoute><DataUpload/></ProtectedRoute>} />
           </Routes> 
         </div>
         <div className="footer"></div>

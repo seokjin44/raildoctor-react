@@ -22,7 +22,7 @@ class PlaceInfo extends React.Component {
 			tickSize: 10,
 			axisColor: "#555",
 			pointRadius: 5,
-			font: "12pt Calibri",
+			font: "12pt NEO_R",
 
 			fontHeight: 12,
 
@@ -84,7 +84,7 @@ class PlaceInfo extends React.Component {
 		this.state.tickSize = 10;
 		this.state.axisColor = "#555";
 		this.state.pointRadius = 5;
-		this.state.font = "12pt Calibri";
+		this.state.font = "10pt NEO_R";
 
 		this.state.fontHeight = 12;
 
@@ -133,7 +133,7 @@ class PlaceInfo extends React.Component {
 		context.lineWidth = 2;
 		context.stroke();
 
-		context.font = "bold 12pt Calibri";
+		context.font = "bold 12pt NEO_R";
 		context.fillStyle = "black";
 		context.textAlign = "left";
 

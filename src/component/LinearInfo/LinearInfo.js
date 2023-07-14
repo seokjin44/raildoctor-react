@@ -125,7 +125,7 @@ class LinearInfo extends React.Component {
 
     context.save();
 
-    context.font = "bold 10pt Calibri";
+    context.font = "bold 10pt NEO_R";
 
     let n = this.state.numYTicks / 4;
     context.fillText("선형정보", this.state.padding / 2, n * this.state.height / this.state.numYTicks + this.state.y);

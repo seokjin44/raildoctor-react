@@ -1,6 +1,6 @@
 import "./trackGeometryMeasurement.css";
 import { useEffect, useState } from "react";
-import PositionTestImage from "../../assets/2023-07-13_13_55_48.png";
+import PositionTestImage from "../../assets/2023-07-13_16_45_35.png";
 import RailStatus from "../../component/railStatus/railStatus";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -933,7 +933,7 @@ function TrackGeometryMeasurement( props ) {
           </div>
         </div>
         <div className="contentBox" style={{width:"800px", height:"100%", marginRight:"10px"}}>
-          <div className="containerTitle">단기계측</div>
+          <div className="containerTitle">장기계측</div>
           <div className="componentBox">
             <div className="table" >
               <div className="tableHeader">
@@ -1151,7 +1151,7 @@ function TrackGeometryMeasurement( props ) {
               }}
             >
               <CartesianGrid />
-              <XAxis type="category" dataKey="time" name="time"  />
+              <XAxis type="category" dataKey="time" name="time" fontSize={9}  />
               <YAxis type="number" dataKey="weight" name="weight" />
               <Tooltip cursor={{ strokeDasharray: '3 3' }} />
               <Scatter name="A school" data={data3} fill="#0041DC" />

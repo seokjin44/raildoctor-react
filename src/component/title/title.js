@@ -26,6 +26,7 @@ function Title() {
           <div className={ classnames("menu",{ active : location.pathname.indexOf("railProfile") > -1 }) } onClick={()=>{navigate("/railProfile",{});}} >레일프로파일</div>
           <div className={ classnames("menu",{ active : location.pathname.indexOf("railRoughness") > -1 }) } onClick={()=>{navigate("/railRoughness",{});}} >레일직진도</div>
           <div className={ classnames("menu",{ active : location.pathname.indexOf("railTrackAlignment") > -1 }) } onClick={()=>{navigate("/railTrackAlignment",{});}} >레일조도</div>
+          <div className={ classnames("menu",{ active : location.pathname.indexOf("dataUpload") > -1 }) } onClick={()=>{navigate("/dataUpload",{});}} >데이터관리</div>
         </div>
         <div className="userInfo">
             <UserInformation userId={""}></UserInformation>
