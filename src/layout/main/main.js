@@ -63,6 +63,7 @@ function Main( props ) {
               <Route path="/railProfile" element={<ProtectedRoute><RailProfile/></ProtectedRoute>} />
               <Route path="/railRoughness" element={<ProtectedRoute><RailRoughness/></ProtectedRoute>} />
               <Route path="/railTrackAlignment" element={<ProtectedRoute><RailTrackAlignment/></ProtectedRoute>} />
+              <Route path="/login" element={<Login memberList={props.memberList} />} />
 
               <Route path="/dataUpload" element={<ProtectedRoute><DataUpload/></ProtectedRoute>} />
           </Routes> 
