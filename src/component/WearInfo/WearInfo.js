@@ -17,6 +17,17 @@ class WearInfo extends React.Component {
                     zoom: {
                         enabled: false,
                         autoScaleYaxis: false,
+                    },
+                    fontFamily: 'NEO_R'
+                },
+                yaxis: {
+                    title: {
+                      text: this.props.title,
+                    }
+                },
+                xaxis: {
+                    title: {
+                      text: '통과톤수 (MGT)'
                     }
                 },
                 markers: {
@@ -41,7 +52,7 @@ class WearInfo extends React.Component {
                         lines: {
                             show: true
                         }
-                    }
+                    },
                 },
                 legend: {
                     markers: {

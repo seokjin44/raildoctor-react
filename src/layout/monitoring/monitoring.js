@@ -15421,10 +15421,10 @@ function Monitoring( props ) {
                   </div>
                   <div className="componentBox separationBox">
                     <div className="componentBox" id="directWearInfo">
-                      <WearInfo title="직마모" data={directWearInfo}></WearInfo>
+                      <WearInfo title="직마모" data={directWearInfo} yTitle="직마모(mm)"></WearInfo>
                     </div>
                     <div className="componentBox" id="sideWearInfo">
-                      <WearInfo title="편마모" data={sideWearInfo}></WearInfo>
+                      <WearInfo title="편마모" data={sideWearInfo} yTitle="편마모(mm)"></WearInfo>
                     </div>
                   </div>
                 </div>

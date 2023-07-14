@@ -50,7 +50,7 @@
 
 .searchContainer{
     /* background-color: rgb(255, 0, 140); */
-    width: 20%;
+    width: 35%;
     height: 100%;
 }
 
@@ -100,6 +100,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 335px;
 }
 
 .graphGroup{
@@ -153,4 +154,86 @@
 
 .linearContainer .containerTitle .tab.select{
     background-color: white;
+}
+
+.graphSection{
+    width: 100%;
+    height: calc(100% - 114px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.graphSection .leftContainer{
+    width: 30%;
+    height: 100%;
+    margin-right: 10px;
+}
+
+.graphSection .rightContainer{
+    width: 70%;
+    height: 100%;
+}
+
+.wearMaintenance .componentBox .radioButtons {
+    width: 200px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #cccccc;
+    margin-right: 5px;
+    border-radius: 5px;
+}
+
+.wearMaintenance .componentBox .distanceSearch {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    height: 100%;
+}
+
+.wearMaintenance .componentBox .distanceSearch input.local {
+    border: none;
+    border-bottom: 1px solid #cccccc;
+    margin-right: 10px;
+    margin-left: 10px;
+    width: 70px;
+    text-align: center;
+    font-size: 17px;
+    font-family: 'NEO_R';
+}
+
+.wearMaintenance .componentBox .position {
+    width: 300px;
+    height: 100%;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    margin-right: 5px;
+    border-radius: 5px;
+    border: 1px solid #cccccc;
+    padding-right: 5px;
+}
+
+.wearMaintenance .contentBox{
+    width: calc(100% - 2px);
+}
+
+.wearMaintenance .componentBox .curDate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    height: 100%;
+}
+
+.wearMaintenance .table .tableHeader .tr .td,
+.wearMaintenance .table .tableBody .tr .td{
+    width: 100%;
 }

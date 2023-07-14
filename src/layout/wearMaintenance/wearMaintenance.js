@@ -2,13 +2,24 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./wearMaintenance.css";
 import PlaceInfo from "../../component/PlaceInfo/PlaceInfo";
 import RailStatus from "../../component/railStatus/railStatus";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Radio, Slider, DatePicker, Space, TimePicker } from "antd";
 import Modal from "../../component/Modal/Modal";
 import WearInfo from "../../component/WearInfo/WearInfo";
 import LinearInfo from "../../component/LinearInfo/LinearInfo";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import Speed from "../../assets/demo/speed.png";
+import IncheonTrackImg from "../../assets/track/incheon_track2.png";
+import MuiRadio from '@mui/joy/Radio';
+import RadioGroup from '@mui/joy/RadioGroup';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import 'dayjs/locale/ko';
+
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 const railroadSection = [
   {
@@ -15242,7 +15253,25 @@ const getInstrumentationPoint = (select) => {
   const [wearData, setWearData] = useState({
     directWearInfo: [],
     sideWearInfo: [],
-  })
+  });
+  const trackDetailCanvasRef = useRef(null);
+  const [trackDetailPosition, setTrackDetailPosition] = useState({x: 0, y: 0});
+  const [scale, setScale] = useState(1);
+
+  const trackDetailDrawImage = () => {
+    const canvas = trackDetailCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src= IncheonTrackImg;
+    img.onload = function() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+      ctx.save(); // Save the current state of the context
+      ctx.translate(trackDetailPosition.x, trackDetailPosition.y); // Apply translation
+      ctx.scale(0.65, 0.22); // Apply scaling 
+      ctx.drawImage(img, -8000, -150, img.width, img.height); // Draw the image
+      ctx.restore(); // Restore the context to its saved state
+    };
+  }
 
   const pathClick = (select) => {
     console.log(select);
@@ -15369,7 +15398,14 @@ const getInstrumentationPoint = (select) => {
   }
 
   useEffect(() => {
+    
+    let trackDetailContainer = document.getElementById("trackDetailContainer");
+    let trackDetailCanvas = trackDetailCanvasRef.current;
+    trackDetailCanvas.width = trackDetailContainer.clientWidth;
+    trackDetailCanvas.height = trackDetailContainer.clientHeight;
+
     makeDummyWear3dData();
+    trackDetailDrawImage();
   }, []);
   
   return (
@@ -15378,7 +15414,7 @@ const getInstrumentationPoint = (select) => {
         <RailStatus railroadSection={railroadSection} pathClick={pathClick}></RailStatus>
       </div>
 
-      <div className="graphGroup">
+      {/* <div className="graphGroup">
         <div className="contentBox linearContainer mr15">
           <div className="containerTitle tab">
             <div className="tab select">선형정보</div>
@@ -15389,95 +15425,311 @@ const getInstrumentationPoint = (select) => {
         <div className="contentBox speedContainer">
           <div className="containerTitle">통과속도 정보</div>
           <div className="componentBox">
-            {/* <TrackSpeed data={trackSpeed}></TrackSpeed> */}
             <img src={Speed} />
           </div>
         </div>
-      </div>
-
-      {/* <div className="graphLine h30 mb15"> */}
-        <div className="contentBox pointContainer">
-          <div className="containerTitle">지점정보</div>
-          <div className="componentBox"><PlaceInfo path={selectedPath} instrumentationPoint={instrumentationPoint}></PlaceInfo></div>
-        </div>
-      {/* </div> */}
-    <div className="mamoGraphContainer">
-      <div className="contentBox searchContainer mr15">
-        <div className="containerTitle">조회 조건</div>
-        <div className="componentBox">
-          <div className="flex flexDirectionColumn margin10" style={{"height": "calc(100% - 20px)", "justify-content": "space-between"}}>
-            <div>
-              <div className="flex textBold">계측 위치</div>
-              <div className="flex">
-                <select id="wearSearchPoint" style={{width: '100px', }}>
-                  <option>-------------</option>
-                  {
-                    instrumentationPoint.map(function(point) {
-                      return <option value={point.location}>{point.name}</option>
-                    })
-                  }
-                </select>
+      </div> */}
+      <div className="scrollContainer" style={{ width: "100%", height: "calc(100% - 0px)", overflow: "auto"}}>
+        <div className="graphSection">
+          <div className="leftContainer">
+            <div className="contentBox linearContainer mr15" style={{marginBottom:"10px", height:"362px"}}>
+              <div className="containerTitle tab">
+                <div className="tab select">선형정보</div>
+                <div className="tab">구배</div>
+              </div>
+              <div className="componentBox" id="trackDetailContainer">
+                <canvas id="trackDetailCanvas"
+                    ref={trackDetailCanvasRef}
+                    /* onMouseDown={(e)=>{trackDetailHandleMouseDown(e)}}
+                    onMouseUp={(e)=>{trackDetailHandleMouseUp()}}
+                    onMouseMove={(e)=>{trackDetailHandleMouseMove(e)}} */
+                />
               </div>
             </div>
-            <div>
-              <div className="flex bothEnds">
-                <label className="textBold">계측기간</label>
-                <div className="flex" style={{fontWeight: "600", fontSize: "12px;"}}>
-                  <div id="startWearDate">{timeFormatDate(wearSearchCondition.startDate)}</div>
-                  <div>~</div>
-                  <div id="endWearDate">{timeFormatDate(wearSearchCondition.endDate)}</div>
-                </div>
+            <div className="contentBox speedContainer" style={{height:"272px"}}>
+              <div className="containerTitle">통과속도 정보</div>
+              <div className="componentBox" style={{ marginRight: "10px", width: "calc(100% - 10px)", overflow: "hidden"}}>
+                <img src={Speed} />
               </div>
-              <div className="flex" tyle={{height:'30px'}}>
-                <div className="sliderContainer">
-                  <Slider range={{ draggableTrack: true }} min={new Date().getTime() - (31536000000 * 7)} max={new Date().getTime()} defaultValue={[new Date().getTime() - (31536000000 * 7), new Date().getTime()]} tooltip={{ open: false, }} onChange={onChangeTimeSlider} step={86400000}/>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="flex bothEnds">
-                <label className="textBold">통과톤수</label>
-                <div className="flex textBold" style={{fontWeight: "600", fontSize: "12px;"}}>
-                  <div id="startWearMGT">{wearSearchCondition.startMGT}</div>
-                  <div>~</div>
-                  <div id="endWearMGT">{wearSearchCondition.endMGT}</div>
-                  <div style={{marginLeft: "5px"}}>MGT</div>
-                </div>
-              </div>
-              <div className="flex">
-                <div className="sliderContainer">
-                  <Slider range={{ draggableTrack: true }} min={0} max={3000} defaultValue={[0, 3000]} tooltip={{ open: false, }} onChange={onChangeMgtSlider} step={50}/>
-                </div>
-              </div>
-            </div>
-            <div className="flex flexCenter">
-              <button className="searchButton" onClick={onClickWearSearch}>조회</button>
             </div>
           </div>
+          <div className="rightContainer">
+            <div className="contentBox pointContainer">
+              <div className="containerTitle">지점정보</div>
+              <div className="componentBox"><PlaceInfo path={selectedPath} instrumentationPoint={instrumentationPoint}></PlaceInfo></div>
+            </div>
+            <div className="mamoGraphContainer">
+              <div className="contentBox searchContainer mr15" style={{width:"35%"}}>
+                <div className="containerTitle">조회 조건</div>
+                <div className="componentBox">
+                  <div className="flex flexDirectionColumn margin10" style={{"height": "calc(100% - 20px)", "justify-content": "space-between"}}>
+                    <div>
+                      <div className="flex textBold">계측 위치</div>
+                      <div className="flex">
+                        <select id="wearSearchPoint" style={{width: '100px', }}>
+                          <option>-------------</option>
+                          {
+                            instrumentationPoint.map(function(point) {
+                              return <option value={point.location}>{point.name}</option>
+                            })
+                          }
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex bothEnds">
+                        <label className="textBold">계측기간</label>
+                        <div className="flex" style={{fontWeight: "600", fontSize: "12px;"}}>
+                          <div id="startWearDate">{timeFormatDate(wearSearchCondition.startDate)}</div>
+                          <div>~</div>
+                          <div id="endWearDate">{timeFormatDate(wearSearchCondition.endDate)}</div>
+                        </div>
+                      </div>
+                      <div className="flex" tyle={{height:'30px'}}>
+                        <div className="sliderContainer">
+                          <Slider range={{ draggableTrack: true }} min={new Date().getTime() - (31536000000 * 7)} max={new Date().getTime()} defaultValue={[new Date().getTime() - (31536000000 * 7), new Date().getTime()]} tooltip={{ open: false, }} onChange={onChangeTimeSlider} step={86400000}/>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex bothEnds">
+                        <label className="textBold">통과톤수</label>
+                        <div className="flex textBold" style={{fontWeight: "600", fontSize: "12px;"}}>
+                          <div id="startWearMGT">{wearSearchCondition.startMGT}</div>
+                          <div>~</div>
+                          <div id="endWearMGT">{wearSearchCondition.endMGT}</div>
+                          <div style={{marginLeft: "5px"}}>MGT</div>
+                        </div>
+                      </div>
+                      <div className="flex">
+                        <div className="sliderContainer">
+                          <Slider range={{ draggableTrack: true }} min={0} max={3000} defaultValue={[0, 3000]} tooltip={{ open: false, }} onChange={onChangeMgtSlider} step={50}/>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flexCenter">
+                      <button className="searchButton" onClick={onClickWearSearch}>조회</button>
+                    </div>
+                  </div>
+                    
+
+                </div>
+              </div>
+              <div className="contentBox wearContainer" style={{marginLeft : 0}}>
+                <div className="containerTitle bothEnds">
+                  <div>마모정보</div>
+                  <div className="flex">
+                    <Modal buttonLabel="상선상세" title="상선 상세보기" data={wear3dData}></Modal>
+                    <Modal buttonLabel="하선상세" title="하선 상세보기" data={wear3dData}></Modal>
+                  </div>
+                </div>
+                <div className="componentBox separationBox">
+                  <div className="componentBox" id="directWearInfo" style={{ border: "1px solid #cccccc",
+                      borderRadius: "5px",
+                      margin: "5px",
+                      width: "calc(100% - 12px)"}} >
+                    <WearInfo title="직마모(mm)" data={directWearInfo}></WearInfo>
+                  </div>
+                  <div className="componentBox" id="sideWearInfo" style={{ border: "1px solid #cccccc",
+                      borderRadius: "5px",
+                      margin: "5px",
+                      width: "calc(100% - 12px)"}}>
+                    <WearInfo title="편마모(mm)" data={sideWearInfo}></WearInfo>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="contentBox" style={{ height: "105px", marginTop : "10px"}} >
+          <div className="containerTitle">예측검토구간</div>
+          <div className="componentBox flex section " style={{ paddingTop: "5px",
+                paddingBottom: "5px",
+                height: "calc(100% - 37px)",
+                paddingLeft: "5px"}} >
+
+  {/*           <div className="position optionBox borderColorGreen" style={{width: "935px"}} >
+              <div className="optionTitle">위치</div>
+              <div className="optionValue">
+                <img src={PositionImg} />
+              </div>
+            </div> */}
             
+            <div className="radioButtons optionBox ">
+              <RadioGroup defaultValue="outlined" name="radio-buttons-group" 
+                orientation="horizontal" 
+                size="sm"  
+                variant="outlined" style={{border : 0}}
+              >
+                <MuiRadio value="outlined" label="상선" />
+                <MuiRadio value="soft" label="하선" />
+              </RadioGroup>
 
+            </div>
+            <div className="distanceSearch optionBox">
+              <div className="optionTitle">KP</div>
+              <input className="local" id="kilometerStart" />
+              <div className="textK">K</div>
+              <input className="local" id="kilometerEnd"/>
+            </div>
+
+            <div className="position optionBox h75">
+              <div className="optionTitle">측정일자</div>
+              <div className="optionValue">
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
+                  <DatePicker label="측정일"  />
+                </LocalizationProvider>
+              </div>
+            </div>
+    
+            <div className="position optionBox h75">
+              <div className="optionTitle">마모예측 <br/> 상관성</div>
+              <div className="optionValue">
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">상관성</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    //value={age}
+                    label="데이터 선택"
+                    //onChange={handleChange}
+                  >
+                    <MenuItem>누적통과톤수만 고려</MenuItem>
+                    <MenuItem>레일특성변수 고려</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
+            </div>
+
+            <div className="position optionBox h75">
+              <div className="optionTitle">예측모델</div>
+              <div className="optionValue">
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">예측모델</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    //value={age}
+                    label="데이터 선택"
+                    //onChange={handleChange}
+                  >
+                    <MenuItem>선형회귀모형</MenuItem>
+                    <MenuItem>로지스틱 회귀모형</MenuItem>
+                    <MenuItem>SVM</MenuItem>
+                    <MenuItem>랜덤포레스트</MenuItem>
+                    <MenuItem>XGBoost</MenuItem>
+                    <MenuItem>Light GBM</MenuItem>
+                    <MenuItem>CatBoost</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div className="contentBox" style={{ height: "300px", marginTop : "10px"}} >
+          <div className="containerTitle">예측결과</div>
+          <div className="componentBox flex section " style={{ paddingTop: "5px",
+                paddingBottom: "5px",
+                height: "calc(100% - 37px)",
+                paddingLeft: "5px",
+                flexDirection: "column",
+                width: "calc( 100% - 12px)" }} >
+            <div class="curDate optionBox borderColorGreen" style={{height:"55px", width: "315px", marginBottom : "10px"}}>
+              <div class="optionTitle" style={{width:"212px"}}>예측 누적통과톤수</div>
+              <div class="optionValue">414,953,971</div>
+            </div>
+            <div className="table" style={{ justifyContent: "flex-start" }}>
+              <div className="tableHeader">
+                <div className="tr">
+                  <div className="td colspan2"><div className="colspan2">열차운행방향</div></div>
+                  <div className="td colspan2"><div className="colspan2">KP</div></div>
+                  <div className="td colspan2"><div className="colspan2">좌우레일</div></div>
+                  <div className="td colspan2"><div className="colspan2">마모</div></div>
+                  <div className="td colspan2"><div className="colspan2">예측일자</div></div>
+                  <div className="td colspan2"><div className="colspan2">누적통과톤수</div></div>
+                  <div className="td colspan2"><div className="colspan2">레일 예측마모량(mm)</div></div>
+                  <div className="td colspan2"><div className="colspan2">레일 실측마모량</div></div>
+                  <div className="td colspan2"><div className="colspan2">마모량(예측-실측)</div></div>
+                  <div className="td rowspan2"><div className="rowspan2">갱환시기 예측</div></div>
+                  <div className="td"></div>
+                </div>
+                <div className="tr">
+                  <div className="td"></div>
+                  <div className="td"></div>
+                  <div className="td"></div>
+                  <div className="td"></div>
+                  <div className="td"></div>
+                  <div className="td"></div>
+                  <div className="td"></div>
+                  <div className="td"></div>
+                  <div className="td"></div>
+                  <div className="td">마모량 기준</div>
+                  <div className="td">누적통과톤수기준</div>
+                </div>
+              </div>
+              <div className="tableBody" style={{ overflow: "auto", height: "calc(100% - 48px)", justifyContent: "flex-start"}}>
+                <div className="tr">
+                  <div className="td">상선</div>
+                  <div className="td">14k800</div>
+                  <div className="td">좌</div>
+                  <div className="td">직마모</div>
+                  <div className="td">2024.01.10</div>
+                  <div className="td">5ton  </div>
+                  <div className="td">10</div>
+                  <div className="td">-</div>
+                  <div className="td">10mm</div>
+                  <div className="td">7.09억톤 - 2029.01.15</div>
+                  <div className="td">6억톤 - 2027.01.15</div>
+                </div>
+                <div className="tr">
+                  <div className="td">상선</div>
+                  <div className="td">14k800</div>
+                  <div className="td">좌</div>
+                  <div className="td">편마모</div>
+                  <div className="td">2024.01.10</div>
+                  <div className="td">5ton  </div>
+                  <div className="td">10</div>
+                  <div className="td">-</div>
+                  <div className="td">10mm</div>
+                  <div className="td">7.09억톤 - 2029.01.15</div>
+                  <div className="td">6억톤 - 2027.01.15</div>
+                </div>
+                <div className="tr">
+                  <div className="td">상선</div>
+                  <div className="td">14k800</div>
+                  <div className="td">우</div>
+                  <div className="td">직마모</div>
+                  <div className="td">2024.01.10</div>
+                  <div className="td">5ton  </div>
+                  <div className="td">10</div>
+                  <div className="td">-</div>
+                  <div className="td">10mm</div>
+                  <div className="td">7.09억톤 - 2029.01.15</div>
+                  <div className="td">6억톤 - 2027.01.15</div>
+                </div>
+                <div className="tr">
+                  <div className="td">상선</div>
+                  <div className="td">14k800</div>
+                  <div className="td">우</div>
+                  <div className="td">편마모</div>
+                  <div className="td">2024.01.10</div>
+                  <div className="td">5ton  </div>
+                  <div className="td">10</div>
+                  <div className="td">-</div>
+                  <div className="td">10mm</div>
+                  <div className="td">7.09억톤 - 2029.01.15</div>
+                  <div className="td">6억톤 - 2027.01.15</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div className="contentBox wearContainer" style={{marginLeft : 0}}>
-        <div className="containerTitle bothEnds">
-          <div>마모정보</div>
-          <div className="flex">
-            <Modal buttonLabel="상선상세" title="상선 상세보기" data={wear3dData}></Modal>
-            <Modal buttonLabel="하선상세" title="하선 상세보기" data={wear3dData}></Modal>
-          </div>
-        </div>
-        <div className="componentBox separationBox">
-          <div className="componentBox" id="directWearInfo">
-            <WearInfo title="직마모" data={directWearInfo}></WearInfo>
-          </div>
-          <div className="componentBox" id="sideWearInfo">
-            <WearInfo title="편마모" data={sideWearInfo}></WearInfo>
-          </div>
-        </div>
-      </div>
-    </div>
     </div>
   );
 }
 
 export default WearMaintenance;
+
