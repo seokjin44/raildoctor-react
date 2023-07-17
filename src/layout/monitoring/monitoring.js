@@ -5,7 +5,6 @@ import SearchIcon from "../../assets/icon/magnifier.svg";
 import DistanceIcon from "../../assets/icon/distance__.svg";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/ko';
 import { useEffect, useRef, useState } from "react";
 import { Map } from 'react-kakao-maps-sdk';
@@ -16,6 +15,7 @@ import InfoIcon from "../../assets/icon/info_white.png";
 import TrainIcon from "../../assets/icon/4047310_car_metro_monochrome_monorail_train_icon.png";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
 import ArrowIcon from "../../assets/icon/arrow.png";
+import { DatePicker } from 'antd';
 
 import IncheonTrackPDF from "../../assets/pdf/INCHEON_TRACK.pdf";
 import IncheonTrackImg from "../../assets/track/incheon_track2.png";
@@ -32,8 +32,11 @@ import { LineChart, Line, XAxis,
   ScatterChart, Scatter, Bar, BarChart } from 'recharts';
 
 window.PDFJS = PDFJS;
-
-
+const { RangePicker } = DatePicker;
+const rangePickerStyle = {
+  height:"22px",
+  fontFamily : 'NEO_R'
+}
 const tempData1 = [
   {"time":"05:38:39","temp":72.636002},
   {"time":"05:51:41","temp":65.306999},
@@ -15008,7 +15011,7 @@ function Monitoring( props ) {
 
   const minimapDrawing = () => {
     
-    let canvas = document.getElementById("minimapCanvas");
+    /* let canvas = document.getElementById("minimapCanvas");
     let ctx = canvas.getContext("2d");
     let width = canvas.width;
     let hiehgt = canvas.height;
@@ -15022,10 +15025,6 @@ function Monitoring( props ) {
         let y = hiehgt / 2;
         y -= routeName.length * 15;
         for( let line of routeName ){
-            /* ctx.beginPath(); */
-            /* ctx.fillStyle = "#000000"; 
-            ctx.arc(x, hiehgt / 2 + 10, 10, 0, Math.PI * 2); */
-            /* ctx.fill(); */
             ctx.font = "10px Arial";
             ctx.fillText(line, x - (ctx.measureText(line).width/2), y + 10);
             y += 15;
@@ -15042,7 +15041,22 @@ function Monitoring( props ) {
         ctx.lineTo(x+50, y+11);
         ctx.stroke();
         x = x + 50;
-    }
+    } */
+
+      const canvas = document.getElementById("minimapCanvas");
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.src= IncheonTrackImg;
+      img.onload = function() {
+        let scale = canvas.width / img.width;
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+        ctx.save(); // Save the current state of the context
+        ctx.translate(0, 0); // Apply translation
+        ctx.scale(scale, 0.1); // Apply scaling 
+        ctx.drawImage(img, 0, 0, img.width, img.height); // Draw the image
+        ctx.restore(); // Restore the context to its saved state
+        drawRect(position.x, position.y);
+      };
   }
 
   const trainDraw = (ctx, x, y) => {
@@ -15057,19 +15071,16 @@ function Monitoring( props ) {
   const drawRect = (x, y) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-    //ctx.fillStyle = '#000000';
+    //ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
     ctx.strokeStyle = 'red';
-    ctx.rect(x, y, 100, 70);  // Draw rectangle
+    ctx.beginPath();
+    ctx.rect(x, y-3, 100, 57);  // Draw rectangle
     ctx.stroke();
+    ctx.closePath();
   }
 
   useEffect(() => {
-    trainImg.src= TrainIcon;
-    trainImg.onload = ()=>{
-      drawRect(position.x, position.y);
-      minimapDrawing();
-    };
+    minimapDrawing();
     makeDummyWear3dData();
   }, [position]);
 
@@ -15105,7 +15116,7 @@ function Monitoring( props ) {
   };
 
   useEffect(() => {
-     let minimapContainer = document.getElementById("minimapContainer");
+    let minimapContainer = document.getElementById("minimapContainer");
     let canvas = canvasRef.current;
     canvas.width = minimapContainer.clientWidth;
     canvas.height = minimapContainer.clientHeight;
@@ -15170,7 +15181,7 @@ function Monitoring( props ) {
     ctx.save(); // Save the current state of the context
     ctx.translate(trackDetailPosition.x, trackDetailPosition.y); // Apply translation
     ctx.scale(scale, scale); // Apply scaling 
-    ctx.fillRect(0, 0, 100, 100); // Draw a rectangle
+    ctx.fillRect(0, 0, 10, 100); // Draw a rectangle
     ctx.restore(); // Restore the context to its saved state
   }
 
@@ -15248,20 +15259,8 @@ function Monitoring( props ) {
   };
 
   return (
-    <div className="monitoringContainer container">
-        {/* <div className="trackBox">
-            <div className="boxTitle">
-              지도
-            </div>
-            <div className="track">
-                <Map
-                  center={{ lat: 33.5563, lng: 126.79581 }}
-                  style={{ width: "100%", height: "100%" }}
-                >
-                </Map>
-            </div>
-        </div> */}
-        <div className="searchBar">
+    <div className="monitoringContainer" >
+        {/* <div className="searchBar">
           <div className="boxProto minimap searchOption">
             <div className="minimapContainer" id="minimapContainer">
               <canvas id="minimapCanvas"
@@ -15280,95 +15279,144 @@ function Monitoring( props ) {
               2022.11.29 ~ 2023.05.06
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <div className="guideLine">
+        {/* <div className="guideLine">
           <div className="KP">
             <img src={PinIcon} />15K205
           </div>
-        </div>
+        </div> */}
 
-        <div className="trackContent">
-          <div className="boxProto track" id="trackDetailContainer">
-            <div className="title">
-              <img src={InfoIcon} />
-              선로열람도</div>
-            <canvas id="trackDetailCanvas"
-                ref={trackDetailCanvasRef}
-                onMouseDown={(e)=>{trackDetailHandleMouseDown(e)}}
-                onMouseUp={(e)=>{trackDetailHandleMouseUp()}}
-                onMouseMove={(e)=>{trackDetailHandleMouseMove(e)}}
-            />
+          <div className="contentBox wearContainer" style={{marginLeft : 0, height: "calc(100% - 190px - 238px)", minHeight: "700px"}}>
+            <div className="containerTitle bothEnds">
+              <div>선로열람도</div>
+              <div className="dataOption">
+                <div className="date">
+                  <img src={CalendarIcon} />
+                  <RangePicker 
+                    style={rangePickerStyle}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="componentBox separationBox" style={{overflow: "auto"}}>
+              <div className="boxProto minimap searchOption">
+                <div className="minimapContainer" id="minimapContainer">
+                  <canvas id="minimapCanvas"
+                      ref={canvasRef}
+                      onMouseDown={handleMouseDown}
+                      onMouseUp={handleMouseUp}
+                      onMouseMove={handleMouseMove}
+                  ></canvas>
+                </div>
+              </div>
+              <div className="boxProto track" id="trackDetailContainer">
+                <canvas id="trackDetailCanvas"
+                    ref={trackDetailCanvasRef}
+                    onMouseDown={(e)=>{trackDetailHandleMouseDown(e)}}
+                    onMouseUp={(e)=>{trackDetailHandleMouseUp()}}
+                    onMouseMove={(e)=>{trackDetailHandleMouseMove(e)}}
+                />
+              </div>
+            </div>
           </div>
-          <div className="boxProto speed" id="trackDetailContainer">
-            <div className="title">
-              <img src={InfoIcon} />
-              속도정보</div>
-            <img className="speedDemo" src={Speed} />
+
+          <div className="contentBox wearContainer" style={{marginLeft : 0, height: "190px"}}>
+            <div className="containerTitle bothEnds">
+              <div>속도정보</div>
+              <div className="dataOption">
+                <div className="date">
+                  <img src={CalendarIcon} />
+                  <RangePicker 
+                    style={rangePickerStyle}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="componentBox separationBox" style={{overflow: "auto"}}>
+              <div className="boxProto speed" id="trackDetailContainer">
+                <img className="speedDemo" src={Speed} />
+              </div>
+            </div>
           </div>
-          <div className="boxProto datafinder" id="trackDetailContainer">
-            {/* <div className="title">
-              <img src={InfoIcon} />
-              데이터 여부</div> */}
-            <div className="dataList">
-              <div className="line" >
-                <div className="dataName">통과톤수</div>
-                <div className="dataBar">
-                  <div className="detailBtn" style={{left:"0.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"9.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"12.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"81.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"78.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"65.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+
+          <div className="contentBox wearContainer" style={{marginLeft : 0}}>
+            <div className="containerTitle bothEnds">
+              <div>데이터여부</div>
+              <div className="dataOption">
+                <div className="date">
+                  <img src={CalendarIcon} />
+                  <RangePicker 
+                    style={rangePickerStyle}
+                  />
                 </div>
               </div>
-              <div className="line" >
-                <div className="dataName">마모 유지관리</div>
-                <div className="dataBar">
-                  <div className="detailBtn" style={{left:"3%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"35%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"12%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"28%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"59%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"91%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                </div>
-              </div>
-              <div className="line" >
-                <div className="dataName">궤도틀림</div>
-                <div className="dataBar">
-                  <div className="detailBtn" style={{left:"4.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"97%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"65%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"71%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"50%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"41%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                </div>
-              </div>
-              <div className="line" >
-                <div className="dataName">궤도거동계측</div>
-                <div className="dataBar">
-                  <div className="detailBtn" style={{left:"77%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"6%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"51%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"31%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"39%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"81"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                </div>
-              </div>
-              <div className="line" >
-                <div className="dataName">온/습도 측정</div>
-                <div className="dataBar">
-                  <div className="detailBtn" style={{left:"8%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"88%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"77%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"66%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"55%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-                  <div className="detailBtn" style={{left:"44%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+            </div>
+            <div className="componentBox separationBox" style={{overflow: "auto"}}>
+              <div className="boxProto datafinder" id="trackDetailContainer">
+                <div className="dataList">
+                  <div className="line" >
+                    <div className="dataName">통과톤수</div>
+                    <div className="dataBar">
+                      <div className="detailBtn" style={{left:"0.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"9.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"12.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"81.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"78.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"65.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                    </div>
+                  </div>
+                  <div className="line" >
+                    <div className="dataName">마모 유지관리</div>
+                    <div className="dataBar">
+                      <div className="detailBtn" style={{left:"3%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"35%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"12%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"28%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"59%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"91%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                    </div>
+                  </div>
+                  <div className="line" >
+                    <div className="dataName">궤도틀림</div>
+                    <div className="dataBar">
+                      <div className="detailBtn" style={{left:"4.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"97%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"65%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"71%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"50%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"41%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                    </div>
+                  </div>
+                  <div className="line" >
+                    <div className="dataName">궤도거동계측</div>
+                    <div className="dataBar">
+                      <div className="detailBtn" style={{left:"77%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"6%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"51%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"31%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"39%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"81"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                    </div>
+                  </div>
+                  <div className="line" >
+                    <div className="dataName">온/습도 측정</div>
+                    <div className="dataBar">
+                      <div className="detailBtn" style={{left:"8%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"88%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"77%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"66%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"55%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                      <div className="detailBtn" style={{left:"44%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+
+
+              
 
         <Modal
           open={open}

@@ -13,7 +13,7 @@
     height: 60px;
     border-radius: 5px;
     background: white;
-    box-shadow: 1px 1px 8px #00000036;
+    /* box-shadow: 1px 1px 8px #00000036; */
     margin-bottom: 10px;
     position: relative;
 }
@@ -40,4 +40,27 @@
 .boxProto .title img{
     width: 15px;
     margin-right: 3px;
+}
+
+.containerTitle .dataOption{
+    height: 100%;
+    position: absolute;
+    right: 10px;
+    top: -1px;
+}
+
+.containerTitle .dataOption .date{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.containerTitle .dataOption img{
+    width: 18px;
+    border-radius: 3px;
+    background: white;
+    border: 1px solid #a7a7a7;
+    margin-right: 5px;
+    cursor: pointer;
 }

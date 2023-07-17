@@ -30,6 +30,7 @@
     width: calc(100% - 15px);
     font-size: 14px;
     padding-top: 2px;
+    position: relative;
 }
 
 .componentBox{
@@ -42,7 +43,7 @@
     width: calc(100% - 0px);
     /* margin-left: 20px;
     margin-right: 20px; */
-    border-radius: 5px;
+    border-radius: 2px;
     border: 1px solid #cccccc;
     overflow: hidden;
     box-shadow: 1px 1px 8px #cccccc5c;
