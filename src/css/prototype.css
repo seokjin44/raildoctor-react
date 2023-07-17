@@ -46,7 +46,7 @@
     height: 100%;
     position: absolute;
     right: 10px;
-    top: -1px;
+    top: 0px;
 }
 
 .containerTitle .dataOption .date{
