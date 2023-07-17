@@ -2,16 +2,19 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./cumulativeThroughput.css";
 import FormControl from '@mui/joy/FormControl';
 import FormLabel from '@mui/joy/FormLabel';
-import Radio from '@mui/joy/Radio';
-import RadioGroup from '@mui/joy/RadioGroup';
+/* import Radio from '@mui/joy/Radio'; */
+/* import RadioGroup from '@mui/joy/RadioGroup'; */
 import CalendarImg from "../../assets/icon/calendar.svg";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+/* import { DatePicker } from '@mui/x-date-pickers/DatePicker'; */
 import 'dayjs/locale/ko';
 import RailStatus from "../../component/railStatus/railStatus";
-import { useState } from "react";
-
+import { useEffect, useRef, useState } from "react";
+import IncheonTrackImg from "../../assets/track/incheon_track2.png";
+import CalendarIcon from "../../assets/icon/299092_calendar_icon.png";
+import { DatePicker, Space } from 'antd';
+import { Radio } from 'antd';
 
 const railroadSection = [
   {
@@ -550,230 +553,244 @@ const tableData = [{"topdown":"상선","leftRight":"좌&우","start":"117.306","
 
 ];
 
+const datePickerStyle = {
+  height:"22px",
+  fontFamily : 'NEO_R'
+}
 
 function CumulativeThroughput( props ) {
   console.log(tableData);
   const location = useLocation();
-  const [selectedPath, setSelectedPath] = useState([]);
-  const pathClick = (select) => {
-    console.log(select);
-    //getInstrumentationPoint(select);
-    setSelectedPath(select);
-  }
-  const addKToNumber = (num, sign) => {
-    let strNum = Number(num).toFixed(0);
-    let reversedStrNum = strNum.split('').reverse().join('');
-    let newStrNum = '';
-  
-    for (let i = 0; i < reversedStrNum.length; i++) {
-      if (i > 0 && i % 3 === 0) {
-        newStrNum += sign;
-      }
-      newStrNum += reversedStrNum[i];
+  const canvasRef = useRef(null);
+  const trackDetailCanvasRef = useRef(null);
+  const [position, setPosition] = useState({x: 38, y: 5});
+  const [dragging, setDragging] = useState(false);
+  const [relPos, setRelPos] = useState({x: 0, y: 0});
+
+  const [scale, setScale] = useState(1);
+  const [trackDetailPosition, setTrackDetailPosition] = useState({x: 0, y: 0});
+  const [trackDetailDragging, setTrackDetailDragging] = useState(false);
+  const [lastPos, setLastPos] = useState(null);
+
+  const handleMouseDown = (e) => {
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    if (x >= position.x && x <= position.x + 100 && y >= position.y && y <= position.y + 70) {
+      setDragging(true);
+      setRelPos({x: x - position.x, y: y - position.y});
     }
+  };
+
+  const handleMouseUp = () => {
+    setDragging(false);
+  };
+
+  const handleMouseMove = (e) => {
+    if (dragging) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      let positionX = e.clientX - rect.left - relPos.x;
+      if(positionX < 38){
+        positionX = 38;
+      }else if( positionX > 1425 ){
+        positionX = 1425;
+      }
+      setPosition({
+        x: positionX,
+        //y: e.clientY - rect.top - relPos.y
+        y: 5
+      });
+    }
+  };
+
+  const trackDetailHandleMouseDown = (e) => {
+    setTrackDetailDragging(true);
+    setLastPos({x: e.clientX, y: e.clientY});
+  };
+
+  const trackDetailHandleMouseUp = () => {
+    setTrackDetailDragging(false);
+    setLastPos(null);
+  };
+
+  const trackDetailHandleMouseMove = (e) => {
+    if (trackDetailDragging) {
+      const newPos = {x: e.clientX, y: e.clientY};
+      const canvas = canvasRef.current;
+      const img = new Image();
+      img.src = IncheonTrackImg; // replace with your image url
   
-    return newStrNum.split('').reverse().join('');
+      img.onload = function() {
+        const newPosX = trackDetailPosition.x + newPos.x - lastPos.x;
+        const newWidth = img.width * scale;
+        
+        // Check if the new position is outside the canvas
+        if (newPosX <= 0 && newPosX + newWidth >= canvas.width) {
+          setTrackDetailPosition({
+            x: newPosX,
+            y: trackDetailPosition.y
+          });
+        }
+        setLastPos(newPos);
+      };
+    }
+  };
+
+  const trackDetailDrawImage = () => {
+    const canvas = trackDetailCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src= IncheonTrackImg;
+    img.onload = function() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+      ctx.save(); // Save the current state of the context
+      ctx.translate(trackDetailPosition.x, trackDetailPosition.y); // Apply translation
+      ctx.scale(scale, 0.35); // Apply scaling 
+      ctx.drawImage(img, 0, 0, img.width, img.height); // Draw the image
+      ctx.restore(); // Restore the context to its saved state
+    };
   }
+
+  const minimapDrawing = () => {
+    const canvas = document.getElementById("minimapCanvas");
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src= IncheonTrackImg;
+    img.onload = function() {
+      let scale = canvas.width / img.width;
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+      ctx.save(); // Save the current state of the context
+      ctx.translate(0, 0); // Apply translation
+      ctx.scale(scale, 0.1); // Apply scaling 
+      ctx.drawImage(img, 0, 0, img.width, img.height); // Draw the image
+      ctx.restore(); // Restore the context to its saved state
+      drawRect(position.x, position.y);
+    };
+  }
+
+  const drawRect = (x, y) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    //ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+    ctx.strokeStyle = 'red';
+    ctx.beginPath();
+    ctx.rect(x, y-3, 100, 57);  // Draw rectangle
+    ctx.stroke();
+    ctx.closePath();
+  }
+
+
+  useEffect(() => {
+    let minimapContainer = document.getElementById("minimapContainer");
+    let canvas = canvasRef.current;
+    canvas.width = minimapContainer.clientWidth;
+    canvas.height = minimapContainer.clientHeight;
+
+    let trackDetailContainer = document.getElementById("trackDetailContainer");
+    let trackDetailCanvas = trackDetailCanvasRef.current;
+    trackDetailCanvas.width = trackDetailContainer.clientWidth;
+    trackDetailCanvas.height = trackDetailContainer.clientHeight;
+
+    drawRect(position.x, position.y);
+    minimapDrawing(); 
+  }, []);
+
+  useEffect(() => {
+    trackDetailDrawImage();
+  }, [trackDetailPosition, scale]);
 
   return (
     <div className="cumulativeThroughput" >
-      <div className="railStatusContainer">
+      {/* <div className="railStatusContainer">
         <RailStatus railroadSection={railroadSection} pathClick={pathClick}></RailStatus>
-      </div>
-      <div className="contentBox" style={{height:"100px"}} >
-        <div className="containerTitle">검토구간</div>
-        <div className="componentBox flex section ">
-          <div className="radioButtons optionBox ">
-            <RadioGroup defaultValue="outlined" name="radio-buttons-group" 
-              orientation="horizontal" 
-              size="sm"  
-              variant="outlined" style={{border : 0}}
-            >
-              <Radio value="outlined" label="상선" />
-              <Radio value="soft" label="하선" />
-            </RadioGroup>
-
-          </div>
-          <div className="distanceSearch optionBox">
-            <div className="optionTitle">KP</div>
-            <input className="local" id="kilometerStart" />
-            <div className="textK">K</div>
-            <input className="local" id="kilometerEnd"/>
-          </div>
-          <div className="position optionBox borderColorGreen">
-            <div className="optionTitle">위치</div>
-            <div className="optionValue">인천터미널 - 문학경기장</div>
-          </div>
-          <div className="position optionBox borderColorGreen">
-            <div className="optionTitle">부설일자</div>
-            <div className="optionValue">
-              <div className="icon">
-                <img src={CalendarImg} />
-              </div>
-              2023/01/01
+      </div> */}
+      <div className="contentBox" style={{height:"100%", position:"relative"}} >
+        <div className="containerTitle">
+          <div>검토구간</div>
+          <div className="dataOption">
+            <div className="option date" >
+              <img src={CalendarIcon} />
+              <DatePicker style={datePickerStyle} />
             </div>
+            <Radio.Group >
+              <Radio value={1}>상선</Radio>
+              <Radio value={2}>하선</Radio>
+            </Radio.Group>
           </div>
         </div>
-      </div>
-      <div className="contentBox" style={{marginTop:"10px", height: "100px"}} >
-        <div className="containerTitle">현재 누적통과톤수</div>
-        <div className="componentBox flex section ">
-          <div className="curDate optionBox borderColorGreen">
-            <div className="optionTitle">현재날짜</div>
-            <div className="optionValue">2023/07/03</div>
-          </div>
-          <div className="curDate optionBox borderColorGreen">
-            <div className="optionTitle">좌레일</div>
-            <div className="optionValue">414,953,971</div>
-          </div>
-          <div className="curDate optionBox borderColorGreen" >
-            <div className="optionTitle">우레일</div>
-            <div className="optionValue">414,953,971</div>
-          </div>
-        </div>
-      </div>
-      <div className="contentBox" style={{marginTop:"10px", height: "calc( 100% - 350px)" }} >
-        <div className="containerTitle">검토 누적통과톤수</div>
-        <div className="componentBox flex section" style={{flexDirection: "column"}} >
-          <div className="searchOption">
-            <div className="curDate optionBox h75">
-              <div className="optionTitle">검토날짜</div>
-              <div className="optionValue">
-                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
-                  <DatePicker label="검토일"  />
-                </LocalizationProvider>
-              </div>
-            </div>
-            <div className="curDate optionBox h75 borderColorGreen">
-              <div className="optionTitle">갱환기준치</div>
-              <div className="optionValue">600,000,000</div>
+        <div className="componentBox">
+          <div className="boxProto minimap searchOption">
+            <div className="minimapContainer" id="minimapContainer">
+              <canvas id="minimapCanvas"
+                  ref={canvasRef}
+                  onMouseDown={handleMouseDown}
+                  onMouseUp={handleMouseUp}
+                  onMouseMove={handleMouseMove}
+              ></canvas>
             </div>
           </div>
-          <div className="tableBox" style={{ marginTop: "10px", width: "100%", height: "calc( 100% - 95px)"}}>
-            <div className="table" >
-              <div className="tableHeader">
-                <div className="tr">
-                  <div className="td">상하</div>
-                  <div className="td">좌우</div>
-                  <div className="td">시점위치</div>
-                  <div className="td">종점위치</div>
-                  <div className="td">연장</div>
-                  <div className="td">교체일</div>
-                  <div className="td">계측일자</div>
-                  <div className="td">누적통과톤수</div>
-                  <div className="td">일 평균 통과톤수</div>
-                  <div className="td">갱환예상일자</div>
-                </div>
-              </div>
-              <div className="tableBody">
-                {
-                  tableData.map( (tr) => {
-                    return <div className="tr">
-                    <div className="td">{tr.topdown}</div>
-                    <div className="td">{tr.leftRight}</div>
-                    <div className="td">{addKToNumber(tr.start, 'K')}</div>
-                    <div className="td">{addKToNumber(tr.end, 'K')}</div>
-                    <div className="td">{addKToNumber(tr.after, ",")}</div>
-                    <div className="td">{tr.change}</div>
-                    <div className="td">{tr.regdate}</div>
-                    <div className="td">{addKToNumber(tr.value1,",")}</div>
-                    <div className="td">{addKToNumber(tr.value2,",")}</div>
-                    <div className="td">{tr.expect}</div>
+          <div className="boxProto track" id="trackDetailContainer">
+            <canvas id="trackDetailCanvas"
+                ref={trackDetailCanvasRef}
+                onMouseDown={(e)=>{trackDetailHandleMouseDown(e)}}
+                onMouseUp={(e)=>{trackDetailHandleMouseUp()}}
+                onMouseMove={(e)=>{trackDetailHandleMouseMove(e)}}
+            />
+          </div>
+          <div className="testObject">
+            <div className="guideLine">
+              <div className="dataContainer">
+                <div className="dataLine">
+                  <div className="table">
+                    <div className="tableHeader">
+                      <div className="tr">
+                        <div className="td">부설일자</div>
+                        <div className="td">좌레일</div>
+                        <div className="td">우레일</div>
+                      </div>
+                    </div>
+                    <div className="tableBody">
+                      <div className="tr">
+                        <div className="td">2023.01.01</div>
+                        <div className="td">414,939,971</div>
+                        <div className="td">414,939,971</div>
+                      </div>
+                    </div>
                   </div>
-                  })
-                }
-                {/* <div className="tr">
-                  <div className="td measurementDate">21.09.16</div>
-                  <div className="td mamo">-0.28</div>
-                  <div className="td mamo">6.79</div>
-                  <div className="td mamo">8.75</div>
-                  <div className="td mamo">9.66</div>
-                  <div className="td mamo">-0.36</div>
-                  <div className="td mamo">534.46</div>
-                  <div className="td mamo">19.19</div>
                 </div>
-                <div className="tr">
-                  <div className="td measurementDate">22.04.27</div>
-                  <div className="td mamo">-0.26</div>
-                  <div className="td mamo">7.49</div>
-                  <div className="td mamo">9.28</div>
-                  <div className="td mamo">10.28</div>
-                  <div className="td mamo">-0.29</div>
-                  <div className="td mamo">574.87</div>
-                  <div className="td mamo">20.64</div>
-                </div>
-
-                <div className="tr">
-                  <div className="td measurementDate">22.06.24</div>
-                  <div className="td mamo">-0.21</div>
-                  <div className="td mamo">7.23</div>
-                  <div className="td mamo">8.95</div>
-                  <div className="td mamo">9.79</div>
-                  <div className="td mamo">-0.38</div>
-                  <div className="td mamo">552.44</div>
-                  <div className="td mamo">19.83</div>
-                </div>
-                <div className="tr">
-                  <div className="td measurementDate">23.01.20</div>
-                  <div className="td mamo">-0.19</div>
-                  <div className="td mamo">8.28</div>
-                  <div className="td mamo">9.8</div>
-                  <div className="td mamo">10.67</div>
-                  <div className="td mamo">-0.32</div>
-                  <div className="td mamo">607.96</div>
-                  <div className="td mamo">21.81</div>
-                </div>
-                <div className="tr">
-                  <div className="td measurementDate">23.03.15</div>
-                  <div className="td mamo">-</div>
-                  <div className="td mamo">-</div>
-                  <div className="td mamo">10.5</div>
-                  <div className="td mamo">11.57</div>
-                  <div className="td mamo">-0.35</div>
-                  <div className="td mamo">608.55</div>
-                  <div className="td mamo">22.78</div>
-                </div> */}
-              </div>
-            </div>
-          </div>
-          {/* <div className="curDate optionBox borderColorGreen">
-            <div className="optionTitle">좌레일</div>
-            <div className="optionValue">
-              <div className="verticalValue">
-                <div className="verticalValueBox">
-                  <div className="boxTitle">누적통과톤수</div>
-                  414,953,971.38
-                </div>
-                <div className="verticalValueBox">
-                  <div className="boxTitle">잔여톤수</div>
-                  414,953,971.38
-                </div>
-                <div className="verticalValueBox">
-                  <div className="boxTitle">갱환예측시기</div>
-                  414,953,971.38
+                <div className="dataLine">
+                  <div className="table">
+                    <div className="tableHeader">
+                      <div className="tr">
+                        <div className="td">좌우</div>
+                        <div className="td">시점</div>
+                        <div className="td">종점</div>
+                        <div className="td">연장</div>
+                        <div className="td">교체</div>
+                        <div className="td">계측</div>
+                        <div className="td">누적</div>
+                        <div className="td">일평균</div>
+                        <div className="td">갱환예상</div>
+                      </div>
+                    </div>
+                    <div className="tableBody">
+                      <div className="tr">
+                        <div className="td">좌&우</div>
+                        <div className="td">117</div>
+                        <div className="td">669</div>
+                        <div className="td">552</div>
+                        <div className="td">2007-03-16</div>
+                        <div className="td">2021-12-31</div>
+                        <div className="td">280,562,738</div>
+                        <div className="td">41,915</div>
+                        <div className="td">2042-11-12</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="curDate optionBox borderColorGreen">
-            <div className="optionTitle">우레일</div>
-            <div className="optionValue">
-              <div className="verticalValue">
-                <div className="verticalValueBox">
-                  <div className="boxTitle">누적통과톤수</div>
-                  414,953,971.38
-                </div>
-                <div className="verticalValueBox">
-                  <div className="boxTitle">잔여톤수</div>
-                  414,953,971.38
-                </div>
-                <div className="verticalValueBox">
-                  <div className="boxTitle">갱환예측시기</div>
-                  414,953,971.38
-                </div>
-              </div>
-            </div>
-          </div> */}
         </div>
       </div>
     </div>

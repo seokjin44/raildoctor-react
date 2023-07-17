@@ -47,6 +47,14 @@
     position: absolute;
     right: 10px;
     top: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.containerTitle .dataOption .option{
+    margin-right: 10px;
+    margin-left: 10px;
 }
 
 .containerTitle .dataOption .date{

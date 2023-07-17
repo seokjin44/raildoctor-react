@@ -15010,39 +15010,6 @@ function Monitoring( props ) {
   
 
   const minimapDrawing = () => {
-    
-    /* let canvas = document.getElementById("minimapCanvas");
-    let ctx = canvas.getContext("2d");
-    let width = canvas.width;
-    let hiehgt = canvas.height;
-    let route = [["계양"], ["귤현"], ["박촌"], ["임학"], ["계산"], ["경인교대","입구"], ["작전"],
-     ["갈산"], ["부평구청"], ["부평시장"], ["부평"], ["동수"], ["부평","삼거리"], ["간석","오거리"],
-     ["인천시청"], ["예술회관"], ["인천","터미널"], ["문학","경기장"], ["선학"], ["신연수"], ["원인재"],
-     ["동춘"], ["동막"], ["캠퍼스","타운"], ["테크노","파크"], ["지식정보","단지"], ["인천대","입구"],
-     ["센트럴","파크"], ["국제업무","지구"], ["송도달빛","축제공원"]];
-    let x = 20;
-    for( let routeName of route ){
-        let y = hiehgt / 2;
-        y -= routeName.length * 15;
-        for( let line of routeName ){
-            ctx.font = "10px Arial";
-            ctx.fillText(line, x - (ctx.measureText(line).width/2), y + 10);
-            y += 15;
-        }
-        trainDraw(ctx, x, hiehgt / 2 + 10);
-        ctx.strokeStyle = "black";
-        ctx.beginPath();
-        ctx.moveTo(x, y+14);
-        ctx.lineTo(x+50, y+14);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(x, y+11);
-        ctx.lineTo(x+50, y+11);
-        ctx.stroke();
-        x = x + 50;
-    } */
-
       const canvas = document.getElementById("minimapCanvas");
       const ctx = canvas.getContext('2d');
       const img = new Image();
