@@ -1,6 +1,7 @@
 .placeInfoBox{
-    width: 100%;
+    width: calc(100% - 20px);
     height: 100%;
+    padding: 0px 10px 0px 10px;
 }
 
 .placeInfoBox canvas{

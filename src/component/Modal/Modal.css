@@ -8,5 +8,11 @@
     padding-right: 8px;
     margin-right: 5px;
     cursor: pointer;
-    /* font-family: 'KoPubWorld돋움체_Pro_Bold'; */
+    font-family:  'NEO_R';
+    user-select: none;
+}
+
+.modalButton.highlight {
+    background: #006bff;
+    color: white;
 }
