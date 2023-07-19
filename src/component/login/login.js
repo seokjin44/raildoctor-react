@@ -16,7 +16,7 @@ function Login( props ) {
     for( let member of props.memberList ) {
       if( member.memberID === id && member.memberPW === password ) {
         sessionStorage.setItem("user", id);
-        navigate("/routeSelection", {state:{id:id}});
+        navigate("/monitoring", {state:{id:id}});
         return;
       }
     };

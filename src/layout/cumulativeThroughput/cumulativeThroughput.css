@@ -157,7 +157,7 @@
 
 .cumulativeThroughput .track {
     position: relative;
-    height: calc(100% - 260px);
+    height: 63%;
 }
 
 .cumulativeThroughput .componentBox .guideLine{
@@ -173,7 +173,7 @@
 .cumulativeThroughput .componentBox .guideLine .dataContainer{
     position: absolute;
     left: 10px;
-    top: 73%;
+    top: 66%;
 }
 
 .cumulativeThroughput .componentBox .guideLine .dataContainer .dataLine:first-child{

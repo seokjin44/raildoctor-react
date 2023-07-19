@@ -328,7 +328,7 @@
 
 .wearMaintenance .dataContainer{
     width: 100%;
-    height: calc(100%);
+    height: calc(100% - 116px);
     display: flex;
     justify-content: center;
     align-items: center;

@@ -998,14 +998,14 @@ function TrackGeometryMeasurement( props ) {
           </div>
         </div>
       </div> */}
-      <div className="contentBoxGroup" style={{width: "100%", height: "300px", marginTop:"10px"}}>
-        <div className="contentBox" style={{marginRight: "10px", width: "calc(100% - 20px - 800px - 330px - 130px)", height: "100%"}}>
+      <div className="contentBoxGroup" style={{width: "100%", height: "250px", marginTop:"10px"}}>
+        <div className="contentBox" style={{marginRight: "10px", width: "calc((((100% - 20px) - 800px) - 330px) - -93px)", height: "100%"}}>
           <div className="containerTitle">측정위치</div>
           <div className="componentBox">
             <img src={PositionTestImage} style={{width:"100%", height:"100%"}} />
           </div>
         </div>
-        <div className="contentBox" style={{width:"800px", height:"100%", marginRight:"10px"}}>
+        <div className="contentBox" style={{width:"700px", height:"100%", marginRight:"10px"}}>
           <div className="containerTitle">장기계측 항목</div>
           <div className="componentBox">
             <div className="table" >
@@ -1208,7 +1208,7 @@ function TrackGeometryMeasurement( props ) {
           </div>
         </div>
       </div>
-      <div className="contentBox" style={{marginTop:"10px", height:"calc(100% - 560px)"}}>
+      <div className="contentBox" style={{marginTop:"10px", height:"calc(100% - 510px)"}}>
         <div className="containerTitle">Chart</div>
         <div className="componentBox flex flexEnd">
           {/* <Scatter options={optionsScatter} data={data} />
