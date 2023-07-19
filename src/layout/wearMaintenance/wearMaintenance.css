@@ -257,7 +257,7 @@
 
 .wearMaintenance #trackDetailContainer{
     padding: 5px;
-    height: calc(100% - 91px);
+    height: calc(100% - 15px);
     width: calc(100% - 10px);
 }
 
@@ -408,42 +408,57 @@
 
 .popupContent .table .tableHeader .tr .td.driving,
 .popupContent .table .tableBody .tr .td.driving {
-    width: 10%;
+    width: 8%;
 }
 
 .popupContent .table .tableHeader .tr .td.kp,
 .popupContent .table .tableBody .tr .td.kp {
-    width: 10%;
+    width: 6%;
 }
 
 .popupContent .table .tableHeader .tr .td.rail,
 .popupContent .table .tableBody .tr .td.rail {
-    width: 10%;
+    width: 6%;
 }
 
 .popupContent .table .tableHeader .tr .td.mamo,
 .popupContent .table .tableBody .tr .td.mamo {
-    width: 10%;
+    width: 4%;
 }
 
 .popupContent .table .tableHeader .tr .td.date,
 .popupContent .table .tableBody .tr .td.date {
-    width: 10%;
+    width: 7%;
 }
 
 .popupContent .table .tableHeader .tr .td.ton,
 .popupContent .table .tableBody .tr .td.ton {
-    width: 10%;
+    width: 7%;
 }
 
 .popupContent .table .tableHeader .tr .td.value1,
 .popupContent .table .tableBody .tr .td.value1 {
-    width: 10%;
+    width: 7%;
+}
+
+.popupContent .table .tableHeader .tr .td.value1_1,
+.popupContent .table .tableBody .tr .td.value1_1 {
+    width: 7%;
+}
+
+.popupContent .table .tableHeader .tr .td.value1_2,
+.popupContent .table .tableBody .tr .td.value1_2 {
+    width: 7%;
+}
+
+.popupContent .table .tableHeader .tr .td.value1_3,
+.popupContent .table .tableBody .tr .td.value1_3 {
+    width: 7%;
 }
 
 .popupContent .table .tableHeader .tr .td.value2,
 .popupContent .table .tableBody .tr .td.value2 {
-    width: 10%;
+    width: 9%;
 }
 
 .popupContent .table .tableHeader .tr .td.value3,
@@ -453,10 +468,21 @@
 
 .popupContent .table .tableHeader .tr .td.value4,
 .popupContent .table .tableBody .tr .td.value4 {
-    width: 10%;
+    width: 15%;
 }
 
 .popupContent .table .tableHeader .tr .td.value5,
 .popupContent .table .tableBody .tr .td.value5 {
-    width: 10%;
+    width: 16%;
+}
+
+.table .tableHeader .tr .td .rowspan4{
+    width: 400%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
 }

@@ -1,5 +1,6 @@
 import "./title.css";
-import RaildoctorLogo from "../../assets/logo.svg";
+/* import RaildoctorLogo from "../../assets/logo.svg"; */
+import RaildoctorLogo from "../../assets/logo_color.png";
 import UserInformation from "../userInformation/userInformation";
 import { useLocation, useNavigate } from "react-router-dom";
 import classnames from "classnames"

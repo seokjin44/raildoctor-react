@@ -1,0 +1,137 @@
+.sideMenu .logo{
+    width: 100%;
+}
+
+.sideMenu .logo img{
+    width: 75%;
+}
+
+
+/* User */
+.sideMenu .user{
+    height: 240px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.sideMenu .user .userIcon{
+    height: 90px;
+    width: 100%;
+}
+
+.sideMenu .user .userIcon img{
+    height: 100%;
+}
+
+.sideMenu .user .userName{
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.sideMenu .user .lastLogin{
+    font-weight: bold;
+    margin-top: 4px;
+    font-size: 1px;
+    color: #c5c5c5;
+}
+
+.sideMenu .user .route{
+    margin-top: 15px;
+    border: 1px solid #cccccc;
+    border-radius: 30px;
+    padding: 7px 15px 7px 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+    background: white;
+    height: 25px;
+    user-select: none;
+}
+
+.sideMenu .user .route img.routeLogo{
+    width: 85px;
+    margin-right: 10px;
+    margin-top: 2px;
+    margin-left: 7px;
+}
+
+.sideMenu .user .route img.rightArrow{
+    width: 14px;
+    margin-left: 7px;
+    margin-right: 6px;
+}
+
+.sideMenu .menuList{
+    width: 100%;
+}
+
+.sideMenu .menuList .menuBox{
+    overflow: hidden;
+    width: calc(100% + 1px);
+}
+
+.sideMenu .menuList .menu{
+    height: 50px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    margin-left: 40px;
+    font-size: 17px;
+    width: calc(100% - 45px);
+    margin-top: 15px;
+    padding-left: 40px;
+    cursor: pointer;
+}
+
+.sideMenu .menuList .menu .icon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    margin-right: 10px;
+}
+
+.sideMenu .menuList .menu .icon img{
+    width: 100%;
+}
+
+.sideMenu .menuList .menu.active{
+    border: 1px solid #cccccc;
+    border-radius: 40px;
+    background: white;
+    height: 48px;
+}
+
+.sideMenu .user .routeSelect{
+    width: 259px;
+    height: 186px;
+    position: absolute;
+    left: 310px;
+    top: 180px;
+    z-index: 1;
+    background: white;
+    border-radius: 10px 10px 10px 10px;
+    border: 1px solid #cccccc;
+    padding: 15px 5px 15px 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    box-shadow: 1px 1px 8px 1px #00000030;
+}
+
+.sideMenu .user .routeSelect .route{
+    width: 210px;
+    margin-top: 7px;
+    user-select: none;
+}
+
+.sideMenu .user .routeSelect .route:first-child{
+    margin-top: 0;
+}
+

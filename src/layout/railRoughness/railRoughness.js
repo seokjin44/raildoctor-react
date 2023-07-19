@@ -4,10 +4,10 @@ import PositionTestImage from "../../assets/2023-07-09_21_48_42.png";
 import RailStatus from "../../component/railStatus/railStatus";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+//import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/ko';
 import PositionImg from "../../assets/position2.png";
-import Radio from '@mui/joy/Radio';
+//import Radio from '@mui/joy/Radio';
 import RadioGroup from '@mui/joy/RadioGroup';
 import ReportIcon from "../../assets/icon/1291748_magnify_magnifying glass_marketing_report_financial_icon.svg";
 import ReportImg from "../../assets/ReportImg.png";
@@ -33,7 +33,10 @@ import {
 import { Chart } from 'react-chartjs-2';
 import faker from 'faker';
 import Modal from '@mui/material/Modal';
+import { DatePicker, Input, Radio } from "antd";
+import { RANGEPICKERSTYLE } from "../../constant";
 
+const { RangePicker } = DatePicker;
 ChartJS.register(
   LinearScale,
   CategoryScale,
@@ -577,44 +580,47 @@ function RailRoughness( props ) {
       <div className="railStatusContainer">
         <RailStatus railroadSection={railroadSection} pathClick={pathClick}></RailStatus>
       </div>
-      <div className="contentBox" style={{ height: "220px"}} >
-        <div className="containerTitle">검토구간</div>
-        <div className="componentBox flex section ">
-
-          <div className="position optionBox borderColorGreen" style={{width: "935px"}} >
-            <div className="optionTitle">위치</div>
-            <div className="optionValue">
-              <img src={PositionImg} />
+      <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px", marginBottom:"10px"}}>
+            <div className="containerTitle bothEnds">
+              <div>Search Navigate</div>
             </div>
-          </div>
-          
-          <div className="radioButtons optionBox ">
-            <RadioGroup defaultValue="outlined" name="radio-buttons-group" 
-              orientation="horizontal" 
-              size="sm"  
-              variant="outlined" style={{border : 0}}
-            >
-              <Radio value="outlined" label="상선" />
-              <Radio value="soft" label="하선" />
-            </RadioGroup>
-
-          </div>
-          <div className="distanceSearch optionBox">
-            <div className="optionTitle">KP</div>
-            <input className="local" id="kilometerStart" />
-            <div className="textK">K</div>
-            <input className="local" id="kilometerEnd"/>
-          </div>
-
-          {/* <div className="position optionBox h75">
-            <div className="optionTitle">측정일자</div>
-            <div className="optionValue">
-              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
-                <DatePicker label="측정일"  />
-              </LocalizationProvider>
+            <div className="componentBox" style={{overflow: "hidden"}}>
+              <div className="dataOption">
+                <div className="title">상하선 </div>
+                <div className="date">
+                <Radio.Group >
+                  <Radio value={1}>상선</Radio>
+                  <Radio value={2}>하선</Radio>
+                </Radio.Group>
+                </div>
+              </div>
+              <div className="line"></div>
+              <div className="dataOption">
+                <div className="title">KP </div>
+                <div className="date">
+                  <Input placeholder="KP"
+                    style={RANGEPICKERSTYLE}
+                  />
+                </div>
+              </div>
+              <div className="dataOption" style={{marginLeft:"10px"}}>
+                완화곡선 /
+                R=우곡선 400 (C=55, S=0) /
+                체감 C=40, S=0 /
+                종구배=+10‰ /
+                V=+40km/h
+              </div>
+              <div className="line"></div>
+              <div className="dataOption">
+                <div className="title">측정일자 </div>
+                <div className="date">
+                  <RangePicker 
+                    style={RANGEPICKERSTYLE}
+                  />
+                  {/* <DatePicker style={RANGEPICKERSTYLE} /> */}
+                </div>
+              </div>
             </div>
-          </div> */}
-        </div>
       </div>
 
       <div className="contentBox" style={{marginTop:"10px", height: "485px"}}>
@@ -629,6 +635,7 @@ function RailRoughness( props ) {
                   <div className="td rail">Rail</div>
                   <div className="td station">Station/tag</div>
                   <div className="td weld">Type of weld</div>
+                  <div className="td weld">누적통과톤수</div>
                   <div className="td viewBtn"></div>
                 </div>
               </div>
@@ -640,6 +647,7 @@ function RailRoughness( props ) {
                   <div className="td rail">Right</div>
                   <div className="td station">15K242</div>
                   <div className="td weld">TMW</div>
+                  <div className="td weld">431,235,694</div>
                   <div className="td viewBtn">
                     <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
                       <img src={ReportIcon} />
@@ -653,6 +661,7 @@ function RailRoughness( props ) {
                   <div className="td rail">Right</div>
                   <div className="td station">15K242</div>
                   <div className="td weld">TMW</div>
+                  <div className="td weld">431,235,694</div>
                   <div className="td viewBtn">
                     <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
                       <img src={ReportIcon} />
@@ -666,6 +675,7 @@ function RailRoughness( props ) {
                   <div className="td rail">Right</div>
                   <div className="td station">15K242</div>
                   <div className="td weld">TMW</div>
+                  <div className="td weld">431,235,694</div>
                   <div className="td viewBtn">
                     <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
                       <img src={ReportIcon} />
@@ -679,6 +689,7 @@ function RailRoughness( props ) {
                   <div className="td rail">Right</div>
                   <div className="td station">15K242</div>
                   <div className="td weld">TMW</div>
+                  <div className="td weld">431,235,694</div>
                   <div className="td viewBtn">
                     <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
                       <img src={ReportIcon} />
@@ -692,6 +703,7 @@ function RailRoughness( props ) {
                   <div className="td rail">Right</div>
                   <div className="td station">15K242</div>
                   <div className="td weld">TMW</div>
+                  <div className="td weld">431,235,694</div>
                   <div className="td viewBtn">
                     <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
                       <img src={ReportIcon} />
@@ -705,6 +717,7 @@ function RailRoughness( props ) {
                   <div className="td rail">Right</div>
                   <div className="td station">15K242</div>
                   <div className="td weld">TMW</div>
+                  <div className="td weld">431,235,694</div>
                   <div className="td viewBtn">
                     <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
                       <img src={ReportIcon} />
@@ -718,6 +731,7 @@ function RailRoughness( props ) {
                   <div className="td rail">Right</div>
                   <div className="td station">15K242</div>
                   <div className="td weld">TMW</div>
+                  <div className="td weld">431,235,694</div>
                   <div className="td viewBtn">
                     <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
                       <img src={ReportIcon} />
@@ -731,6 +745,7 @@ function RailRoughness( props ) {
                   <div className="td rail">Right</div>
                   <div className="td station">15K242</div>
                   <div className="td weld">TMW</div>
+                  <div className="td weld">431,235,694</div>
                   <div className="td viewBtn">
                     <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
                       <img src={ReportIcon} />

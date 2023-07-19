@@ -1,3 +1,14 @@
+.loginConatiner{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.loginConatiner .logo{
+    width: 280px;
+    margin-bottom: 25px;
+}
 .containerBackground{
     background: #F8F8FA;
     width: 350px;

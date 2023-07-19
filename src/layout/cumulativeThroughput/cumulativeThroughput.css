@@ -157,47 +157,39 @@
 
 .cumulativeThroughput .track {
     position: relative;
-    height: 590px;
+    height: calc(100% - 260px);
 }
 
-.testObject{
-    width: 100%;
-    height: calc(100% - 26px);
-    position: absolute;
-    top: 26px;
-    left: 0;
-}
-
-.testObject .guideLine{
+.cumulativeThroughput .componentBox .guideLine{
     width: 1px;
-    height: calc(100% - 87px);
+    height: calc(100% - 48px);
     position: absolute;
     background-color: #ff0000;
     left: 295px;
-    top: 78px;
+    top: 32px;
     border-radius: 5px;
 }
 
-.testObject .guideLine .dataContainer{
+.cumulativeThroughput .componentBox .guideLine .dataContainer{
     position: absolute;
     left: 10px;
-    top: 83%;
+    top: 73%;
 }
 
-.testObject .guideLine .dataContainer .dataLine:first-child{
+.cumulativeThroughput .componentBox .guideLine .dataContainer .dataLine:first-child{
     margin-top: 0;
 }
 
-.testObject .guideLine .dataContainer .dataLine{
+.cumulativeThroughput .componentBox .guideLine .dataContainer .dataLine{
     margin-top: 10px;
     width: fit-content;
 }
 
-.testObject .guideLine .dataContainer .table .tableBody{
+.cumulativeThroughput .componentBox .guideLine .dataContainer .table .tableBody{
     overflow: hidden;
 }
 
-.testObject .guideLine .dataContainer .table .tableHeader .tr .td,
-.testObject .guideLine .dataContainer .table .tableBody .tr .td{
+.cumulativeThroughput .componentBox .guideLine .dataContainer .table .tableHeader .tr .td,
+.cumulativeThroughput .componentBox .guideLine .dataContainer .table .tableBody .tr .td{
     min-width: 100px;
 }

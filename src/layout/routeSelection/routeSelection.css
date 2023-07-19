@@ -61,3 +61,12 @@
     border-radius: 5px;
     padding: 6px;
 }
+
+.routeSelection .logo{
+    width: 280px;
+    margin-bottom: 25px;
+}
+
+.routeSelection .logo img{
+    width: 100%;
+}

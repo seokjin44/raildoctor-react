@@ -4,7 +4,7 @@ import "./login.css"
 import Modal from "../Modal/Modal";
 import ExplainIcon from "../../assets/8725674_comment_info_alt_icon (1).svg";
 import { useNavigate } from "react-router-dom";
-
+import RaildoctorLogo from "../../assets/logo_color.png";
 
 function Login( props ) {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ function Login( props ) {
     for( let member of props.memberList ) {
       if( member.memberID === id && member.memberPW === password ) {
         sessionStorage.setItem("user", id);
-        navigate("/routeSelection");
+        navigate("/routeSelection", {state:{id:id}});
         return;
       }
     };
@@ -26,6 +26,10 @@ function Login( props ) {
   }
 
   return (
+  <div className="loginConatiner">
+    <div className="logo">
+      <img src={RaildoctorLogo} />
+    </div>
     <div className="containerBackground">
       <div id="loginContainer">
         <div id="greetings">
@@ -53,6 +57,7 @@ function Login( props ) {
         </div>
       </div>
     </div>
+  </div>
   );
 }
 

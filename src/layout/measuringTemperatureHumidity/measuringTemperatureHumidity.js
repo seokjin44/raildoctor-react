@@ -15,6 +15,8 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { Checkbox, Input } from "antd";
+import { RANGEPICKERSTYLE } from "../../constant";
 /* import {
   Chart as ChartJS,
   LinearScale,
@@ -770,6 +772,13 @@ const railroadSection = [
   }
 ]
 
+const dataOption = [
+  { label: '레일온도', value: '레일온도' },
+  { label: '대기온도', value: '대기온도' },
+  { label: '대기습도', value: '대기습도' },
+  { label: '(기상청)외부온도', value: '(기상청)외부온도' },
+];
+
 function MeasuringTemperatureHumidity( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
   const pathClick = (select) => {
@@ -787,7 +796,50 @@ function MeasuringTemperatureHumidity( props ) {
         <div className="railStatusContainer">
           <RailStatus railroadSection={railroadSection} pathClick={pathClick}></RailStatus>
         </div>
-        <div className="contentBox" style={{ height: "220px"}} >
+        <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px", marginBottom:"10px"}}>
+            <div className="containerTitle bothEnds">
+              <div>Search Navigate</div>
+            </div>
+            <div className="componentBox" style={{overflow: "hidden"}}>
+              <div className="dataOption">
+                <div className="title">KP </div>
+                <div className="date">
+                  <Input placeholder="KP"
+                    style={RANGEPICKERSTYLE}
+                  />
+                </div>
+              </div>
+              <div className="dataOption" style={{marginLeft:"10px"}}>
+                완화곡선 /
+                R=우곡선 400 (C=55, S=0) /
+                체감 C=40, S=0 /
+                종구배=+10‰ /
+                V=+40km/h
+              </div>
+              <div className="line"></div>
+              <div className="dataOption">
+                <div className="title">데이터 </div>
+                <div className="date">
+                  {/* <RangePicker 
+                    style={RANGEPICKERSTYLE}
+                  /> */}
+                  {/* <DatePicker style={RANGEPICKERSTYLE} /> */}
+                  <Checkbox.Group options={dataOption} />
+                </div>
+              </div>
+
+
+              {/* <div className="dataOption" style={{marginLeft:"10px"}}>
+                완화곡선 /
+                R=우곡선 400 (C=55, S=0) /
+                체감 C=40, S=0 /
+                종구배=+10‰ /
+                V=+40km/h
+              </div> */}
+              {/* <div className="line"></div> */}
+            </div>
+      </div>
+        {/* <div className="contentBox" style={{ height: "220px"}} >
           <div className="containerTitle">검토구간</div>
           <div className="componentBox flex section ">
 
@@ -820,9 +872,9 @@ function MeasuringTemperatureHumidity( props ) {
             </div>
 
           </div>
-        </div>
+        </div> */}
 
-        <div className="contentBox" style={{marginTop:"10px", height: "485px"}}>
+        <div className="contentBox" style={{marginTop:"10px", height: "calc(100% - 250px)"}}>
           <div className="containerTitle">Chart</div>
           <div className="componentBox chartBox flex">
             {/* <Chart type='bar' data={data} /> */}

@@ -4,7 +4,7 @@ import PositionTestImage from "../../assets/2023-07-13_16_45_35.png";
 import RailStatus from "../../component/railStatus/railStatus";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+//import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/ko';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, 
   ScatterChart, Scatter
@@ -15,7 +15,9 @@ import Chart from 'chart.js/auto';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+//import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { Checkbox, DatePicker, Input, Select } from "antd";
+import { RANGEPICKERSTYLE } from "../../constant";
 /* import {
   Chart as ChartJS,
   LinearScale,
@@ -857,6 +859,16 @@ function TrackGeometryMeasurement( props ) {
     setSelectedPath(select);
   }
 
+  const dataOption = [
+    { label: '윤중', value: '윤중' },
+    { label: '횡압', value: '횡압' },
+    { label: '레일저부응력', value: '레일저부응력' },
+    { label: '레일수평변위', value: '레일수평변위' },
+    { label: '레일수직변위', value: '레일수직변위' },
+    { label: '레일수직가속도', value: '레일수직가속도' },
+    { label: '열차속도', value: '열차속도' },
+  ];
+
   useEffect(() => {
   }, []);
   
@@ -865,7 +877,68 @@ function TrackGeometryMeasurement( props ) {
       <div className="railStatusContainer">
         <RailStatus railroadSection={railroadSection} pathClick={pathClick}></RailStatus>
       </div>
-      <div className="contentBox" >
+      <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px", marginBottom:"10px"}}>
+            <div className="containerTitle bothEnds">
+              <div>Search Navigate</div>
+            </div>
+            <div className="componentBox" style={{overflow: "hidden"}}>
+              <div className="dataOption">
+                <div className="title">선택구간 </div>
+                <div className="date">
+                  <Input placeholder="KP" value={"간석오거리 - 인천시청"}
+                    style={RANGEPICKERSTYLE}
+                    readOnly={true}
+                  />
+                </div>
+              </div>
+              <div className="line"></div>
+              <div className="dataOption">
+                <div className="title">측정일자 </div>
+                <div className="date">
+                  {/* <RangePicker 
+                    style={RANGEPICKERSTYLE}
+                  /> */}
+                  <DatePicker style={RANGEPICKERSTYLE} />
+                </div>
+              </div>
+              <div className="line"></div>
+              <div className="dataOption">
+                <div className="title">데이터 </div>
+                <div className="date">
+                  {/* <RangePicker 
+                    style={RANGEPICKERSTYLE}
+                  /> */}
+                  {/* <DatePicker style={RANGEPICKERSTYLE} /> */}
+                  <Checkbox.Group options={dataOption} />
+                </div>
+              </div>
+              {/* <div className="dataOption">
+                <div className="title">KP </div>
+                <div className="date">
+                  <Input placeholder="KP"
+                    style={RANGEPICKERSTYLE}
+                  />
+                </div>
+              </div>
+              <div className="dataOption" style={{marginLeft:"10px"}}>
+                완화곡선 /
+                R=우곡선 400 (C=55, S=0) /
+                체감 C=40, S=0 /
+                종구배=+10‰ /
+                V=+40km/h
+              </div> */}
+
+              {/* <div className="dataOption" style={{marginLeft:"10px"}}>
+                완화곡선 /
+                R=우곡선 400 (C=55, S=0) /
+                체감 C=40, S=0 /
+                종구배=+10‰ /
+                V=+40km/h
+              </div> */}
+              {/* <div className="line"></div> */}
+            </div>
+      </div>
+      {/* <div className="contentBox" >
         <div className="containerTitle">검토구간</div>
         <div className="componentBox flex section ">
           <div className="position optionBox borderColorGreen">
@@ -924,16 +997,16 @@ function TrackGeometryMeasurement( props ) {
             </div>
           </div>
         </div>
-      </div>
-      <div className="contentBoxGroup" style={{width: "100%", height: "238px", marginTop:"10px"}}>
-        <div className="contentBox" style={{marginRight: "10px", width: "calc(100% - 20px - 800px - 330px - 7px)", height: "100%"}}>
+      </div> */}
+      <div className="contentBoxGroup" style={{width: "100%", height: "300px", marginTop:"10px"}}>
+        <div className="contentBox" style={{marginRight: "10px", width: "calc(100% - 20px - 800px - 330px - 130px)", height: "100%"}}>
           <div className="containerTitle">측정위치</div>
           <div className="componentBox">
             <img src={PositionTestImage} style={{width:"100%", height:"100%"}} />
           </div>
         </div>
         <div className="contentBox" style={{width:"800px", height:"100%", marginRight:"10px"}}>
-          <div className="containerTitle">장기계측</div>
+          <div className="containerTitle">장기계측 항목</div>
           <div className="componentBox">
             <div className="table" >
               <div className="tableHeader">
@@ -1081,9 +1154,9 @@ function TrackGeometryMeasurement( props ) {
           </div>
         </div>
         <div className="contentBox" style={{width:"330px", height:"100%"}}>
-          <div className="containerTitle">단기계측</div>
+          <div className="containerTitle">단기계측 항목</div>
           <div className="componentBox">
-          <div className="table table2" >
+          <div className="table table2" style={{justifyContent: "flex-start"}} >
               <div className="tableHeader">
                 <div className="tr">
                   <div className="td detail2 colspan2"><div className="colspan2">세부항목</div></div>
@@ -1135,7 +1208,7 @@ function TrackGeometryMeasurement( props ) {
           </div>
         </div>
       </div>
-      <div className="contentBox" style={{marginTop:"10px", height:"330px"}}>
+      <div className="contentBox" style={{marginTop:"10px", height:"calc(100% - 560px)"}}>
         <div className="containerTitle">Chart</div>
         <div className="componentBox flex flexEnd">
           {/* <Scatter options={optionsScatter} data={data} />
@@ -1152,7 +1225,7 @@ function TrackGeometryMeasurement( props ) {
             >
               <CartesianGrid />
               <XAxis type="category" dataKey="time" name="time" fontSize={9}  />
-              <YAxis type="number" dataKey="weight" name="weight" />
+              <YAxis type="number" dataKey="weight" name="weight" fontSize={12}/>
               <Tooltip cursor={{ strokeDasharray: '3 3' }} />
               <Scatter name="A school" data={data3} fill="#0041DC" />
             </ScatterChart>
@@ -1170,8 +1243,8 @@ function TrackGeometryMeasurement( props ) {
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis />
+              <XAxis dataKey="time" fontSize={12}/>
+              <YAxis fontSize={12}/>
               <Tooltip />
               <Legend />
               <Bar dataKey="weight" name="윤중" fill="#0041DC" />
@@ -1190,8 +1263,8 @@ function TrackGeometryMeasurement( props ) {
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis />
+              <XAxis dataKey="time" fontSize={12}/>
+              <YAxis fontSize={12}/>
               <Tooltip />
               <Legend />
               <Bar dataKey="weight" name="윤중" fill="#0041DC" />

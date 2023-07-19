@@ -267,7 +267,7 @@
 
 .monitoringContainer .track{
     position: relative;
-    height: 590px;
+    height: calc(100% - 4px);
 }
 .monitoringContainer .guideLine {
     left: 50%;
@@ -490,4 +490,32 @@
     padding-right: 10px;
     width: calc(100% - 20px);
     margin-top: 10px;
+}
+
+.searchNavigate .componentBox{
+    overflow: auto;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    padding: 15px;
+    height: calc(100% - 55px);
+    width: calc(100% - 30px);
+}
+
+.searchNavigate .dataOption{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.searchNavigate .dataOption .title{
+    margin-right: 15px;
+}
+
+.searchNavigate .line{
+    height: 90%;
+    width: 1px;
+    background-color: #cccccc;
+    margin-left: 20px;
+    margin-right: 20px;
 }

@@ -4,11 +4,11 @@ import PositionTestImage from "../../assets/2023-07-09_21_48_42.png";
 import RailStatus from "../../component/railStatus/railStatus";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+//import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/ko';
 import PositionImg from "../../assets/position2.png";
-import Radio from '@mui/joy/Radio';
-import RadioGroup from '@mui/joy/RadioGroup';
+//import Radio from '@mui/joy/Radio';
+//import RadioGroup from '@mui/joy/RadioGroup';
 import LeftProfile from "../../assets/left_profile.png"; 
 import RightProfile from "../../assets/right_profile.png"; 
 import Slider from '@mui/material/Slider';
@@ -33,6 +33,10 @@ import {
 } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 import faker from 'faker';
+import { RANGEPICKERSTYLE } from "../../constant";
+import { Input, DatePicker, Radio } from "antd";
+import { RadioGroup } from "@mui/material";
+const { RangePicker } = DatePicker;
 
 ChartJS.register(
   LinearScale,
@@ -578,7 +582,49 @@ function RailProfile( props ) {
       <div className="railStatusContainer">
         <RailStatus railroadSection={railroadSection} pathClick={pathClick}></RailStatus>
       </div>
-      <div className="contentBox" style={{ height: "220px"}} >
+      <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px", marginBottom:"10px"}}>
+            <div className="containerTitle bothEnds">
+              <div>Search Navigate</div>
+            </div>
+            <div className="componentBox" style={{overflow: "hidden"}}>
+              <div className="dataOption">
+                <div className="title">상하선 </div>
+                <div className="date">
+                <Radio.Group >
+                  <Radio value={1}>상선</Radio>
+                  <Radio value={2}>하선</Radio>
+                </Radio.Group>
+                </div>
+              </div>
+              <div className="line"></div>
+              <div className="dataOption">
+                <div className="title">KP </div>
+                <div className="date">
+                  <Input placeholder="KP"
+                    style={RANGEPICKERSTYLE}
+                  />
+                </div>
+              </div>
+              <div className="dataOption" style={{marginLeft:"10px"}}>
+                완화곡선 /
+                R=우곡선 400 (C=55, S=0) /
+                체감 C=40, S=0 /
+                종구배=+10‰ /
+                V=+40km/h
+              </div>
+              <div className="line"></div>
+              <div className="dataOption">
+                <div className="title">검토일자 </div>
+                <div className="date">
+                  <RangePicker 
+                    style={RANGEPICKERSTYLE}
+                  />
+                  {/* <DatePicker style={RANGEPICKERSTYLE} /> */}
+                </div>
+              </div>
+            </div>
+      </div>
+      {/* <div className="contentBox" style={{ height: "220px"}} >
         <div className="containerTitle">검토구간</div>
         <div className="componentBox flex section ">
 
@@ -617,7 +663,7 @@ function RailProfile( props ) {
           </div>
   
         </div>
-      </div>
+      </div> */}
 
       <div className="contentBox" style={{marginTop:"10px", height: "485px"}}>
         <div className="containerTitle">프로파일 및 마모 데이터</div>

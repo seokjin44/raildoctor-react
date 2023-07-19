@@ -15,7 +15,7 @@ import InfoIcon from "../../assets/icon/info_white.png";
 import TrainIcon from "../../assets/icon/4047310_car_metro_monochrome_monorail_train_icon.png";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
 import ArrowIcon from "../../assets/icon/arrow.png";
-import { DatePicker } from 'antd';
+import { DatePicker, Input } from 'antd';
 
 import IncheonTrackPDF from "../../assets/pdf/INCHEON_TRACK.pdf";
 import IncheonTrackImg from "../../assets/track/incheon_track2.png";
@@ -30,11 +30,13 @@ import { LineChart, Line, XAxis,
   YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer,
   ScatterChart, Scatter, Bar, BarChart } from 'recharts';
+import RailStatus from "../../component/railStatus/railStatus";
+import { RAILROADSECTION } from "../../constant";
 
 window.PDFJS = PDFJS;
 const { RangePicker } = DatePicker;
 const rangePickerStyle = {
-  height:"22px",
+  height:"35px",
   fontFamily : 'NEO_R'
 }
 const tempData1 = [
@@ -15047,7 +15049,7 @@ function Monitoring( props ) {
   }
 
   useEffect(() => {
-    minimapDrawing();
+    //minimapDrawing();
     makeDummyWear3dData();
   }, [position]);
 
@@ -15083,18 +15085,18 @@ function Monitoring( props ) {
   };
 
   useEffect(() => {
-    let minimapContainer = document.getElementById("minimapContainer");
+    /* let minimapContainer = document.getElementById("minimapContainer");
     let canvas = canvasRef.current;
     canvas.width = minimapContainer.clientWidth;
-    canvas.height = minimapContainer.clientHeight;
+    canvas.height = minimapContainer.clientHeight; */
 
     let trackDetailContainer = document.getElementById("trackDetailContainer");
     let trackDetailCanvas = trackDetailCanvasRef.current;
     trackDetailCanvas.width = trackDetailContainer.clientWidth;
     trackDetailCanvas.height = trackDetailContainer.clientHeight;
 
-    drawRect(position.x, position.y);
-    minimapDrawing(); 
+    //drawRect(position.x, position.y);
+    //minimapDrawing(); 
   }, []);
 
   //const trackDetailCanvasRef = useRef(null);
@@ -15161,7 +15163,7 @@ function Monitoring( props ) {
       ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
       ctx.save(); // Save the current state of the context
       ctx.translate(trackDetailPosition.x, trackDetailPosition.y); // Apply translation
-      ctx.scale(scale, 0.35); // Apply scaling 
+      ctx.scale(2, 0.875); // Apply scaling 
       ctx.drawImage(img, 0, 0, img.width, img.height); // Draw the image
       ctx.restore(); // Restore the context to its saved state
     };
@@ -15185,7 +15187,7 @@ function Monitoring( props ) {
   const trackDetailHandleMouseMove = (e) => {
     if (trackDetailDragging) {
       const newPos = {x: e.clientX, y: e.clientY};
-      const canvas = canvasRef.current;
+      const canvas = trackDetailCanvasRef.current;
       const img = new Image();
       img.src = IncheonTrackImg; // replace with your image url
   
@@ -15224,9 +15226,18 @@ function Monitoring( props ) {
   
     setScale(newScale);
   };
+  const [selectedPath, setSelectedPath] = useState([]);
+  const pathClick = (select) => {
+    console.log(select);
+    //getInstrumentationPoint(select);
+    setSelectedPath(select);
+  }
 
   return (
     <div className="monitoringContainer" >
+        <div className="railStatusContainer">
+          <RailStatus railroadSection={RAILROADSECTION} pathClick={pathClick}></RailStatus>
+        </div>
         {/* <div className="searchBar">
           <div className="boxProto minimap searchOption">
             <div className="minimapContainer" id="minimapContainer">
@@ -15253,21 +15264,53 @@ function Monitoring( props ) {
             <img src={PinIcon} />15K205
           </div>
         </div> */}
+          <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px"}}>
+            <div className="containerTitle bothEnds">
+              <div>Search Navigate</div>
+            </div>
+            <div className="componentBox" style={{overflow: "auto"}}>
+              <div className="dataOption">
+                <div className="title">탐색날짜 </div>
+                <div className="date">
+                  <RangePicker 
+                    style={rangePickerStyle}
+                />
+                </div>
+              </div>
+              <div className="line"></div>
+              <div className="dataOption">
+                <div className="title">KP </div>
+                <div className="date">
+                  <Input placeholder="KP"
+                    style={rangePickerStyle}
+                  />
+                </div>
+              </div>
+              <div className="dataOption" style={{marginLeft:"10px"}}>
+                완화곡선 /
+                R=우곡선 400 (C=55, S=0) /
+                체감 C=40, S=0 /
+                종구배=+10‰ /
+                V=+40km/h
+              </div>
+              {/* <div className="line"></div> */}
+            </div>
+          </div>
 
-          <div className="contentBox wearContainer" style={{marginLeft : 0, height: "calc(100% - 190px - 238px)", minHeight: "700px"}}>
+          <div className="contentBox wearContainer" style={{marginLeft : 0, height: "calc(100% - 190px - 238px)", minHeight: "1500px"}}>
             <div className="containerTitle bothEnds">
               <div>선로열람도</div>
-              <div className="dataOption">
+              {/* <div className="dataOption">
                 <div className="date">
                   <img src={CalendarIcon} />
                   <RangePicker 
                     style={rangePickerStyle}
                   />
                 </div>
-              </div>
+              </div> */}
             </div>
             <div className="componentBox separationBox" style={{overflow: "auto"}}>
-              <div className="boxProto minimap searchOption">
+              {/* <div className="boxProto minimap searchOption">
                 <div className="minimapContainer" id="minimapContainer">
                   <canvas id="minimapCanvas"
                       ref={canvasRef}
@@ -15276,7 +15319,7 @@ function Monitoring( props ) {
                       onMouseMove={handleMouseMove}
                   ></canvas>
                 </div>
-              </div>
+              </div> */}
               <div className="boxProto track" id="trackDetailContainer">
                 <canvas id="trackDetailCanvas"
                     ref={trackDetailCanvasRef}
@@ -15291,14 +15334,14 @@ function Monitoring( props ) {
           <div className="contentBox wearContainer" style={{marginLeft : 0, height: "190px"}}>
             <div className="containerTitle bothEnds">
               <div>속도정보</div>
-              <div className="dataOption">
+              {/* <div className="dataOption">
                 <div className="date">
                   <img src={CalendarIcon} />
                   <RangePicker 
                     style={rangePickerStyle}
                   />
                 </div>
-              </div>
+              </div> */}
             </div>
             <div className="componentBox separationBox" style={{overflow: "auto"}}>
               <div className="boxProto speed" id="trackDetailContainer">
@@ -15313,9 +15356,7 @@ function Monitoring( props ) {
               <div className="dataOption">
                 <div className="date">
                   <img src={CalendarIcon} />
-                  <RangePicker 
-                    style={rangePickerStyle}
-                  />
+                  2022.01.01 ~ 2023.05.05
                 </div>
               </div>
             </div>
@@ -15408,12 +15449,37 @@ function Monitoring( props ) {
             </Box>
             <TabPanel value="1">
               <div className="tabPanel throughput">
-                <div className="contentBox" style={{height: "100px"}} >
-                  <div className="containerTitle">현재 누적통과톤수</div>
+                <div className="contentBox" style={{height: "100px", marginBottom:"10px"}} >
+                  <div className="containerTitle">하선 - 현재 누적통과톤수</div>
                   <div className="componentBox flex section ">
                     <div className="curDate optionBox borderColorGreen">
                       <div className="optionTitle">현재날짜</div>
                       <div className="optionValue">2023/07/03</div>
+                    </div>
+                    <div className="curDate optionBox borderColorGreen">
+                      <div className="optionTitle">KP</div>
+                      <div className="optionValue">15k520</div>
+                    </div>
+                    <div className="curDate optionBox borderColorGreen">
+                      <div className="optionTitle">좌레일</div>
+                      <div className="optionValue">414,953,971</div>
+                    </div>
+                    <div className="curDate optionBox borderColorGreen" >
+                      <div className="optionTitle">우레일</div>
+                      <div className="optionValue">414,953,971</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="contentBox" style={{height: "100px"}} >
+                  <div className="containerTitle">상선 - 현재 누적통과톤수</div>
+                  <div className="componentBox flex section ">
+                    <div className="curDate optionBox borderColorGreen">
+                      <div className="optionTitle">현재날짜</div>
+                      <div className="optionValue">2023/07/03</div>
+                    </div>
+                    <div className="curDate optionBox borderColorGreen">
+                      <div className="optionTitle">KP</div>
+                      <div className="optionValue">15k520</div>
                     </div>
                     <div className="curDate optionBox borderColorGreen">
                       <div className="optionTitle">좌레일</div>
@@ -15429,10 +15495,20 @@ function Monitoring( props ) {
               </div>
             </TabPanel>
             <TabPanel value="2">
-              <div className="tabPanel"  style={{width:"763px", height:"336px"}}>
-                <div className="contentBox wearContainer" style={{marginLeft : 0}}>
+              <div className="tabPanel"  style={{width: "915px", height: "565px" }}>
+                <div className="contentBox wearContainer" style={{marginLeft : 0, height:"100%"}}>
                   <div className="containerTitle bothEnds">
                     <div>마모정보</div>
+                    <div className="dataOption" style={{right: "162px"}}>
+                      <div className="value">
+                        위치 : 15k520
+                      </div>
+                    </div>
+                    <div className="dataOption">
+                      <div className="value">
+                        측정기간 : 22년 2분기
+                      </div>
+                    </div>
                   </div>
                   <div className="componentBox separationBox">
                     <div className="componentBox" id="directWearInfo">
@@ -15449,7 +15525,19 @@ function Monitoring( props ) {
             <TabPanel value="3">
               <div className="tabPanel" style={{width:"763px", height:"336px"}}>
                 <div className="contentBox" style={{width:"100%", height: "100%"}}>
-                  <div className="containerTitle">Chart</div>
+                  <div className="containerTitle">
+                    Chart
+                    <div className="dataOption" style={{right: "162px"}}>
+                      <div className="value">
+                        측정구간 : 간석오거리~인천시청 
+                      </div>
+                    </div>
+                    <div className="dataOption">
+                      <div className="value">
+                        측정기간 : 22년 2분기
+                      </div>
+                    </div>
+                  </div>
                   <div className="componentBox chartBox flex">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart
@@ -15482,10 +15570,21 @@ function Monitoring( props ) {
               </div>
             </TabPanel>
             <TabPanel value="4">
-              <div className="tabPanel" style={{width:"1000px", height:"336px"}}>
+              <div className="tabPanel" style={{width:"1000px", height:"320px"}}>
               <div className="contentBox" style={{height:"100%"}}>
-                  <div className="containerTitle">Chart</div>
-                  <div className="componentBox flex flexEnd">
+                  <div className="containerTitle">Chart
+                  <div className="dataOption" style={{right: "162px"}}>
+                    <div className="value">
+                        위치 : 15k520
+                    </div>
+                  </div>
+                  <div className="dataOption">
+                    <div className="value">
+                      측정기간 : 22년 2분기
+                    </div>
+                  </div>
+                  </div>
+                  <div className="componentBox flex flexEnd" style={{paddingTop : "5px", paddingBottom : "5px", height: "calc(100% - 35px)"}}>
                     {/* <Scatter options={optionsScatter} data={data} />
                     <Bar options={optionsBar1} data={dataBar} />
                     <Bar options={optionsBar2} data={dataBar} /> */}
@@ -15500,7 +15599,7 @@ function Monitoring( props ) {
                       >
                         <CartesianGrid />
                         <XAxis type="category" dataKey="time" name="time" fontSize={9}  />
-                        <YAxis type="number" dataKey="weight" name="weight" />
+                        <YAxis type="number" dataKey="weight" name="weight" fontSize={10} />
                         <Tooltip cursor={{ strokeDasharray: '3 3' }} />
                         <Scatter name="A school" data={data3} fill="#0041DC" />
                       </ScatterChart>
@@ -15518,8 +15617,8 @@ function Monitoring( props ) {
                         }}
                       >
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" />
-                        <YAxis />
+                        <XAxis dataKey="time" fontSize={9}/>
+                        <YAxis fontSize={10}/>
                         <Tooltip />
                         <Legend />
                         <Bar dataKey="weight" name="윤중" fill="#0041DC" />
@@ -15538,8 +15637,8 @@ function Monitoring( props ) {
                         }}
                       >
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" />
-                        <YAxis />
+                        <XAxis dataKey="time" fontSize={9}/>
+                        <YAxis fontSize={10}/>
                         <Tooltip />
                         <Legend />
                         <Bar dataKey="weight" name="윤중" fill="#0041DC" />
@@ -15553,7 +15652,23 @@ function Monitoring( props ) {
             <TabPanel value="5">
               <div className="tabPanel" style={{width:"763px", height:"336px"}}>
                 <div className="contentBox" style={{height: "100%"}}>
-                  <div className="containerTitle">Chart</div>
+                  <div className="containerTitle">Chart
+                    <div className="dataOption" style={{right: "277px"}}>
+                      <div className="value">
+                        측정구간 : 간석오거리~인천시청
+                      </div>
+                    </div>
+                    <div className="dataOption" style={{right: "174px"}}>
+                      <div className="value">
+                          위치 : 15k515
+                      </div>
+                    </div>
+                    <div className="dataOption">
+                      <div className="value">
+                        측정기간 : 2023.06.01
+                      </div>
+                    </div>
+                  </div>
                   <div className="componentBox chartBox flex">
                     {/* <Chart type='bar' data={data} /> */}
                     <ResponsiveContainer width="100%" height="100%">
