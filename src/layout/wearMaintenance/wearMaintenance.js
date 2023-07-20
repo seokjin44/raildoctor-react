@@ -758,9 +758,23 @@ const getInstrumentationPoint = (select) => {
                       paddingLeft: "5px",
                       flexDirection: "column",
                       width: "calc( 100% - 12px)" }} >
-                  <div class="curDate optionBox borderColorGreen" style={{height:"55px", width: "315px", marginBottom : "10px"}}>
-                    <div class="optionTitle" style={{width:"212px"}}>예측 누적통과톤수</div>
-                    <div class="optionValue">414,953,971</div>
+                  <div className="dataBox">
+                    <div class="curDate optionBox borderColorGreen" style={{height:"55px", width: "315px", marginBottom : "10px"}}>
+                      <div class="optionTitle" style={{width:"212px"}}>예측 누적통과톤수</div>
+                      <div class="optionValue">414,953,971</div>
+                    </div>
+                    <div class="curDate optionBox borderColorGreen" style={{height:"55px", width: "315px", marginBottom : "10px"}}>
+                      <div class="optionTitle" style={{width:"212px"}}>기준직마모량</div>
+                      <div class="optionValue">13mm</div>
+                    </div>
+                    <div class="curDate optionBox borderColorGreen" style={{height:"55px", width: "315px", marginBottom : "10px"}}>
+                      <div class="optionTitle" style={{width:"212px"}}>기준편마모량</div>
+                      <div class="optionValue">15mm</div>
+                    </div>
+                    <div class="curDate optionBox borderColorGreen" style={{height:"55px", width: "315px", marginBottom : "10px"}}>
+                      <div class="optionTitle" style={{width:"212px"}}>갱환시기</div>
+                      <div class="optionValue">6억톤</div>
+                    </div>
                   </div>
                   <div className="table" style={{ justifyContent: "flex-start" }}>
                     <div className="tableHeader">

@@ -554,3 +554,9 @@
 .commentTitle .radioGroup{
     margin-left: 10px;
 }
+
+.wearMaintenance .dataBox{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}

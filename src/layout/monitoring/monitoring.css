@@ -527,7 +527,7 @@
 }
 
 .monitoringContainer .contentBox.wearContainer{
-    min-height: 1500px;
+    min-height: 500px;
     height: calc(100% - 190px - 238px);
 }
 

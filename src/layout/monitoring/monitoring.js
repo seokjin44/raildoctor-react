@@ -15162,10 +15162,11 @@ function Monitoring( props ) {
     const img = new Image();
     img.src= IncheonTrackImg;
     img.onload = function() {
+      let Hscale = canvas.height / img.height
       ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
       ctx.save(); // Save the current state of the context
       ctx.translate(trackDetailPosition.x, trackDetailPosition.y); // Apply translation
-      ctx.scale(2, 0.875); // Apply scaling 
+      ctx.scale(scale, Hscale); // Apply scaling 
       ctx.drawImage(img, 0, 0, img.width, img.height); // Draw the image
       ctx.restore(); // Restore the context to its saved state
     };
@@ -15234,6 +15235,15 @@ function Monitoring( props ) {
     //getInstrumentationPoint(select);
     setSelectedPath(select);
   }
+
+  useEffect(()=>{
+    let trackDetailContainer = document.getElementById("trackDetailContainer");
+    let trackDetailCanvas = trackDetailCanvasRef.current;
+    trackDetailCanvas.width = trackDetailContainer.clientWidth;
+    trackDetailCanvas.height = trackDetailContainer.clientHeight;
+
+    trackDetailDrawImage();
+  },[routeHidden] );
 
   return (
     <div className="monitoringContainer" >
@@ -15311,9 +15321,12 @@ function Monitoring( props ) {
                   />
                 </div>
               </div> */}
-              <div className="dataOption">
-                <div className="value" onClick={()=>{ setRouteHidden(!routeHidden) }}>
-                  숨기기
+              <div className="dataOption" style={{cursor:"pointer"}}>
+                <div className="value" onClick={()=>{ 
+                  setRouteHidden(!routeHidden);
+
+                }}>
+                  {(!routeHidden) ? "숨기기" : "펼치기"}
                 </div>
               </div>
             </div>

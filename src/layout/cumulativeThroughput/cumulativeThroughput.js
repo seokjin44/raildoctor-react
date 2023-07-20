@@ -305,12 +305,6 @@ function CumulativeThroughput( props ) {
       <div className="contentBox" style={{height:"calc(100% - 245px)", position:"relative"}} >
         <div className="containerTitle">
           <div>검토구간</div>
-          <div className="dataOption">
-            <div className="option date" >
-              <img src={CalendarIcon} />
-              2023.01.01
-            </div>
-          </div>
         </div>
         <div className="componentBox">
           {/* <div className="boxProto minimap searchOption">
