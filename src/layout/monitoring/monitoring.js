@@ -15264,11 +15264,12 @@ function Monitoring( props ) {
             <img src={PinIcon} />15K205
           </div>
         </div> */}
+        <div className="monitoringContent" style={{ height: "calc(100% - 135px)", width: "100%", overflow: "auto"}} >
           <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px"}}>
             <div className="containerTitle bothEnds">
               <div>Search Navigate</div>
             </div>
-            <div className="componentBox" style={{overflow: "auto"}}>
+            <div className="componentBox" style={{overflow: "hidden"}}>
               <div className="dataOption">
                 <div className="title">탐색날짜 </div>
                 <div className="date">
@@ -15422,6 +15423,7 @@ function Monitoring( props ) {
               </div>
             </div>
           </div>
+        </div>
 
 
               

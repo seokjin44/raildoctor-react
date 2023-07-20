@@ -10,7 +10,7 @@
 
 .railStatusContainer{
     height: 135px;
-    width: calc(100% - 2px); 
+    width: calc(100% - 0px); 
 }
 
 .pointContainer{
@@ -328,7 +328,7 @@
 
 .wearMaintenance .dataContainer{
     width: 100%;
-    height: calc(100% - 116px);
+    height: calc(100% - 135px);
     display: flex;
     justify-content: center;
     align-items: center;

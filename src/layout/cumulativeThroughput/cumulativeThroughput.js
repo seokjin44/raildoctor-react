@@ -253,7 +253,7 @@ function CumulativeThroughput( props ) {
             <div className="containerTitle bothEnds">
               <div>Search Navigate</div>
             </div>
-            <div className="componentBox" style={{overflow: "auto"}}>
+            <div className="componentBox" style={{overflow: "hidden"}}>
               <div className="dataOption">
                 <div className="title">조회일자 </div>
                 <div className="date">
@@ -302,7 +302,7 @@ function CumulativeThroughput( props ) {
               {/* <div className="line"></div> */}
             </div>
       </div>
-      <div className="contentBox" style={{height:"100%", position:"relative"}} >
+      <div className="contentBox" style={{height:"calc(100% - 245px)", position:"relative"}} >
         <div className="containerTitle">
           <div>검토구간</div>
           <div className="dataOption">
