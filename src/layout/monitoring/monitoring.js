@@ -15269,7 +15269,7 @@ function Monitoring( props ) {
         <div className="monitoringContent" style={{ height: "calc(100% - 135px)", width: "100%", overflow: "auto"}} >
           <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px"}}>
             <div className="containerTitle bothEnds">
-              <div>Search Navigate</div>
+              <div>검색</div>
             </div>
             <div className="componentBox" style={{overflow: "hidden"}}>
               <div className="dataOption">
