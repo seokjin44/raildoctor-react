@@ -72,52 +72,52 @@ function Sidemenu( props ) {
         <div className="menuBox">
           <div className={ classnames("menu",{ active : location.pathname.indexOf("monitoring") > -1 }) } 
               onClick={()=>{navigate("/monitoring");}}>
-            <div className="icon"><img src={MonitoringIcon} /></div>선로모니터링
+            {/* <div className="icon"><img src={MonitoringIcon} /></div> */}선로모니터링
           </div>
         </div>
         <div className="menuBox">
           <div className={ classnames("menu",{ active : location.pathname.indexOf("cumulativeThroughput") > -1 }) } onClick={()=>{navigate("/cumulativeThroughput",{});}} >
-            <div className="icon"><img src={CumulativeThroughputIcon} /></div>누적통과톤수
+            {/* <div className="icon"><img src={CumulativeThroughputIcon} /></div> */}누적통과톤수
           </div>
         </div>
         <div className="menuBox">
           <div className={ classnames("menu",{ active : location.pathname.indexOf("wearMaintenance") > -1 }) } onClick={()=>{navigate("/wearMaintenance");}}>
-            <div className="icon"><img src={WearMaintenanceIcon} /></div>마모유지관리
+            {/* <div className="icon"><img src={WearMaintenanceIcon} /></div> */}마모유지관리
           </div>
         </div>
         <div className="menuBox">
           <div className={ classnames("menu",{ active : location.pathname.indexOf("trackDeviation") > -1 }) } onClick={()=>{navigate("/trackDeviation",{});}} >
-            <div className="icon"><img src={TrackDeviationIcon} /></div>궤도틀림
+            {/* <div className="icon"><img src={TrackDeviationIcon} /></div> */}궤도틀림
           </div>
         </div>
         <div className="menuBox">
           <div className={ classnames("menu",{ active : location.pathname.indexOf("trackGeometryMeasurement") > -1 }) } onClick={()=>{navigate("/trackGeometryMeasurement",{});}} >
-            <div className="icon"><img src={TrackGeometryMeasurementIcon} /></div>궤도거동계측 
+            {/* <div className="icon"><img src={TrackGeometryMeasurementIcon} /></div> */}궤도거동계측 
           </div>
         </div>
         <div className="menuBox">
           <div className={ classnames("menu",{ active : location.pathname.indexOf("MeasuringTemperatureHumidity") > -1 }) } onClick={()=>{navigate("/MeasuringTemperatureHumidity",{});}} >
-            <div className="icon"><img src={MeasuringTemperatureHumidityIcon} /></div>온/습도
+            {/* <div className="icon"><img src={MeasuringTemperatureHumidityIcon} /></div> */}온/습도
           </div>
         </div>
         <div className="menuBox">
           <div className={ classnames("menu",{ active : location.pathname.indexOf("railProfile") > -1 }) } onClick={()=>{navigate("/railProfile",{});}} >
-          <div className="icon"><img src={RailProfileIcon} /></div>레일프로파일
+          {/* <div className="icon"><img src={RailProfileIcon} /></div> */}레일프로파일
           </div>
         </div>
         <div className="menuBox">
           <div className={ classnames("menu",{ active : location.pathname.indexOf("railRoughness") > -1 }) } onClick={()=>{navigate("/railRoughness",{});}} >
-          <div className="icon"><img src={RailRoughnessIcon} /></div>레일직진도
+          {/* <div className="icon"><img src={RailRoughnessIcon} /></div> */}레일직진도
           </div>
         </div>
         <div className="menuBox">
           <div className={ classnames("menu",{ active : location.pathname.indexOf("railTrackAlignment") > -1 }) } onClick={()=>{navigate("/railTrackAlignment",{});}} >
-          <div className="icon"><img src={RailTrackAlignmentIcon} /></div> 레일조도
+          {/* <div className="icon"><img src={RailTrackAlignmentIcon} /></div> */} 레일조도
           </div>
         </div>
         <div className="menuBox">
           <div className={ classnames("menu",{ active : location.pathname.indexOf("dataUpload") > -1 }) } onClick={()=>{navigate("/dataUpload",{});}} >
-            <div className="icon"><img src={DataIcon} /></div>데이터관리
+            {/* <div className="icon"><img src={DataIcon} /></div> */}데이터관리
           </div>
         </div>
       </div>
