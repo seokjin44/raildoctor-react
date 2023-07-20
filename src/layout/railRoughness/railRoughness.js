@@ -34,7 +34,7 @@ import { Chart } from 'react-chartjs-2';
 import faker from 'faker';
 import Modal from '@mui/material/Modal';
 import { DatePicker, Input, Radio } from "antd";
-import { RANGEPICKERSTYLE } from "../../constant";
+import { RADIO_STYLE, RANGEPICKERSTYLE } from "../../constant";
 
 const { RangePicker } = DatePicker;
 ChartJS.register(
@@ -588,7 +588,7 @@ function RailRoughness( props ) {
               <div className="dataOption">
                 <div className="title">상하선 </div>
                 <div className="date">
-                <Radio.Group >
+                <Radio.Group style={RADIO_STYLE} >
                   <Radio value={1}>상선</Radio>
                   <Radio value={2}>하선</Radio>
                 </Radio.Group>

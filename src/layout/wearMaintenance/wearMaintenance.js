@@ -24,7 +24,11 @@ import { Select } from 'antd';
 import classNames from "classnames";
 import { Box, Modal } from "@mui/material";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
-import { DIRECTWEARINFO, INSTRUMENTATIONPOINT, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO } from "../../constant";
+import { DIRECTWEARINFO, INSTRUMENTATIONPOINT, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO } from "../../constant";
+import AlertIcon from "../../assets/icon/decision/3876149_alert_emergency_light_protection_security_icon.png";
+import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
+
+const { TextArea } = Input;
 
 const style = {
   position: 'absolute',
@@ -289,9 +293,14 @@ const getInstrumentationPoint = (select) => {
   const [lastPos, setLastPos] = useState(null);
 
   const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
   const handleClose = () => {
     setOpen(false);
   }
+  const handleClose2 = () => {
+    setOpen2(false);
+  }
+
 
 
   const pathClick = (select) => {
@@ -699,6 +708,10 @@ const getInstrumentationPoint = (select) => {
                         console.log("예측데이터 상세보기");
                         setOpen(true);
                       }} >예측데이터 상세보기</div>
+                      <div className="modalButton highlight orange" onClick={()=>{
+                        console.log("예측데이터 상세보기");
+                        setOpen2(true);
+                      }} >의사결정</div>
                     </div>
                   </div>
                   <div className="componentBox separationBox">
@@ -732,7 +745,13 @@ const getInstrumentationPoint = (select) => {
             <div className="popupTitle"><img src={PopupIcon} />예측데이터 상세</div>
             <div className="popupContent">
               <div className="contentBox" style={{ height: "300px", marginTop : "10px", width: "1248px"}} >
-                <div className="containerTitle">예측결과</div>
+                <div className="containerTitle">예측결과
+                  <div className="dataOption">
+                    <div className="value">
+                      Update : 2023.01.25
+                    </div>
+                  </div>
+                </div>
                 <div className="componentBox flex section " style={{ paddingTop: "5px",
                       paddingBottom: "5px",
                       height: "calc(100% - 37px)",
@@ -919,6 +938,68 @@ const getInstrumentationPoint = (select) => {
             </div>
           </Box>
         </Modal>
+
+        <Modal
+          open={open2}
+          onClose={(e)=>{handleClose2()}}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style} >
+            <div className="decisionPopupTitle">
+              <img src={AlertIcon} />선로 마모 심각 
+              <div className="closeBtn" onClick={()=>{setOpen2(false)}} ><img src={CloseIcon} /></div>
+            </div>
+            <div className="decisionPopupContent">
+              <div className="contentBox wearContainer" style={{marginLeft : 0, height:"450px"}}>
+                  <div className="containerTitle bothEnds">
+                    <div>마모정보</div>
+                  </div>
+                  <div className="componentBox separationBox">
+                    <div className="componentBox" id="directWearInfo" style={{ border: "1px solid #cccccc",
+                        borderRadius: "5px",
+                        margin: "5px",
+                        width: "calc(100% - 12px)"}} >
+                      <WearInfo title="직마모(mm)" data={DIRECTWEARINFO}></WearInfo>
+                    </div>
+                    <div className="componentBox" id="sideWearInfo" style={{ border: "1px solid #cccccc",
+                        borderRadius: "5px",
+                        margin: "5px",
+                        width: "calc(100% - 12px)"}}>
+                      <WearInfo title="편마모(mm)" data={SIDEWEARINFO}></WearInfo>
+                    </div>
+                  </div>
+              </div>
+
+              <div className="comment" style={{ marginTop: "50px"}} >
+                <div className="commentTitle">유지보수 지침</div>
+                <div className="commentInput">
+                  <TextArea rows={6} />
+                </div>
+              </div>
+              <div className="comment" style={{ marginTop: "15px"}} >
+                <div className="commentTitle">
+                  유지보수 의사결정
+                  <div className="radioGroup">
+                    <Radio.Group style={RADIO_STYLE} >
+                      <Radio value={1}>알람무시</Radio>
+                      <Radio value={2}>점검 후 조치</Radio>
+                    </Radio.Group>
+                  </div>
+                </div>
+                <div className="commentInput">
+                  <TextArea rows={6} />
+                </div>
+              </div>
+
+            </div>
+            <div className="decisionButtonContainer">
+              <div className="button">유지보수 의사결정 등록</div>
+            </div>
+          </Box>
+        </Modal>
+
+
     </div>
   );
 }

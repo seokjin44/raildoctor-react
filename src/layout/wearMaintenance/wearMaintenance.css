@@ -486,3 +486,71 @@
     top: 0;
     left: 0;
 }
+
+
+/*== decision ==*/
+.decisionPopupTitle{
+    color: #EB501F;
+    font-size: 25px;
+    font-weight: bold;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    border-bottom: 5px solid #9F9F9F;
+    padding-bottom: 10px;
+    padding-right: 80px;
+    margin-left: 15px;
+    margin-top: 15px;
+    width: 25%;
+}
+
+.decisionPopupTitle img{
+    width: 30px;
+}
+
+.decisionPopupTitle .closeBtn{
+    position: absolute;
+    right: 21px;
+    cursor: pointer;
+}
+
+.decisionPopupContent{
+    padding: 15px;
+    width: 900px;
+}
+
+.decisionPopupContent .comment:first-child{
+    margin-top: 50px;
+}
+
+.decisionPopupContent .comment{
+}
+
+.decisionPopupContent .comment .commentTitle{
+    font-weight: bold;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.decisionButtonContainer{
+    width: calc(100% - 15px);
+    display: flex;
+    justify-content: end;
+    padding-right: 15px;
+}
+
+.decisionButtonContainer .button{
+    font-size: 13px;
+    border-radius: 14px;
+    background-color: #4854BF;
+    color: white;
+    width: fit-content;
+    padding: 7px 13px;
+    cursor: pointer;
+}
+
+.commentTitle .radioGroup{
+    margin-left: 10px;
+}

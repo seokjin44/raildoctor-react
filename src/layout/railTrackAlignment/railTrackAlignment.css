@@ -29,7 +29,13 @@
 .componentBox .curLine{
     position: absolute;
     width: 1px;
-    height: 120%;
+    height: 96%;
     background-color: red;
     left: 50%;
+}
+
+.decisionPopupContent .chartConatiner{
+    width: 100%;
+    height: 300px;
+    padding-top: 15px;
 }

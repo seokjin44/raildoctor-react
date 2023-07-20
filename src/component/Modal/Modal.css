@@ -16,3 +16,8 @@
     background: #006bff;
     color: white;
 }
+
+.modalButton.highlight.orange {
+    background-color: #ff8d00;
+    color: white;
+}

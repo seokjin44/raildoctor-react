@@ -15,7 +15,7 @@ import IncheonTrackImg from "../../assets/track/incheon_track2.png";
 import CalendarIcon from "../../assets/icon/299092_calendar_icon.png";
 import { DatePicker, Space, Input } from 'antd';
 import { Radio } from 'antd';
-import { RAILROADSECTION, RANGEPICKERSTYLE } from "../../constant";
+import { RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE } from "../../constant";
 
 const { RangePicker } = DatePicker;
 const tableData = [{"topdown":"상선","leftRight":"좌&우","start":"117.306","end":"669.306","after":"552","change":"2007-3-16","regdate":"2021-12-31","value1":"280562738.375","value2":"41915.0739726026","expect":"2042-11-12"},
@@ -180,7 +180,7 @@ function CumulativeThroughput( props ) {
       ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
       ctx.save(); // Save the current state of the context
       ctx.translate(trackDetailPosition.x, trackDetailPosition.y); // Apply translation
-      ctx.scale(scale, 0.35); // Apply scaling 
+      ctx.scale(scale, 0.28); // Apply scaling 
       ctx.drawImage(img, 0, 0, img.width, img.height); // Draw the image
       ctx.restore(); // Restore the context to its saved state
     };
@@ -277,7 +277,7 @@ function CumulativeThroughput( props ) {
               <div className="dataOption">
                 <div className="title">상하선 </div>
                 <div className="date">
-                  <Radio.Group >
+                  <Radio.Group style={RADIO_STYLE} >
                     <Radio value={1}>상선</Radio>
                     <Radio value={2}>하선</Radio>
                   </Radio.Group>

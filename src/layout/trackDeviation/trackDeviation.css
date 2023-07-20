@@ -146,3 +146,41 @@
     padding-left: 10px;
     padding-right: 10px;
 }
+
+/* trackReportPopup */
+.trackReportPopupTitle{
+    color: black;
+    font-size: 25px;
+    font-weight: bold;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    border-bottom: 5px solid #9F9F9F;
+    padding-bottom: 10px;
+    padding-right: 80px;
+    margin-left: 15px;
+    margin-top: 15px;
+    width: 25%;
+}
+
+.trackReportPopupTitle img{
+    width: 30px;
+}
+
+.trackReportPopupTitle .closeBtn{
+    position: absolute;
+    right: 21px;
+    cursor: pointer;
+}
+
+.trackReportPopupContent .table .tableHeader .tr .td,
+.trackReportPopupContent .table .tableBody .tr .td{
+    width: 100%;
+}
+
+.trackReportPopupContent{
+    width: 900px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+}

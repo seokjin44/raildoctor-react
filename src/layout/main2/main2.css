@@ -23,5 +23,10 @@
     height: calc(100%);
 }
 
-.main2 .top{
+.main2 .topBar{
+    position: absolute;
+    top: 0;
+    width: calc(100% - 300px);
+    background: #44546A;
+    height: 10px;
 }

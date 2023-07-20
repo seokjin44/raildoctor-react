@@ -31,11 +31,11 @@ class WearInfo extends React.Component {
                     }
                 },
                 markers: {
-                    size: [4, 4, 4, 4],
-                    shape: ["circle", "circle", "circle", "circle"],
-                    colors: ["#ffffff", "#0000ff", "#ffffff", "#ff0000"],
-                    strokeColor: ["#0000ff", "#ffffff", "#ff0000", "#ffffff"],
-                    strokeWidth: [2, 0, 2, 0],
+                    size: [4, 4, 4, 4,5,5,5,5],
+                    shape: ["circle", "circle", "circle", "circle","circle", "circle", "circle", "circle"],
+                    colors: ["#ffffff", "#0000ff", "#ffffff", "#ff0000","#FF7F27", "#A349A4", "#FF7F27", "#A349A4"],
+                    strokeColor: ["#0000ff", "#ffffff", "#ff0000", "#ffffff","#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+                    strokeWidth: [2, 0, 2, 0, 2, 0, 2, 0],
                 },
 
                 //colors: ['#0000FF', '#0000FF', '#FF0000', '#FF0000'],
@@ -143,6 +143,20 @@ class WearInfo extends React.Component {
             }, {
                 name: "상선 우레일",
                 data: []
+            },
+
+            {
+                name: "하선 좌레일 예측데이터",
+                data: []
+            }, {
+                name: "상선 좌레일 예측데이터",
+                data: []
+            }, {
+                name: "하선 우레일 예측데이터",
+                data: []
+            }, {
+                name: "상선 우레일 예측데이터",
+                data: []
             }
         ];
 
@@ -152,6 +166,12 @@ class WearInfo extends React.Component {
             if(data.track_type === 0) {
                 series[0].data.push([data.mgt, data.w_left]);
                 series[2].data.push([data.mgt, data.w_right]);
+            }else if(data.track_type === 2) {
+                series[4].data.push([data.mgt, data.w_left]);
+                series[6].data.push([data.mgt, data.w_right]);
+            }else if(data.track_type === 3) {
+                series[5].data.push([data.mgt, data.w_left]);
+                series[7].data.push([data.mgt, data.w_right]);
             } else {
                 series[1].data.push([data.mgt, data.w_left]);
                 series[3].data.push([data.mgt, data.w_right]);

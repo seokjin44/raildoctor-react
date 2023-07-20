@@ -520,3 +520,17 @@
     margin-left: 20px;
     margin-right: 20px;
 }
+
+.monitoringContainer .contentBox.wearContainer.hidden{
+    min-height: 38px;
+    height: 38px;
+}
+
+.monitoringContainer .contentBox.wearContainer{
+    min-height: 1500px;
+    height: calc(100% - 190px - 238px);
+}
+
+.monitoringContainer .contentBox.wearContainer.hidden #trackDetailCanvas{
+    opacity: 0;
+}

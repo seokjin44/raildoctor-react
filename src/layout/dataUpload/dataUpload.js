@@ -80,6 +80,24 @@ function DataUpload( props ) {
         </div>
         <div className="uploadHistory">
           <div className="title">선로열람도</div>
+          <div className="info">
+            <div className="infoBox">
+              <div className="infoTitle">총 등록 데이터 수</div>
+              <div className="infoValue">6 건</div>
+            </div>
+            <div className="infoBox">
+              <div className="infoTitle">총 등록 데이터 용량</div>
+              <div className="infoValue">523 MB</div>
+            </div>
+            <div className="infoBox">
+              <div className="infoTitle">최근 1주일 간 데이터 등록 건수</div>
+              <div className="infoValue">0 건</div>
+            </div>
+            <div className="infoBox">
+              <div className="infoTitle">1주일간 데이터 등록 용량</div>
+              <div className="infoValue">0 MB</div>
+            </div>
+          </div>
           <div className="uploadBtn"><img src={UploadIcon}/>Upload</div>
           <div className="table3">
             <div className="tableHeader">

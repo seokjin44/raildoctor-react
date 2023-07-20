@@ -32,6 +32,7 @@ import { LineChart, Line, XAxis,
   ScatterChart, Scatter, Bar, BarChart } from 'recharts';
 import RailStatus from "../../component/railStatus/railStatus";
 import { RAILROADSECTION } from "../../constant";
+import classNames from "classnames";
 
 window.PDFJS = PDFJS;
 const { RangePicker } = DatePicker;
@@ -15141,6 +15142,7 @@ function Monitoring( props ) {
   const [trackDetailPosition, setTrackDetailPosition] = useState({x: 0, y: 0});
   const [trackDetailDragging, setTrackDetailDragging] = useState(false);
   const [lastPos, setLastPos] = useState(null);
+  const [routeHidden, setRouteHidden] = useState(true);
   const trackDetailCanvasRef = useRef(null);
 
   const trackDetailDrawRect = () => {
@@ -15298,7 +15300,7 @@ function Monitoring( props ) {
             </div>
           </div>
 
-          <div className="contentBox wearContainer" style={{marginLeft : 0, height: "calc(100% - 190px - 238px)", minHeight: "1500px"}}>
+          <div className={classNames("contentBox wearContainer",{hidden : routeHidden} )} style={{marginLeft : 0}}>
             <div className="containerTitle bothEnds">
               <div>선로열람도</div>
               {/* <div className="dataOption">
@@ -15309,8 +15311,13 @@ function Monitoring( props ) {
                   />
                 </div>
               </div> */}
+              <div className="dataOption">
+                <div className="value" onClick={()=>{ setRouteHidden(!routeHidden) }}>
+                  숨기기
+                </div>
+              </div>
             </div>
-            <div className="componentBox separationBox" style={{overflow: "auto"}}>
+            <div className={classNames("componentBox separationBox",{hidden : routeHidden} )} style={{overflow: "auto"}}>
               {/* <div className="boxProto minimap searchOption">
                 <div className="minimapContainer" id="minimapContainer">
                   <canvas id="minimapCanvas"
@@ -15332,7 +15339,7 @@ function Monitoring( props ) {
             </div>
           </div>
 
-          <div className="contentBox wearContainer" style={{marginLeft : 0, height: "190px"}}>
+          <div className="contentBox" style={{marginLeft : 0, height: "190px"}}>
             <div className="containerTitle bothEnds">
               <div>속도정보</div>
               {/* <div className="dataOption">
@@ -15351,7 +15358,7 @@ function Monitoring( props ) {
             </div>
           </div>
 
-          <div className="contentBox wearContainer" style={{marginLeft : 0}}>
+          <div className="contentBox" style={{marginLeft : 0}}>
             <div className="containerTitle bothEnds">
               <div>데이터여부</div>
               <div className="dataOption">
@@ -15498,7 +15505,7 @@ function Monitoring( props ) {
             </TabPanel>
             <TabPanel value="2">
               <div className="tabPanel"  style={{width: "915px", height: "565px" }}>
-                <div className="contentBox wearContainer" style={{marginLeft : 0, height:"100%"}}>
+                <div className="contentBox" style={{marginLeft : 0, height:"100%"}}>
                   <div className="containerTitle bothEnds">
                     <div>마모정보</div>
                     <div className="dataOption" style={{right: "162px"}}>

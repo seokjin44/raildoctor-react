@@ -47,6 +47,7 @@ function Main2( props ) {
           <Sidemenu></Sidemenu>
         </div>
         <div className="content">
+          <div className="topBar"></div>
           <Routes>
               <Route path="/" element={<ProtectedRoute>
                 <Navigate to="/routeSelection" replace />

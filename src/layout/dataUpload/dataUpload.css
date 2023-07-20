@@ -76,12 +76,12 @@
 .dataUpload .uploadHistory{
     width: calc(100% - 300px);
     margin-left: 10px;
-    height: calc(100% - 110px);
+    height: calc(100% - 225px);
     box-shadow: 1px 1px 8px #00000021;
     background-color: white;
     border-radius: 5px;
     position: relative;
-    padding-top: 110px;
+    padding-top: 215px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -108,7 +108,7 @@
     border-radius: 15px;
     position: absolute;
     right: 15px;
-    top: 80px;
+    top: 185px;
     color: white;
 }
 
@@ -188,4 +188,30 @@
 .donwloadBtn img{
     width: 20px;
     height: 20px;
+}
+
+.dataUpload .info{
+    position: absolute;
+    top: 62px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dataUpload .info .infoBox{
+    width: 220px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #F5F6F8;
+    border-radius: 5px;
+    margin-right: 15px;
+}
+
+.dataUpload .info .infoBox .infoValue{
+    font-size: 25px;
+    font-weight: bold;
+    margin-top: 15px;
 }

@@ -53,3 +53,6 @@ code {
 ::-webkit-scrollbar-thumb:hover {
   background-color: #a8bbbf;
 }
+span{
+  font-family: 'NEO_R' !important;
+}

@@ -6,6 +6,9 @@ export const RANGEPICKERSTYLE = {
   height:"35px",
   fontFamily : 'NEO_R'
 }
+export const RADIO_STYLE = {
+  fontFamily : 'NEO_R'
+}
 export const RAILROADSECTION = [
     {
       "id": 2,
@@ -785,7 +788,7 @@ export const DIRECTWEARINFO = [
     "point_id": 13,
     "wear_type": 0
   },
-  {
+  /* {
     "NO": 23,
     "track_type": 0,
     "reg_date": "2018/08/24",
@@ -826,7 +829,7 @@ export const DIRECTWEARINFO = [
     "mgt": 361,
     "point_id": 13,
     "wear_type": 0
-  },
+  }, */
   {
     "NO": 26,
     "track_type": 0,
@@ -3850,7 +3853,7 @@ export const DIRECTWEARINFO = [
     "mgt": 413,
     "point_id": 41,
     "wear_type": 0
-  },
+  } */
   {
     "NO": 242,
     "track_type": 1,
@@ -3963,7 +3966,7 @@ export const DIRECTWEARINFO = [
     "point_id": 43,
     "wear_type": 0
   },
-  {
+  /*{
     "NO": 250,
     "track_type": 1,
     "reg_date": "2020/11/09",
@@ -7463,6 +7466,118 @@ export const DIRECTWEARINFO = [
     "point_id": 75,
     "wear_type": 0
   } */
+  /* {
+    "NO": 496,
+    "track_type": 2,
+    "reg_date": "2020/05/08",
+    "location": "16100",
+    "START": "15",
+    "END": "16",
+    "w_left": 6.4,
+    "w_right": 5.5,
+    "t": "385287321.6",
+    "mgt": 385,
+    "point_id": 75,
+    "wear_type": 0
+  }, */
+  {
+    "NO": 497,
+    "track_type": 2,
+    "reg_date": "2020/11/11",
+    "location": "16100",
+    "START": "15",
+    "END": "16",
+    "w_left": 6.8,
+    "w_right": 6,
+    "t": "395851268.4",
+    "mgt": 396,
+    "point_id": 75,
+    "wear_type": 0
+  },
+  {
+    "NO": 498,
+    "track_type": 2,
+    "reg_date": "2021/05/15",
+    "location": "16100",
+    "START": "15",
+    "END": "16",
+    "w_left": 6.8,
+    "w_right": 6,
+    "t": "404695027.4",
+    "mgt": 405,
+    "point_id": 75,
+    "wear_type": 0
+  },
+  {
+    "NO": 499,
+    "track_type": 2,
+    "reg_date": "2021/11/16",
+    "location": "16100",
+    "START": "15",
+    "END": "16",
+    "w_left": 6.8,
+    "w_right": 6.44,
+    "t": "412943525.7",
+    "mgt": 413,
+    "point_id": 75,
+    "wear_type": 0
+  },
+  /* {
+    "NO": 496,
+    "track_type": 3,
+    "reg_date": "2020/05/08",
+    "location": "16100",
+    "START": "15",
+    "END": "16",
+    "w_left": 6.4,
+    "w_right": 5.5,
+    "t": "385287321.6",
+    "mgt": 385,
+    "point_id": 75,
+    "wear_type": 0
+  }, */
+  {
+    "NO": 497,
+    "track_type": 3,
+    "reg_date": "2020/11/11",
+    "location": "16100",
+    "START": "15",
+    "END": "16",
+    "w_left": 6.8,
+    "w_right": 6,
+    "t": "395851268.4",
+    "mgt": 396,
+    "point_id": 75,
+    "wear_type": 0
+  },
+  {
+    "NO": 498,
+    "track_type": 3,
+    "reg_date": "2021/05/15",
+    "location": "16100",
+    "START": "15",
+    "END": "16",
+    "w_left": 6.8,
+    "w_right": 6,
+    "t": "404695027.4",
+    "mgt": 405,
+    "point_id": 75,
+    "wear_type": 0
+  },
+  {
+    "NO": 499,
+    "track_type": 3,
+    "reg_date": "2021/11/16",
+    "location": "16100",
+    "START": "15",
+    "END": "16",
+    "w_left": 6.8,
+    "w_right": 6.44,
+    "t": "412943525.7",
+    "mgt": 413,
+    "point_id": 75,
+    "wear_type": 0
+  }
 ];
 export const SIDEWEARINFO = [
 		{
@@ -14451,4 +14566,102 @@ export const SIDEWEARINFO = [
 			"point_id": 75,
 			"wear_type": 1
 		} */
+    {
+      "NO": 497,
+      "track_type": 2,
+      "reg_date": "2020/11/11",
+      "location": "16100",
+      "START": "15",
+      "END": "16",
+      "w_left": 6.8,
+      "w_right": 6,
+      "t": "395851268.4",
+      "mgt": 396,
+      "point_id": 75,
+      "wear_type": 0
+    },
+    {
+      "NO": 498,
+      "track_type": 2,
+      "reg_date": "2021/05/15",
+      "location": "16100",
+      "START": "15",
+      "END": "16",
+      "w_left": 6.8,
+      "w_right": 6,
+      "t": "404695027.4",
+      "mgt": 405,
+      "point_id": 75,
+      "wear_type": 0
+    },
+    {
+      "NO": 499,
+      "track_type": 2,
+      "reg_date": "2021/11/16",
+      "location": "16100",
+      "START": "15",
+      "END": "16",
+      "w_left": 6.8,
+      "w_right": 6.44,
+      "t": "412943525.7",
+      "mgt": 413,
+      "point_id": 75,
+      "wear_type": 0
+    },
+    /* {
+      "NO": 496,
+      "track_type": 3,
+      "reg_date": "2020/05/08",
+      "location": "16100",
+      "START": "15",
+      "END": "16",
+      "w_left": 6.4,
+      "w_right": 5.5,
+      "t": "385287321.6",
+      "mgt": 385,
+      "point_id": 75,
+      "wear_type": 0
+    }, */
+    {
+      "NO": 497,
+      "track_type": 3,
+      "reg_date": "2020/11/11",
+      "location": "16100",
+      "START": "15",
+      "END": "16",
+      "w_left": 6.8,
+      "w_right": 6,
+      "t": "395851268.4",
+      "mgt": 396,
+      "point_id": 75,
+      "wear_type": 0
+    },
+    {
+      "NO": 498,
+      "track_type": 3,
+      "reg_date": "2021/05/15",
+      "location": "16100",
+      "START": "15",
+      "END": "16",
+      "w_left": 6.8,
+      "w_right": 6,
+      "t": "404695027.4",
+      "mgt": 405,
+      "point_id": 75,
+      "wear_type": 0
+    },
+    {
+      "NO": 499,
+      "track_type": 3,
+      "reg_date": "2021/11/16",
+      "location": "16100",
+      "START": "15",
+      "END": "16",
+      "w_left": 6.8,
+      "w_right": 6.44,
+      "t": "412943525.7",
+      "mgt": 413,
+      "point_id": 75,
+      "wear_type": 0
+    }
 	];
