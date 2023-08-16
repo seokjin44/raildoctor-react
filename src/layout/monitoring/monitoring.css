@@ -534,3 +534,9 @@
 .monitoringContainer .contentBox.wearContainer.hidden #trackDetailCanvas{
     opacity: 0;
 }
+
+.railMapContainer{
+    overflow: auto;
+    width: 90vw;
+    height: 85vh;
+}

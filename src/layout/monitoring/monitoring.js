@@ -14954,6 +14954,7 @@ function Monitoring( props ) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('1');
   const [wear3dData, setWear3dData] = useState([]);
+  const [railmapOpen, setRailmapOpen] = useState(false);
 
   const makeDummyWear3dData = () => {
     function randArr(num, mul) {
@@ -15162,12 +15163,15 @@ function Monitoring( props ) {
     const img = new Image();
     img.src= IncheonTrackImg;
     img.onload = function() {
-      let Hscale = canvas.height / img.height
+      let newWidth = (img.width/img.height) * canvas.height;
+      let newHeight = canvas.height;
+      console.log(newWidth);
+      console.log(img.height);
       ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
       ctx.save(); // Save the current state of the context
       ctx.translate(trackDetailPosition.x, trackDetailPosition.y); // Apply translation
-      ctx.scale(scale, Hscale); // Apply scaling 
-      ctx.drawImage(img, 0, 0, img.width, img.height); // Draw the image
+      ctx.scale(1, 1); // Apply scaling 
+      ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, newWidth, newHeight); // Draw the image
       ctx.restore(); // Restore the context to its saved state
     };
   }
@@ -15321,13 +15325,19 @@ function Monitoring( props ) {
                   />
                 </div>
               </div> */}
-              <div className="dataOption" style={{cursor:"pointer"}}>
-                <div className="value" onClick={()=>{ 
-                  setRouteHidden(!routeHidden);
+              <div className="flex">
+                <div className="modalButton" style={{cursor:"pointer"}}>
+                  <div className="value" onClick={()=>{ 
+                    setRouteHidden(!routeHidden);
 
-                }}>
-                  {(!routeHidden) ? "숨기기" : "펼치기"}
+                  }}>
+                    {(!routeHidden) ? "숨기기" : "펼치기"}
+                  </div>
                 </div>
+                <div className="modalButton highlight" onClick={()=>{
+                          console.log("선로열람도 상세보기");
+                          setRailmapOpen(true);
+                }} >선로열람도 상세보기</div>
               </div>
             </div>
             <div className={classNames("componentBox separationBox",{hidden : routeHidden} )} style={{overflow: "auto"}}>
@@ -15446,7 +15456,19 @@ function Monitoring( props ) {
         </div>
 
 
-              
+        <Modal
+          open={railmapOpen}
+          onClose={(e)=>{setRailmapOpen(false)}}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style} >
+            <div className="popupTitle"><img src={PopupIcon} />선로열람도 상세보기</div>
+            <div className="railMapContainer">
+              <img src={IncheonTrackImg} />
+            </div>
+          </Box>
+        </Modal>      
 
         <Modal
           open={open}
