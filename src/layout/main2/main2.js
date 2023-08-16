@@ -50,11 +50,11 @@ function Main2( props ) {
           <div className="topBar"></div>
           <Routes>
               <Route path="/" element={<ProtectedRoute>
-                <Navigate to="/routeSelection" replace />
+                <Navigate to="/monitoring" replace />
               </ProtectedRoute>} />
-              <Route path="/routeSelection" element={<ProtectedRoute>
+              {/* <Route path="/routeSelection" element={<ProtectedRoute>
                 <RouteSelection />
-              </ProtectedRoute>} />
+              </ProtectedRoute>} /> */}
               <Route path="/monitoring" element={<ProtectedRoute><Monitoring/></ProtectedRoute>} />
               <Route path="/wearMaintenance" element={<ProtectedRoute><WearMaintenance/></ProtectedRoute>} />
               <Route path="/cumulativeThroughput" element={<ProtectedRoute><CumulativeThroughput/></ProtectedRoute>} />
