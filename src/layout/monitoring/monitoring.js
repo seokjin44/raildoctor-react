@@ -33,6 +33,7 @@ import { LineChart, Line, XAxis,
 import RailStatus from "../../component/railStatus/railStatus";
 import { RAILROADSECTION } from "../../constant";
 import classNames from "classnames";
+import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 
 window.PDFJS = PDFJS;
 const { RangePicker } = DatePicker;
@@ -14946,6 +14947,80 @@ const style = {
   fontFamily : 'NEO_R'
 };
 
+const trackData = [
+  {
+    trackType: 1,
+    data: [
+      {x:589,y:0,name:""},
+      {x:598,y:5.4,name:""},
+      {x:615,y:11.4,name:""},
+      {x:647,y:19.5,name:""},
+      {x:681,y:26.1,name:""},
+      {x:700,y:28.8685714285714,name:""},
+      {x:716,y:31.2,name:""},
+      {x:784,y:38.5,name:""},
+      {x:834,y:42.9,name:""},
+      {x:876,y:45.8,name:""},
+      {x:900,y:48.0909090909091,name:""},
+      {x:920,y:50,name:""},
+      {x:1000,y:50,name:""},
+      {x:1166,y:50,name:""},
+      {x:1210,y:45.4,name:""},
+      {x:1257,y:41.7,name:""},
+      {x:1290,y:38.8,name:""},
+      {x:1332,y:33.9,name:""},
+      {x:1382,y:27.3,name:""},
+      {x:1400,y:24.45,name:""},
+      {x:1430,y:19.7,name:""},
+      {x:1465,y:13.2,name:""},
+      {x:1485,y:8.6,name:""},
+      {x:1514,y:0,name:""},
+      {x:1521,y:3.2,name:""},
+      {x:1537,y:7.2,name:""},
+      {x:1556,y:11.6,name:""},
+      {x:1582,y:16.6,name:""},
+      {x:1600,y:19.9,name:""},
+      {x:1628,y:24.2,name:""},
+      {x:1657,y:28.7,name:""},
+      {x:1698,y:33.8,name:""},
+  ]
+  },
+  {
+    trackType: -1,
+    data: [
+    /* {
+      x: 20,
+      y: 25,
+      name: "14b687"
+    }, {
+      x: 40,
+      y: 75,
+      name: "14b687"
+    }, {
+      x: 60,
+      y: 75,
+      name: "14b687"
+    }, {
+      x: 80,
+      y: 45,
+      name: "14b687"
+    }, {
+      x: 100,
+      y: 65,
+      name: "14b687"
+    }, {
+      x: 120,
+      y: 40,
+      name: "14b687"
+    }, {
+      x: 140,
+      y: 35,
+      name: "14b687"
+    } */
+  ]
+  }
+];
+
 function Monitoring( props ) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -15376,7 +15451,8 @@ function Monitoring( props ) {
             </div>
             <div className="componentBox separationBox" style={{overflow: "auto"}}>
               <div className="boxProto speed" id="trackDetailContainer">
-                <img className="speedDemo" src={Speed} />
+                {/* <img className="speedDemo" src={Speed} /> */}
+                <TrackSpeed data={trackData} ></TrackSpeed>
               </div>
             </div>
           </div>

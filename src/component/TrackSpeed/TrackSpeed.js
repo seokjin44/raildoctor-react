@@ -2,6 +2,11 @@ import React from "react";
 import "./TrackSpeed.css";
 
 class TrackSpeed extends React.Component {
+	IncheonKP = {
+		start : 589,
+		end : 30814
+	}
+	KP1toPixel1Width = 0.15;
 	constructor( props ) {
 		super(props);
 		this.state = {
@@ -46,7 +51,7 @@ class TrackSpeed extends React.Component {
 	}
 
 	init() {
-		this.setXY();
+		/* this.setXY(); */
 		document.getElementById("track-speed-container-" + this.state.id).innerHTML = "";
 		let canvas = document.createElement("canvas");
 		canvas.style.width = "100%";
@@ -58,12 +63,15 @@ class TrackSpeed extends React.Component {
 		this.state.ctx = canvas.getContext("2d");
 		document.getElementById("track-speed-container-" + this.state.id).appendChild(canvas);
 		
+		let rangeX = canvas.width / this.KP1toPixel1Width;
+		console.log(rangeX);
+
 		// user defined properties    
 		this.state.unitsPerTickX = 20;  
 		this.state.unitsPerTickY = 20;  
 	
 		// constants  
-		this.state.padding = 20;  
+		this.state.padding = 20;  //x,y축의 공간
 		this.state.tickSize = 10;  
 		this.state.axisColor = "#555";  
 		this.state.pointRadius = 4;  
@@ -72,14 +80,20 @@ class TrackSpeed extends React.Component {
 		this.state.fontHeight = 12;  
 	
 		// relationships
-		this.state.rangeX = this.state.maxX - this.state.minX;  
-		this.state.rangeY = this.state.maxY - this.state.minY;  
+		this.state.rangeX = rangeX/* this.state.maxX - this.state.minX */;//X축과 Y축 사이의 공간을 말하는 듯(그래프상의 X축)
+		this.state.rangeY = this.state.maxY - this.state.minY;//X축과 Y축 사이의 공간을 말하는 듯(그래프상의 Y축)
 		this.state.numXTicks = Math.round(this.state.rangeX / this.state.unitsPerTickX);  
-		this.state.numYTicks = Math.round(this.state.rangeY / this.state.unitsPerTickY);  
-		this.state.x = this.getLongestValueWidth() + this.state.padding * 2;  
-		this.state.y = this.state.padding * 2;  
+		this.state.numYTicks = Math.round(this.state.rangeY / this.state.unitsPerTickY);
+
+		//x축의 시작점
+		this.state.x = this.getLongestValueWidth() + this.state.padding * 2; //x,y축(레이블)의 공간만큼 보정해주는 듯함.
+		this.state.y = this.state.padding * 2; //x,y축(레이블)의 공간만큼 보정해주는 듯함.
+
+		//아마 HTML의 위치와 캔버스의 위치를 상대적으로 구한 값인듯. 
+		//padding도 css에 있는 padding값을 의미하는 듯 함.
 		this.state.width = this.state.canvas.width - this.state.x - this.state.padding * 2;  
 		this.state.height = this.state.canvas.height - this.state.y - this.state.padding - this.state.fontHeight;  
+
 		this.state.scaleX = this.state.width / this.state.rangeX;  
 		this.state.scaleY = this.state.height / this.state.rangeY;  
 	
@@ -217,8 +231,9 @@ class TrackSpeed extends React.Component {
 	drawLine () {  
 		let context = this.state.ctx;  
 		context.save();  
-
-		for(let track of this.props.data) {
+		console.log("drawLine");
+		let trackData = [...this.props.data]
+		for(let track of trackData) {
 			let arrowCoordinates = [];
 
 			let color = "blue";
@@ -236,22 +251,30 @@ class TrackSpeed extends React.Component {
 
 			for (let n = 0; n < track.data.length; n++) {
 				let point = track.data[n];  
-
+				let pointX = point.x - this.IncheonKP.start;
 				//draw line
 				if(n > 0) {
 					let _point = track.data[n-1];
+					let _pointX = _point.x - this.IncheonKP.start;
 					context.beginPath(); 
-					context.moveTo(_point.x * this.state.scaleX + this.state.x, this.state.y + this.state.height - _point.y * this.state.scaleY);  
+					context.moveTo(_pointX * this.state.scaleX + this.state.x, this.state.y + this.state.height - _point.y * this.state.scaleY);  
 					
 					//rise in value
 					if(_point.y < point.y) {
-						context.bezierCurveTo(_point.x * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY, point.x * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY, point.x * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY);
+						context.lineTo(
+							/* _pointX * this.state.scaleX + this.state.x,                     // start X
+							this.state.y + this.state.height - point.y * this.state.scaleY, */ // start Y
+							/* pointX * this.state.scaleX + this.state.x,
+							this.state.y + this.state.height - point.y * this.state.scaleY, */
+							pointX * this.state.scaleX + this.state.x, // End X
+							this.state.y + this.state.height - point.y * this.state.scaleY // End Y
+						);
 					
 						if(Math.abs(_point.y - point.y) >= this.state.unitsPerTickY) {
-							let p0 = {x: _point.x * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - _point.y * this.state.scaleY};
-							let p1 = {x: _point.x * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - point.y * this.state.scaleY};
-							let p2 = {x: point.x * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - point.y * this.state.scaleY};
-							let p3 = {x: point.x * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - point.y * this.state.scaleY};
+							let p0 = {x: _pointX * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - _point.y * this.state.scaleY};
+							let p1 = {x: _pointX * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - point.y * this.state.scaleY};
+							let p2 = {x: pointX * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - point.y * this.state.scaleY};
+							let p3 = {x: pointX * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - point.y * this.state.scaleY};
 							let p = [];
 							p.push(p0); p.push(p1); p.push(p2); p.push(p3);
 		
@@ -265,13 +288,19 @@ class TrackSpeed extends React.Component {
 					} 
 					//fall in value
 					else {
-						context.bezierCurveTo(_point.x * this.state.scaleX + this.state.x, this.state.y + this.state.height - _point.y * this.state.scaleY, point.x * this.state.scaleX + this.state.x, this.state.y + this.state.height - _point.y * this.state.scaleY, point.x * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY);
+						context.lineTo(
+							/* _pointX * this.state.scaleX + this.state.x,
+							this.state.y + this.state.height - _point.y * this.state.scaleY,
+							pointX * this.state.scaleX + this.state.x,
+							this.state.y + this.state.height - _point.y * this.state.scaleY, */
+							pointX * this.state.scaleX + this.state.x,
+							this.state.y + this.state.height - point.y * this.state.scaleY);
 					
 						if(Math.abs(_point.y - point.y) >= this.state.unitsPerTickY) {
-							let p0 = {x: _point.x * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - _point.y * this.state.scaleY};
-							let p1 = {x: _point.x * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - _point.y * this.state.scaleY};
-							let p2 = {x: point.x * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - _point.y * this.state.scaleY};
-							let p3 = {x: point.x * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - point.y * this.state.scaleY};
+							let p0 = {x: _pointX * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - _point.y * this.state.scaleY};
+							let p1 = {x: _pointX * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - _point.y * this.state.scaleY};
+							let p2 = {x: pointX * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - _point.y * this.state.scaleY};
+							let p3 = {x: pointX * this.state.scaleX + this.state.x, y: this.state.y + this.state.height - point.y * this.state.scaleY};
 							let p = [];
 							p.push(p0); p.push(p1); p.push(p2); p.push(p3);
 							
@@ -290,13 +319,13 @@ class TrackSpeed extends React.Component {
 				}
 
 				// draw point  
-				context.beginPath();  
-				context.arc(point.x * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY, this.state.pointRadius, 0, 2 * Math.PI, false);  
+				/* context.beginPath();  
+				context.arc(pointX * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY, this.state.pointRadius, 0, 2 * Math.PI, false);  
 				context.fill();
 				context.textBaseline = "top";
 				context.textAlign = "center";
-				context.fillText(point.name, point.x * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY + this.state.fontHeight * 0.5);
-				context.closePath();  
+				context.fillText(point.name, pointX * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY + this.state.fontHeight * 0.5);
+				context.closePath();   */
 			}
 
 			for (let n = 0; n < arrowCoordinates.length; n++) { 
