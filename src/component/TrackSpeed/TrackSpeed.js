@@ -6,7 +6,7 @@ class TrackSpeed extends React.Component {
 		start : 589,
 		end : 30814
 	}
-	KP1toPixel1Width = 0.15;
+	KP1toPixel1Width = 0.125;
 	constructor( props ) {
 		super(props);
 		this.state = {
@@ -48,6 +48,51 @@ class TrackSpeed extends React.Component {
 	componentDidMount(){
 		this.init();
 		this.drawLine();
+		let x = this.state.x + this.state.width;
+		console.log((x/2)/this.KP1toPixel1Width);
+	}
+
+	componentDidUpdate(prevProps, prevState){
+	  if (prevProps.kp !== this.props.kp) {
+		console.log('kp has changed');
+		const canvas = this.state.canvas;
+		const ctx = this.state.ctx;
+
+		//pointX * this.state.scaleX + this.state.x
+
+		/* let cneterKP = ((this.state.x + this.state.width)/2) / this.KP1toPixel1Width; */
+		let cneterKP = ((this.state.x + this.state.width)/2) / this.KP1toPixel1Width;
+		let move = (this.props.kp - cneterKP) * this.state.scaleX + this.state.x;
+		/* let curKP = (( ((this.state.x + this.state.width)/2) + move) ); */
+		let curKP = (( ((this.state.x + this.state.width)/2) + move ) );
+		console.log(curKP);
+		console.log(curKP * ( 1 / this.KP1toPixel1Width ));
+
+		ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+		ctx.save(); // Save the current state of the context
+
+		if( cneterKP < this.props.kp ){	
+			ctx.translate( -move, 0); // Apply translation
+		}
+		ctx.beginPath();
+		ctx.strokeStyle = this.axisColor;
+		ctx.lineWidth = 0.5; 
+		ctx.moveTo( this.props.kp * this.state.scaleX + this.state.x, 0 );
+		ctx.lineTo( this.props.kp * this.state.scaleX + this.state.x, 125 );
+		ctx.stroke();
+
+		ctx.beginPath();  
+		ctx.textBaseline = "top";
+		ctx.textAlign = "center";
+		ctx.fillText( this.props.kp, this.props.kp * this.state.scaleX + this.state.x, 125);
+		ctx.closePath();
+		
+		this.drawYAxis();  
+		this.drawLegend();
+		this.drawLine();
+		ctx.restore(); // Restore the context to its saved state
+
+	  }
 	}
 
 	init() {
@@ -64,7 +109,7 @@ class TrackSpeed extends React.Component {
 		document.getElementById("track-speed-container-" + this.state.id).appendChild(canvas);
 		
 		let rangeX = canvas.width / this.KP1toPixel1Width;
-		console.log(rangeX);
+		console.log("[TrackSpeed] rangeX :::: "+rangeX);
 
 		// user defined properties    
 		this.state.unitsPerTickX = 20;  
@@ -157,7 +202,7 @@ class TrackSpeed extends React.Component {
 		for (let n = 0; n < this.state.numYTicks; n++) {  
 			context.beginPath();  
 			context.moveTo(this.state.x, n * this.state.height / this.state.numYTicks + this.state.y);  
-			context.lineTo(this.state.x + this.state.width, n * this.state.height / this.state.numYTicks + this.state.y);
+			context.lineTo(this.state.x + this.IncheonKP.end, n * this.state.height / this.state.numYTicks + this.state.y);
 			context.setLineDash([4]);
 			context.lineWidth = 0.5; 
 			context.stroke();  
@@ -228,11 +273,18 @@ class TrackSpeed extends React.Component {
 		context.restore();
 	}
 	
-	drawLine () {  
+	drawLine() {  
 		let context = this.state.ctx;  
 		context.save();  
 		console.log("drawLine");
-		let trackData = [...this.props.data]
+		let trackData = [...this.props.data];
+		/* let minKP = (this.props.kp - this.state.rangeX/2 < this.IncheonKP.start) ? 0 : this.props.kp - this.state.rangeX/2;
+		let maxKP = this.props.kp + this.state.rangeX/2;
+		if( maxKP > this.IncheonKP.end ){
+			minKP = this.IncheonKP.end - this.state.rangeX;
+			maxKP = this.IncheonKP.end;
+		} */
+
 		for(let track of trackData) {
 			let arrowCoordinates = [];
 
@@ -249,8 +301,12 @@ class TrackSpeed extends React.Component {
 			context.setLineDash([0]);
 			context.lineWidth = 1.5; 
 
+			let kpPrint = 0;
 			for (let n = 0; n < track.data.length; n++) {
 				let point = track.data[n];  
+				/* if( point.x < minKP || point.x > maxKP ){
+					continue;
+				} */
 				let pointX = point.x - this.IncheonKP.start;
 				//draw line
 				if(n > 0) {
@@ -313,8 +369,29 @@ class TrackSpeed extends React.Component {
 							arrowCoordinates.push({x0: __p.x, y0: __p.y, x1: _p.x, y1: _p.y});
 						}
 					}
-					
 					context.stroke();  
+					context.closePath();
+				}
+
+				if( point.name !== "" ){
+					context.beginPath();  
+					context.arc(pointX * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY, this.state.pointRadius, 0, 2 * Math.PI, false);  
+					context.fill();
+					context.textBaseline = "top";
+					context.textAlign = "center";
+					context.fillText(point.name, pointX * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY + this.state.fontHeight * 0.5);
+					context.closePath();
+				}
+
+				kpPrint++;
+				if( kpPrint > 9 ){
+					kpPrint = 0;
+					context.beginPath();  
+					context.arc(pointX * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY, this.state.pointRadius, 0, 2 * Math.PI, false);  
+					context.fill();
+					context.textBaseline = "top";
+					context.textAlign = "center";
+					context.fillText(pointX, pointX * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY + this.state.fontHeight * 0.5);
 					context.closePath();
 				}
 
