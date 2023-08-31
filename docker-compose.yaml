@@ -1,0 +1,16 @@
+version: "3.8"
+
+networks:
+  default:
+    name: ${COMPOSE_PROJECT_NAME:-sdl}
+    external: true
+
+services:
+  frontend:
+    image: registry.suredatalab.kr/raildoctor/web:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    expose:
+      - 80
