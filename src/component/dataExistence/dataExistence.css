@@ -1,0 +1,46 @@
+
+.monitoringContainer .datafinder .dataList .line{
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3000px;
+}
+
+.monitoringContainer .datafinder{
+    position: relative;
+    height: 250px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    padding-top: 10px;
+    overflow: auto;
+}
+
+.monitoringContainer .datafinder .dataList .line .dataBar .kp{
+    width: 50px;
+    font-size: 11px;
+    height: 15px;
+    position: absolute;
+    padding: 2px;
+    border-radius: 5px;
+    border: 1px solid #44546a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 5px;
+    border: 1px solid #bdbdbd;
+    color: #44546a;
+    user-select: none;
+}
+
+.monitoringContainer .datafinder .dataList .line .dataBar{
+    flex-grow: 1;
+    height: 100%;
+    border-bottom: 1px solid #cccccc;
+    position: relative;
+}
+
+.monitoringContainer .datafinder .dataList .line .dataBar.kp{
+    border-bottom: 2px dashed black;
+}

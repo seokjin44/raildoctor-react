@@ -374,36 +374,13 @@
     height: 100%;
 }
 
-.monitoringContainer .datafinder{
-    position: relative;
-    height: 200px;
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    padding-top: 10px;
-}
-
 .monitoringContainer .datafinder .dataList{
     width: calc(100% - 15px);
     height: 100%;
 }
 
-.monitoringContainer .datafinder .dataList .line{
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .monitoringContainer .datafinder .dataList .line .dataName{
     width: 120px;
-}
-
-.monitoringContainer .datafinder .dataList .line .dataBar{
-    flex-grow: 1;
-    height: 100%;
-    border-bottom: 1px solid #cccccc;
-    position: relative;
 }
 
 .monitoringContainer .datafinder .dataList .line .dataBar .detailBtn{

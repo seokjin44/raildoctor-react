@@ -1,11 +1,8 @@
 import React from "react";
 import "./TrackSpeed.css";
+import { IncheonKP } from "../../constant";
 
 class TrackSpeed extends React.Component {
-	IncheonKP = {
-		start : 589,
-		end : 30814
-	}
 	KP1toPixel1Width = 0.125;
 	constructor( props ) {
 		super(props);
@@ -200,9 +197,23 @@ class TrackSpeed extends React.Component {
 	
 		// draw tick marks  
 		for (let n = 0; n < this.state.numYTicks; n++) {  
+			if( n === 0 ){
+				for( let i = IncheonKP.start; i < IncheonKP.end; i++ ){
+					if( i % 1000 === 0 ){
+						context.beginPath();  
+						context.font = "bold 12px NEO_R";  
+						context.textBaseline = "top";
+						context.textAlign = "center";
+						context.fillStyle = "black";  
+						/* this.props.kp * this.state.scaleX + this.state.x */
+						context.fillText( i,  i * this.state.scaleX + this.state.x, n * this.state.height / this.state.numYTicks + this.state.y - 16);
+						context.closePath();
+					}
+				}
+			}
 			context.beginPath();  
 			context.moveTo(this.state.x, n * this.state.height / this.state.numYTicks + this.state.y);  
-			context.lineTo(this.state.x + this.IncheonKP.end, n * this.state.height / this.state.numYTicks + this.state.y);
+			context.lineTo(this.state.x + IncheonKP.end, n * this.state.height / this.state.numYTicks + this.state.y);
 			context.setLineDash([4]);
 			context.lineWidth = 0.5; 
 			context.stroke();  
@@ -213,7 +224,7 @@ class TrackSpeed extends React.Component {
 			let value = Math.round(this.state.maxY - n * this.state.maxY / this.state.numYTicks);  
 			context.save();
 			
-			context.font = "bold 12pt Calibri";  
+			context.font = "bold 12px NEO_R";  
 			context.fillStyle = "black";  
 			context.textAlign = "right";  
 			context.textBaseline = "middle";  
@@ -226,7 +237,7 @@ class TrackSpeed extends React.Component {
 		// draw unit
 		context.save();
 
-		context.font = "bold 12pt Calibri";  
+		context.font = "bold 12px NEO_R";  
 		context.fillStyle = "black";  
 		context.textAlign = "right";  
 		context.textBaseline = "middle";  
@@ -240,13 +251,12 @@ class TrackSpeed extends React.Component {
 		let context = this.state.ctx; 
 		context.save();
 
-		context.font = "bold 12pt Calibri";  
+		context.font = "bold 12px NEO_R";  
 		context.fillStyle = "black";  
 		context.textAlign = "right";  
 		context.textBaseline = "middle";  
-
-		context.fillText(": 상본선", this.state.x + this.state.padding * 4, this.state.padding);
-		context.fillText(": 하본선", this.state.x + this.state.padding * 8.5, this.state.padding);
+		context.fillText(": 상본선", this.state.x + this.state.padding * 3.25, this.state.padding);
+		context.fillText(": 하본선", this.state.x + this.state.padding * 7.75, this.state.padding);
 		
 		//상본선
 		context.beginPath();
@@ -295,23 +305,23 @@ class TrackSpeed extends React.Component {
 			} else {
 				color = "red";
 			}
-
-			context.strokeStyle = color;  
-			context.fillStyle = color;  
+ 
 			context.setLineDash([0]);
 			context.lineWidth = 1.5; 
 
-			let kpPrint = 0;
+			/* let kpPrint = 0; */
 			for (let n = 0; n < track.data.length; n++) {
+				context.strokeStyle = color;  
+				context.fillStyle = color; 
 				let point = track.data[n];  
 				/* if( point.x < minKP || point.x > maxKP ){
 					continue;
 				} */
-				let pointX = point.x - this.IncheonKP.start;
+				let pointX = point.x - IncheonKP.start;
 				//draw line
 				if(n > 0) {
 					let _point = track.data[n-1];
-					let _pointX = _point.x - this.IncheonKP.start;
+					let _pointX = _point.x - IncheonKP.start;
 					context.beginPath(); 
 					context.moveTo(_pointX * this.state.scaleX + this.state.x, this.state.y + this.state.height - _point.y * this.state.scaleY);  
 					
@@ -375,15 +385,27 @@ class TrackSpeed extends React.Component {
 
 				if( point.name !== "" ){
 					context.beginPath();  
-					context.arc(pointX * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY, this.state.pointRadius, 0, 2 * Math.PI, false);  
+					/* context.arc(pointX * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY, this.state.pointRadius, 0, 2 * Math.PI, false);   */
+					context.strokeStyle = "#66C5A5";  
+					context.fillStyle = "#66C5A5";  
+					context.fillRect(
+						pointX * this.state.scaleX + this.state.x - 20, //x
+						this.state.y + this.state.height - point.y * this.state.scaleY, //y
+						70, //width
+						20); //height
 					context.fill();
+					context.closePath();
+
+					context.beginPath();
 					context.textBaseline = "top";
 					context.textAlign = "center";
-					context.fillText(point.name, pointX * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY + this.state.fontHeight * 0.5);
+					context.fillStyle = "white";  
+					context.font = "12px NEO_R";
+					context.fillText(point.name, pointX * this.state.scaleX + this.state.x + 15, this.state.y + this.state.height - point.y * this.state.scaleY + this.state.fontHeight * 0.5);
 					context.closePath();
 				}
 
-				kpPrint++;
+				/* kpPrint++;
 				if( kpPrint > 9 ){
 					kpPrint = 0;
 					context.beginPath();  
@@ -393,7 +415,7 @@ class TrackSpeed extends React.Component {
 					context.textAlign = "center";
 					context.fillText(pointX, pointX * this.state.scaleX + this.state.x, this.state.y + this.state.height - point.y * this.state.scaleY + this.state.fontHeight * 0.5);
 					context.closePath();
-				}
+				} */
 
 				// draw point  
 				/* context.beginPath();  
