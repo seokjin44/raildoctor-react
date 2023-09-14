@@ -1,27 +1,13 @@
 import "./railProfile.css";
 import { useEffect, useState } from "react";
-import PositionTestImage from "../../assets/2023-07-09_21_48_42.png";
 import RailStatus from "../../component/railStatus/railStatus";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-//import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/ko';
-import PositionImg from "../../assets/position2.png";
-//import Radio from '@mui/joy/Radio';
-//import RadioGroup from '@mui/joy/RadioGroup';
 import LeftProfile from "../../assets/left_profile.png"; 
 import RightProfile from "../../assets/right_profile.png"; 
 import Slider from '@mui/material/Slider';
 
 import DemoImg1 from "../../assets/demo/그림2.png";
 import DemoImg2 from "../../assets/demo/그림3.png";
-
-import Box from '@mui/material/Box';
-import ChartAuto from 'chart.js/auto';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
 import {
   Chart as ChartJS,
   LinearScale,
@@ -34,11 +20,9 @@ import {
   LineController,
   BarController,
 } from 'chart.js';
-import { Chart } from 'react-chartjs-2';
 import faker from 'faker';
 import { RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE } from "../../constant";
 import { Input, DatePicker, Radio } from "antd";
-import { RadioGroup } from "@mui/material";
 const { RangePicker } = DatePicker;
 
 ChartJS.register(
@@ -106,7 +90,6 @@ function RailProfile( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
   const pathClick = (select) => {
     console.log(select);
-    //getInstrumentationPoint(select);
     setSelectedPath(select);
   }
 
@@ -155,52 +138,11 @@ function RailProfile( props ) {
                   <RangePicker 
                     style={RANGEPICKERSTYLE}
                   />
-                  {/* <DatePicker style={RANGEPICKERSTYLE} /> */}
                 </div>
               </div>
             </div>
       </div>
-      {/* <div className="contentBox" style={{ height: "220px"}} >
-        <div className="containerTitle">검토구간</div>
-        <div className="componentBox flex section ">
-
-          <div className="position optionBox borderColorGreen" style={{width: "935px"}} >
-            <div className="optionTitle">위치</div>
-            <div className="optionValue">
-              <img src={PositionImg} />
-            </div>
-          </div>
-          
-          <div className="radioButtons optionBox ">
-            <RadioGroup defaultValue="outlined" name="radio-buttons-group" 
-              orientation="horizontal" 
-              size="sm"  
-              variant="outlined" style={{border : 0}}
-            >
-              <Radio value="outlined" label="상선" />
-              <Radio value="soft" label="하선" />
-            </RadioGroup>
-
-          </div>
-          <div className="distanceSearch optionBox">
-            <div className="optionTitle">KP</div>
-            <input className="local" id="kilometerStart" />
-            <div className="textK">K</div>
-            <input className="local" id="kilometerEnd"/>
-          </div>
-
-          <div className="position optionBox h75">
-            <div className="optionTitle">측정일자</div>
-            <div className="optionValue">
-              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
-                <DatePicker label="측정일"  />
-              </LocalizationProvider>
-            </div>
-          </div>
-  
-        </div>
-      </div> */}
-
+      
       <div className="contentBox" style={{marginTop:"10px", height: "485px"}}>
         <div className="containerTitle">프로파일 및 마모 데이터</div>
         <div className="componentBox chartBox flex">
@@ -324,7 +266,6 @@ function RailProfile( props ) {
               <Slider
                 track={false}
                 aria-labelledby="track-false-slider"
-                /* getAriaValueText={valuetext} */
                 defaultValue={30}
                 marks={marks}
               />

@@ -1,32 +1,18 @@
-import { useLocation, useNavigate } from "react-router-dom";
 import "./wearMaintenance.css";
 import PlaceInfo from "../../component/PlaceInfo/PlaceInfo";
 import RailStatus from "../../component/railStatus/railStatus";
-import { useEffect, useRef, useState } from "react";
-import { Radio, Slider, DatePicker, Space, TimePicker, Input } from "antd";
+import { useEffect, useState } from "react";
+import { Radio, Slider, Input } from "antd";
 import ModalCustom from "../../component/Modal/Modal";
 import WearInfo from "../../component/WearInfo/WearInfo";
-import LinearInfo from "../../component/LinearInfo/LinearInfo";
-import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
-import Speed from "../../assets/demo/speed.png";
-import IncheonTrackImg from "../../assets/track/incheon_track2.png";
-import MuiRadio from '@mui/joy/Radio';
-//import RadioGroup from '@mui/joy/RadioGroup';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/ko';
-import RailIcon from "../../assets/icon/1342923_citycons_public_rail_train_transport_icon.png";
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-//import Select from '@mui/material/Select';
 import { Select } from 'antd';
-import classNames from "classnames";
 import { Box, Modal } from "@mui/material";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
-import { DIRECTWEARINFO, INSTRUMENTATIONPOINT, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO } from "../../constant";
+import { DIRECTWEARINFO, INSTRUMENTATIONPOINT, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO, TRACKSPEEDDATA } from "../../constant";
 import AlertIcon from "../../assets/icon/decision/3876149_alert_emergency_light_protection_security_icon.png";
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
+import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 
 const { TextArea } = Input;
 
@@ -45,198 +31,7 @@ const style = {
   fontFamily : 'NEO_R'
 };
 
-
-const linearInfo = [{
-  x: 10,
-  y: 50,
-  name: "1",
-  type: "line"
-}, {
-  x: 20,
-  y: 100,
-  name: "2",
-  type: "line"
-}, {
-  x: 30,
-  y: 100,
-  name: "3",
-  type: "dash"
-}, {
-  x: 35,
-  y: 80,
-  name: "4",
-  type: "line"
-}, {
-  x: 40,
-  y: 80,
-  name: "5",
-  type: "line"
-}, {
-  x: 50,
-  y: 60,
-  name: "6",
-  type: "line"
-}, {
-  x: 60,
-  y: 60,
-  name: "7",
-  type: "line"
-}, {
-  x: 70,
-  y: 0,
-  name: "8",
-  type: "line"
-}, {
-  x: 75,
-  y: 0,
-  name: "9",
-  type: "dash"
-}, {
-  x: 80,
-  y: 60,
-  name: "10",
-  type: "line"
-}, {
-  x: 85,
-  y: 60,
-  name: "11",
-  type: "line"
-}, {
-  x: 95,
-  y: 80,
-  name: "12",
-  type: "line"
-}, {
-  x: 100,
-  y: 80,
-  name: "13",
-  type: "line"
-}];
-
-const trackSpeed = [
-  {
-    trackType: -1,
-    data: [{
-      x: 0,
-      y: 40,
-      name: "14b687"
-    }, {
-      x: 10,
-      y: 40,
-      name: "14b687"
-    }, {
-      x: 30,
-      y: 40,
-      name: "14b687"
-    }, {
-      x: 40,
-      y: 0,
-      name: "14b687"
-    }, {
-      x: 50,
-      y: 40,
-      name: "14b687"
-    }, {
-      x: 60,
-      y: 40,
-      name: "14b687"
-    }, {
-      x: 70,
-      y: 50,
-      name: "14b687"
-    }, {
-      x: 75,
-      y: 50,
-      name: "14b687"
-    }, {
-      x: 80,
-      y: 42,
-      name: "14b687"
-    }, {
-      x: 85,
-      y: 42,
-      name: "14b687"
-    }, {
-      x: 95,
-      y: 0,
-      name: "14b687"
-    }, {
-      x: 100,
-      y: 30,
-      name: "14b687"
-    }]
-  },
-  {
-    trackType: 1,
-    data: [{
-      x: 20,
-      y: 25,
-      name: "14b687"
-    }, {
-      x: 40,
-      y: 75,
-      name: "14b687"
-    }, {
-      x: 60,
-      y: 75,
-      name: "14b687"
-    }, {
-      x: 80,
-      y: 45,
-      name: "14b687"
-    }, {
-      x: 100,
-      y: 65,
-      name: "14b687"
-    }, {
-      x: 120,
-      y: 40,
-      name: "14b687"
-    }, {
-      x: 140,
-      y: 35,
-      name: "14b687"
-    }]
-  }
-];
-
-const getInstrumentationPoint = (select) => {
-  var myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
-  var urlencoded = new URLSearchParams();
-  urlencoded.append("railroad_id", "0");
-  urlencoded.append("start_station_up_track_location", select.start_station_up_track_location);
-  urlencoded.append("end_station_up_track_location", select.end_station_up_track_location);
-  urlencoded.append("start_station_down_track_location", select.start_station_down_track_location);
-  urlencoded.append("end_station_down_track_location", select.end_station_down_track_location);
-
-  var requestOptions = {
-    method: 'POST',
-    //redirect: 'follow',
-    headers: myHeaders,
-    body: urlencoded
-  };
-
-  fetch("/RailDoctor/railroad/getInstrumentationPoint", requestOptions)
-    .then(response => {
-      return response.json(); //Promise 반환
-    }).then(result => {
-      console.log(result)
-      this.setState({
-        //selectedPath: select,
-        instrumentationPoint: result
-      });
-    }).catch(error => {
-      console.log('error', error)
-    });
-}
-
-
-
-  function WearMaintenance( props ) {
-  const location = useLocation();
-  //const [instrumentationPoint, setInstrumentationPoint] = useState([]);
+function WearMaintenance( props ) {
   const [selectedPath, setSelectedPath] = useState({
     "start_station_id": "15",
     "end_station_id": "16",
@@ -251,7 +46,7 @@ const getInstrumentationPoint = (select) => {
     "start_station_longitude": 126.7079019,
     "end_station_latitude": 37.4576187,
     "end_station_longitude": 126.7022161
-});
+  });
   const [wearSearchCondition, setWearSearchCondition] = useState({
     startDate: new Date().getTime() - (31536000000 * 7),
     endDate: new Date().getTime(),
@@ -259,41 +54,9 @@ const getInstrumentationPoint = (select) => {
     endMGT: 3000
   });
   const [wear3dData, setWear3dData] = useState([]);
-  const [wearData, setWearData] = useState({
-    directWearInfo: [],
-    sideWearInfo: [],
-  });
-  const trackDetailCanvasRef = useRef(null);
-  const canvasRef = useRef(null);
-
-  const [trackDetailPosition, setTrackDetailPosition] = useState({x: 0, y: 0});
-  const [scale, setScale] = useState(1);
-  const [menuSelect, setMenuSelect] = useState(1);
-  const trackDetailDrawImage = () => {
-    const canvas = trackDetailCanvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.src= IncheonTrackImg;
-    img.onload = function() {
-      let scaleFactor = canvas.height / img.height;
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-      ctx.save(); // Save the current state of the context
-      ctx.translate(trackDetailPosition.x, trackDetailPosition.y); // Apply translation
-      //ctx.scale(0.65, 0.22); // Apply scaling 
-      ctx.scale(0.65, scaleFactor);
-      ctx.drawImage(img, -8000, 0, img.width, img.height); // Draw the image
-      ctx.restore(); // Restore the context to its saved state
-    };
-  }
-  const [position, setPosition] = useState({x: 38, y: 5});
-  const [dragging, setDragging] = useState(false);
-  const [relPos, setRelPos] = useState({x: 0, y: 0});
-
-  const [trackDetailDragging, setTrackDetailDragging] = useState(false);
-  const [lastPos, setLastPos] = useState(null);
-
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
+  const [kp, setKP] = useState(0);
   const handleClose = () => {
     setOpen(false);
   }
@@ -301,14 +64,11 @@ const getInstrumentationPoint = (select) => {
     setOpen2(false);
   }
 
-
-
   const pathClick = (select) => {
     console.log(select);
     //getInstrumentationPoint(select);
     setSelectedPath(select);
   }
-
   
   const timeFormatDate = (milliSeconds) => {
     let d = new Date(milliSeconds); 
@@ -427,147 +187,16 @@ const getInstrumentationPoint = (select) => {
     setWear3dData(data);
   }
 
-  const handleMouseDown = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    if (x >= position.x && x <= position.x + 100 && y >= position.y && y <= position.y + 70) {
-      setDragging(true);
-      setRelPos({x: x - position.x, y: y - position.y});
-    }
-  };
-  
-  const handleMouseUp = () => {
-    setDragging(false);
-  };
-
-  const handleMouseMove = (e) => {
-    if (dragging) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      let positionX = e.clientX - rect.left - relPos.x;
-      if(positionX < 38){
-        positionX = 38;
-      }else if( positionX > 1425 ){
-        positionX = 1425;
-      }
-      setPosition({
-        x: positionX,
-        //y: e.clientY - rect.top - relPos.y
-        y: 5
-      });
-    }
-  };
-
-  const trackDetailHandleMouseDown = (e) => {
-    setTrackDetailDragging(true);
-    setLastPos({x: e.clientX, y: e.clientY});
-  };
-
-  const trackDetailHandleMouseUp = () => {
-    setTrackDetailDragging(false);
-    setLastPos(null);
-  };
-
-  const trackDetailHandleMouseMove = (e) => {
-    if (trackDetailDragging) {
-      const newPos = {x: e.clientX, y: e.clientY};
-      const canvas = canvasRef.current;
-      const img = new Image();
-      img.src = IncheonTrackImg; // replace with your image url
-  
-      img.onload = function() {
-        const newPosX = trackDetailPosition.x + newPos.x - lastPos.x;
-        const newWidth = img.width * scale;
-        
-        // Check if the new position is outside the canvas
-        if (newPosX <= 0 && newPosX + newWidth >= canvas.width) {
-          setTrackDetailPosition({
-            x: newPosX,
-            y: trackDetailPosition.y
-          });
-        }
-        setLastPos(newPos);
-      };
-    }
-  };
-
-  const drawRect = (x, y) => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    //ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-    ctx.strokeStyle = 'red';
-    ctx.beginPath();
-    ctx.rect(x, y-3, 100, 46);  // Draw rectangle
-    ctx.stroke();
-    ctx.closePath();
-  }
-
-  const minimapDrawing = () => {
-    const canvas = document.getElementById("minimapCanvas");
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.src= IncheonTrackImg;
-    img.onload = function() {
-      let scale = canvas.width / img.width;
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-      ctx.save(); // Save the current state of the context
-      ctx.translate(0, 0); // Apply translation
-      ctx.scale(scale, 0.1); // Apply scaling 
-      ctx.drawImage(img, 0, 0, img.width, img.height); // Draw the image
-      ctx.restore(); // Restore the context to its saved state
-      drawRect(position.x, position.y);
-    };
-  }
-
   useEffect(() => {
-    
-    /* let minimapContainer = document.getElementById("minimapContainer");
-    let canvas = canvasRef.current;
-    canvas.width = minimapContainer.clientWidth;
-    canvas.height = minimapContainer.clientHeight; */
-
-    let trackDetailContainer = document.getElementById("trackDetailContainer");
-    let trackDetailCanvas = trackDetailCanvasRef.current;
-    trackDetailCanvas.width = trackDetailContainer.clientWidth;
-    trackDetailCanvas.height = trackDetailContainer.clientHeight;
-
-    //drawRect(position.x, position.y);
-    //minimapDrawing(); 
-
     makeDummyWear3dData();
-    trackDetailDrawImage();
   }, []);
   
   return (
     <div className="wearMaintenance" >
-      {/* <div className="railStatusContainer">
-        <RailStatus railroadSection={railroadSection} pathClick={pathClick}></RailStatus>
-      </div> */}
-
-      {/* <div className="graphGroup">
-        <div className="contentBox linearContainer mr15">
-          <div className="containerTitle tab">
-            <div className="tab select">선형정보</div>
-            <div className="tab">구배</div>
-          </div>
-          <div className="componentBox"><LinearInfo data={linearInfo}></LinearInfo></div>
-        </div>
-        <div className="contentBox speedContainer">
-          <div className="containerTitle">통과속도 정보</div>
-          <div className="componentBox">
-            <img src={Speed} />
-          </div>
-        </div>
-      </div> */}
       <div className="railStatusContainer">
         <RailStatus railroadSection={RAILROADSECTION} pathClick={pathClick}></RailStatus>
       </div>
       <div className="dataContainer">
-        {/* <div className="sideMenu">
-          <div className="title"><img src={RailIcon} />마모유지관리</div>
-          <div className={classNames( "menu", { "active" : menuSelect === 1 } )} onClick={()=>{setMenuSelect(1)}} >마모정보</div>
-          <div className={classNames( "menu", { "active" : menuSelect === 2 } )} onClick={()=>{setMenuSelect(2)}} >마모예측</div>
-        </div> */}
         <div className="scrollContainer" style={{ width: "calc(100%)", height: "calc(100% - 0px)", overflow: "auto"}}>
           <div className="graphSection">
             <div className="leftContainer">
@@ -577,23 +206,13 @@ const getInstrumentationPoint = (select) => {
                   <div className="tab">구배</div>
                 </div>
                 <div className="componentBox">
-                {/* <div className="boxProto minimap searchOption" style={{height:"50px"}}>
-                  <div className="minimapContainer" id="minimapContainer">
-                    <canvas id="minimapCanvas"
-                        ref={canvasRef}
-                        onMouseDown={handleMouseDown}
-                        onMouseUp={handleMouseUp}
-                        onMouseMove={handleMouseMove}
-                    ></canvas>
-                  </div>
-                </div> */}
                 <div className="boxProto track" id="trackDetailContainer">
-                  <canvas id="trackDetailCanvas"
+                  {/* <canvas id="trackDetailCanvas"
                       ref={trackDetailCanvasRef}
                       onMouseDown={(e)=>{trackDetailHandleMouseDown(e)}}
                       onMouseUp={(e)=>{trackDetailHandleMouseUp()}}
                       onMouseMove={(e)=>{trackDetailHandleMouseMove(e)}}
-                  />
+                  /> */}
                 </div>
                 </div>
               </div>
@@ -601,7 +220,7 @@ const getInstrumentationPoint = (select) => {
                 <div className="containerTitle">통과속도 정보</div>
                 <div className="componentBox" style={{ marginRight: "10px", width: "calc(100% - 10px)", overflow: "hidden"}}>
                   <div className="demoImgContainer">
-                    <img src={Speed} />
+                    <TrackSpeed data={TRACKSPEEDDATA} kp={kp} ></TrackSpeed>
                   </div>
                 </div>
               </div>
@@ -609,7 +228,9 @@ const getInstrumentationPoint = (select) => {
             <div className="rightContainer">
               <div className="contentBox pointContainer">
                 <div className="containerTitle">지점정보</div>
-                <div className="componentBox"><PlaceInfo path={selectedPath} instrumentationPoint={INSTRUMENTATIONPOINT}></PlaceInfo></div>
+                <div className="componentBox">
+                  <PlaceInfo path={selectedPath} instrumentationPoint={INSTRUMENTATIONPOINT}></PlaceInfo>
+                </div>
               </div>
               <div className="mamoGraphContainer">
                 <div className="contentBox searchContainer mr10" style={{width:"35%"}}>
