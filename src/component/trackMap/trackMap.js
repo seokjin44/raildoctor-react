@@ -83,26 +83,53 @@ function TrackMap( props ) {
     })
   }
 
+  const findKP = (kp) => {
+    let accWidth = 0;
+    for( let img of imgLoadArr ){
+      if( img.start <= kp && img.end >= kp ){
+        let range = img.end - img.start;
+        let ratio = (img.width* IMGSCALING) / range;
+        let pos = kp - img.start;
+        let left = (ratio * pos) + accWidth;
+
+        let container = document.getElementById('trackMapContainer');
+        container.scroll({
+          top: 0,
+          left: left - (container.clientWidth/2),
+          behavior: "smooth",
+        });
+        return;
+      }else{
+        accWidth = accWidth + (img.width * IMGSCALING);
+      }
+    }
+  }
+
   useEffect(() => {
     readyImg(); 
   }, []);
 
+  useEffect(() => {
+    console.log(props.kp);
+    findKP(props.kp);
+  }, [props.kp]);
+
   const readyImg = async () => {
     console.log("readyImg");
     let imgLoadArr_ = [];
-    for( let i of imgArr ){
-      console.log(i);
-      let img = await loadImg(i);
-      imgLoadArr_.push(img);
+    for( let img of imgArr ){
+      let img_ = await loadImg(img.url);
+      img_['start'] = img.start;
+      img_['end'] = img.end;
+      imgLoadArr_.push(img_);
     }
     setImgLoadArr(imgLoadArr_);
   }
 
   return (
-    <div className="trackDetailContainer" id="trackDetailContainer">
+    <div className="trackMapContainer" id="trackMapContainer">
       {
         imgLoadArr.map( (img, i) => {
-          console.log(img);
           return <img width={img.width * IMGSCALING} src={img.src}/>
         })
       }
