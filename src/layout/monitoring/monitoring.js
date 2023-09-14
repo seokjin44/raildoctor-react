@@ -103,6 +103,7 @@ function Monitoring( props ) {
                 <TrackMap 
                   open={railmapOpen} 
                   popupClose={()=>{setRailmapOpen(false)}}
+                  kp={kp} 
                 />
               </div>
             </div>
@@ -112,8 +113,8 @@ function Monitoring( props ) {
             <div className="containerTitle bothEnds">
               <div>속도정보</div>
             </div>
-            <div className="componentBox separationBox" style={{overflow: "auto"}}>
-              <div className="boxProto speed" id="trackDetailContainer">
+            <div className="componentBox separationBox">
+              <div className="boxProto speed">
                 <TrackSpeed data={TRACKSPEEDDATA} kp={kp} ></TrackSpeed>
               </div>
             </div>
