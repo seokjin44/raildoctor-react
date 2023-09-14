@@ -157,23 +157,29 @@
 
 .cumulativeThroughput .track {
     position: relative;
-    height: 63%;
+    height: calc(100% - 280px);
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    overflow: auto;
+    user-select: none;
 }
 
 .cumulativeThroughput .componentBox .guideLine{
-    width: 1px;
+    width: 5px;
     height: calc(100% - 48px);
     position: absolute;
     background-color: #ff0000;
     left: 295px;
     top: 32px;
     border-radius: 5px;
+    cursor: e-resize;
 }
 
 .cumulativeThroughput .componentBox .guideLine .dataContainer{
     position: absolute;
     left: 10px;
-    top: 66%;
+    bottom: 10px;
 }
 
 .cumulativeThroughput .componentBox .guideLine .dataContainer .dataLine:first-child{
@@ -192,4 +198,8 @@
 .cumulativeThroughput .componentBox .guideLine .dataContainer .table .tableHeader .tr .td,
 .cumulativeThroughput .componentBox .guideLine .dataContainer .table .tableBody .tr .td{
     min-width: 100px;
+}
+
+.cumulativeThroughput .componentBox .guideLine.guideLineOver{
+    background-color: black;
 }
