@@ -1,7 +1,10 @@
 import React from "react";
 import "./PlaceInfo.css";
+import classNames from "classnames";
 
+let pointList = [];
 class PlaceInfo extends React.Component {
+	
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -183,6 +186,7 @@ class PlaceInfo extends React.Component {
 	}
 
 	drawPlace() {
+		pointList = [];
 		if(this.props.path === undefined)	return;
 		if(this.props.instrumentationPoint === undefined)	return;
 
@@ -220,6 +224,11 @@ class PlaceInfo extends React.Component {
 			context.fillText(point.name, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
 			
 			context.closePath();
+			pointList.push({
+				x : point.x * this.state.scaleX + this.state.x,
+				y : y,
+				radius : this.state.pointRadius
+			});
 		}
 
 		//하선
@@ -246,6 +255,11 @@ class PlaceInfo extends React.Component {
 			context.fillText(point.name, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
 			
 			context.closePath();
+			pointList.push({
+				x : point.x * this.state.scaleX + this.state.x,
+				y : y,
+				radius : this.state.pointRadius
+			});
 		}
 
 		context.restore();
@@ -296,7 +310,26 @@ class PlaceInfo extends React.Component {
 
 	render() {
 		return (
-			<div className="placeInfoBox" id={"place-info-container-" + this.state.id}></div>
+			<div className={classNames("placeInfoBox")} id={"place-info-container-" + this.state.id}
+				onMouseMove={(e)=>{
+					let canvas = document.getElementById("place-info-canvas-" + this.state.id);
+					const rect = canvas.getBoundingClientRect();
+					const x = e.clientX - rect.left;
+					const y = e.clientY - rect.top;
+					
+					let isInsideCircle = false;
+					
+					pointList.forEach(circle => {
+						const distance = Math.sqrt((x - circle.x) ** 2 + (y - circle.y) ** 2);
+						if (distance < circle.radius) {
+							console.log("find");
+							isInsideCircle = true;
+						}
+					});
+					
+					canvas.style.cursor = isInsideCircle ? 'pointer' : 'default';
+				}}
+			></div>
 		);
 	}
 }
