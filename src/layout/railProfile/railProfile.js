@@ -23,6 +23,8 @@ import {
 import faker from 'faker';
 import { RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE } from "../../constant";
 import { Input, DatePicker, Radio } from "antd";
+import ImgSlider from "../../component/imgSlider/imgSlider";
+import { dateFormat } from "../../util";
 const { RangePicker } = DatePicker;
 
 ChartJS.register(
@@ -37,52 +39,22 @@ ChartJS.register(
   BarController
 );
 
-const labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17'];
-
-export const data = {
-  labels,
-  datasets: [
-    {
-      type: 'line',
-      label: 'Dataset 1',
-      borderColor: 'rgb(255, 99, 132)',
-      borderWidth: 2,
-      fill: false,
-      data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-    },
-    {
-      type: 'line',
-      label: 'Dataset 2',
-      backgroundColor: 'rgb(75, 192, 192)',
-      data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-      borderColor: 'white',
-      borderWidth: 2,
-    },
-    {
-      type: 'line',
-      label: 'Dataset 3',
-      backgroundColor: 'rgb(53, 162, 235)',
-      data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-    },
-  ],
-};
-
 const marks = [
   {
-    value: 0,
-    label: '10/05',
+    value: new Date("2023-10-05").getTime(),
+    /* label: '10/05', */
   },
   {
-    value: 20,
-    label: '11/23',
+    value: new Date("2023-11-23").getTime(),
+    /* label: '11/23', */
   },
   {
-    value: 37,
-    label: '12/04',
+    value: new Date("2023-12-04").getTime(),
+    /* label: '12/04', */
   },
   {
-    value: 100,
-    label: '12/26',
+    value: new Date("2023-12-26").getTime(),
+    /* label: '12/26', */
   },
 ];
 
@@ -91,6 +63,11 @@ function RailProfile( props ) {
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
+  }
+
+  const valueLabelFormat = (value) => {
+    let etst = dateFormat(new Date(value));
+    return etst;
   }
 
   useEffect(() => {
@@ -152,16 +129,24 @@ function RailProfile( props ) {
               <Slider
                 track={false}
                 aria-labelledby="track-false-slider"
-                /* getAriaValueText={valuetext} */
                 defaultValue={30}
                 marks={marks}
+                step={null}
+                min={new Date("2023-08-01").getTime()}
+                max={new Date("2023-12-31").getTime()}
+                getAriaValueText={valueLabelFormat}
+                valueLabelFormat={valueLabelFormat}
+                valueLabelDisplay="on"
+                size="medium"
               />
             </div>
             <div className="profileData">
               <div className="picture">
                 <div className="pictureData regDate">23.03.15</div>
                 <div className="pictureData newUpload">Upload</div>
-                <img src={DemoImg2} />
+                <ImgSlider
+                  imgUrlList={[DemoImg1,DemoImg2]}
+                />
               </div>
               <div className="table" >
                 <div className="tableHeader">
@@ -274,7 +259,7 @@ function RailProfile( props ) {
               <div className="picture">
                 <div className="pictureData regDate">23.03.15</div>
                 <div className="pictureData newUpload">Upload</div>
-                <img src={DemoImg1} />
+                <ImgSlider/>
               </div>
               <div className="table" >
                 <div className="tableHeader">

@@ -94,6 +94,7 @@
     border-radius: 5px;
     background: white;
     padding: 3px;
+    z-index: 1;
 }
 
 .profileData .picture .regDate{
@@ -150,4 +151,8 @@
 
 .railProfile .table{
     font-size: 10px;
+}
+
+span.css-yafthl-MuiSlider-markLabel{
+
 }
