@@ -120,11 +120,11 @@ function CumulativeThroughput( props ) {
     for( let img of imgLoadArr ){
       let nextImgWidth = img.width* IMGSCALING;
       accWidth = accWidth + nextImgWidth;
-      if( accWidth > container.scrollLeft ){
+      if( accWidth > (container.scrollLeft + guideLineLeft) ){
         accWidth = accWidth - nextImgWidth;
-        let imgWidth = (img.width* IMGSCALING);
-        let dataPosition = img.start + (guideLineLeft / imgWidth) * (img.end - img.start);
-        console.log(dataPosition);
+        let pos = (container.scrollLeft + guideLineLeft) - accWidth;
+        let imgWidth = (img.width * IMGSCALING);
+        let dataPosition = img.start + (pos / imgWidth) * (img.end - img.start);
         setKP( parseInt(dataPosition) );
         return;
       }
@@ -223,6 +223,11 @@ function CumulativeThroughput( props ) {
             const x = e.clientX - parentRect.left;
             setGuideLineLeft(x);
             guideLIneFindKP();
+          }
+        }}
+        onMouseUp={()=>{
+          if( isGuideLineDragging ){
+            setIsGuideLineDragging(false);
           }
         }}
       >
