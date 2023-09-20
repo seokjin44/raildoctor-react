@@ -6,3 +6,7 @@
     align-items: center;
     overflow: auto;
 }
+
+.trackMapContainer img{
+    user-select: none;
+}
