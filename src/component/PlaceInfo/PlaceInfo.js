@@ -1,6 +1,7 @@
 import React from "react";
 import "./PlaceInfo.css";
 import classNames from "classnames";
+import { DOWN_TRACK, UP_TRACK } from "../../constant";
 
 let pointList = [];
 class PlaceInfo extends React.Component {
@@ -11,7 +12,7 @@ class PlaceInfo extends React.Component {
 			id: Math.random().toString(36).substring(2, 11),
 			canvas: undefined,
 			ctx: undefined,
-
+			hoverPoint : null,
 			// user defined properties  
 			minX: 0,
 			minY: 0,
@@ -22,6 +23,8 @@ class PlaceInfo extends React.Component {
 
 			// constants  
 			padding: 50,
+			topPadding : 10,
+			bottomPadding : 25,
 			tickSize: 10,
 			axisColor: "#555",
 			pointRadius: 5,
@@ -123,15 +126,15 @@ class PlaceInfo extends React.Component {
 		context.save();
 
 		context.beginPath();
-		context.moveTo(this.state.x, this.state.canvas.height / 2 - this.state.padding);
-		context.lineTo(this.state.x + this.state.width, this.state.canvas.height / 2 - this.state.padding);
+		context.moveTo(this.state.x, this.state.canvas.height / 2 - this.state.padding + this.state.topPadding );
+		context.lineTo(this.state.x + this.state.width, this.state.canvas.height / 2 - this.state.padding + this.state.topPadding );
 		context.setLineDash([0]);
 		context.lineWidth = 2;
 		context.stroke();
 
 		context.beginPath();
-		context.moveTo(this.state.x, this.state.canvas.height / 2 + this.state.padding);
-		context.lineTo(this.state.x + this.state.width, this.state.canvas.height / 2 + this.state.padding);
+		context.moveTo(this.state.x, this.state.canvas.height / 2 + this.state.padding - this.state.bottomPadding );
+		context.lineTo(this.state.x + this.state.width, this.state.canvas.height / 2 + this.state.padding - this.state.bottomPadding );
 		context.setLineDash([0]);
 		context.lineWidth = 2;
 		context.stroke();
@@ -148,24 +151,35 @@ class PlaceInfo extends React.Component {
 		context.textAlign = "right"
 		context.fillText(endName, this.state.canvas.width - 10, this.state.canvas.height / 2 + this.state.fontHeight / 2);
 
+		//하선동그라미(양쪽끝)
 		context.beginPath();
-		context.arc(this.state.x, this.state.canvas.height / 2 + this.state.padding, this.state.pointRadius * 1.5, 0, 2 * Math.PI, false);
+		context.arc(this.state.x, 
+			this.state.canvas.height / 2 + this.state.padding - this.state.bottomPadding ,
+			this.state.pointRadius * 1.5, 0, 2 * Math.PI,
+			false);
 		context.fillStyle = "white";
 		context.fill();
 		context.stroke();
 
 		context.beginPath();
-		context.arc(this.state.x + this.state.width, this.state.canvas.height / 2 + this.state.padding, this.state.pointRadius * 1.5, 0, 2 * Math.PI, false);
+		context.arc(this.state.x + this.state.width,
+			this.state.canvas.height / 2 + this.state.padding - this.state.bottomPadding ,
+			this.state.pointRadius * 1.5, 0, 2 * Math.PI, false);
+		context.fill();
+		context.stroke();
+
+		//상선동그라미(양쪽끝)
+		context.beginPath();
+		context.arc(this.state.x,
+			this.state.canvas.height / 2 - this.state.padding + this.state.topPadding, 
+			this.state.pointRadius * 1.5, 0, 2 * Math.PI, false);
 		context.fill();
 		context.stroke();
 
 		context.beginPath();
-		context.arc(this.state.x, this.state.canvas.height / 2 - this.state.padding, this.state.pointRadius * 1.5, 0, 2 * Math.PI, false);
-		context.fill();
-		context.stroke();
-
-		context.beginPath();
-		context.arc(this.state.x + this.state.width, this.state.canvas.height / 2 - this.state.padding, this.state.pointRadius * 1.5, 0, 2 * Math.PI, false);
+		context.arc(this.state.x + this.state.width,
+			this.state.canvas.height / 2 - this.state.padding + this.state.topPadding, 
+			this.state.pointRadius * 1.5, 0, 2 * Math.PI, false);
 		context.fill();
 		context.stroke();
 
@@ -209,16 +223,22 @@ class PlaceInfo extends React.Component {
 				name: this.naming(location)
 			}
 
-			let y = this.state.canvas.height / 2 - this.state.padding;
+			let y = this.state.canvas.height / 2 - this.state.padding + this.state.topPadding;
 
 			context.beginPath();
 			
 			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
-			context.fillStyle = "yellow";
+			context.fillStyle = (
+				point.name === this.props.selectKP.name &&
+				this.props.selectKP.trackType === UP_TRACK
+			) ? "orange" : "yellow";
 			context.fill();
 			context.stroke();
 
-			context.fillStyle = "black";
+			context.fillStyle = (
+				point.name === this.props.selectKP.name &&
+				this.props.selectKP.trackType === UP_TRACK 
+			) ? "orange" : "black";
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
 			context.fillText(point.name, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
@@ -227,7 +247,9 @@ class PlaceInfo extends React.Component {
 			pointList.push({
 				x : point.x * this.state.scaleX + this.state.x,
 				y : y,
-				radius : this.state.pointRadius
+				radius : this.state.pointRadius + 3,
+				name: point.name,
+				trackType : UP_TRACK
 			});
 		}
 
@@ -240,16 +262,22 @@ class PlaceInfo extends React.Component {
 				name: this.naming(location)
 			}
 
-			let y = this.state.canvas.height / 2 + this.state.padding;
+			let y = this.state.canvas.height / 2 + this.state.padding - this.state.bottomPadding;
 
 			context.beginPath();
 			
 			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
-			context.fillStyle = "yellow";
+			context.fillStyle = (
+				point.name === this.props.selectKP.name &&
+				this.props.selectKP.trackType === DOWN_TRACK
+			) ? "orange" : "yellow";
 			context.fill();
 			context.stroke();
 
-			context.fillStyle = "black";
+			context.fillStyle = (
+				point.name === this.props.selectKP.name &&
+				this.props.selectKP.trackType === DOWN_TRACK 
+			) ? "orange" : "black";
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
 			context.fillText(point.name, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
@@ -258,7 +286,9 @@ class PlaceInfo extends React.Component {
 			pointList.push({
 				x : point.x * this.state.scaleX + this.state.x,
 				y : y,
-				radius : this.state.pointRadius
+				radius : this.state.pointRadius + 3,
+				name: point.name,
+				trackType : DOWN_TRACK
 			});
 		}
 
@@ -312,6 +342,7 @@ class PlaceInfo extends React.Component {
 		return (
 			<div className={classNames("placeInfoBox")} id={"place-info-container-" + this.state.id}
 				onMouseMove={(e)=>{
+					let container = document.getElementById("place-info-container-" + this.state.id);
 					let canvas = document.getElementById("place-info-canvas-" + this.state.id);
 					const rect = canvas.getBoundingClientRect();
 					const x = e.clientX - rect.left;
@@ -323,11 +354,20 @@ class PlaceInfo extends React.Component {
 						const distance = Math.sqrt((x - circle.x) ** 2 + (y - circle.y) ** 2);
 						if (distance < circle.radius) {
 							console.log("find");
+							this.setState({hoverPoint : circle})
 							isInsideCircle = true;
 						}
 					});
 					
-					canvas.style.cursor = isInsideCircle ? 'pointer' : 'default';
+					container.style.cursor = isInsideCircle ? 'pointer' : 'default';
+				}}
+				onMouseUp={(e)=>{
+					if( this.state.hoverPoint ){
+						this.props.setSelectKP(this.state.hoverPoint);
+					}
+					this.setState({
+						hoverPoint : null
+					})
 				}}
 			></div>
 		);
