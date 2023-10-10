@@ -42,24 +42,30 @@ ChartJS.register(
 const marks = [
   {
     value: new Date("2023-10-05").getTime(),
+    mamo : 1
     /* label: '10/05', */
   },
   {
     value: new Date("2023-11-23").getTime(),
+    mamo : 2
     /* label: '11/23', */
   },
   {
     value: new Date("2023-12-04").getTime(),
+    mamo : 3
     /* label: '12/04', */
   },
   {
     value: new Date("2023-12-26").getTime(),
+    mamo : 4
     /* label: '12/26', */
   },
 ];
 
 function RailProfile( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
+  const [upTrackProfileImg, setUpTrackProfileImg] = useState(0);
+  const [downTrackProfileImg, setDownTrackProfileImg] = useState(0);
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
@@ -72,6 +78,39 @@ function RailProfile( props ) {
 
   useEffect(() => {
   }, []);
+
+  const upTrackHandleChange = (e) => {
+    console.log(e);
+    for( let mark of marks ){
+      if( mark.value === e.target.value ){
+        setUpTrackProfileImg(mark.mamo);
+        break;
+      }
+    }
+  }
+
+  const downTrackHandleChange = (e) => {
+    console.log(e);
+    for( let mark of marks ){
+      if( mark.value === e.target.value ){
+        setDownTrackProfileImg(mark.mamo);
+        break;
+      }
+    }
+  }
+
+  const getProfileImg = (value) => {
+    if( value === 1 ){
+      return <img className="profileImg" src={LeftProfile} />;
+    }else if( value === 0 ){
+      return <div className="profileImg" >
+        날짜를 선택해주세요.
+      </div>;
+    }
+    return <div className="profileImg" >
+      이미지가 준비되지않은 범위입니다.
+    </div>;
+  } 
   
   return (
     <div className="trackDeviation railProfile" >
@@ -125,7 +164,7 @@ function RailProfile( props ) {
         <div className="componentBox chartBox flex">
           <div className="profile left">
             <div className="profileSlider">
-              <img src={LeftProfile} />
+              {getProfileImg(upTrackProfileImg)}
               <Slider
                 track={false}
                 aria-labelledby="track-false-slider"
@@ -137,6 +176,7 @@ function RailProfile( props ) {
                 getAriaValueText={valueLabelFormat}
                 valueLabelFormat={valueLabelFormat}
                 valueLabelDisplay="on"
+                onChange={upTrackHandleChange}
                 size="medium"
               />
             </div>
@@ -247,12 +287,20 @@ function RailProfile( props ) {
           </div>
           <div className="profile right">
             <div className="profileSlider">
-              <img src={RightProfile} />
+              {getProfileImg(downTrackProfileImg)}
               <Slider
                 track={false}
                 aria-labelledby="track-false-slider"
                 defaultValue={30}
                 marks={marks}
+                step={null}
+                min={new Date("2023-08-01").getTime()}
+                max={new Date("2023-12-31").getTime()}
+                getAriaValueText={valueLabelFormat}
+                valueLabelFormat={valueLabelFormat}
+                valueLabelDisplay="on"
+                size="medium"
+                onChange={downTrackHandleChange}
               />
             </div>
             <div className="profileData">

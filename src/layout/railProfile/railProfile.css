@@ -60,8 +60,16 @@
     padding: 20px;
 }
 
-.profileSlider img{
+.profileSlider img,
+.profileSlider .profileImg{
     width: 65%;
+    height: 209px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border: 1px solid #cccccc; */
+    border-radius: 5px;
+    margin-bottom: 45px;
 }
 
 .railProfile .table{
