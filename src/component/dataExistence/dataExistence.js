@@ -13,6 +13,7 @@ import { LineChart, Line, XAxis,
   YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer,
   ScatterChart, Scatter, Bar, BarChart } from 'recharts';
+import { convertToCustomFormat } from "../../util";
 
 function DataExistence( props ) {
   const navigate = useNavigate();
@@ -62,7 +63,7 @@ function DataExistence( props ) {
           <div className="dataBar kp">
             {
               kpList.map( kp => {
-                return <div className="kp" style={{left:kp}} >{kp}</div>;
+                return <div className="kp" style={{left:kp}} >{convertToCustomFormat(kp)}</div>;
               })
             }
           </div>

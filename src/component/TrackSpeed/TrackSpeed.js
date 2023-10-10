@@ -1,6 +1,7 @@
 import React from "react";
 import "./TrackSpeed.css";
 import { IncheonKP } from "../../constant";
+import { convertToCustomFormat } from "../../util";
 
 class TrackSpeed extends React.Component {
 	KP1toPixel1Width = 0.125;
@@ -206,7 +207,8 @@ class TrackSpeed extends React.Component {
 						context.textAlign = "center";
 						context.fillStyle = "black";  
 						/* this.props.kp * this.state.scaleX + this.state.x */
-						context.fillText( i,  i * this.state.scaleX + this.state.x, n * this.state.height / this.state.numYTicks + this.state.y - 16);
+						
+						context.fillText( convertToCustomFormat(i),  i * this.state.scaleX + this.state.x, n * this.state.height / this.state.numYTicks + this.state.y - 16);
 						context.closePath();
 					}
 				}
