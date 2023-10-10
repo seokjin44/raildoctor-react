@@ -16,7 +16,7 @@
 .pointContainer{
     width: 100%;
     /* height: 100%; */
-    height: 300px;
+    height: 165px;
 }
 
 .containerTitle{
@@ -49,10 +49,10 @@
     box-shadow: 1px 1px 8px #cccccc5c;
 }
 
-.searchContainer{
-    /* background-color: rgb(255, 0, 140); */
-    width: 35%;
-    height: 100%;
+.wearMaintenance .contentBox.searchContainer{
+    width: 350px;
+    height: calc(100% - 1px);
+    margin-right: 10px;
 }
 
 .flexDirectionColumn {
@@ -109,7 +109,7 @@
     justify-content: center;
     align-items: center;
     height: 335px;
-    height: calc(100% - 314px);
+    height: calc(100% - 177px);
 }
 
 .graphGroup{
@@ -168,10 +168,11 @@
 .graphSection{
     width: 100%;
     /* height: 655px; */
-    height: 100%;
+    height: calc(100% - 177px);
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-bottom: 10px;
 }
 
 .graphSection .leftContainer{
@@ -181,7 +182,7 @@
 }
 
 .graphSection .rightContainer{
-    width: 70%;
+    width: calc(100% - 360px);
     height: 100%;
 }
 
@@ -291,32 +292,32 @@
     height: calc(100% - 25px);
 }
 
-.mamoGraphContainer .componentBox .selectBox{
+.searchContainer .componentBox .selectBox{
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.mamoGraphContainer .componentBox .searchOption{
+.searchContainer .componentBox .searchOption{
     border: 1px solid #cccccc;
     border-radius: 5px;
     padding: 15px;
     margin-top: 10px;
 }
 
-.mamoGraphContainer .componentBox .searchOption:first-child{
+.searchContainer .componentBox .searchOption:first-child{
     margin-top: 0;
 }
 
-.mamoGraphContainer .componentBox .searchOption .title{
+.searchContainer .componentBox .searchOption .title{
     font-size: 13px;
 }
 
-.mamoGraphContainer .componentBox .searchOption .valueBox{
+.searchContainer .componentBox .searchOption .valueBox{
     align-items: center;
 }
 
-.mamoGraphContainer .componentBox .searchOption .dataText{
+.searchContainer .componentBox .searchOption .dataText{
     font-size: 13px;
     font-weight: bold;
 }

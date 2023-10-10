@@ -9,7 +9,7 @@ import 'dayjs/locale/ko';
 import { Select } from 'antd';
 import { Box, Modal } from "@mui/material";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
-import { DIRECTWEARINFO, INSTRUMENTATIONPOINT, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO, TRACKSPEEDDATA } from "../../constant";
+import { DIRECTWEARINFO, INSTRUMENTATIONPOINT, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO, TRACKSPEEDDATA, UP_TRACK } from "../../constant";
 import AlertIcon from "../../assets/icon/decision/3876149_alert_emergency_light_protection_security_icon.png";
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
@@ -46,6 +46,10 @@ function WearMaintenance( props ) {
     "start_station_longitude": 126.7079019,
     "end_station_latitude": 37.4576187,
     "end_station_longitude": 126.7022161
+  });
+  const [selectKP, setSelectKP] = useState({
+    name : "14K100",
+    trackType : UP_TRACK
   });
   const [wearSearchCondition, setWearSearchCondition] = useState({
     startDate: new Date().getTime() - (31536000000 * 7),
@@ -199,7 +203,7 @@ function WearMaintenance( props ) {
       <div className="dataContainer">
         <div className="scrollContainer" style={{ width: "calc(100%)", height: "calc(100% - 0px)", overflow: "auto"}}>
           <div className="graphSection">
-            <div className="leftContainer">
+            {/* <div className="leftContainer">
               <div className="contentBox linearContainer mr10" style={{marginBottom:"10px", height:"calc(100% - 287px)"}}>
                 <div className="containerTitle tab">
                   <div className="tab select">선형정보</div>
@@ -207,12 +211,6 @@ function WearMaintenance( props ) {
                 </div>
                 <div className="componentBox">
                 <div className="boxProto track" id="trackDetailContainer">
-                  {/* <canvas id="trackDetailCanvas"
-                      ref={trackDetailCanvasRef}
-                      onMouseDown={(e)=>{trackDetailHandleMouseDown(e)}}
-                      onMouseUp={(e)=>{trackDetailHandleMouseUp()}}
-                      onMouseMove={(e)=>{trackDetailHandleMouseMove(e)}}
-                  /> */}
                 </div>
                 </div>
               </div>
@@ -224,101 +222,106 @@ function WearMaintenance( props ) {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
+            <div className="contentBox searchContainer mr10">
+              <div className="containerTitle">조회 조건</div>
+                <div className="componentBox">
+                  <div className="flex flexDirectionColumn margin10" style={{"height": "calc(100% - 20px)", "justify-content": "flex-start"}}>
+                    <div className="searchOption selectBox">
+                      <div className="title flex textBold">계측 위치</div>
+                      <div className="flex">
+                          <Input placeholder="KP" value={selectKP.name} style={RANGEPICKERSTYLE} />
+                      </div>
+                    </div>
+                    <div className="searchOption" style={{padding: "15px 15px 6px 15px"}}>
+                      <div className="flex bothEnds valueBox">
+                        <label className="textBold title">계측기간</label>
+                        <div className="flex dataText">
+                          <div id="startWearDate">{timeFormatDate(wearSearchCondition.startDate)}</div>
+                          <div>~</div>
+                          <div id="endWearDate">{timeFormatDate(wearSearchCondition.endDate)}</div>
+                        </div>
+                      </div>
+                      <div className="flex" tyle={{height:'30px'}}>
+                        <div className="sliderContainer">
+                          <Slider range={{ draggableTrack: true }} min={new Date().getTime() - (31536000000 * 7)} max={new Date().getTime()} defaultValue={[new Date().getTime() - (31536000000 * 7), new Date().getTime()]} tooltip={{ open: false, }} onChange={onChangeTimeSlider} step={86400000}/>
+                        </div>
+                      </div>
+                    </div>
+                    <div  className="searchOption" style={{padding: "15px 15px 6px 15px"}}>
+                      <div className="flex bothEnds valueBox">
+                        <label className="textBold title">통과톤수</label>
+                        <div className="flex dataText">
+                          <div id="startWearMGT">{wearSearchCondition.startMGT}</div>
+                          <div>~</div>
+                          <div id="endWearMGT">{wearSearchCondition.endMGT}</div>
+                          <div style={{marginLeft: "5px"}}>MGT</div>
+                        </div>
+                      </div>
+                      <div className="flex">
+                        <div className="sliderContainer">
+                          <Slider range={{ draggableTrack: true }} min={0} max={3000} defaultValue={[0, 3000]} tooltip={{ open: false, }} onChange={onChangeMgtSlider} step={50}/>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="searchOption selectBox">
+                      <div className="title flex textBold">마모예측 상관성</div>
+                      <div className="flex">
+                          <Select
+                            defaultValue=""
+                            style={{ width: 190 }}
+                            /* onChange={handleChange} */
+                            options={
+                              [
+                                {value:"누적통과톤수만 고려",label:"누적통과톤수만 고려"},
+                                {value:"레일특성변수 모두고려",label:"레일특성변수 모두고려"}
+                              ]
+                            }
+                          />
+                      </div>
+                    </div>
+                    <div className="searchOption selectBox">
+                      <div className="title flex textBold">예측모델</div>
+                      <div className="flex">
+                          <Select
+                            defaultValue=""
+                            style={{ width: 190 }}
+                            /* onChange={handleChange} */
+                            options={
+                              [
+                                {value:"선형회귀모형",label:"선형회귀모형"},
+                                {value:"로지스틱 회귀모형",label:"로지스틱 회귀모형"},
+                                {value:"SVM",label:"SVM"},
+                                {value:"랜덤포레스트",label:"랜덤포레스트"},
+                                {value:"XGBoost",label:"XGBoost"},
+                                {value:"Light GBM",label:"Light GBM"},
+                                {value:"CatBoost",label:"CatBoost"}
+                              ]
+                            }
+                          />
+                      </div>
+                    </div>
+                    <div className="flex flexCenter" style={{flexDirection: "row-reverse"}} >
+                      <button className="searchButton" onClick={onClickWearSearch}>조회</button>
+                    </div>
+                  </div>
+                    
+
+                </div>
+              </div>
             <div className="rightContainer">
               <div className="contentBox pointContainer">
                 <div className="containerTitle">지점정보</div>
                 <div className="componentBox">
-                  <PlaceInfo path={selectedPath} instrumentationPoint={INSTRUMENTATIONPOINT}></PlaceInfo>
+                  <PlaceInfo 
+                    selectKP={selectKP}
+                    setSelectKP={setSelectKP}
+                    path={selectedPath} 
+                    instrumentationPoint={INSTRUMENTATIONPOINT}
+                  ></PlaceInfo>
                 </div>
               </div>
               <div className="mamoGraphContainer">
-                <div className="contentBox searchContainer mr10" style={{width:"35%"}}>
-                  <div className="containerTitle">조회 조건</div>
-                  <div className="componentBox">
-                    <div className="flex flexDirectionColumn margin10" style={{"height": "calc(100% - 20px)", "justify-content": "flex-start"}}>
-                      <div className="searchOption selectBox">
-                        <div className="title flex textBold">계측 위치</div>
-                        <div className="flex">
-                            <Input placeholder="KP" value={"14K100"} style={RANGEPICKERSTYLE} />
-                        </div>
-                      </div>
-                      <div className="searchOption" style={{padding: "15px 15px 6px 15px"}}>
-                        <div className="flex bothEnds valueBox">
-                          <label className="textBold title">계측기간</label>
-                          <div className="flex dataText">
-                            <div id="startWearDate">{timeFormatDate(wearSearchCondition.startDate)}</div>
-                            <div>~</div>
-                            <div id="endWearDate">{timeFormatDate(wearSearchCondition.endDate)}</div>
-                          </div>
-                        </div>
-                        <div className="flex" tyle={{height:'30px'}}>
-                          <div className="sliderContainer">
-                            <Slider range={{ draggableTrack: true }} min={new Date().getTime() - (31536000000 * 7)} max={new Date().getTime()} defaultValue={[new Date().getTime() - (31536000000 * 7), new Date().getTime()]} tooltip={{ open: false, }} onChange={onChangeTimeSlider} step={86400000}/>
-                          </div>
-                        </div>
-                      </div>
-                      <div  className="searchOption" style={{padding: "15px 15px 6px 15px"}}>
-                        <div className="flex bothEnds valueBox">
-                          <label className="textBold title">통과톤수</label>
-                          <div className="flex dataText">
-                            <div id="startWearMGT">{wearSearchCondition.startMGT}</div>
-                            <div>~</div>
-                            <div id="endWearMGT">{wearSearchCondition.endMGT}</div>
-                            <div style={{marginLeft: "5px"}}>MGT</div>
-                          </div>
-                        </div>
-                        <div className="flex">
-                          <div className="sliderContainer">
-                            <Slider range={{ draggableTrack: true }} min={0} max={3000} defaultValue={[0, 3000]} tooltip={{ open: false, }} onChange={onChangeMgtSlider} step={50}/>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="searchOption selectBox">
-                        <div className="title flex textBold">마모예측 상관성</div>
-                        <div className="flex">
-                            <Select
-                              defaultValue=""
-                              style={{ width: 190 }}
-                              /* onChange={handleChange} */
-                              options={
-                                [
-                                  {value:"누적통과톤수만 고려",label:"누적통과톤수만 고려"},
-                                  {value:"레일특성변수 모두고려",label:"레일특성변수 모두고려"}
-                                ]
-                              }
-                            />
-                        </div>
-                      </div>
-                      <div className="searchOption selectBox">
-                        <div className="title flex textBold">예측모델</div>
-                        <div className="flex">
-                            <Select
-                              defaultValue=""
-                              style={{ width: 190 }}
-                              /* onChange={handleChange} */
-                              options={
-                                [
-                                  {value:"선형회귀모형",label:"선형회귀모형"},
-                                  {value:"로지스틱 회귀모형",label:"로지스틱 회귀모형"},
-                                  {value:"SVM",label:"SVM"},
-                                  {value:"랜덤포레스트",label:"랜덤포레스트"},
-                                  {value:"XGBoost",label:"XGBoost"},
-                                  {value:"Light GBM",label:"Light GBM"},
-                                  {value:"CatBoost",label:"CatBoost"}
-                                ]
-                              }
-                            />
-                        </div>
-                      </div>
-                      <div className="flex flexCenter" style={{flexDirection: "row-reverse"}} >
-                        <button className="searchButton" onClick={onClickWearSearch}>조회</button>
-                      </div>
-                    </div>
-                      
-
-                  </div>
-                </div>
                 <div className="contentBox wearContainer" style={{marginLeft : 0, height:"100%"}}>
                   <div className="containerTitle bothEnds">
                     <div>마모정보</div>
@@ -353,6 +356,26 @@ function WearMaintenance( props ) {
               </div>
             </div>
           </div>
+          <div className="leftContainer">
+              {/* <div className="contentBox linearContainer mr10" style={{marginBottom:"10px", height:"calc(100% - 287px)"}}>
+                <div className="containerTitle tab">
+                  <div className="tab select">선형정보</div>
+                  <div className="tab">구배</div>
+                </div>
+                <div className="componentBox">
+                <div className="boxProto track" id="trackDetailContainer">
+                </div>
+                </div>
+              </div> */}
+              <div className="contentBox speedContainer" style={{height:"165px"}}>
+                <div className="containerTitle">통과속도 정보</div>
+                <div className="componentBox" style={{ marginRight: "10px", width: "calc(100% - 10px)", overflow: "hidden"}}>
+                  <div className="demoImgContainer">
+                    <TrackSpeed data={TRACKSPEEDDATA} kp={kp} ></TrackSpeed>
+                  </div>
+                </div>
+              </div>
+            </div>
         </div>
       </div>
 
@@ -379,7 +402,7 @@ function WearMaintenance( props ) {
                       paddingLeft: "5px",
                       flexDirection: "column",
                       width: "calc( 100% - 12px)" }} >
-                  <div className="dataBox">
+                  <div className="dataBox" style={{display:"flex"}}>
                     <div class="curDate optionBox borderColorGreen" style={{height:"55px", width: "315px", marginBottom : "10px"}}>
                       <div class="optionTitle" style={{width:"212px"}}>예측 누적통과톤수</div>
                       <div class="optionValue">414,953,971</div>
