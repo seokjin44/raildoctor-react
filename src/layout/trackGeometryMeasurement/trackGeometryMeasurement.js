@@ -8,6 +8,7 @@ import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarC
 import { Checkbox, DatePicker, Input } from "antd";
 import { INSTRUMENTATIONPOINT, RAILROADSECTION, RANGEPICKERSTYLE, TRACKGEODATA1, TRACKGEODATA2, TRACKGEODATA3 } from "../../constant";
 import PlacePosition from "../../component/PlacePosition/PlacePosition";
+import axios from 'axios';
 
 const upTrackPoint = [{kp:700}];
 const downTrackPoint = [{kp:800}];
@@ -31,6 +32,15 @@ function TrackGeometryMeasurement( props ) {
   ];
 
   useEffect(() => {
+    axios.get('https://devel.suredatalab.kr/api/railbehaviors/locations',{
+      params : {
+        railroad : "인천 1호선",
+        begin : "계양",
+        end : "귤현"
+      }
+    })
+    .then(response => console.log(response.data))
+    .catch(error => console.error('Error fetching data:', error));
   }, []);
   
   return (
