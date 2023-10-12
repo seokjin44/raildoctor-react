@@ -11,6 +11,8 @@ class PlacePosition extends React.Component {
 			id: Math.random().toString(36).substring(2, 11),
 			canvas: undefined,
 			ctx: undefined,
+			hoverPoint : null,
+			lineSpacing : 20,
 
 			// user defined properties  
 			minX: 0,
@@ -118,20 +120,47 @@ class PlacePosition extends React.Component {
 	}
 
 	drawAxis = function () {
+		console.log("PlacePosition - drawAxis");
 		let context = this.state.ctx;
-
+		let lineSpacing = this.state.lineSpacing;
 		context.save();
 
+		context.font = "bold 12px NEO_R";
+		context.fillStyle = "black";
+		context.textAlign = "left";
+
+		//상선 좌
 		context.beginPath();
-		context.moveTo(this.state.x, this.state.canvas.height / 2 - this.state.padding);
-		context.lineTo(this.state.x + this.state.width, this.state.canvas.height / 2 - this.state.padding);
+		context.fillText("좌", this.state.x - 30, this.state.canvas.height / 2 - this.state.padding - lineSpacing + this.state.fontHeight / 2 - 2.5);
+		context.moveTo(this.state.x, this.state.canvas.height / 2 - this.state.padding - lineSpacing);
+		context.lineTo(this.state.x + this.state.width, this.state.canvas.height / 2 - this.state.padding - lineSpacing);
 		context.setLineDash([0]);
 		context.lineWidth = 2;
 		context.stroke();
 
+		//상선 우
 		context.beginPath();
-		context.moveTo(this.state.x, this.state.canvas.height / 2 + this.state.padding);
-		context.lineTo(this.state.x + this.state.width, this.state.canvas.height / 2 + this.state.padding);
+		context.fillText("우", this.state.x - 30, this.state.canvas.height / 2 - this.state.padding + (lineSpacing / 2) + this.state.fontHeight / 2 - 2.5);
+		context.moveTo(this.state.x, this.state.canvas.height / 2 - this.state.padding + (lineSpacing / 2));
+		context.lineTo(this.state.x + this.state.width, this.state.canvas.height / 2 - this.state.padding + (lineSpacing / 2));
+		context.setLineDash([0]);
+		context.lineWidth = 2;
+		context.stroke();
+
+		//하선 좌
+		context.beginPath();
+		context.fillText("좌", this.state.x - 30, this.state.canvas.height / 2 + this.state.padding - (lineSpacing / 2) + this.state.fontHeight / 2 - 2.5);
+		context.moveTo(this.state.x, this.state.canvas.height / 2 + this.state.padding - (lineSpacing / 2) );
+		context.lineTo(this.state.x + this.state.width, this.state.canvas.height / 2 + this.state.padding - (lineSpacing / 2) );
+		context.setLineDash([0]);
+		context.lineWidth = 2;
+		context.stroke();
+
+		//하선 우
+		context.beginPath();
+		context.fillText("우", this.state.x - 30, this.state.canvas.height / 2 + this.state.padding + lineSpacing + this.state.fontHeight / 2 - 2.5);
+		context.moveTo(this.state.x, this.state.canvas.height / 2 + this.state.padding + lineSpacing);
+		context.lineTo(this.state.x + this.state.width, this.state.canvas.height / 2 + this.state.padding + lineSpacing);
 		context.setLineDash([0]);
 		context.lineWidth = 2;
 		context.stroke();
@@ -148,24 +177,51 @@ class PlacePosition extends React.Component {
 		context.textAlign = "right"
 		context.fillText(endName, this.state.canvas.width - 10, this.state.canvas.height / 2 + this.state.fontHeight / 2);
 
+		//상선 좌
 		context.beginPath();
-		context.arc(this.state.x, this.state.canvas.height / 2 + this.state.padding, this.state.pointRadius * 1.5, 0, 2 * Math.PI, false);
+		context.arc(this.state.x, this.state.canvas.height / 2 - this.state.padding - lineSpacing, this.state.pointRadius * 1, 0, 2 * Math.PI, false);
 		context.fillStyle = "white";
 		context.fill();
 		context.stroke();
 
 		context.beginPath();
-		context.arc(this.state.x + this.state.width, this.state.canvas.height / 2 + this.state.padding, this.state.pointRadius * 1.5, 0, 2 * Math.PI, false);
+		context.arc(this.state.x + this.state.width, this.state.canvas.height / 2 - this.state.padding - lineSpacing, this.state.pointRadius * 1, 0, 2 * Math.PI, false);
+		context.fill();
+		context.stroke();
+
+		//상선 우
+		context.beginPath();
+		context.arc(this.state.x, this.state.canvas.height / 2 - this.state.padding + (lineSpacing / 2), this.state.pointRadius * 1, 0, 2 * Math.PI, false);
+		context.fillStyle = "white";
 		context.fill();
 		context.stroke();
 
 		context.beginPath();
-		context.arc(this.state.x, this.state.canvas.height / 2 - this.state.padding, this.state.pointRadius * 1.5, 0, 2 * Math.PI, false);
+		context.arc(this.state.x + this.state.width, this.state.canvas.height / 2 - this.state.padding + (lineSpacing / 2), this.state.pointRadius * 1, 0, 2 * Math.PI, false);
+		context.fill();
+		context.stroke();
+
+		//하선 좌
+		context.beginPath();
+		context.arc(this.state.x, this.state.canvas.height / 2 + this.state.padding - (lineSpacing / 2), this.state.pointRadius * 1, 0, 2 * Math.PI, false);
+
 		context.fill();
 		context.stroke();
 
 		context.beginPath();
-		context.arc(this.state.x + this.state.width, this.state.canvas.height / 2 - this.state.padding, this.state.pointRadius * 1.5, 0, 2 * Math.PI, false);
+		context.arc(this.state.x + this.state.width, this.state.canvas.height / 2 + this.state.padding - (lineSpacing / 2), this.state.pointRadius * 1, 0, 2 * Math.PI, false);
+		context.fill();
+		context.stroke();
+
+		//하선 우
+		context.beginPath();
+		context.arc(this.state.x, this.state.canvas.height / 2 + this.state.padding + lineSpacing, this.state.pointRadius * 1, 0, 2 * Math.PI, false);
+		context.fillStyle = "white";
+		context.fill();
+		context.stroke();
+
+		context.beginPath();
+		context.arc(this.state.x + this.state.width, this.state.canvas.height / 2 + this.state.padding + lineSpacing, this.state.pointRadius * 1, 0, 2 * Math.PI, false);
 		context.fill();
 		context.stroke();
 
@@ -186,6 +242,7 @@ class PlacePosition extends React.Component {
 	}
 
 	drawPlace() {
+		let lineSpacing = this.state.lineSpacing;
 		pointList = [];
 		if(this.props.path === undefined)	return;
 		if(this.props.instrumentationPoint === undefined)	return;
@@ -196,11 +253,9 @@ class PlacePosition extends React.Component {
 		let upTrackLength = this.props.path.end_station_up_track_location - this.props.path.start_station_up_track_location;
 		let downTrackLength = this.props.path.end_station_down_track_location - this.props.path.start_station_down_track_location;
 
-		console.log("drawPlace");
-
-		//상선
-		for(let i = 0 ; i < this.props.upTrackPoint.length; i++) {
-			let location = this.props.upTrackPoint[i].kp;
+		//상선 좌
+		for(let trackPoint of this.props.upLeftTrackPoint ) {
+			let location = trackPoint.kp;
 			if( !(location >= this.props.path.start_station_up_track_location && location <= this.props.path.end_station_up_track_location) ){
 				continue;
 			}
@@ -210,7 +265,7 @@ class PlacePosition extends React.Component {
 				name: this.naming(location)
 			}
 
-			let y = this.state.canvas.height / 2 - this.state.padding;
+			let y = this.state.canvas.height / 2 - this.state.padding - lineSpacing;
 
 			context.beginPath();
 			
@@ -222,19 +277,57 @@ class PlacePosition extends React.Component {
 			context.fillStyle = "black";
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
-			context.fillText(point.name, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
+			context.fillText(trackPoint.displayName, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
 			
 			context.closePath();
 			pointList.push({
 				x : point.x * this.state.scaleX + this.state.x,
 				y : y,
-				radius : this.state.pointRadius
+				radius : this.state.pointRadius + 3,
+				sensorId : trackPoint.sensorId,
+				displayName : trackPoint.displayName
 			});
 		}
 
-		//하선
-		for(let i = 0 ; i < this.props.downTrackPoint.length; i++) {
-			let location = this.props.downTrackPoint[i].kp;
+		//상선 우
+		for(let trackPoint of this.props.upRightTrackPoint ) {
+			let location = trackPoint.kp;
+			if( !(location >= this.props.path.start_station_up_track_location && location <= this.props.path.end_station_up_track_location) ){
+				continue;
+			}
+			let point = {
+				x: (location - this.props.path.start_station_up_track_location) / upTrackLength * 100,
+				trackType: 1,
+				name: this.naming(location)
+			}
+
+			let y = this.state.canvas.height / 2 - this.state.padding + (lineSpacing / 2);
+
+			context.beginPath();
+			
+			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
+			context.fillStyle = "yellow";
+			context.fill();
+			context.stroke();
+
+			context.fillStyle = "black";
+			context.textBaseline = "bottom";
+			context.textAlign = "center";
+			context.fillText(trackPoint.displayName, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
+			
+			context.closePath();
+			pointList.push({
+				x : point.x * this.state.scaleX + this.state.x,
+				y : y,
+				radius : this.state.pointRadius + 3,
+				sensorId : trackPoint.sensorId,
+				displayName : trackPoint.displayName
+			});
+		}
+
+		//하선 좌
+		for(let trackPoint of this.props.downLeftTrackPoint ) {
+			let location = trackPoint.kp;
 			if( !(location >= this.props.path.start_station_down_track_location && location <= this.props.path.end_station_down_track_location) ){
 				continue;
 			}
@@ -244,7 +337,7 @@ class PlacePosition extends React.Component {
 				name: this.naming(location)
 			}
 
-			let y = this.state.canvas.height / 2 + this.state.padding;
+			let y = this.state.canvas.height / 2 + this.state.padding - (lineSpacing / 2);
 
 			context.beginPath();
 			
@@ -256,13 +349,51 @@ class PlacePosition extends React.Component {
 			context.fillStyle = "black";
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
-			context.fillText(point.name, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
+			context.fillText(trackPoint.displayName, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
 			
 			context.closePath();
 			pointList.push({
 				x : point.x * this.state.scaleX + this.state.x,
 				y : y,
-				radius : this.state.pointRadius
+				radius : this.state.pointRadius + 3,
+				sensorId : trackPoint.sensorId,
+				displayName : trackPoint.displayName
+			});
+		}
+
+		//하선 우
+		for(let trackPoint of this.props.downRightTrackPoint ) {
+			let location = trackPoint.kp;
+			if( !(location >= this.props.path.start_station_down_track_location && location <= this.props.path.end_station_down_track_location) ){
+				continue;
+			}
+			let point = {
+				x: (location - this.props.path.start_station_down_track_location) / downTrackLength * 100,
+				trackType: 1,
+				name: this.naming(location)
+			}
+
+			let y = this.state.canvas.height / 2 + this.state.padding + lineSpacing;
+
+			context.beginPath();
+			
+			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
+			context.fillStyle = "yellow";
+			context.fill();
+			context.stroke();
+
+			context.fillStyle = "black";
+			context.textBaseline = "bottom";
+			context.textAlign = "center";
+			context.fillText(trackPoint.displayName, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
+			
+			context.closePath();
+			pointList.push({
+				x : point.x * this.state.scaleX + this.state.x,
+				y : y,
+				radius : this.state.pointRadius + 3,
+				sensorId : trackPoint.sensorId,
+				displayName : trackPoint.displayName
 			});
 		}
 
@@ -316,6 +447,7 @@ class PlacePosition extends React.Component {
 		return (
 			<div className={classNames("placeInfoBox")} id={"place-info-container-" + this.state.id}
 				onMouseMove={(e)=>{
+					let container = document.getElementById("place-info-container-" + this.state.id);
 					let canvas = document.getElementById("place-info-canvas-" + this.state.id);
 					const rect = canvas.getBoundingClientRect();
 					const x = e.clientX - rect.left;
@@ -328,10 +460,19 @@ class PlacePosition extends React.Component {
 						if (distance < circle.radius) {
 							console.log("find");
 							isInsideCircle = true;
+							this.setState({hoverPoint : circle})
 						}
 					});
 					
-					canvas.style.cursor = isInsideCircle ? 'pointer' : 'default';
+					container.style.cursor = isInsideCircle ? 'pointer' : 'default';
+				}}
+				onMouseUp={()=>{
+					if( this.state.hoverPoint ){
+						this.props.pointClick(this.state.hoverPoint);
+					}
+					this.setState({
+						hoverPoint : null
+					})
 				}}
 			></div>
 		);

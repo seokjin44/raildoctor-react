@@ -6,19 +6,40 @@ import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarC
   ScatterChart, Scatter
 } from 'recharts';
 import { Checkbox, DatePicker, Input } from "antd";
-import { INSTRUMENTATIONPOINT, RAILROADSECTION, RANGEPICKERSTYLE, TRACKGEODATA1, TRACKGEODATA2, TRACKGEODATA3 } from "../../constant";
+import { DOWN_TRACK, INSTRUMENTATIONPOINT, RAILROADSECTION, RANGEPICKERSTYLE, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, TRACKGEODATA1, TRACKGEODATA2, TRACKGEODATA3, UP_TRACK } from "../../constant";
 import PlacePosition from "../../component/PlacePosition/PlacePosition";
 import axios from 'axios';
-
-const upTrackPoint = [{kp:700}];
-const downTrackPoint = [{kp:800}];
+import qs from 'qs';
+import { findRange } from "../../util";
 
 function TrackGeometryMeasurement( props ) {
-  const [selectedPath, setSelectedPath] = useState([]);
+  const [selectedPath, setSelectedPath] = useState({
+    start_station_name : "",
+    end_station_name : ""
+  });
+  const [dataExits, setDataExits] = useState([]);
+
+  const [upLeftTrackPoint, setUpLeftTrackPoint] = useState([]); //상선좌포인트
+  const [upRightTrackPoint, setUpRightTrackPoint] = useState([]); //상선우포인트
+  const [downLeftTrackPoint, setDownLeftTrackPoint] = useState([]); //하선좌포인트
+  const [downRightTrackPoint, setDownRightTrackPoint] = useState([]); //하선우포인트
+
+  const [selectPoints, setSelectPoints] = useState([]);
   const pathClick = (select) => {
     console.log(select);
     //getInstrumentationPoint(select);
     setSelectedPath(select);
+  }
+  
+  const selectPointAdd = ( addPoint ) => {
+    let selectPoints_ = [...selectPoints];
+    for( let point of selectPoints_ ){
+      if( point.sensorId === addPoint.sensorId ){
+        return;
+      }
+    }
+    selectPoints_.push(addPoint);
+    setSelectPoints(selectPoints_);
   }
 
   const dataOption = [
@@ -32,21 +53,96 @@ function TrackGeometryMeasurement( props ) {
   ];
 
   useEffect(() => {
-    axios.get('https://devel.suredatalab.kr/api/railbehaviors/locations',{
+    
+    let dataArr = [];
+    RAILROADSECTION.forEach( data => {
+      dataArr.push(0);
+    })
+
+    axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/locations',{
       params : {
         railroad : "인천 1호선",
         begin : "계양",
-        end : "귤현"
+        end : "송도달빛축제공원"
+      },
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
       }
     })
-    .then(response => console.log(response.data))
+    .then(response => {
+      let data = response.data.measureSets[0];
+      let sensors = response.data.measureSets[0].sensors;
+      console.log(data);
+      let dataExits_ = [...dataArr];
+
+      let upLeftTrackPoint_ = [...upLeftTrackPoint];
+      let upRightTrackPoint_ = [...upRightTrackPoint];
+      let downLeftTrackPoint_ = [...downLeftTrackPoint];
+      let downRightTrackPoint_ = [...downRightTrackPoint];
+
+      /*
+      !sensor Obj!
+      accMax : "string"
+      accMin : "string"
+      displayName : "Point 1"
+      hd : "string"
+      kp : 0
+      lf : "string"
+      measureSetId : "0825960e-0755-4e17-99b8-6f78651c35f4"
+      railTrack : "T1R"
+      sensorId : "9397149e-ba93-4573-b08f-18a417e2c172"
+      speed : "string"
+      stress : "string"
+      stressMin : "string"
+      vd : "string"
+      wlMax : "string"
+      */
+      console.log(sensors);
+      for( let sensor of sensors ){
+        let index = -1;
+        if( sensor.railTrack === STRING_UP_TRACK ||
+          sensor.railTrack === STRING_UP_TRACK_LEFT ||
+          sensor.railTrack === STRING_UP_TRACK_RIGHT ){
+          index = findRange(RAILROADSECTION, sensor.kp, UP_TRACK);
+        }else{
+          index = findRange(RAILROADSECTION, sensor.kp, DOWN_TRACK);
+        }
+
+        if( sensor.railTrack === STRING_UP_TRACK_LEFT ){
+          upLeftTrackPoint_.push(sensor);
+        }else if( sensor.railTrack === STRING_UP_TRACK_RIGHT ){
+          upRightTrackPoint_.push(sensor);
+        }else if( sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
+          downLeftTrackPoint_.push(sensor);
+        }else if( sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
+          downRightTrackPoint_.push(sensor);
+        }
+
+        dataExits_[index]++;
+      }
+      setDataExits(dataExits_);
+      setUpLeftTrackPoint(upLeftTrackPoint_); 
+      setUpRightTrackPoint(upRightTrackPoint_); 
+      setDownLeftTrackPoint(downLeftTrackPoint_); 
+      setDownRightTrackPoint(downRightTrackPoint_); 
+
+    })
     .catch(error => console.error('Error fetching data:', error));
+
   }, []);
   
+  useEffect( ()=>{
+    
+  }, [dataExits] )
+
   return (
     <div className="trackDeviation trackGeometryMeasurement" >
       <div className="railStatusContainer">
-        <RailStatus railroadSection={RAILROADSECTION} pathClick={pathClick}></RailStatus>
+        <RailStatus 
+          railroadSection={RAILROADSECTION} 
+          pathClick={pathClick}
+          dataExits={dataExits}
+        ></RailStatus>
       </div>
       <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px", marginBottom:"10px"}}>
             <div className="containerTitle bothEnds">
@@ -56,7 +152,10 @@ function TrackGeometryMeasurement( props ) {
               <div className="dataOption">
                 <div className="title">선택구간 </div>
                 <div className="date">
-                  <Input placeholder="KP" value={"간석오거리 - 인천시청"}
+                  <Input placeholder="KP" value={
+                    selectedPath.start_station_name+
+                    " - "+
+                    selectedPath.end_station_name}
                     style={RANGEPICKERSTYLE}
                     readOnly={true}
                   />
@@ -85,8 +184,14 @@ function TrackGeometryMeasurement( props ) {
             <PlacePosition 
               path={selectedPath} 
               instrumentationPoint={INSTRUMENTATIONPOINT}
-              upTrackPoint={upTrackPoint}
-              downTrackPoint={downTrackPoint}
+              upLeftTrackPoint={upLeftTrackPoint}
+              upRightTrackPoint={upRightTrackPoint}
+              downLeftTrackPoint={downLeftTrackPoint}
+              downRightTrackPoint={downRightTrackPoint}
+              pointClick={(e)=>{
+                console.log(e);
+                selectPointAdd(e);
+              }}
             ></PlacePosition>
           </div>
         </div>

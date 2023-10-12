@@ -1,5 +1,6 @@
 import React from "react";
 import "./railSTatus.css";
+import isEqual from 'lodash/isEqual';
 
 class RailStatus extends React.Component {
 
@@ -17,12 +18,15 @@ class RailStatus extends React.Component {
     if(this.props.railroadSection === undefined)  return;
     if(this.props.railroadSection.length === 0)  return;
     
-    if(prevProps.railroadSection === undefined) {
+    if(prevProps.railroadSection === undefined ||
+      this.props.railroadSection.length !== prevProps.railroadSection.length ||
+      JSON.stringify(prevProps.railroadSection) !== JSON.stringify(this.props.railroadSection)) {
       this.init();
-    } else if(this.props.railroadSection.length !== prevProps.railroadSection.length) {
-      this.init();
-    } else if(JSON.stringify(prevProps.railroadSection) !== JSON.stringify(this.props.railroadSection)) {
-      this.init();
+    }
+
+    if (!isEqual(prevProps.dataExits, this.props.dataExits)) {
+      console.log("props array has changed!");
+      this.dataExist();
     }
 	}
 
@@ -54,7 +58,7 @@ class RailStatus extends React.Component {
       pointerDiv.appendChild(pointerTextDiv);
       document.getElementById("pointer-list-" + this.state.id).appendChild(pointerDiv);
 
-      if(i == this.props.railroadSection.length - 1) {
+      if(i === this.props.railroadSection.length - 1) {
         pointerDiv = document.createElement("div");
         pointerDiv.className = "pointer";
         pointerDiv.style.left = (tick * (i + 2)) + "px";
@@ -96,9 +100,9 @@ class RailStatus extends React.Component {
       pathDiv.onclick = function (e) {
         let selectedPath = document.getElementsByClassName("path selectedPath")[0];
 
-        if (e.target == selectedPath) {
+        if (e.target === selectedPath) {
           return;
-        } else if (selectedPath != undefined) {
+        } else if (selectedPath !== undefined) {
           selectedPath.classList.remove("selectedPath");
         }
         e.target.classList.add("selectedPath");
@@ -127,6 +131,20 @@ class RailStatus extends React.Component {
     }
   }
 
+  dataExist() {
+    let pathList = document.querySelectorAll(".pointerList .path");
+    pathList.forEach( (path, i) => {
+      let cnt = this.props.dataExits[i];
+      if( cnt > 0 ){
+        console.log(path.classList);
+        path.classList.add("exist");
+        let cntDiv = document.createElement("div");
+        cntDiv.innerHTML = "(" + cnt + ")";
+        path.appendChild(cntDiv);
+      }
+    })
+  }
+
   componentDidMount() {
     this.init();
   }
@@ -136,15 +154,6 @@ class RailStatus extends React.Component {
       <div className="railStatusBox">
         <div className="obj rail"></div>
         <div className="obj pointerList" id={"pointer-list-" + this.state.id}>
-          {
-            /*
-          this.stationList.map(obj => {
-            return <div className="pointer">
-              <div className="pointerText">{obj}</div>
-            </div>
-          })
-          */
-          }
         </div>
       </div>
     );
