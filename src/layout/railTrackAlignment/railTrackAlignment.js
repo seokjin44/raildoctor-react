@@ -11,8 +11,9 @@ import Box from '@mui/material/Box';
 import Select from '@mui/material/Select';
 import { Modal } from "@mui/material";
 import TextArea from "antd/es/input/TextArea";
-import { RAILROADSECTION, RAILTRACKALIGNMENTDUMMYDATA1, RANGEPICKERSTYLE } from "../../constant";
+import { INSTRUMENTATIONPOINT, RAILROADSECTION, RAILTRACKALIGNMENTDUMMYDATA1, RANGEPICKERSTYLE } from "../../constant";
 import { DatePicker, Input } from "antd";
+import PlaceGauge from "../../component/PlaceGauge/PlaceGauge";
 
 const style = {
   position: 'absolute',
@@ -92,10 +93,19 @@ function RailTrackAlignment( props ) {
         <div className="containerTitle">검토구간</div>
         <div className="componentBox flex section " style={{ height: "130px"}} >
 
-          <div className="position optionBox borderColorGreen" style={{width: "935px"}} >
+          <div className="position optionBox borderColorGreen" style={{width: "100%"}} >
             <div className="optionTitle">위치</div>
             <div className="optionValue">
-              <img src={Position} />
+              {/* <img src={Position} /> */}
+              <PlaceGauge 
+                path={selectedPath} 
+                instrumentationPoint={INSTRUMENTATIONPOINT}
+                existData={[{
+                  type:"LeftTop",
+                  start : 200,
+                  end : 900
+                }]}
+            ></PlaceGauge>
             </div>
           </div>
         </div>

@@ -1,0 +1,14 @@
+.placeInfoBox{
+    width: 100%;
+    height: 100%;
+    /* padding: 0px 10px 0px 10px; */
+}
+
+.placeInfoBox canvas{
+    width: 100%;
+    height: 100%;
+}
+
+.placeInfoBox.pointer canvas{
+    cursor: pointer;
+}

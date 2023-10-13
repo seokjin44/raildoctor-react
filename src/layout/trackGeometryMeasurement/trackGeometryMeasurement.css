@@ -50,6 +50,7 @@
     flex-direction: column;
     width: 100%;
     background-color: #D6D6D6;
+    border-bottom: 1px solid #D6D6D6;
 }
 
 .table .tableHeader .tr,
@@ -149,4 +150,36 @@
 
 .trackGeometryMeasurement .table .tableHeader .tr, .table .tableBody .tr{
     height: 32px;
+}
+
+.trackGeometryMeasurement .table .tableHeader .tr,
+.trackGeometryMeasurement .table .tableBody .tr{
+    justify-content: left;
+}
+
+.trackGeometryMeasurement .selectPoints{
+    right: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+}
+
+.trackGeometryMeasurement .selectPoints .point{
+    font-size: 11px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    background: white;
+    padding: 4px;
+    padding-left: 9px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.trackGeometryMeasurement .selectPoints .point img{
+    width: 12px;
+    height: 11px;
+    margin-left: 5px;
+    cursor: pointer;
 }

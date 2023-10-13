@@ -12,6 +12,9 @@ export const STRING_DOWN_TRACK = "T2";
 export const STRING_DOWN_TRACK_LEFT = "T2L";
 export const STRING_DOWN_TRACK_RIGHT = "T2R";
 
+export const STRING_SHORT_MEASURE = "SHORT";
+export const STRING_LONG_MEASURE = "LONG";
+
 export const RANGEPICKERSTYLE = {
   height:"35px",
   fontFamily : 'NEO_R'

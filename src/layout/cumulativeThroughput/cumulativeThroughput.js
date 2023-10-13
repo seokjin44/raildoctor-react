@@ -35,6 +35,7 @@ import test27Img from "../../assets/trackTest/27.jpg";
 import test28Img from "../../assets/trackTest/28.jpg";
 import test29Img from "../../assets/trackTest/29.jpg"; 
 import classNames from "classnames";
+import axios from 'axios';
 
 let imgArr = [
   { url : test1Img, start : 0, end : 900 } ,
@@ -132,6 +133,18 @@ function CumulativeThroughput( props ) {
   }
 
   useEffect(() => {
+    axios.get('https://devel.suredatalab.kr/api/accumulateweights/remaining',{
+      params : {
+        operator : "인천",
+        lineNo : 1,
+        railTrack : "T1L",
+        kp : 500,
+        measureTs : "2023-01-25",
+        railroadName : "계양",
+      }
+    })
+    .then(response => console.log(response.data))
+    .catch(error => console.error('Error fetching data:', error));
     readyImg();
   }, []);
 
