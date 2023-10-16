@@ -285,7 +285,8 @@ class PlacePosition extends React.Component {
 				y : y,
 				radius : this.state.pointRadius + 3,
 				sensorId : trackPoint.sensorId,
-				displayName : trackPoint.displayName
+				displayName : trackPoint.displayName,
+				measureSetId : trackPoint.measureSetId,
 			});
 		}
 
@@ -321,7 +322,8 @@ class PlacePosition extends React.Component {
 				y : y,
 				radius : this.state.pointRadius + 3,
 				sensorId : trackPoint.sensorId,
-				displayName : trackPoint.displayName
+				displayName : trackPoint.displayName,
+				measureSetId : trackPoint.measureSetId,
 			});
 		}
 
@@ -357,7 +359,8 @@ class PlacePosition extends React.Component {
 				y : y,
 				radius : this.state.pointRadius + 3,
 				sensorId : trackPoint.sensorId,
-				displayName : trackPoint.displayName
+				displayName : trackPoint.displayName,
+				measureSetId : trackPoint.measureSetId,
 			});
 		}
 
@@ -393,7 +396,8 @@ class PlacePosition extends React.Component {
 				y : y,
 				radius : this.state.pointRadius + 3,
 				sensorId : trackPoint.sensorId,
-				displayName : trackPoint.displayName
+				displayName : trackPoint.displayName,
+				measureSetId : trackPoint.measureSetId,
 			});
 		}
 

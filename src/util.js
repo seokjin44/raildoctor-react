@@ -1,4 +1,4 @@
-import { DOWN_TRACK, UP_TRACK } from "./constant";
+import { DOWN_TRACK, STRING_ACC_KEY, STRING_HD_KEY, STRING_LATERAL_LOAD_KEY, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
 
 export const dateFormat = ( date ) => {
     const yyyy = date.getFullYear();
@@ -6,6 +6,24 @@ export const dateFormat = ( date ) => {
     const dd = String(date.getDate()).padStart(2, '0');
   
     return `${yyyy}-${mm}-${dd}`;
+}
+
+export const formatTime = (date) => {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+}
+
+export const formatDate = (date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    return day;
+}
+
+export const formatYearMonth = (date) => {
+    const year = String(date.getFullYear()).slice(-2); // 년도의 마지막 두 자리만 가져옵니다.
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // JavaScript에서 getMonth()는 0부터 11까지의 값을 반환하므로 1을 더해줍니다.
+    return `${year}-${month}`;
 }
 
 export const convertToCustomFormat = (num) => {
@@ -41,4 +59,29 @@ export const findRange = (ranges, x, trackType) => {
     }
 
     return null; // 범위를 찾지 못했을 경우 null 반환
+}
+
+export const findAddedItems =(oldArray, newArray) => {
+    const addedItems = newArray.filter(item => !oldArray.includes(item));
+    return addedItems;
+}
+
+export const trackDataName = ( value ) => {
+    if( STRING_WHEEL_LOAD_KEY === value ){
+        return "윤중";
+    }else if( STRING_LATERAL_LOAD_KEY === value ){
+        return "횡압";
+    }else if( STRING_STRESS_KEY === value ){
+        return "레일저부응력";
+    }else if( STRING_HD_KEY === value ){
+        return "레일수평변위";
+    }else if( STRING_VD_KEY === value ){
+        return "레일수직변위";
+    }else if( STRING_ACC_KEY === value ){
+        return "레일수직가속도";
+    }else if( STRING_SPEED_KEY === value ){
+        return "열차속도";
+    }else{
+        return "";
+    }
 }

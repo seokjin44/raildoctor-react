@@ -15,6 +15,18 @@ export const STRING_DOWN_TRACK_RIGHT = "T2R";
 export const STRING_SHORT_MEASURE = "SHORT";
 export const STRING_LONG_MEASURE = "LONG";
 
+export const CHART_FORMAT_TODAY = 1;
+export const CHART_FORMAT_DAILY = 2;
+export const CHART_FORMAT_MONTHLY = 3;
+
+export const STRING_WHEEL_LOAD_KEY = "WL_MAX"
+export const STRING_LATERAL_LOAD_KEY = "LF"
+export const STRING_STRESS_KEY = "STRESS"
+export const STRING_HD_KEY = "HD"
+export const STRING_VD_KEY = "VD"
+export const STRING_ACC_KEY = "ACC"
+export const STRING_SPEED_KEY = "SPEED"
+
 export const RANGEPICKERSTYLE = {
   height:"35px",
   fontFamily : 'NEO_R'
