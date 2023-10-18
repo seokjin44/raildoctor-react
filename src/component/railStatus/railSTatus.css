@@ -46,7 +46,7 @@
     left: 3px;
     height: 7px;
     pointer-events: none;
-    font-size: 3px;
+    font-size: 7px;
 }
 
 .railStatusBox .path.selectedPath{

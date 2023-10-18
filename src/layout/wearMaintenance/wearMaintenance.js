@@ -9,28 +9,15 @@ import 'dayjs/locale/ko';
 import { Select } from 'antd';
 import { Box, Modal } from "@mui/material";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
-import { DIRECTWEARINFO, INSTRUMENTATIONPOINT, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO, TRACKSPEEDDATA, UP_TRACK } from "../../constant";
+import { BOXSTYLE, DIRECTWEARINFO, INSTRUMENTATIONPOINT, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO, STRING_DOWN_TRACK, STRING_UP_TRACK, TRACKSPEEDDATA, UP_TRACK } from "../../constant";
 import AlertIcon from "../../assets/icon/decision/3876149_alert_emergency_light_protection_security_icon.png";
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
+import axios from 'axios';
+import qs from 'qs';
+import { convertToNumber, convertToNumber2, findRange, trackNumberToString } from "../../util";
 
 const { TextArea } = Input;
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  //width: 400,
-  bgcolor: 'background.paper',
-  border: '1px solid #000',
-  boxShadow: 24,
-  borderRadius: "5px",
-  //p: 4,
-  padding : "5px",
-  fontFamily : 'NEO_R'
-};
-
 function WearMaintenance( props ) {
   const [selectedPath, setSelectedPath] = useState({
     "start_station_id": "15",
@@ -48,7 +35,7 @@ function WearMaintenance( props ) {
     "end_station_longitude": 126.7022161
   });
   const [selectKP, setSelectKP] = useState({
-    name : "14K100",
+    name : "",
     trackType : UP_TRACK
   });
   const [wearSearchCondition, setWearSearchCondition] = useState({
@@ -60,7 +47,11 @@ function WearMaintenance( props ) {
   const [wear3dData, setWear3dData] = useState([]);
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
-  const [kp, setKP] = useState(0);
+  /* const [kp, setKP] = useState("0"); */
+  const [dataExits, setDataExits] = useState([]);
+  const [cornerWearGraphData, setCornerWearGraphData] = useState([]);
+  const [verticalWearGraphData, setVerticalWearGraphData] = useState([]);
+  
   const handleClose = () => {
     setOpen(false);
   }
@@ -147,43 +138,136 @@ function WearMaintenance( props ) {
   }
 
   const onClickWearSearch = () => {
-    getWearInfo();
+    /* getWearInfo(); */
+    let startKP = convertToNumber(selectKP.name);
+    let endKP = startKP + 0.099;
+    let param = {
+      begin_kp : [3.3],
+      end_kp : [4.4],
+      beginMeasureTs : new Date(wearSearchCondition.startDate).toISOString(),
+      endMeasureTs : new Date(wearSearchCondition.endDate).toISOString(),
+      minAccumulateWeight : 1,
+      maxAccumulateWeight : 500000000,
+      railTrack : trackNumberToString(selectKP.trackType),
+      railroadName : "인천 1호선" ,
+      graphType : "TWO_DIMENTION"
+    }
+    console.log(param);
+    axios.get('https://raildoctor.suredatalab.kr/api/railwears/graph_data',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
+      },
+      params : param
+    })
+    .then(response => {
+      console.log(response.data);
+      setCornerWearGraphData(response.data.cornerWearGraph);
+      setVerticalWearGraphData(response.data.verticalWearGraph);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+
+
+    param = {
+      begin_kp : [3.3],
+      end_kp : [4.4],
+      beginMeasureTs : new Date(wearSearchCondition.startDate).toISOString(),
+      endMeasureTs : new Date(wearSearchCondition.endDate).toISOString(),
+      minAccumulateWeight : 1,
+      maxAccumulateWeight : 500000000,
+      railTrack : trackNumberToString(selectKP.trackType),
+      railroadName : "인천 1호선" ,
+      graphType : "THREE_DIMENTION"
+    }
+    console.log(param);
+    axios.get('https://raildoctor.suredatalab.kr/api/railwears/graph_data',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
+      },
+      params : param
+    })
+    .then(response => {
+      console.log(response.data);
+      let cornerWearGraph = response.data.cornerWearGraph;
+      let verticalWearGraph = response.data.verticalWearGraph;
+      setCornerWearGraphData(cornerWearGraph);
+      setVerticalWearGraphData(verticalWearGraph);
+      makeWear3dData(cornerWearGraph, verticalWearGraph);
+    })
+    .catch(error => console.error('Error fetching data:', error));
   }
 
-  const makeDummyWear3dData = () => {
-    function randArr(num, mul) {
-      const arr = [];
-      const index = [];
-      for (let i = 0; i < num; i++) {
-        arr.push(parseInt(Math.random() * mul))
-        index.push(i);
+  const makeWear3dData = (cornerWearGraph, verticalWearGraph) => {
+    let upTrackMGT = [];
+    let upTrackKP = [];
+    let upTrackWear = [];
+
+    let downTrackMGT = [];
+    let downTrackKP = [];
+    let downTrackWear = [];
+
+    for( let data of cornerWearGraph ){
+      if( data.railTrack === STRING_UP_TRACK ){
+        upTrackMGT.push( data.accumulateWeight );
+        upTrackKP.push( data.kp * 1000 );
+        upTrackWear.push( data.wear );
       }
-      return arr;
+      if( data.railTrack === STRING_DOWN_TRACK ){
+        downTrackMGT.push( data.accumulateWeight );
+        downTrackKP.push( data.kp * 1000 );
+        downTrackWear.push( data.wear );
+      }else{
+        upTrackMGT.push( data.accumulateWeight );
+        upTrackKP.push( data.kp * 1000 );
+        upTrackWear.push( data.wear );
+        downTrackMGT.push( data.accumulateWeight );
+        downTrackKP.push( data.kp * 1000 );
+        downTrackWear.push( data.wear );
+      }
+    }
+
+    for( let data of verticalWearGraph ){
+      if( data.railTrack === STRING_UP_TRACK ){
+        upTrackMGT.push( data.accumulateWeight );
+        upTrackKP.push( data.kp * 1000 );
+        upTrackWear.push( data.wear );
+      }
+      if( data.railTrack === STRING_DOWN_TRACK ){
+        downTrackMGT.push( data.accumulateWeight );
+        downTrackKP.push( data.kp * 1000 );
+        downTrackWear.push( data.wear );
+      }else{
+        upTrackMGT.push( data.accumulateWeight );
+        upTrackKP.push( data.kp * 1000 );
+        upTrackWear.push( data.wear );
+        downTrackMGT.push( data.accumulateWeight );
+        downTrackKP.push( data.kp * 1000 );
+        downTrackWear.push( data.wear );
+      }
     }
 
     let data = [
       {
-        x: randArr(30, 1300), //
-        y: randArr(30, 16200),
-        z: randArr(30, 14),
+        x: upTrackMGT, //통과톤수
+        y: upTrackKP, //kp
+        z: upTrackWear, //마모
         mode: 'markers',
         type: 'scatter3d',
         name: 'T2 L 0',
         marker: {
           size: 3,
-          color: "red"
+          color: "red" //상선
         },
       },
       {
-        x: randArr(300, 1300),
-        y: randArr(300, 16200),
-        z: randArr(300, 14),
+        x: downTrackMGT,
+        y: downTrackKP,
+        z: downTrackWear,
         mode: 'markers',
         type: 'scatter3d',
         name: 'T2 L 45',
         marker: {
           size: 3,
-          color: "blue"
+          color: "blue" //하선
         }
       }
     ];
@@ -192,13 +276,47 @@ function WearMaintenance( props ) {
   }
 
   useEffect(() => {
-    makeDummyWear3dData();
+    axios.get('https://raildoctor.suredatalab.kr/api/railwears/kp',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroadName : "인천 1호선",
+        begin : "계양",
+        end : "송도달빛축제공원"
+      }
+    })
+    .then(response => {
+      let dataArr = [];
+      RAILROADSECTION.forEach( data => {
+        dataArr.push(0);
+      });
+      let dataExits_ = [...dataArr];
+
+      console.log(response.data);
+      for( let data of response.data.t1 ){
+        let index = -1;
+        index = findRange(RAILROADSECTION, data * 1000, UP_TRACK);
+        dataExits_[index]++;        
+      }
+      for( let data of response.data.t2 ){
+        let index = -1;
+        index = findRange(RAILROADSECTION, data * 1000, UP_TRACK);
+        dataExits_[index]++;
+      }
+      setDataExits(dataExits_);
+    })
+    .catch(error => console.error('Error fetching data:', error));
   }, []);
   
   return (
     <div className="wearMaintenance" >
       <div className="railStatusContainer">
-        <RailStatus railroadSection={RAILROADSECTION} pathClick={pathClick}></RailStatus>
+        <RailStatus 
+          railroadSection={RAILROADSECTION} 
+          pathClick={pathClick}
+          dataExits={dataExits}
+        ></RailStatus>
       </div>
       <div className="dataContainer">
         <div className="scrollContainer" style={{ width: "calc(100%)", height: "calc(100% - 0px)", overflow: "auto"}}>
@@ -244,7 +362,12 @@ function WearMaintenance( props ) {
                       </div>
                       <div className="flex" tyle={{height:'30px'}}>
                         <div className="sliderContainer">
-                          <Slider range={{ draggableTrack: true }} min={new Date().getTime() - (31536000000 * 7)} max={new Date().getTime()} defaultValue={[new Date().getTime() - (31536000000 * 7), new Date().getTime()]} tooltip={{ open: false, }} onChange={onChangeTimeSlider} step={86400000}/>
+                          <Slider 
+                            range={{ draggableTrack: true }} 
+                            min={new Date().getTime() - (31536000000 * 7)} 
+                            max={new Date().getTime()} 
+                            defaultValue={[new Date().getTime() - (31536000000 * 7), new Date().getTime()]} tooltip={{ open: false, }} 
+                            onChange={onChangeTimeSlider} step={86400000}/>
                         </div>
                       </div>
                     </div>
@@ -260,7 +383,13 @@ function WearMaintenance( props ) {
                       </div>
                       <div className="flex">
                         <div className="sliderContainer">
-                          <Slider range={{ draggableTrack: true }} min={0} max={3000} defaultValue={[0, 3000]} tooltip={{ open: false, }} onChange={onChangeMgtSlider} step={50}/>
+                          <Slider 
+                            range={{ draggableTrack: true }} 
+                            min={0} 
+                            max={3000} 
+                            defaultValue={[0, 3000]} 
+                            tooltip={{ open: false, }} 
+                            onChange={onChangeMgtSlider} step={50}/>
                         </div>
                       </div>
                     </div>
@@ -343,13 +472,13 @@ function WearMaintenance( props ) {
                         borderRadius: "5px",
                         margin: "5px",
                         width: "calc(100% - 12px)"}} >
-                      <WearInfo title="직마모(mm)" data={DIRECTWEARINFO}></WearInfo>
+                      <WearInfo title="직마모(mm)" data={verticalWearGraphData} ></WearInfo>
                     </div>
                     <div className="componentBox" id="sideWearInfo" style={{ border: "1px solid #cccccc",
                         borderRadius: "5px",
                         margin: "5px",
                         width: "calc(100% - 12px)"}}>
-                      <WearInfo title="편마모(mm)" data={SIDEWEARINFO}></WearInfo>
+                      <WearInfo title="편마모(mm)" data={cornerWearGraphData} ></WearInfo>
                     </div>
                   </div>
                 </div>
@@ -371,7 +500,10 @@ function WearMaintenance( props ) {
                 <div className="containerTitle">통과속도 정보</div>
                 <div className="componentBox" style={{ marginRight: "10px", width: "calc(100% - 10px)", overflow: "hidden"}}>
                   <div className="demoImgContainer">
-                    <TrackSpeed data={TRACKSPEEDDATA} kp={kp} ></TrackSpeed>
+                    <TrackSpeed 
+                      data={TRACKSPEEDDATA} 
+                      kp={convertToNumber2(selectKP.name)} 
+                    ></TrackSpeed>
                   </div>
                 </div>
               </div>
@@ -385,7 +517,7 @@ function WearMaintenance( props ) {
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
-          <Box sx={style} >
+          <Box sx={BOXSTYLE} >
             <div className="popupTitle"><img src={PopupIcon} />예측데이터 상세</div>
             <div className="popupContent">
               <div className="contentBox" style={{ height: "300px", marginTop : "10px", width: "1248px"}} >
@@ -603,7 +735,7 @@ function WearMaintenance( props ) {
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
-          <Box sx={style} >
+          <Box sx={BOXSTYLE} >
             <div className="decisionPopupTitle">
               <img src={AlertIcon} />선로 마모 심각 
               <div className="closeBtn" onClick={()=>{setOpen2(false)}} ><img src={CloseIcon} /></div>
@@ -618,13 +750,13 @@ function WearMaintenance( props ) {
                         borderRadius: "5px",
                         margin: "5px",
                         width: "calc(100% - 12px)"}} >
-                      <WearInfo title="직마모(mm)" data={DIRECTWEARINFO}></WearInfo>
+                      <WearInfo title="직마모(mm)" data={verticalWearGraphData}></WearInfo>
                     </div>
                     <div className="componentBox" id="sideWearInfo" style={{ border: "1px solid #cccccc",
                         borderRadius: "5px",
                         margin: "5px",
                         width: "calc(100% - 12px)"}}>
-                      <WearInfo title="편마모(mm)" data={SIDEWEARINFO}></WearInfo>
+                      <WearInfo title="편마모(mm)" data={cornerWearGraphData}></WearInfo>
                     </div>
                   </div>
               </div>

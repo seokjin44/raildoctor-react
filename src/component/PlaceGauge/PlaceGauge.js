@@ -1,9 +1,11 @@
 import React from "react";
 import "./PlaceGauge.css";
 import classNames from "classnames";
+import { STRING_DOWN_TRACK2, STRING_DOWN_TRACK_LEFT2, STRING_DOWN_TRACK_RIGHT2, STRING_UP_TRACK2, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_LEFT2, STRING_UP_TRACK_RIGHT2 } from "../../constant";
+import { convertToCustomFormat } from "../../util";
 
-let pointList = [];
-class 	PlaceGauge extends React.Component {
+let rectList = [];
+class PlaceGauge extends React.Component {
 	
 	constructor(props) {
 		super(props);
@@ -12,6 +14,11 @@ class 	PlaceGauge extends React.Component {
 			canvas: undefined,
 			ctx: undefined,
 
+			tooltipLeft : 100,
+			tooltipTop : 100,
+			tooltipOn : false,
+
+			findRects : [],
 			// user defined properties  
 			minX: 0,
 			minY: 0,
@@ -19,7 +26,8 @@ class 	PlaceGauge extends React.Component {
 			maxY: 100,
 			unitsPerTickX: 20,
 			unitsPerTickY: 20,
-
+			rightMargin : 50,
+			lineSpacing : 25,
 			// constants  
 			padding: 25,
 			tickSize: 10,
@@ -120,8 +128,8 @@ class 	PlaceGauge extends React.Component {
 	drawAxis = function () {
 		console.log("PlaceGauge - drawAxis");
 		let context = this.state.ctx;
-		let rightMargin = 50;
-		let lineSpacing = 25;
+		let rightMargin = this.state.rightMargin;
+		let lineSpacing = this.state.lineSpacing;
 		context.save();
 
 		context.font = "bold 12px NEO_R";
@@ -242,10 +250,11 @@ class 	PlaceGauge extends React.Component {
 	}
 
 	drawPlace() {
-		pointList = [];
+		rectList = [];
 		if(this.props.path === undefined)	return;
 		if(this.props.instrumentationPoint === undefined)	return;
-
+		let rightMargin = this.state.rightMargin;
+		let lineSpacing = this.state.lineSpacing;
 		let context = this.state.ctx;
 		context.save();
 		console.log(this.props.path);
@@ -254,22 +263,120 @@ class 	PlaceGauge extends React.Component {
 
 		console.log("PlaceGauge - drawPlace");
 		for( let data of this.props.existData ){
-			console.log(data);
-			let y = this.state.canvas.height / 2 - this.state.padding;
-			let startPoint = {
-				x: (data.start - this.props.path.start_station_up_track_location) / upTrackLength * 100,
-				trackType: 1,
-				name: this.naming(data.start)
+			let start = data.beginKp * 1000;
+			let end = data.endKp * 1000;
+			let railTrack = data.railTrack;
+			if( start < this.props.path.start_station_up_track_location && end > this.props.path.end_station_down_track_location ){
+				start = this.props.path.start_station_up_track_location;
+				end = this.props.path.end_station_up_track_location;
+			}else if( end < this.props.path.start_station_up_track_location ){
+				continue;
+			}else if( start > this.props.path.end_station_up_track_location ){
+				continue;
 			}
-			let endPoint = {
-				x: (data.end - this.props.path.start_station_up_track_location) / upTrackLength * 100,
-				trackType: 1,
-				name: this.naming(data.start)
+			if( start < this.props.path.start_station_up_track_location ){
+				start = this.props.path.start_station_up_track_location;
+			}
+			if( end > this.props.path.end_station_up_track_location ){
+				end = this.props.path.end_station_up_track_location;
 			}
 
-			
-			context.fillRect(startPoint.x * this.state.scaleX, y - 10, (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX), 20);
+			if( railTrack === STRING_UP_TRACK_RIGHT2 ){
+				let y = this.state.canvas.height / 2 - this.state.padding + lineSpacing;
+				let startPoint = {
+					x: (start - this.props.path.start_station_up_track_location) / upTrackLength * 100,
+					trackType: 1,
+					name: this.naming(start)
+				}
+				let endPoint = {
+					x: (end - this.props.path.start_station_up_track_location) / upTrackLength * 100,
+					trackType: 1,
+					name: this.naming(start)
+				}
+				let rect = {
+					beginKp : data.beginKp,
+					endKp : data.endKp,
+					x : startPoint.x * this.state.scaleX + this.state.x, 
+					y : y - 10,
+					width : (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10,
+					height : 20,
+					dataFile : data.dataFile
+				}
+				rectList.push(rect);
+				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+			}else if( railTrack === STRING_DOWN_TRACK_LEFT2 ){
+				let y = this.state.canvas.height / 2 + this.state.padding - lineSpacing;
+				let startPoint = {
+					x: (start - this.props.path.start_station_up_track_location) / upTrackLength * 100,
+					trackType: 1,
+					name: this.naming(start)
+				}
+				let endPoint = {
+					x: (end - this.props.path.start_station_up_track_location) / upTrackLength * 100,
+					trackType: 1,
+					name: this.naming(start)
+				}
+				let rect = {
+					beginKp : data.beginKp,
+					endKp : data.endKp,
+					x : startPoint.x * this.state.scaleX + this.state.x, 
+					y : y - 10,
+					width : (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10,
+					height : 20,
+					dataFile : data.dataFile
+				}
+				rectList.push(rect);
+				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+			}else if( railTrack === STRING_DOWN_TRACK_RIGHT2 ){
+				let y = this.state.canvas.height / 2 + this.state.padding;
+				let startPoint = {
+					x: (start - this.props.path.start_station_up_track_location) / upTrackLength * 100,
+					trackType: 1,
+					name: this.naming(start)
+				}
+				let endPoint = {
+					x: (end - this.props.path.start_station_up_track_location) / upTrackLength * 100,
+					trackType: 1,
+					name: this.naming(start)
+				}
+				let rect = {
+					beginKp : data.beginKp,
+					endKp : data.endKp,
+					x : startPoint.x * this.state.scaleX + this.state.x, 
+					y : y - 10,
+					width : (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10,
+					height : 20,
+					dataFile : data.dataFile
+				}
+				rectList.push(rect);
+				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+			}else if( railTrack === STRING_UP_TRACK_LEFT2 ){
+				let y = this.state.canvas.height / 2 - this.state.padding;
+				let startPoint = {
+					x: (start - this.props.path.start_station_up_track_location) / upTrackLength * 100,
+					trackType: 1,
+					name: this.naming(start)
+				}
+				let endPoint = {
+					x: (end - this.props.path.start_station_up_track_location) / upTrackLength * 100,
+					trackType: 1,
+					name: this.naming(start)
+				}
+				let rect = {
+					beginKp : data.beginKp,
+					endKp : data.endKp,
+					x : startPoint.x * this.state.scaleX + this.state.x, 
+					y : y - 10,
+					width : (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10,
+					height : 20,
+					dataFile : data.dataFile
+				}
+				rectList.push(rect);
+				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+			}
 		}
+
+
 		//상선
 		/* for(let i = 0 ; i < this.props.upTrackPoint.length; i++) {
 			let location = this.props.upTrackPoint[i].kp;
@@ -384,28 +491,66 @@ class 	PlaceGauge extends React.Component {
 		context.restore();
 	}
 
+	isInside(mouseX, mouseY, rect) {
+		return (
+			mouseX >= rect.x && mouseX <= rect.x + rect.width &&
+			mouseY >= rect.y && mouseY <= rect.y + rect.height
+		);
+	}
+
 	render() {
 		return (
+			<>
 			<div className={classNames("placeInfoBox")} id={"place-info-container-" + this.state.id}
 				onMouseMove={(e)=>{
+					let container = document.getElementById("place-info-container-" + this.state.id);
 					let canvas = document.getElementById("place-info-canvas-" + this.state.id);
 					const rect = canvas.getBoundingClientRect();
 					const x = e.clientX - rect.left;
 					const y = e.clientY - rect.top;
+
+					this.setState({
+						tooltipLeft : e.clientX - 50,
+						tooltipTop : e.clientY + 30
+					})
+
+					let isInsideRect = false;
+					const hoveringRects = rectList.filter(r => this.isInside(x, y, r));
+					if(hoveringRects.length > 0) {
+						console.log('Mouse is inside these rectangles:', hoveringRects);
+						isInsideRect = true;
+						this.setState({
+							tooltipOn : true,
+							findRects : hoveringRects,
+						})
+					}else{
+						this.setState({
+							tooltipOn : false
+						})
+					}
 					
-					let isInsideCircle = false;
-					
-					pointList.forEach(circle => {
-						const distance = Math.sqrt((x - circle.x) ** 2 + (y - circle.y) ** 2);
-						if (distance < circle.radius) {
-							console.log("find");
-							isInsideCircle = true;
-						}
-					});
-					
-					canvas.style.cursor = isInsideCircle ? 'pointer' : 'default';
+					container.style.cursor = isInsideRect ? 'pointer' : 'default';
 				}}
-			></div>
+
+				onMouseUp={()=>{
+					this.props.selectGauge(this.state.findRects);
+				}}
+			>
+			</div>
+			<div className="placeGaugeTooltip" style={{
+					display : (this.state.tooltipOn) ? "flex" : "none",
+					left : this.state.tooltipLeft, 
+					top : this.state.tooltipTop
+				}} >
+					{
+						this.state.findRects.map( (rect,i) => {
+							return <div className="kp" key={i}>
+								{`${convertToCustomFormat(rect.beginKp*1000)}~${convertToCustomFormat(rect.endKp*1000)}`}
+							</div>
+						})
+					}
+			</div>
+			</>
 		);
 	}
 }

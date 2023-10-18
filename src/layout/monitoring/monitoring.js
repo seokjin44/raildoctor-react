@@ -1,6 +1,6 @@
 import "./monitoring.css";
 import 'dayjs/locale/ko';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CalendarIcon from "../../assets/icon/299092_calendar_icon.png";
 import { DatePicker, Input } from 'antd';
 import * as PDFJS from "pdfjs-dist/build/pdf";
@@ -11,6 +11,8 @@ import classNames from "classnames";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import DataExistence from "../../component/dataExistence/dataExistence";
 import TrackMap from "../../component/trackMap/trackMap";
+import axios from 'axios';
+import qs from 'qs';
 
 window.PDFJS = PDFJS;
 const { RangePicker } = DatePicker;
@@ -36,6 +38,21 @@ function Monitoring( props ) {
 
     trackDetailDrawImage();
   },[routeHidden] ); */
+
+  useEffect( ()=>{
+    axios.get(`https://raildoctor.suredatalab.kr/api/railroads/railroadmap`,{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroad : "인천 1호선"
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+  }, [] )
 
   return (
     <div className="monitoringContainer" >

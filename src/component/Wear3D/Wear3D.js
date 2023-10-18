@@ -51,8 +51,10 @@ class Wear3D extends React.Component {
         return (
             <div className="wear3DContainer">
                 <div className="wear3DChekboxContainer">
-                    <div class="checkboxContainer"><input type="checkbox" id="directWearCheck" /> <label for="directWearCheck">직마모</label></div>
-                    <div class="checkboxContainer"><input type="checkbox" id="sideWearCheck" /> <label for="sideWearCheck">편마모</label></div>
+                    <div class="checkboxContainer">
+                        <input type="checkbox" id="directWearCheck" /> <label for="directWearCheck">직마모</label></div>
+                    <div class="checkboxContainer">
+                        <input type="checkbox" id="sideWearCheck" /> <label for="sideWearCheck">편마모</label></div>
                 </div>
                 <div className="wear3DRangeContainer">
                     <Slider range marks={this.state.marks} tooltip={{ formatter: null }} defaultValue={[20, 50]} />

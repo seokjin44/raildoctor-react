@@ -1,4 +1,4 @@
-import { DOWN_TRACK, STRING_ACC_KEY, STRING_HD_KEY, STRING_LATERAL_LOAD_KEY, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_HD_KEY, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
 
 export const dateFormat = ( date ) => {
     const yyyy = date.getFullYear();
@@ -15,6 +15,17 @@ export const formatTime = (date) => {
     return `${hours}:${minutes}:${seconds}`;
 }
 
+export const formatDateTime = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+
 export const formatDate = (date) => {
     const day = String(date.getDate()).padStart(2, '0');
     return day;
@@ -26,7 +37,9 @@ export const formatYearMonth = (date) => {
     return `${year}-${month}`;
 }
 
+//1000단위 KP를 1K000 으로 바꺼줌
 export const convertToCustomFormat = (num) => {
+    num = Math.floor(num);
     if (typeof num !== 'number' || num < 1000) {
         return 'Input should be a number greater than or equal to 1000';
     }
@@ -46,8 +59,8 @@ export const findRange = (ranges, x, trackType) => {
     while (start <= end) {
         let mid = Math.floor((start + end) / 2);
         let range = ranges[mid];
-        let rangeStart = (trackType === UP_TRACK) ? range.start_station_up_track_location : range.end_station_up_track_location;
-        let rangeEnd = (trackType === DOWN_TRACK) ? range.start_station_down_track_location : range.end_station_down_track_location;
+        let rangeStart = (trackType === UP_TRACK) ? range.start_station_up_track_location : range.start_station_down_track_location;
+        let rangeEnd = (trackType === DOWN_TRACK) ? range.end_station_down_track_location : range.end_station_up_track_location;
 
         if (x >= rangeStart && x < rangeEnd) {
             return mid; // 범위를 찾았다면 해당 범위를 반환
@@ -85,3 +98,54 @@ export const trackDataName = ( value ) => {
         return "";
     }
 }
+
+export const tempDataName = ( value ) => {
+    if( STRING_RAIL_TEMPERATURE === value ){
+        return "레일온도";
+    }else if( STRING_TEMPERATURE === value ){
+        return "대기온도";
+    }else if( STRING_HUMIDITY === value ){
+        return "대기습도";
+    }else{
+        return "";
+    }
+}
+
+export const convertToNumber = (inputStr) => {
+    // "K"를 "."로 바꾸고, 숫자로 파싱
+    const convertedStr = inputStr.replace('K', '.');
+    return parseFloat(convertedStr);
+}
+
+export const convertToNumber2 = (inputStr) => {
+    // "K"를 "."로 바꾸고, 숫자로 파싱
+    const convertedStr = inputStr.replace('K', '.');
+    return parseFloat(convertedStr * 1000);
+}
+
+export const trackNumberToString = ( number ) => {
+    if( UP_TRACK === number ){
+        return STRING_UP_TRACK;
+    }else if( DOWN_TRACK === number ){
+        return STRING_DOWN_TRACK;
+    }
+}
+
+export const convertObjectToArray = (obj, type) => {
+    let format = ( key ) => {
+      if( type === CHART_FORMAT_TODAY ){
+        return formatTime(new Date(key));
+      }else if( type === CHART_FORMAT_DAILY ){
+        return formatDate(new Date(key));
+      }else if( type === CHART_FORMAT_MONTHLY ){
+        return formatYearMonth(new Date(key));
+      }
+      return key;
+    }
+    return Object.keys(obj).map(key => {
+        return {
+            time: format(key),
+            ...obj[key]
+        };
+    });
+  }

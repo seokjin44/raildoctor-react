@@ -5,7 +5,8 @@ import 'dayjs/locale/ko';
 import LeftProfile from "../../assets/left_profile.png"; 
 import RightProfile from "../../assets/right_profile.png"; 
 import Slider from '@mui/material/Slider';
-
+import axios from 'axios';
+import qs from 'qs';
 import DemoImg1 from "../../assets/demo/그림2.png";
 import DemoImg2 from "../../assets/demo/그림3.png";
 import {
@@ -21,10 +22,10 @@ import {
   BarController,
 } from 'chart.js';
 import faker from 'faker';
-import { RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE } from "../../constant";
-import { Input, DatePicker, Radio } from "antd";
+import { DOWN_TRACK, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_UP_TRACK, UP_TRACK } from "../../constant";
+import { Input, DatePicker, Radio, Select } from "antd";
 import ImgSlider from "../../component/imgSlider/imgSlider";
-import { dateFormat } from "../../util";
+import { convertToCustomFormat, dateFormat, findRange } from "../../util";
 const { RangePicker } = DatePicker;
 
 ChartJS.register(
@@ -62,13 +63,53 @@ const marks = [
   },
 ];
 
+let dataExistKPs = {t1 : [], t2 : []};
 function RailProfile( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
   const [upTrackProfileImg, setUpTrackProfileImg] = useState(0);
   const [downTrackProfileImg, setDownTrackProfileImg] = useState(0);
+  const [selectTrack, setSelectTrack] = useState(STRING_UP_TRACK);
+  const [dataExits, setDataExits] = useState([]);
+  const [kpOptions, setKpOptions] = useState([]);
+  const [selectKP, setSelectKP] = useState("");
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
+    let startKP = (select.start_station_up_track_location > select.start_station_down_track_location)? 
+    select.start_station_down_track_location : select.start_station_up_track_location;
+    let endKP = (select.end_station_up_track_location > select.end_station_down_track_location)? 
+    select.end_station_up_track_location : select.end_station_down_track_location;
+    let kpOptions_ = [];
+    if( selectTrack === STRING_UP_TRACK ){
+      for( let kp of dataExistKPs.t1 ){
+        if( (kp * 1000) >= startKP &&
+            (kp * 1000) <= endKP
+        ){
+          let options = {
+            'label' : convertToCustomFormat(kp * 1000),
+            'value' : kp
+          }
+          kpOptions_.push(
+            options
+          );
+        }
+      }
+    }else if( selectTrack === STRING_DOWN_TRACK ){
+      for( let kp of dataExistKPs.t2 ){
+        if( (kp * 1000) >= startKP &&
+            (kp * 1000) <= endKP
+        ){
+          let options = {
+            'label' : convertToCustomFormat(kp * 1000),
+            'value' : kp
+          }
+          kpOptions_.push(
+            options
+          );
+        }
+      }
+    }
+    setKpOptions(kpOptions_);
   }
 
   const valueLabelFormat = (value) => {
@@ -77,6 +118,37 @@ function RailProfile( props ) {
   }
 
   useEffect(() => {
+    axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/locations`,{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroad : "인천 1호선",
+        begin : "계양",
+        end : "송도달빛축제공원",
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      dataExistKPs = response.data;
+      let dataArr = [];
+      let index = -1;
+      RAILROADSECTION.forEach( data => {
+        dataArr.push(0);
+      })
+      let dataExits_ = [...dataArr];
+      console.log(response.data);
+      for( let kp of response.data.t1 ){
+        index = findRange(RAILROADSECTION, kp * 1000, UP_TRACK);
+        dataExits_[index]++;
+      }
+      for( let kp of response.data.t2 ){
+        index = findRange(RAILROADSECTION, kp * 1000, DOWN_TRACK);
+        dataExits_[index]++;
+      }
+      setDataExits(dataExits_);
+    })
+    .catch(error => console.error('Error fetching data:', error));
   }, []);
 
   const upTrackHandleChange = (e) => {
@@ -115,7 +187,11 @@ function RailProfile( props ) {
   return (
     <div className="trackDeviation railProfile" >
       <div className="railStatusContainer">
-        <RailStatus railroadSection={RAILROADSECTION} pathClick={pathClick}></RailStatus>
+        <RailStatus 
+          railroadSection={RAILROADSECTION} 
+          pathClick={pathClick}
+          dataExits={dataExits}
+        ></RailStatus>
       </div>
       <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px", marginBottom:"10px"}}>
             <div className="containerTitle bothEnds">
@@ -125,9 +201,9 @@ function RailProfile( props ) {
               <div className="dataOption">
                 <div className="title">상하선 </div>
                 <div className="date">
-                <Radio.Group style={RADIO_STYLE} >
-                  <Radio value={1}>상선</Radio>
-                  <Radio value={2}>하선</Radio>
+                <Radio.Group style={RADIO_STYLE} defaultValue={selectTrack} value={selectTrack} >
+                  <Radio value={STRING_UP_TRACK}>상선</Radio>
+                  <Radio value={STRING_DOWN_TRACK}>하선</Radio>
                 </Radio.Group>
                 </div>
               </div>
@@ -135,8 +211,17 @@ function RailProfile( props ) {
               <div className="dataOption">
                 <div className="title">KP </div>
                 <div className="date">
-                  <Input placeholder="KP"
+                  {/* <Input placeholder="KP"
                     style={RANGEPICKERSTYLE}
+                  /> */}
+                  <Select
+                    defaultValue={selectKP}
+                    value={selectKP}
+                    style={{
+                      width: 200,
+                    }}
+                    onChange={(val)=>{setSelectKP(val)}}
+                    options={kpOptions}
                   />
                 </div>
               </div>
@@ -148,13 +233,31 @@ function RailProfile( props ) {
                 V=+40km/h
               </div>
               <div className="line"></div>
-              <div className="dataOption">
+              {/* <div className="dataOption">
                 <div className="title">검토일자 </div>
                 <div className="date">
                   <RangePicker 
                     style={RANGEPICKERSTYLE}
                   />
                 </div>
+              </div> */}
+              <div className="dataOption">
+                <button onClick={()=>{
+                  axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles`,{
+                    paramsSerializer: params => {
+                      return qs.stringify(params, { format: 'RFC3986' })
+                    },
+                    params : {
+                      railroad : "인천 1호선",
+                      measure_kp : selectKP,
+                      rail_track : selectTrack
+                    }
+                  })
+                  .then(response => {
+                    console.log(response.data);
+                  })
+                  .catch(error => console.error('Error fetching data:', error));
+                }}>조회</button>
               </div>
             </div>
       </div>

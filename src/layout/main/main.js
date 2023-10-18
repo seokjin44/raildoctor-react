@@ -16,9 +16,9 @@ import TrackGeometryMeasurement from "../trackGeometryMeasurement/trackGeometryM
 import TrackDeviation from "../trackDeviation/trackDeviation";
 import MeasuringTemperatureHumidity from "../measuringTemperatureHumidity/measuringTemperatureHumidity";
 import RailProfile from "../railProfile/railProfile";
+import DataUpload from "../dataUpload/dataUpload";
 import RailRoughness from "../railRoughness/railRoughness";
 import RailTrackAlignment from "../railTrackAlignment/railTrackAlignment";
-import DataUpload from "../dataUpload/dataUpload";
 
 const ProtectedRoute = ({ user, children }) => {
   const isAuth = () => {

@@ -1,6 +1,7 @@
 import React from 'react';
 import "./WearInfo.css";
 import Chart from "react-apexcharts";
+import { STRING_DOWN_TRACK, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, STRING_UP_TRACK } from '../../constant';
 
 class WearInfo extends React.Component {
     constructor(props) {
@@ -118,6 +119,7 @@ class WearInfo extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
+        console.log("wearInfo componentDidUpdate");
         if(prevProps.data === undefined) {
             this.initSeries();
         } else if(this.props.data.length !== prevProps.data.length) {
@@ -130,40 +132,46 @@ class WearInfo extends React.Component {
     }
 
     initSeries() {
+        console.log("initSeries");
         let series = [
-            {
+            {//0
                 name: "하선 좌레일",
                 data: []
-            }, {
+            }, 
+            {//1
                 name: "상선 좌레일",
                 data: []
-            }, {
+            }, 
+            {//2
                 name: "하선 우레일",
                 data: []
-            }, {
+            }, 
+            {//3
                 name: "상선 우레일",
                 data: []
             },
 
-            {
+            {//4
                 name: "하선 좌레일 예측데이터",
                 data: []
-            }, {
+            }, 
+            {//5
                 name: "상선 좌레일 예측데이터",
                 data: []
-            }, {
+            }, 
+            {//6
                 name: "하선 우레일 예측데이터",
                 data: []
-            }, {
+            }, 
+            {//7
                 name: "상선 우레일 예측데이터",
                 data: []
             }
         ];
 
-        for(let i = 0 ; i < this.props.data.length ; i++) {
-            let data = this.props.data[i];
+        for(let data of this.props.data) {
             
-            if(data.track_type === 0) {
+            /* if(data.track_type === 0) {
                 series[0].data.push([data.mgt, data.w_left]);
                 series[2].data.push([data.mgt, data.w_right]);
             }else if(data.track_type === 2) {
@@ -175,6 +183,21 @@ class WearInfo extends React.Component {
             } else {
                 series[1].data.push([data.mgt, data.w_left]);
                 series[3].data.push([data.mgt, data.w_right]);
+            } */
+
+            if( data.railTrack === STRING_UP_TRACK && data.railSide === STRING_TRACK_SIDE_LEFT ){
+                series[1].data.push([data.accumulateWeight, data.wear]);
+            }else if( data.railTrack === STRING_UP_TRACK && data.railSide === STRING_TRACK_SIDE_RIGHT ){
+                series[3].data.push([data.accumulateWeight, data.wear]);
+            }else if( data.railTrack === STRING_DOWN_TRACK && data.railSide === STRING_TRACK_SIDE_LEFT ){
+                series[0].data.push([data.accumulateWeight, data.wear]);
+            }else if( data.railTrack === STRING_DOWN_TRACK && data.railSide === STRING_TRACK_SIDE_RIGHT ){
+                series[2].data.push([data.accumulateWeight, data.wear]);
+            }else{
+                series[1].data.push([data.accumulateWeight, data.wear]);
+                series[3].data.push([data.accumulateWeight, data.wear]);
+                series[0].data.push([data.accumulateWeight, data.wear]);
+                series[2].data.push([data.accumulateWeight, data.wear]);
             }
         }
 

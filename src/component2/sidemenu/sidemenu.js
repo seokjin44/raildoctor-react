@@ -106,12 +106,12 @@ function Sidemenu( props ) {
           </div>
         </div>
         <div className="menuBox">
-          <div className={ classnames("menu",{ active : location.pathname.indexOf("railRoughness") > -1 }) } onClick={()=>{navigate("/railRoughness",{});}} >
+          <div className={ classnames("menu",{ active : location.pathname.indexOf("railTrackAlignment") > -1 }) } onClick={()=>{navigate("/railTrackAlignment",{});}} >
           {/* <div className="icon"><img src={RailRoughnessIcon} /></div> */}레일직진도
           </div>
         </div>
         <div className="menuBox">
-          <div className={ classnames("menu",{ active : location.pathname.indexOf("railTrackAlignment") > -1 }) } onClick={()=>{navigate("/railTrackAlignment",{});}} >
+          <div className={ classnames("menu",{ active : location.pathname.indexOf("railRoughness") > -1 }) } onClick={()=>{navigate("/railRoughness",{});}} >
           {/* <div className="icon"><img src={RailTrackAlignmentIcon} /></div> */} 레일조도
           </div>
         </div>

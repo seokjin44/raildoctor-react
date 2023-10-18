@@ -1,4 +1,4 @@
-.railRoughness .componentBox .radioButtons {
+.railTrackAlignment .componentBox .radioButtons {
     width: 200px;
     height: 100%;
     display: flex;
@@ -9,82 +9,37 @@
     border-radius: 5px;
 }
 
-.railRoughness .componentBox .distanceSearch {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 5px;
+.componentBox .trackBox{
+    width: 100%;
+    height: 100%;
+    position: relative;
     border: 1px solid #cccccc;
     border-radius: 5px;
+}
+
+.componentBox .chartBox{
+    width: 100%;
     height: 100%;
-}
-
-.railRoughness .componentBox .distanceSearch input.local {
-    border: none;
-    border-bottom: 1px solid #cccccc;
-    margin-right: 10px;
-    margin-left: 10px;
-    width: 70px;
-    text-align: center;
-    font-size: 17px;
-    font-family: 'NEO_R';
-}
-
-.table .tableHeader .tr .td.no, 
-.table .tableBody .tr .td.no {
-    width: 20%;
-}
-
-.table .tableHeader .tr .td.regDate, 
-.table .tableBody .tr .td.regDate {
-    width: 20%;
-}
-
-.table .tableHeader .tr .td.track, 
-.table .tableBody .tr .td.track {
-    width: 20%;
-}
-
-.table .tableHeader .tr .td.rail, 
-.table .tableBody .tr .td.rail {
-    width: 20%;
-}
-
-.table .tableHeader .tr .td.station, 
-.table .tableBody .tr .td.station {
-    width: 20%;
-}
-
-.table .tableHeader .tr .td.weld, 
-.table .tableBody .tr .td.weld {
-    width: 20%;
-}
-
-.table .tableHeader .tr .td.viewBtn, 
-.table .tableBody .tr .td.viewBtn {
-    width: 20%;
-}
-
-.table .tableBody .tr .td.viewBtn .viewBtn{
-    width: 20px;
-    height: 20px;
-    background-color: #cccccc;
-    padding: 5px;
+    position: relative;
+    border: 1px solid #cccccc;
     border-radius: 5px;
-    box-shadow: 1px 1px 8px 1px #0000001c;
-}
-.table .tableBody .tr .td.viewBtn .viewBtn img{
-    width: 100%;
+    margin-left: 10px;
 }
 
-.railRoughness .table .tableBody .tr{
-    height: 43px;
+.componentBox .curLine{
+    position: absolute;
+    width: 1px;
+    height: 96%;
+    background-color: red;
+    left: 50%;
 }
 
-.report{
+.decisionPopupContent .chartConatiner{
     width: 100%;
+    height: 300px;
+    padding-top: 15px;
+}
+
+.railTrackAlignment .optionBox.position .optionValue{
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }

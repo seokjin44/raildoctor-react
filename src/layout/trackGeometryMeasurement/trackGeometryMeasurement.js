@@ -10,7 +10,7 @@ import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRAC
 import PlacePosition from "../../component/PlacePosition/PlacePosition";
 import axios from 'axios';
 import qs from 'qs';
-import { dateFormat, findAddedItems, findRange, formatDate, formatTime, formatYearMonth, trackDataName } from "../../util";
+import { convertObjectToArray, dateFormat, findAddedItems, findRange, formatDate, formatTime, formatYearMonth, trackDataName } from "../../util";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
@@ -56,25 +56,6 @@ function TrackGeometryMeasurement( props ) {
   const [todayChartseries, setTodayChartseries] = useState([]);
   const [dailyChartseries, setDailyChartseries] = useState([]);
   const [monthlyChartseries, setMonthlyChartseries] = useState([]);
-
-  const convertObjectToArray = (obj, type) => {
-    let format = ( key ) => {
-      if( type === CHART_FORMAT_TODAY ){
-        return formatTime(new Date(key));
-      }else if( type === CHART_FORMAT_DAILY ){
-        return formatDate(new Date(key));
-      }else if( type === CHART_FORMAT_MONTHLY ){
-        return formatYearMonth(new Date(key));
-      }
-      return key;
-    }
-    return Object.keys(obj).map(key => {
-        return {
-            time: format(key),
-            ...obj[key]
-        };
-    });
-  }
 
   const disabledDate = (current) => {
     return !dataExitsDate[dateFormat(current.$d)];
@@ -208,7 +189,7 @@ function TrackGeometryMeasurement( props ) {
 
   const findPoints = (date) => {
     date[0].$d.setHours(0, 0, 0, 0);
-    date[1].$d.setHours(0, 0, 0, 0);
+    date[1].$d.setHours(23, 59, 59, 0);
     let param = {
       params : {
         railroad : "인천 1호선",
@@ -271,9 +252,9 @@ function TrackGeometryMeasurement( props ) {
           if( sensor.railTrack === STRING_UP_TRACK ||
             sensor.railTrack === STRING_UP_TRACK_LEFT ||
             sensor.railTrack === STRING_UP_TRACK_RIGHT ){
-            index = findRange(RAILROADSECTION, sensor.kp, UP_TRACK);
+            index = findRange(RAILROADSECTION, sensor.kp * 1000, UP_TRACK);
           }else{
-            index = findRange(RAILROADSECTION, sensor.kp, DOWN_TRACK);
+            index = findRange(RAILROADSECTION, sensor.kp * 1000, DOWN_TRACK);
           }
   
           if( sensor.railTrack === STRING_UP_TRACK_LEFT ){
