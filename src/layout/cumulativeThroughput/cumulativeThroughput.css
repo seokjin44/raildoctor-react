@@ -165,13 +165,17 @@
     user-select: none;
 }
 
+.cumulativeThroughput .track img{
+    height: 100%;
+}
+
 .cumulativeThroughput .componentBox .guideLine{
     width: 5px;
-    height: calc(100% - 48px);
+    height: calc(100%);
     position: absolute;
     background-color: #ff0000;
     left: 295px;
-    top: 32px;
+    top: 0px;
     border-radius: 5px;
     cursor: e-resize;
 }
@@ -202,4 +206,26 @@
 
 .cumulativeThroughput .componentBox .guideLine.guideLineOver{
     background-color: black;
+}
+
+.dataContainer .dataLine{
+    margin-bottom: 10px;
+    width: 98%;
+}
+
+.dataContainer .dataLine .table .tableBody .tr{
+    height: 55px;
+    font-size: 16px;
+}
+
+.cumulativeThroughput .dataContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+}
+
+.cumulativeThroughput .dataContainer .table .tableBody .tr .td {
+    height: calc(100% - 1px);
 }

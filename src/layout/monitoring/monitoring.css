@@ -268,7 +268,23 @@
 .monitoringContainer .track{
     position: relative;
     height: calc(100% - 4px);
+    display: flex;
+    justify-content: left;
+    align-items: center;
 }
+
+.monitoringContainer .track img{
+    height: 100%;
+}
+
+.monitoringContainer .track .kpMarker{
+    position: absolute;
+    height: 100%;
+    width: 1px;
+    background: red;
+    left: 0px;
+}
+
 .monitoringContainer .guideLine {
     left: 50%;
     position: absolute;

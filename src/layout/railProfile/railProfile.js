@@ -40,38 +40,29 @@ ChartJS.register(
   BarController
 );
 
-const marks = [
-  {
-    value: new Date("2023-10-05").getTime(),
-    mamo : 1
-    /* label: '10/05', */
-  },
-  {
-    value: new Date("2023-11-23").getTime(),
-    mamo : 2
-    /* label: '11/23', */
-  },
-  {
-    value: new Date("2023-12-04").getTime(),
-    mamo : 3
-    /* label: '12/04', */
-  },
-  {
-    value: new Date("2023-12-26").getTime(),
-    mamo : 4
-    /* label: '12/26', */
-  },
-];
-
 let dataExistKPs = {t1 : [], t2 : []};
+let profilesMap = new Map();
 function RailProfile( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
-  const [upTrackProfileImg, setUpTrackProfileImg] = useState(0);
-  const [downTrackProfileImg, setDownTrackProfileImg] = useState(0);
+  const [leftTrackProfile, setLeftTrackProfile] = useState(null);
+  const [rightTrackProfile, setRightTrackProfile] = useState(null);
   const [selectTrack, setSelectTrack] = useState(STRING_UP_TRACK);
   const [dataExits, setDataExits] = useState([]);
   const [kpOptions, setKpOptions] = useState([]);
   const [selectKP, setSelectKP] = useState("");
+  const [profiles, setProfiles] = useState([]);
+/*   const [leftProfileImages, setLeftProfileImages] = useState([]); 
+  const [rightProfileImages, setRightProfileImages] = useState([]); */
+
+  const [profileDetails, setProfileDetails] = useState([]);
+
+  const [leftImgView, setLeftImgView] = useState(false);
+  const [rightImgView, setRightImgView] = useState(false);
+
+  const [sliderMin, setSliderMin] = useState(new Date()); 
+  const [sliderMax, setSliderMax] = useState(new Date());
+  const [marks, setMarks] = useState([]);
+
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
@@ -152,37 +143,63 @@ function RailProfile( props ) {
   }, []);
 
   const upTrackHandleChange = (e) => {
-    console.log(e);
-    for( let mark of marks ){
-      if( mark.value === e.target.value ){
-        setUpTrackProfileImg(mark.mamo);
-        break;
-      }
+    if( profilesMap.get(e.target.value) ){
+      let profile = profilesMap.get(e.target.value);
+      axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/pictures/${profile.profileId}`,{
+        paramsSerializer: params => {
+          return qs.stringify(params, { format: 'RFC3986' })
+        }
+      })
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => console.error('Error fetching data:', error));
+      setLeftTrackProfile(profile);
     }
   }
 
   const downTrackHandleChange = (e) => {
-    console.log(e);
-    for( let mark of marks ){
-      if( mark.value === e.target.value ){
-        setDownTrackProfileImg(mark.mamo);
-        break;
-      }
+    if( profilesMap.get(e.target.value) ){
+      let profile = profilesMap.get(e.target.value);
+      axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/pictures/${profile.profileId}`,{
+        paramsSerializer: params => {
+          return qs.stringify(params, { format: 'RFC3986' })
+        }
+      })
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => console.error('Error fetching data:', error));
+      setRightTrackProfile(profile);
     }
   }
 
-  const getProfileImg = (value) => {
-    if( value === 1 ){
-      return <img className="profileImg" src={LeftProfile} />;
-    }else if( value === 0 ){
+  const getProfileLeftImg = (profile) => {
+    if( !profile ){
       return <div className="profileImg" >
         날짜를 선택해주세요.
       </div>;
+    }else if( profile.imageLeft ){
+      return <img className="profileImg" src={`https://raildoctor.suredatalab.kr${profile.imageLeft.fileName}`} />;
     }
     return <div className="profileImg" >
       이미지가 준비되지않은 범위입니다.
     </div>;
   } 
+
+  const getProfileRightImg = (profile) => {
+    if( !profile ){
+      return <div className="profileImg" >
+        날짜를 선택해주세요.
+      </div>;
+    }else if( profile.imageRight ){
+      return <img className="profileImg" src={`https://raildoctor.suredatalab.kr${profile.imageRight.fileName}`} />;
+    }
+    return <div className="profileImg" >
+      이미지가 준비되지않은 범위입니다.
+    </div>;
+  } 
+  
   
   return (
     <div className="trackDeviation railProfile" >
@@ -250,11 +267,44 @@ function RailProfile( props ) {
                     params : {
                       railroad : "인천 1호선",
                       measure_kp : selectKP,
-                      rail_track : selectTrack
+                      /* rail_track : selectTrack */
                     }
                   })
                   .then(response => {
                     console.log(response.data);
+                    let sliderMin_ = new Date();
+                    let sliderMax_ = new Date(0);
+                    let marks_ = [];
+                    /* {
+                      value: new Date("2023-10-05").getTime(),
+                      mamo : 1
+                    }, */
+                    let dateCnt = {};
+                    let profiles = [];
+                    for( let profile of response.data.profiles ){
+                      if( !profile.imageLeft && !profile.imageRight ){ continue; }
+                      profilesMap.set(new Date(profile.measureTs).getTime(), profile);
+                      let profileId = profile.profileId;
+                      let measureDate = new Date(profile.measureTs);
+                      console.log(profile.measureTs);
+                      (dateCnt[profile.measureTs]) ? dateCnt[profile.measureTs]++ : dateCnt[profile.measureTs] = 1;
+                      if( measureDate.getTime() < sliderMin_.getTime() ){
+                        sliderMin_ = measureDate;
+                      }
+                      if( measureDate.getTime() > sliderMax_.getTime() ){
+                        sliderMax_ = measureDate;
+                      }
+                      marks_.push({
+                        value: measureDate.getTime(),
+                        profileId : profileId
+                      });
+                      profiles.push(profile);
+                    }
+                    console.log(dateCnt);
+                    setSliderMin(sliderMin_);
+                    setSliderMax(sliderMax_);
+                    setMarks(marks_);
+                    setProfiles(profiles);
                   })
                   .catch(error => console.error('Error fetching data:', error));
                 }}>조회</button>
@@ -262,20 +312,29 @@ function RailProfile( props ) {
             </div>
       </div>
       
-      <div className="contentBox" style={{marginTop:"10px", height: "485px"}}>
+      <div className="contentBox" style={{marginTop:"10px", height: "calc(100% - 255px)"}}>
         <div className="containerTitle">프로파일 및 마모 데이터</div>
-        <div className="componentBox chartBox flex">
+        <div className="componentBox chartBox flex" style={{overflow:"hidden"}}>
           <div className="profile left">
             <div className="profileSlider">
-              {getProfileImg(upTrackProfileImg)}
+              {(profileDetails.length > 0) ? <div className="imageViewButton" onClick={()=>{setLeftImgView(true)}} >이미지 보기</div> : null}
+              {(leftImgView) ? <div className="picture">
+                <div className="pictureData regDate">23.03.15</div>
+                <div className="pictureData newUpload">Upload</div>
+                <div className="pictureData closeImg">이미지 닫기</div>
+                <ImgSlider
+                  imgUrlList={[DemoImg1,DemoImg2]}
+                />
+              </div> : null}
+              {getProfileLeftImg(leftTrackProfile)}
               <Slider
                 track={false}
                 aria-labelledby="track-false-slider"
                 defaultValue={30}
                 marks={marks}
                 step={null}
-                min={new Date("2023-08-01").getTime()}
-                max={new Date("2023-12-31").getTime()}
+                min={sliderMin.getTime()}
+                max={sliderMax.getTime()}
                 getAriaValueText={valueLabelFormat}
                 valueLabelFormat={valueLabelFormat}
                 valueLabelDisplay="on"
@@ -284,13 +343,6 @@ function RailProfile( props ) {
               />
             </div>
             <div className="profileData">
-              <div className="picture">
-                <div className="pictureData regDate">23.03.15</div>
-                <div className="pictureData newUpload">Upload</div>
-                <ImgSlider
-                  imgUrlList={[DemoImg1,DemoImg2]}
-                />
-              </div>
               <div className="table" >
                 <div className="tableHeader">
                   <div className="tr">
@@ -328,7 +380,22 @@ function RailProfile( props ) {
                   </div>
                 </div>
                 <div className="tableBody">
-                  <div className="tr">
+                  {
+                    profiles.map( (profile, i) => {
+                      return <div key={i} className="tr">
+                      <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
+                      <div className="td ton ">{"-"}</div>
+                      <div className="td mamo">{profile.llSideWear}</div> 
+                      <div className="td mamo">{profile.llCornerWear}</div> 
+                      <div className="td mamo">{profile.lVerticalWear}</div> 
+                      <div className="td mamo">{profile.lrCornerWear}</div> 
+                      <div className="td mamo">{profile.lrSideWear}</div> 
+                      <div className="td mamo">{profile.lWearArea}</div> 
+                      <div className="td mamo">{profile.lWearRate}</div> 
+                    </div>
+                    })
+                  }
+                  {/* <div className="tr">
                     <div className="td measurementDate">21.09.16</div>
                     <div className="td ton ">413,584,122</div>
                     <div className="td mamo">-0.28</div>
@@ -350,7 +417,6 @@ function RailProfile( props ) {
                     <div className="td mamo">574.87</div>
                     <div className="td mamo">20.64</div>
                   </div>
-
                   <div className="tr">
                     <div className="td measurementDate">22.06.24</div>
                     <div className="td ton ">413,588,125</div>
@@ -383,22 +449,31 @@ function RailProfile( props ) {
                     <div className="td mamo">-0.35</div>
                     <div className="td mamo">608.55</div>
                     <div className="td mamo">22.78</div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
           </div>
           <div className="profile right">
             <div className="profileSlider">
-              {getProfileImg(downTrackProfileImg)}
+              {(profileDetails.length > 0) ? <div className="imageViewButton" onClick={()=>{setRightImgView(true)}} >이미지 보기</div> : null}
+              {(rightImgView) ? <div className="picture">
+                <div className="pictureData regDate">23.03.15</div>
+                <div className="pictureData newUpload">Upload</div>
+                <div className="pictureData closeImg">이미지 닫기</div>
+                <ImgSlider
+                  imgUrlList={[DemoImg1,DemoImg2]}
+                />
+              </div> : null}
+              {getProfileRightImg(rightTrackProfile)}
               <Slider
                 track={false}
                 aria-labelledby="track-false-slider"
                 defaultValue={30}
                 marks={marks}
                 step={null}
-                min={new Date("2023-08-01").getTime()}
-                max={new Date("2023-12-31").getTime()}
+                min={sliderMin.getTime()}
+                max={sliderMax.getTime()}
                 getAriaValueText={valueLabelFormat}
                 valueLabelFormat={valueLabelFormat}
                 valueLabelDisplay="on"
@@ -407,11 +482,11 @@ function RailProfile( props ) {
               />
             </div>
             <div className="profileData">
-              <div className="picture">
+              {/* <div className="picture">
                 <div className="pictureData regDate">23.03.15</div>
                 <div className="pictureData newUpload">Upload</div>
                 <ImgSlider/>
-              </div>
+              </div> */}
               <div className="table" >
                 <div className="tableHeader">
                   <div className="tr">
@@ -449,7 +524,22 @@ function RailProfile( props ) {
                   </div>
                 </div>
                 <div className="tableBody">
-                  <div className="tr">
+                  {
+                    profiles.map( (profile, i) => {
+                      return <div key={i} className="tr">
+                      <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
+                      <div className="td ton ">{"-"}</div>
+                      <div className="td mamo">{profile.rlSideWear}</div> 
+                      <div className="td mamo">{profile.rlCornerWear}</div> 
+                      <div className="td mamo">{profile.rVerticalWear}</div> 
+                      <div className="td mamo">{profile.rrCornerWear}</div> 
+                      <div className="td mamo">{profile.rrSideWear}</div> 
+                      <div className="td mamo">{profile.rWearArea}</div> 
+                      <div className="td mamo">{profile.rWearRate}</div> 
+                    </div>
+                    })
+                  }
+                  {/* <div className="tr">
                     <div className="td measurementDate">21.09.16</div>
                     <div className="td ton ">413,584,122</div>
                     <div className="td mamo">2.33</div>
@@ -503,7 +593,7 @@ function RailProfile( props ) {
                     <div className="td mamo">-</div>
                     <div className="td mamo">-</div>
                     <div className="td mamo">-</div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

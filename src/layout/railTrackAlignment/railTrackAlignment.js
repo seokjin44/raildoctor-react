@@ -4,6 +4,7 @@ import RailStatus from "../../component/railStatus/railStatus";
 import 'dayjs/locale/ko';
 import ReportIcon from "../../assets/icon/1291748_magnify_magnifying glass_marketing_report_financial_icon.svg";
 import ReportImg from "../../assets/ReportImg.png";
+import { Document, Page } from 'react-pdf';
 
 import Box from '@mui/material/Box';
 import faker from 'faker';
@@ -27,6 +28,7 @@ function RailTrackAlignment( props ) {
   const [selectKP, setSelectKP] = useState("");
   const [reports, setReports] = useState([]);
   const [selectDateRange, setSelectDateRange] = useState([{$d:new Date()}, {$d:new Date()}]);
+  const [pdfDataList , setPDFDataList] = useState([]);
 
   const pathClick = (select) => {
     console.log(select);
@@ -215,7 +217,7 @@ function RailTrackAlignment( props ) {
             </div>
       </div>
 
-      <div className="contentBox" style={{marginTop:"10px", height: "485px"}}>
+      <div className="contentBox" style={{marginTop:"10px", height: "calc(100% - 245px)"}}>
         <div className="containerTitle">보고서 목록</div>
         <div className="componentBox chartBox flex">
           <div className="table" style={{ justifyContent: "flex-start" }} >
@@ -256,6 +258,22 @@ function RailTrackAlignment( props ) {
                         })
                         .then(response => {
                           console.log(response.data);
+                          /* setOpen(true);
+                          let pdfData = []; */
+                          for( let file of response.data.file ){
+                            /* let url = `https://raildoctor.suredatalab.kr/resources${pdfFile.filePath}`; */
+                            /* let url = `https://raildoctor.suredatalab.kr/resources/data/railstraights/bb6b47ac-d8ab-489b-8722-aefc76c06a14.pdf`;
+                            console.log(url);
+                            axios.get(url, {
+                              responseType: 'arraybuffer', // 중요: PDF 데이터를 ArrayBuffer로 가져옵니다.
+                            })
+                            .then( response => {
+                              pdfData.push( new Uint8Array(response.data) );
+                              setPDFDataList(pdfData);
+                            })
+                            .catch(error => console.error('Error fetching data:', error));          */                 
+                            window.open(`https://raildoctor.suredatalab.kr/resources${file.filePath}`);
+                          }
                         })
                         .catch(error => console.error('Error fetching data:', error));
                         }}>
@@ -382,16 +400,23 @@ function RailTrackAlignment( props ) {
         </div>
       </div>
 
-      <Modal
+      {/* <Modal
         open={open}
         onClose={(e)=>{console.log(e);handleClose()}}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={RAIL_ROUGHNESS_BOXSTYLE} >
-          <img src={ReportImg} />
+          {
+            (pdfDataList.length > 0) ?
+            <Document file={pdfDataList[0]}>
+              <Page pageNumber={1} />
+            </Document> : null
+          }
+          
+
         </Box>
-      </Modal>
+      </Modal> */}
 
     </div>
   );

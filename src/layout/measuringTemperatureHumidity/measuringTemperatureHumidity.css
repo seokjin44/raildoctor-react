@@ -10,7 +10,7 @@
     height: calc(100% - 25px - 20px);
 }
 
-.trackDeviation .componentBox.chartBox{
+.measuringTemperatureHumidity .componentBox.chartBox{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -163,4 +163,8 @@
 
 .measuringTemperatureHumidity .contentBox{
     width: calc(100% - 2px);
+}
+
+.measuringTemperatureHumidity .railStatusContainer{
+    width: calc(100% - 1px);
 }

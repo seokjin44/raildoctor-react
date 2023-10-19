@@ -183,13 +183,13 @@ function MeasuringTemperatureHumidity( props ) {
                     style={RANGEPICKERSTYLE}
                   /> */}
                   <Select
-                  defaultValue=""
-                  style={{
-                    width: 200,
-                  }}
-                  onChange={handleChange}
-                  options={selectOptionSensors}
-                />
+                    defaultValue=""
+                    style={{
+                      width: 200,
+                    }}
+                    onChange={handleChange}
+                    options={selectOptionSensors}
+                  />
                 </div>
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
@@ -305,8 +305,8 @@ function MeasuringTemperatureHumidity( props ) {
                 <Legend />
                 {/* <Line dataKey="temp" stroke="#FF0000" dot={false} /> */}
                 {
-                  chartseries.map( series => {
-                    return <Line dataKey={series.dataKey} name={`${series.sensorName}_${series.item}`} stroke="#FF0000" dot={false} />;
+                  chartseries.map( (series, i) => {
+                    return <Line key={i} dataKey={series.dataKey} name={`${series.sensorName}_${series.item}`} stroke="#FF0000" dot={false} />;
                   })
                 }
               </LineChart>

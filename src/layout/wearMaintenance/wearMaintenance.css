@@ -442,6 +442,11 @@
     width: 7%;
 }
 
+.popupContent .table.mgt .tableHeader .tr .td.value1,
+.popupContent .table.mgt .tableBody .tr .td.value1 {
+    width: 11%;
+}
+
 .popupContent .table .tableHeader .tr .td.value1_1,
 .popupContent .table .tableBody .tr .td.value1_1 {
     width: 7%;

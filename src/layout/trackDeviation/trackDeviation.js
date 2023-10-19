@@ -10,7 +10,7 @@ import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import { Modal } from "@mui/material";
 import axios from 'axios';
 import qs from 'qs';
-import { dateFormat, findRange } from "../../util";
+import { dateFormat, findRange, transposeObjectToArray } from "../../util";
 
 let dataExitsDate = {};
 function TrackDeviation( props ) {
@@ -46,6 +46,7 @@ function TrackDeviation( props ) {
     let end = (selectTrack === STRING_UP_TRACK) ? select.end_station_up_track_location : select.end_station_down_track_location;
     start = (start>0) ? start/1000 : start;
     end = (end>0) ? end/1000 : end;
+    console.log(start,end);
     axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/ts`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat' })
@@ -215,29 +216,47 @@ function TrackDeviation( props ) {
               <div className="line"></div>
               <div className="dataOption">
                 <button onClick={()=>{
-                  let start = (selectTrack === STRING_UP_TRACK) ? selectedPath.start_station_up_track_location : selectedPath.start_station_down_track_location;
-                  let end = (selectTrack === STRING_UP_TRACK) ? selectedPath.end_station_up_track_location : selectedPath.end_station_down_track_location;
-                  start = (start>0) ? start/1000 : start;
-                  end = (end>0) ? end/1000 : end;
-                  let param = {
-                    begin_kp : [start],
-                    end_kp : [end],
-                    measure_ts : dataExitsDate[selectMeasureDate][0],
-                    rail_track : selectTrack,
-                    data_types : selectCheckBox,
-                    railroad_name : "인천 1호선",
-                  };
-                  console.log(param);
-                  axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/graph_data`,{
-                    paramsSerializer: params => {
-                      return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
-                    },
-                    params : param
-                  })
-                  .then(response => {
-                    console.log(response.data);
-                  })
-                  .catch(error => console.error('Error fetching data:', error));
+                  let searchChartView_ = [];
+                  for( let option of selectCheckBox ){
+                    let start = (selectTrack === STRING_UP_TRACK) ? selectedPath.start_station_up_track_location : selectedPath.start_station_down_track_location;
+                    let end = (selectTrack === STRING_UP_TRACK) ? selectedPath.end_station_up_track_location : selectedPath.end_station_down_track_location;
+                    start = (start>0) ? start/1000 : start;
+                    end = (end>0) ? end/1000 : end;
+                    let param = {
+                      begin_kp : [start],
+                      end_kp : [end],
+                      measure_ts : dataExitsDate[selectMeasureDate][0],
+                      rail_track : selectTrack,
+                      data_type : option,
+                      railroad_name : "인천 1호선",
+                    };
+                    console.log(param);
+                    axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/graph_data`,{
+                      paramsSerializer: params => {
+                        return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
+                      },
+                      params : param
+                    })
+                    .then(response => {
+                      console.log(response.data);
+                      let dataAry = transposeObjectToArray(response.data);
+                      console.log(dataAry);
+                      if( option === STRING_HEIGHT ){
+                        setHeightChartData(dataAry);
+                      }else if( option === STRING_DIRECTION ){
+                        setDirectionChartData(dataAry);
+                      }else if( option === STRING_CANT ){
+                        setCantChartData(dataAry);
+                      }else if( option === STRING_RAIL_DISTANCE ){
+                        setRaildistanceChartData(dataAry);
+                      }else if( option === STRING_DISTORTION ){
+                        setDistortionChartData(dataAry);
+                      }
+                      searchChartView_.push(option);
+                      setSearchChartView(searchChartView_);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+                  }
                 }}>조회</button>
               </div>
             </div>
@@ -251,23 +270,32 @@ function TrackDeviation( props ) {
             }} >Report</div>
           </div>
         </div>
-        <div className="componentBox chartBox flex">
+        <div className="componentBox chartBox">
           {/* <Chart type='bar' data={data} /> */}
           {
-            searchChartView.map( type => {
+            searchChartView.map( (type, i) => {
               let data = [];
+              let series = [];
               if( type === STRING_HEIGHT ){
-                data = heightChartData
+                data = heightChartData;
+                series.push(<Line type="monotone" name="좌레일-고저틀림" dataKey="valueLeft" stroke="#4371C4" dot={false} />);
+                series.push(<Line type="monotone" name="우레일-고저틀림" dataKey="valueRight" stroke="#4371C4" dot={false} />);
               }else if( type === STRING_DIRECTION ){
                 data = directionChartData
+                series.push(<Line type="monotone" name="좌레일-방향틀림" dataKey="valueLeft" stroke="#4371C4" dot={false} />);
+                series.push(<Line type="monotone" name="우레일-방향틀림" dataKey="valueRight" stroke="#4371C4" dot={false} />);
               }else if( type === STRING_CANT ){
                 data = cantChartData
+                series.push(<Line type="monotone" name="캔트틀림" dataKey="value" stroke="#4371C4" dot={false} />);
               }else if( type === STRING_RAIL_DISTANCE ){
                 data = raildistanceChartData
+                series.push(<Line type="monotone" name="궤간틀림" dataKey="value" stroke="#4371C4" dot={false} />);
               }else if( type === STRING_DISTORTION ){
                 data = distortionChartData
+                series.push(<Line type="monotone" name="비틀림" dataKey="value" stroke="#4371C4" dot={false} />);
               }
-              return <ResponsiveContainer width="100%" height="100%">
+
+              return <ResponsiveContainer key={i} width="100%" height="100%">
               <LineChart
                 width={500}
                 height={300}
@@ -280,23 +308,22 @@ function TrackDeviation( props ) {
                 }}
               >
                 <CartesianGrid />
-                <XAxis dataKey="kp" interval={15} tickFormatter={(value) => value.toFixed(4)} />
+                <XAxis dataKey="kp" interval={100} tickFormatter={(value) => value.toFixed(4)} />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" name="좌레일" dataKey="left" stroke="#4371C4" dot={false} />
-                <Line type="monotone" name="우레일" dataKey="right" stroke="#4371C4" dot={false} />
+
+                <Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} />
+                {series.map( obj => {
+                  return obj;
+                })}
   
-                {/* <Line type="monotone" name="고저틀림" dataKey="value1" stroke="#4371C4" dot={false} />
-                <Line type="monotone" name="방향틀림" dataKey="value2" stroke="#4371C4" dot={false} />
-                <Line type="monotone" name="궤간틀림" dataKey="value3" stroke="#4371C4" dot={false} />
-                <Line type="monotone" name="수평틀림" dataKey="value4" stroke="#4371C4" dot={false} />
-                <Line type="monotone" name="비틀림" dataKey="value5" stroke="#4371C4" dot={false} /> */}
-  
-                <Line type="monotone" name="목표기준" dataKey="target1" stroke="#4BC784" dot={false} />
-                <Line type="monotone" name="목표기준" dataKey="target2" stroke="#4BC784" dot={false} />
-                <Line type="monotone" name="보수기준" dataKey="repair1" stroke="#FF0606" dot={false} />
-                <Line type="monotone" name="보수기준" dataKey="repair2" stroke="#FF0606" dot={false} />
+                <Line type="monotone" name="목표기준" dataKey="maxTargetCriteria" stroke="#4BC784" dot={false} />
+                <Line type="monotone" name="목표기준" dataKey="minTargetCriteria" stroke="#4BC784" dot={false} />
+                <Line type="monotone" name="보수기준" dataKey="maxRepairCriteria" stroke="#FF0606" dot={false} />
+                <Line type="monotone" name="보수기준" dataKey="minRepairCriteria" stroke="#FF0606" dot={false} />
+                <Line type="monotone" name="주의기준" dataKey="maxCautionCriteria" stroke="#FFF200" dot={false} />
+                <Line type="monotone" name="주의기준" dataKey="minCautionCriteria" stroke="#FFF200" dot={false} />
               </LineChart>
             </ResponsiveContainer>
             })

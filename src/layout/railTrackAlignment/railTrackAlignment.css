@@ -88,3 +88,12 @@
     justify-content: center;
     align-items: center;
 }
+
+.pdf-container {
+    display: flex;
+    overflow-x: auto;  /* 필요하다면 가로 스크롤 추가 */
+  }
+  
+  .pdf-item {
+    margin-right: 20px;  /* PDF 파일들 사이의 간격 조절 */
+  }

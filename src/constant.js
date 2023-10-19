@@ -49,6 +49,17 @@ export const STRING_CANT = "CANT";
 export const STRING_RAIL_DISTANCE = "RAIL_DISTANCE";
 export const STRING_DISTORTION = "DISTORTION";
 
+export const STRING_SELECT_WEAR_CORRELATION_MGT = "mgt";
+export const STRING_SELECT_WEAR_CORRELATION_RAILVAL = "railVal";
+
+export const colors = [
+  "#FF5733", "#33FF57", "#5733FF", "#FF33A6", 
+  "#33FFC1", "#FFC133", "#3314FF", "#FF3370", 
+  "#709C3B", "#703B9C", "#9C3B70", "#3B709C", 
+  "#9C703B", "#3B9C70", "#8C703B", "#3B8C70", 
+  "#7C703B", "#3B7C70", "#6C703B", "#3B6C70"
+];
+
 export const RANGEPICKERSTYLE = {
   height:"35px",
   fontFamily : 'NEO_R'

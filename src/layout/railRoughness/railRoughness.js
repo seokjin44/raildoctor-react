@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import RailStatus from "../../component/railStatus/railStatus";
 import 'dayjs/locale/ko';
 import Position from "../../assets/zodo2.png";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Brush } from 'recharts';
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import AlertIcon from "../../assets/icon/decision/3876149_alert_emergency_light_protection_security_icon.png";
 
@@ -11,12 +11,12 @@ import Papa from 'papaparse';
 import Box from '@mui/material/Box';
 import { Modal } from "@mui/material";
 import TextArea from "antd/es/input/TextArea";
-import { BOXSTYLE, DOWN_TRACK, DUMMY_RANGE, INSTRUMENTATIONPOINT, RAILROADSECTION, RAILTRACKALIGNMENTDUMMYDATA1, RANGEPICKERSTYLE, STRING_DOWN_TRACK2, STRING_UP_TRACK2, UP_TRACK } from "../../constant";
+import { BOXSTYLE, DOWN_TRACK, DUMMY_RANGE, INSTRUMENTATIONPOINT, RAILROADSECTION, RAILTRACKALIGNMENTDUMMYDATA1, RANGEPICKERSTYLE, STRING_DOWN_TRACK2, STRING_DOWN_TRACK_LEFT2, STRING_DOWN_TRACK_RIGHT2, STRING_UP_TRACK2, STRING_UP_TRACK_LEFT2, STRING_UP_TRACK_RIGHT2, UP_TRACK } from "../../constant";
 import { DatePicker, Input, Select } from "antd";
 import PlaceGauge from "../../component/PlaceGauge/PlaceGauge";
 import axios from 'axios';
 import qs from 'qs';
-import { findRange } from "../../util";
+import { findRange, intervalSample, roundNumber } from "../../util";
 
 
 function RailRoughness( props ) {
@@ -54,11 +54,15 @@ function RailRoughness( props ) {
       let dataList = response.data.entities;
       setGaugeData(dataList);
       for( let data of dataList ){
-        if( data.railTrack === STRING_UP_TRACK2 ){
+        if( data.railTrack === STRING_UP_TRACK2 ||
+            data.railTrack === STRING_UP_TRACK_LEFT2 ||
+            data.railTrack === STRING_UP_TRACK_RIGHT2 ){
           index = findRange(RAILROADSECTION, data.beginKp * 1000, UP_TRACK);
           dataExits_[index]++;
         }
-        if( data.railTrack === STRING_DOWN_TRACK2 ){
+        if( data.railTrack === STRING_DOWN_TRACK2 ||
+            data.railTrack === STRING_DOWN_TRACK_LEFT2 ||
+            data.railTrack === STRING_DOWN_TRACK_RIGHT2 ){
           index = findRange(RAILROADSECTION, data.beginKp * 1000, DOWN_TRACK);
           dataExits_[index]++;
         }
@@ -159,14 +163,27 @@ function RailRoughness( props ) {
                     axios.get("https://raildoctor.suredatalab.kr/"+findRects[0].dataFile, { responseType: 'text' })
                     .then(response => {
                       const csvData = response.data;
-                      const results = [];
+                      let results = [];
                       Papa.parse(csvData, {
                         header: true,  // 첫 번째 행을 헤더로 사용
                         step: (result) => {
-                          results.push(result.data);
+                          /* results.push(result.data); */
+                            // 각 데이터 항목을 반복하며 숫자 값에 대한 소수점을 제한
+                            let roundedData = {};
+                            for (const key in result.data) {
+                              let value = result.data[key];
+                              if (key === 'Roughness(mm)') {  // 값이 숫자인 경우
+                                let round = value * 1000;
+                                roundedData[key] = round;  // 소수점 두 자리까지만 반올림
+                              } else {
+                                roundedData[key] = value;
+                              }
+                            }
+                            results.push(roundedData);
                         }
                       });
                       console.log(results);
+                      /* results = intervalSample(results, 100); */
                       roughnessChartData_.push(...results);
                       setRoughnessChartData(roughnessChartData_);
                     })
@@ -179,7 +196,7 @@ function RailRoughness( props ) {
         </div>
       </div>
 
-      <div className="contentBox" style={{marginTop:"10px", height: "480px"}}>
+      <div className="contentBox" style={{marginTop:"10px", height: "calc(100% - 440px)" }}>
         <div className="containerTitle">Chart
           <div className="modalButton highlight orange" onClick={()=>{
               console.log("예측데이터 상세보기");
@@ -213,10 +230,11 @@ function RailRoughness( props ) {
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="KP(m)" />
-                <YAxis />
-                <Tooltip />
+                <YAxis tickFormatter={(tick) => (tick / 1000).toFixed(3)} />
+                <Tooltip formatter={(value) => (value / 1000).toFixed(3)} />
                 <Legend />
-                <Line type="monotone" dataKey="Roughness(mm)" stroke="#82ca9d" dot={false} />
+                <Line dataKey="Roughness(mm)" stroke="#82ca9d" dot={false} />
+                <Brush startIndex={0} endIndex={500} dataKey="KP(m)" height={30} stroke="#8884d8" />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -248,6 +266,7 @@ function RailRoughness( props ) {
                       left: 20,
                       bottom: 5,
                     }}
+                    
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="km" fontSize={12} />

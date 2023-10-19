@@ -148,4 +148,51 @@ export const convertObjectToArray = (obj, type) => {
             ...obj[key]
         };
     });
-  }
+}
+
+export const intervalSample = (array, interval) => {
+    return array.filter((_, index) => index % interval === 0);
+}
+  
+export const roundNumber = (num, decimalPlaces) => {
+    const multiplier = Math.pow(10, decimalPlaces);
+    return Math.round(num * multiplier) / multiplier;
+}
+
+export const transposeObjectToArray = (inputObj) => {
+    let output = [];
+    let keys = Object.keys(inputObj).filter(key => inputObj[key].length > 0);
+
+    const length = inputObj[keys[0]].length;
+    if (!keys.every(key => inputObj[key].length === length)) {
+        throw new Error("All arrays inside the object must have the same length.");
+    }
+
+    for (let i = 0; i < inputObj[keys[0]].length; i++) {
+        const obj = {};
+        for (const key of keys) {
+            obj[key] = inputObj[key][i];
+        }
+        output.push(obj);
+    }
+
+    return output;
+}
+
+export const getLastDateOfMonth = (month, year) => {
+    // 다음 달의 첫 날짜를 구한 후 하루를 빼면 해당 월의 마지막 날짜를 얻을 수 있습니다.
+    let date = new Date(year, month + 1, 0);
+    return date;
+}
+
+export const getFirstDateOfThreeMonthsAgo = (month, year) => {
+    // 3달 전을 계산합니다.
+    month -= 3;
+    if (month < 0) {
+        month += 12;
+        year -= 1;
+    }
+    // 계산된 3달 전의 월의 첫째 날을 반환합니다.
+    let date = new Date(year, month, 1);
+    return date;
+}

@@ -10,9 +10,11 @@
 }
 
 .trackDeviation .componentBox.chartBox{
-    display: flex;
+    /* display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column; */
+    overflow: auto;
 }
 
 .trackDeviation .componentBox .position{
