@@ -111,9 +111,39 @@ function DataExistence( props ) {
 
   return (
     <div className="boxProto datafinder" id="dataExistenceContainer">
+      <div className="dataList header">
+        <div className="line" >
+          <div className="dataName">KP</div>
+        </div>
+        <div className="line"  >
+          <div className="dataName">통과톤수</div>
+        </div>
+        <div className="line"  >
+          <div className="dataName">마모 유지관리</div>
+        </div>
+        <div className="line"  >
+          <div className="dataName">궤도틀림</div>
+        </div>
+        <div className="line"  >
+          <div className="dataName">궤도거동계측</div>
+        </div>
+        <div className="line"  >
+          <div className="dataName">온/습도 측정</div>
+        </div>
+        <div className="line"  >
+          <div className="dataName">PAUT 탐상</div>
+        </div>
+        <div className="line"  >
+          <div className="dataName">DRL</div>
+        </div>
+        <div className="line"  >
+          <div className="dataName">LWD</div>
+        </div>
+      </div>
+      <div className="scroll">
       <div className="dataList">
         <div className="line" style={{width:kptoPixel}} >
-          <div className="dataName">KP</div>
+          {/* <div className="dataName">KP</div> */}
           <div className="dataBar kp">
             {
               kpList.map( kp => {
@@ -123,7 +153,7 @@ function DataExistence( props ) {
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
-          <div className="dataName">통과톤수</div>
+          {/* <div className="dataName">통과톤수</div> */}
           <div className="dataBar">
             {props.accumulateWeights.map( (data, i) => {
               return <div key={i} className="detailBtn" style={{left:`${(data.beginKp*1000)}px`}} onClick={()=>{
@@ -159,7 +189,7 @@ function DataExistence( props ) {
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
-          <div className="dataName">마모 유지관리</div>
+          {/* <div className="dataName">마모 유지관리</div> */}
           <div className="dataBar">
             {props.railwears.map( (data, i) => {
               return <div key={i} className="detailBtn" style={{left:`${(data.kp*1000)}px`}} onClick={()=>{
@@ -201,7 +231,7 @@ function DataExistence( props ) {
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
-          <div className="dataName">궤도틀림</div>
+          {/* <div className="dataName">궤도틀림</div> */}
           <div className="dataBar">
             {props.railtwists.map( (data, i) => {
               return <div key={i} className="detailBtn" style={{left:`${(data.beginKp*1000)}px`}} onClick={()=>{
@@ -254,7 +284,7 @@ function DataExistence( props ) {
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
-          <div className="dataName">궤도거동계측</div>
+          {/* <div className="dataName">궤도거동계측</div> */}
           <div className="dataBar">
             {props.railbehaviors.map( (railbehaviorsData, i) => {
               return <div key={i} className="detailBtn" style={{left:`${0}px`}} onClick={()=>{
@@ -361,7 +391,7 @@ function DataExistence( props ) {
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
-          <div className="dataName">온/습도 측정</div>
+          {/* <div className="dataName">온/습도 측정</div> */}
           <div className="dataBar">
             {props.temperatures.map( (tempData, i) => {
               return <div key={i} className="detailBtn" style={{left:`0px`}} onClick={()=>{
@@ -427,22 +457,22 @@ function DataExistence( props ) {
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
-          <div className="dataName">PAUT 탐상</div>
+          {/* <div className="dataName">PAUT 탐상</div> */}
           <div className="dataBar">
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
-          <div className="dataName">DRL</div>
+          {/* <div className="dataName">DRL</div> */}
           <div className="dataBar">
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
-          <div className="dataName">LWD</div>
+          {/* <div className="dataName">LWD</div> */}
           <div className="dataBar">
           </div>
         </div>
       </div>
-
+      </div>
       <Modal
           open={accOpen}
           onClose={(e)=>{setAccOpen(false)}}

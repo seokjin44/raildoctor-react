@@ -227,3 +227,23 @@
     left: 75%;
     width: 50px;
 }
+
+.datafinder .dataList.header{
+    width: 135px;
+}
+
+.monitoringContainer .datafinder.header .dataList .line .dataName {
+    width: 120px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.monitoringContainer .datafinder .dataList.header .line{
+    width: 135px;
+}
+
+.datafinder .scroll{
+    overflow: auto;
+}
