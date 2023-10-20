@@ -516,12 +516,12 @@ function TrackGeometryMeasurement( props ) {
                           addData[dataKey] = (data.data) ? data.data : data.maxValue;
                           todayChartDataObj[data.ts] = {...todayChartDataObj[data.ts], ...addData};
                         }
-                        for( let data of chartData.monthly ){
+                        for( let data of chartData.daily ){
                           let addData = {}
                           addData[dataKey] = (data.data) ? data.data : data.maxValue;
                           dailyChartDataObj[data.ts] = {...dailyChartDataObj[data.ts], ...addData};
                         }
-                        for( let data of chartData.today ){
+                        for( let data of chartData.monthly ){
                           let addData = {}
                           addData[dataKey] = (data.data) ? data.data : data.maxValue;
                           monthlyChartDataObj[data.ts] = {...monthlyChartDataObj[data.ts], ...addData};

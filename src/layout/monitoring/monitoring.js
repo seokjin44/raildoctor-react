@@ -31,6 +31,12 @@ function Monitoring( props ) {
   const [viewRailMap, setViewRailMap] = useState(null);
   const [kpMarker, setKPMarker] = useState(0);
 
+  const [accumulateWeights, setAccumulateWeights] = useState([]);
+  const [railbehaviors, setRailbehaviors] = useState([]);
+  const [railtwists, setRailtwists] = useState([]);
+  const [railwears, setRailwears] = useState([]);
+  const [temperatures, setTemperatures] = useState([]);
+
   const pathClick = (select) => {
     console.log(select);
     //getInstrumentationPoint(select);
@@ -101,24 +107,27 @@ function Monitoring( props ) {
                     style={RANGEPICKERSTYLE}
                     onChange={(e)=>{
                         console.log(e);
-                        axios.get(`https://raildoctor.suredatalab.kr/api/railroads/railroadmap`,{
-                        paramsSerializer: params => {
-                          return qs.stringify(params, { format: 'RFC3986' })
-                        },
-                        params : {
-                          railroad : "인천 1호선",
-                          beginTs : e[0].$d.toISOString(),
-                          endTs : e[1].$d.toISOString(),
-                          beginKp : 0.23,
-                          endKp : 16.84
-                        }
-                      })
-                      .then(response => {
-                        console.log(response.data);
-                        /* "https://raildoctor.suredatalab.kr/resources/data/railroads/railroadmap/c1e7c0a1-e425-4793-9e91-933f003b1cb9.jpeg" */
-                        pictureList = response.data.entities;
-                      })
-                      .catch(error => console.error('Error fetching data:', error));
+                        axios.get(`https://raildoctor.suredatalab.kr/api/statistics/data`,{
+                          paramsSerializer: params => {
+                            return qs.stringify(params, { format: 'RFC3986' })
+                          },
+                          params : {
+                            railroad : "인천 1호선",
+                            /* beginTs : e[0].$d.toISOString(),
+                            endTs : e[1].$d.toISOString(),
+                            beginKp : 0.23,
+                            endKp : 16.84 */
+                          }
+                        })
+                        .then(response => {
+                          console.log(response.data);
+                          setAccumulateWeights(response.data.accumulateWeights);
+                          setRailbehaviors(response.data.railbehaviors);
+                          setRailtwists(response.data.railtwists);
+                          setRailwears(response.data.railwears);
+                          setTemperatures(response.data.temperatures);
+                        })
+                        .catch(error => console.error('Error fetching data:', error));
                     }}
                   />
                 </div>
@@ -217,7 +226,14 @@ function Monitoring( props ) {
               </div>
             </div>
             <div className="componentBox separationBox">
-              <DataExistence kp={kp}></DataExistence>
+              <DataExistence 
+                kp={kp}
+                accumulateWeights={accumulateWeights}
+                railbehaviors={railbehaviors}
+                railtwists={railtwists}
+                railwears={railwears}
+                temperatures={temperatures}
+              ></DataExistence>
             </div>
           </div>
         </div>

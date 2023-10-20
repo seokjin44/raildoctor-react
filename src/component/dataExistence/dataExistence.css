@@ -9,7 +9,7 @@
 
 .monitoringContainer .datafinder{
     position: relative;
-    height: 250px;
+    height: 360px;
     display: flex;
     justify-content: left;
     align-items: center;
@@ -43,4 +43,8 @@
 
 .monitoringContainer .datafinder .dataList .line .dataBar.kp{
     border-bottom: 2px dashed black;
+}
+
+.tabPanel{
+    padding-bottom: 50px;
 }

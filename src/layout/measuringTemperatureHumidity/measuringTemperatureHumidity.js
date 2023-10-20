@@ -4,10 +4,12 @@ import RailStatus from "../../component/railStatus/railStatus";
 import 'dayjs/locale/ko';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Checkbox, Input, Select, DatePicker } from "antd";
-import { CHART_FORMAT_DAILY, CHART_FORMAT_TODAY, RAILROADSECTION, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, TEMPDATA1, UP_TRACK } from "../../constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_TODAY, RAILROADSECTION, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, TEMPDATA1, UP_TRACK, colors } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
 import { convertObjectToArray, convertToCustomFormat, findRange, tempDataName } from "../../util";
+import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
+
 const { RangePicker } = DatePicker;
 const dataOption = [
   { label: '레일온도', value: 'RAIL_TEMPERATURE' },
@@ -18,6 +20,7 @@ const dataOption = [
 
 let sensorList = [];
 let chartDataObj = {};
+let colorIndex = 1;
 function MeasuringTemperatureHumidity( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
   const [searchRangeDate, setSearchRangeDate] = useState([{$d : new Date(), $D : new Date()}]);
@@ -27,6 +30,7 @@ function MeasuringTemperatureHumidity( props ) {
   const [chartseries, setChartseries] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [checkboxSelects, setCheckboxSelects] = useState([]);
+  const [selectPoints, setSelectPoints] = useState([]);
 
   const handleChange = (value) => {
     console.log(`selected ${value}`);
@@ -69,6 +73,10 @@ function MeasuringTemperatureHumidity( props ) {
     setSelectedPath(select);
   }
 
+  const getColor = (index) => {
+    return colors[index % 20];
+  }
+
   const searchTempData = () => {
     console.log(selectDeviceID);
     console.log(searchRangeDate[0].$d.toISOString());
@@ -99,7 +107,8 @@ function MeasuringTemperatureHumidity( props ) {
             chartDataObj[tsAry[i]] = {...chartDataObj[tsAry[i]], ...addData};
           }
           chartseries_.push({
-            sensorName : sensorName, dataKey : dataKey, item : tempDataName(STRING_RAIL_TEMPERATURE)
+            sensorName : sensorName, dataKey : dataKey, item : tempDataName(STRING_RAIL_TEMPERATURE),
+            deviceID : selectDeviceID, color : getColor(colorIndex++)
           });
         }
         if( select === STRING_TEMPERATURE ){
@@ -110,7 +119,8 @@ function MeasuringTemperatureHumidity( props ) {
             chartDataObj[tsAry[i]] = {...chartDataObj[tsAry[i]], ...addData};
           }
           chartseries_.push({
-            sensorName : sensorName, dataKey : dataKey, item : tempDataName(STRING_TEMPERATURE)
+            sensorName : sensorName, dataKey : dataKey, item : tempDataName(STRING_TEMPERATURE),
+            deviceID : selectDeviceID, color : getColor(colorIndex++)
           });
         }
         if( select === STRING_HUMIDITY ){
@@ -121,7 +131,8 @@ function MeasuringTemperatureHumidity( props ) {
             chartDataObj[tsAry[i]] = {...chartDataObj[tsAry[i]], ...addData};
           }
           chartseries_.push({
-            sensorName : sensorName, dataKey : dataKey, item : tempDataName(STRING_HUMIDITY)
+            sensorName : sensorName, dataKey : dataKey, item : tempDataName(STRING_HUMIDITY),
+            deviceID : selectDeviceID, color : getColor(colorIndex++)
           });
         }
       }
@@ -283,7 +294,24 @@ function MeasuringTemperatureHumidity( props ) {
         </div> */}
 
         <div className="contentBox" style={{marginTop:"10px", height: "calc(100% - 250px)"}}>
-          <div className="containerTitle">Chart</div>
+          <div className="containerTitle">Chart
+            <div className="selectPoints">
+              {
+                chartseries.map( (point, i) => {
+                  return <div key={i} className="point">
+                    {`${point.sensorName} - ${point.item}`}
+                    <img src={CloseIcon} alt="제거" 
+                      onClick={()=>{
+                        let chartseries_ = [...chartseries];
+                        chartseries_ = chartseries_.filter(series => !(series.deviceID === point.deviceID && series.item === point.item));
+                        setChartseries(chartseries_);
+                      }}
+                    />
+                  </div>
+                })
+              }
+            </div>          
+          </div>
           <div className="componentBox chartBox flex">
             {/* <Chart type='bar' data={data} /> */}
             <ResponsiveContainer width="100%" height="100%">
@@ -306,7 +334,10 @@ function MeasuringTemperatureHumidity( props ) {
                 {/* <Line dataKey="temp" stroke="#FF0000" dot={false} /> */}
                 {
                   chartseries.map( (series, i) => {
-                    return <Line key={i} dataKey={series.dataKey} name={`${series.sensorName}_${series.item}`} stroke="#FF0000" dot={false} />;
+                    console.log(series.colorCode);
+                    return <Line key={i} 
+                      dataKey={series.dataKey} name={`${series.sensorName}_${series.item}`} 
+                      stroke={series.color} dot={false} />;
                   })
                 }
               </LineChart>

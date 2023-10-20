@@ -1,4 +1,4 @@
-import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_HD_KEY, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
 
 export const dateFormat = ( date ) => {
     const yyyy = date.getFullYear();
@@ -40,7 +40,7 @@ export const formatYearMonth = (date) => {
 //1000단위 KP를 1K000 으로 바꺼줌
 export const convertToCustomFormat = (num) => {
     num = Math.floor(num);
-    if (typeof num !== 'number' || num < 1000) {
+    if (typeof num !== 'number' ) {
         return 'Input should be a number greater than or equal to 1000';
     }
 
@@ -195,4 +195,17 @@ export const getFirstDateOfThreeMonthsAgo = (month, year) => {
     // 계산된 3달 전의 월의 첫째 날을 반환합니다.
     let date = new Date(year, month, 1);
     return date;
+}
+
+export const trackToString = ( track ) => {
+    if( track === STRING_UP_TRACK ||
+     track === STRING_UP_TRACK_LEFT ||
+     track === STRING_UP_TRACK_RIGHT ){
+        return "상선";
+    }else if( track === STRING_DOWN_TRACK ||
+        track === STRING_DOWN_TRACK_LEFT ||
+        track === STRING_DOWN_TRACK_RIGHT ){
+        return "하선";
+    }
+    return "";
 }

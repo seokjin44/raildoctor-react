@@ -168,3 +168,31 @@
 .measuringTemperatureHumidity .railStatusContainer{
     width: calc(100% - 1px);
 }
+
+
+.measuringTemperatureHumidity .selectPoints{
+    right: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+}
+
+.measuringTemperatureHumidity .selectPoints .point{
+    font-size: 11px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    background: white;
+    padding: 4px;
+    padding-left: 9px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.measuringTemperatureHumidity .selectPoints .point img{
+    width: 12px;
+    height: 11px;
+    margin-left: 5px;
+    cursor: pointer;
+}

@@ -431,10 +431,6 @@
     margin-right: 10px;
 }
 
-.tabPanel{
-    padding-bottom: 20px;
-}
-
 .throughput .componentBox {
     padding: 10px;
     width: calc(100% - 20px);

@@ -8,6 +8,7 @@ import { RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRI
 import classNames from "classnames";
 import axios from 'axios';
 import qs from 'qs';
+import { formatDateTime } from "../../util";
 
 let imgTotalWidth = 0;
 const IMGSCALING = 0.2;
@@ -27,6 +28,11 @@ function CumulativeThroughput( props ) {
   const [selectDate, setSelectDate] = useState(new Date());
   const [selectTrack, setSelectTrack] = useState(STRING_UP_TRACK);
   const [selectDir, setSelectDir] = useState(STRING_TRACK_DIR_LEFT);
+  const [accumulateweightData, setAccumulateweightData] = useState({});
+
+  const [remainingCriteria, setRemainingCriteria] = useState(0);
+  const [leftRemaining, setLeftRemaining] = useState({});
+  const [rightRemaining, setRightRemaining] = useState({});
 
   const loadImg = async (url) => {
     return new Promise((resolve, reject)=>{
@@ -223,11 +229,12 @@ function CumulativeThroughput( props ) {
                         railroad_name : "인천 1호선",
                         measure_ts : selectDate.toISOString(),
                         rail_track : track_,
-                        begin_kp: (e.target.value / 1000),
-                        end_kp : (e.target.value / 1000) + 0.99
+                        kp : (e.target.value / 1000)
+                        /* begin_kp: (e.target.value / 1000),
+                        end_kp : (e.target.value / 1000) + 0.99 */
                       }
                       console.log(param);
-                      axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remainings`,{
+                      axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remaining`,{
                         paramsSerializer: params => {
                           return qs.stringify(params, { format: 'RFC3986' })
                         },
@@ -235,6 +242,9 @@ function CumulativeThroughput( props ) {
                       })
                       .then(response => {
                         console.log(response.data);
+                        setRemainingCriteria(response.data.criteria);
+                        setLeftRemaining(response.data.leftRemaining);
+                        setRightRemaining(response.data.rightRemaining);
                       })
                       .catch(error => console.error('Error fetching data:', error));
                     }}}
@@ -360,11 +370,11 @@ function CumulativeThroughput( props ) {
                     <div className="td">552</div>
                     <div className="td">2007-03-16</div>
                     <div className="td">2021-12-31</div> */}
-                    <div className="td">-</div>
-                    <div className="td">280,562,738</div>
+                    <div className="td">{remainingCriteria}</div>
+                    <div className="td">{rightRemaining.accumulateweight}</div>
                     {/* <div className="td">41,915</div> */}
-                    <div className="td">-</div>
-                    <div className="td">2042-11-12</div>
+                    <div className="td">{rightRemaining.remainingWeight}</div>
+                    <div className="td">{formatDateTime(new Date(rightRemaining.nextTimeToReplace))}</div>
                   </div>
                 </div>
               </div>
@@ -394,11 +404,11 @@ function CumulativeThroughput( props ) {
                     <div className="td">552</div>
                     <div className="td">2007-03-16</div>
                     <div className="td">2021-12-31</div> */}
-                    <div className="td">-</div>
-                    <div className="td">280,562,738</div>
+                    <div className="td">{remainingCriteria}</div>
+                    <div className="td">{leftRemaining.accumulateweight}</div>
                     {/* <div className="td">41,915</div> */}
-                    <div className="td">-</div>
-                    <div className="td">2042-11-12</div>
+                    <div className="td">{leftRemaining.remainingWeight}</div>
+                    <div className="td">{formatDateTime(new Date(leftRemaining.nextTimeToReplace))}</div>
                   </div>
                 </div>
               </div>
