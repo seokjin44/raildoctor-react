@@ -37,11 +37,11 @@ class WearInfo extends React.Component {
                     }
                 },
                 markers: {
-                    size: [4, 4, 4, 4,5,5,5,5],
-                    shape: ["circle", "circle", "circle", "circle","circle", "circle", "circle", "circle"],
-                    colors: ["#22B14C", "#0000ff", "#ffffff", "#ff0000","#FF7F27", "#A349A4", "#FF7F27", "#A349A4"],
-                    strokeColor: ["#22B14C", "#ffffff", "#ff0000", "#ffffff","#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-                    strokeWidth: [2, 0, 2, 0, 2, 0, 2, 0],
+                    size: [4, 4, 4, 4, 5, 5, 5, 5],
+                    shape: ["circle", "circle", "circle", "circle", "circle", "circle", "circle", "circle"],
+                         colors: ["#22B14C", "#0000ff", "#FFF200", "#ff0000","#FF7F27", "#A349A4", "#00A2E8", "#A349A4"],
+                    strokeColor: ["#22B14C", "#0000ff", "#FFF200", "#ff0000","#FF7F27", "#A349A4", "#00A2E8", "#A349A4"],
+                    strokeWidth: [2, 2, 2, 2, 2, 2, 2, 2],
                 },
 
                 //colors: ['#0000FF', '#0000FF', '#FF0000', '#FF0000'],
@@ -62,11 +62,11 @@ class WearInfo extends React.Component {
                 },
                 legend: {
                     markers: {
-                        width: [5, 9, 5, 9],
-                        height: [5, 9, 5, 9],
+                        width: [4, 4, 4, 4, 5, 5, 5, 5],
+                        height: [4, 4, 4, 4, 5, 5, 5, 5],
                         strokeWidth: 0.5,
-                        strokeColor: ["#22B14C", "#ffffff", "#FFF200", "#ffffff"],
-                        fillColors: ["#22B14C", "#0000ff", "#FFF200", "#ff0000"],
+                         fillColors: ["#22B14C", "#0000ff", "#FFF200", "#ff0000","#FF7F27", "#A349A4", "#00A2E8", "#A349A4"],
+                        strokeColor: ["#22B14C", "#0000ff", "#FFF200", "#ff0000","#FF7F27", "#A349A4", "#00A2E8", "#A349A4"],
                         //radius: 2,
                         customHTML: undefined,
                         onClick: undefined,
@@ -112,6 +112,22 @@ class WearInfo extends React.Component {
                 data: []
             }, {
                 name: "상선 우레일",
+                data: []
+            },
+            {//4
+                name: "하선 좌레일 예측데이터",
+                data: []
+            }, 
+            {//5
+                name: "상선 좌레일 예측데이터",
+                data: []
+            }, 
+            {//6
+                name: "하선 우레일 예측데이터",
+                data: []
+            }, 
+            {//7
+                name: "상선 우레일 예측데이터",
                 data: []
             }
            ]
@@ -192,17 +208,26 @@ class WearInfo extends React.Component {
 
             if( data.railTrack === STRING_UP_TRACK && data.railSide === STRING_TRACK_SIDE_LEFT ){
                 series[1].data.push([data.accumulateWeight, data.wear]);
+                series[5].data.push([data.accumulateWeight, data.prediction]);
             }else if( data.railTrack === STRING_UP_TRACK && data.railSide === STRING_TRACK_SIDE_RIGHT ){
                 series[3].data.push([data.accumulateWeight, data.wear]);
+                series[7].data.push([data.accumulateWeight, data.prediction]);
             }else if( data.railTrack === STRING_DOWN_TRACK && data.railSide === STRING_TRACK_SIDE_LEFT ){
                 series[0].data.push([data.accumulateWeight, data.wear]);
+                series[4].data.push([data.accumulateWeight, data.prediction]);
             }else if( data.railTrack === STRING_DOWN_TRACK && data.railSide === STRING_TRACK_SIDE_RIGHT ){
                 series[2].data.push([data.accumulateWeight, data.wear]);
+                series[6].data.push([data.accumulateWeight, data.prediction]);
             }else{
                 series[1].data.push([data.accumulateWeight, data.wear]);
                 series[3].data.push([data.accumulateWeight, data.wear]);
                 series[0].data.push([data.accumulateWeight, data.wear]);
                 series[2].data.push([data.accumulateWeight, data.wear]);
+
+                series[4].data.push([data.accumulateWeight, data.prediction]);
+                series[5].data.push([data.accumulateWeight, data.prediction]);
+                series[6].data.push([data.accumulateWeight, data.prediction]);
+                series[7].data.push([data.accumulateWeight, data.prediction]);
             }
         }
 

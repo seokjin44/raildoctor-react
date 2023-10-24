@@ -37,8 +37,7 @@ function TrackGeometryMeasurement( props ) {
     end_station_up_track_location : 0,
     end_station_down_track_location : 0,
   });
-  /* const [dataExits, setDataExits] = useState([]); */
-
+  const [dataExits, setDataExits] = useState([]);
   const [upLeftTrackPoint, setUpLeftTrackPoint] = useState([]); //상선좌포인트
   const [upRightTrackPoint, setUpRightTrackPoint] = useState([]); //상선우포인트
   const [downLeftTrackPoint, setDownLeftTrackPoint] = useState([]); //하선좌포인트
@@ -79,8 +78,8 @@ function TrackGeometryMeasurement( props ) {
     let param = {
       params : {
         railroad : "인천 1호선",
-        begin : /* "계양" */select.start_station_name,
-        end : /* "송도달빛축제공원" */select.end_station_name
+        begin : select.start_station_name,
+        end : select.end_station_name
       },
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
@@ -309,101 +308,6 @@ function TrackGeometryMeasurement( props ) {
     setFindDatas(e.target.value);
   }
 
-  const findPoints = (date) => {
-    date[0].$d.setHours(0, 0, 0, 0);
-    date[1].$d.setHours(23, 59, 59, 0);
-    let param = {
-      params : {
-        railroad : "인천 1호선",
-        begin : "계양",
-        end : "송도달빛축제공원",
-        beginTs : date[0].$d.toISOString(),
-        endTs : date[1].$d.toISOString()
-      },
-      paramsSerializer: params => {
-        return qs.stringify(params, { format: 'RFC3986' })
-      }
-    }
-    console.log(param);
-    axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/locations', param )
-    .then(response => {
-      let dataArr = [];
-      RAILROADSECTION.forEach( data => {
-        dataArr.push(0);
-      })
-
-      let measureSets = response.data.measureSets;
-      let dataExits_ = [...dataArr];
-
-      let upLeftTrackPoint_ = [...upLeftTrackPoint];
-      let upRightTrackPoint_ = [...upRightTrackPoint];
-      let downLeftTrackPoint_ = [...downLeftTrackPoint];
-      let downRightTrackPoint_ = [...downRightTrackPoint];
-
-      let shortMeasureList_ = [...shortMeasureList];
-      let longMeasureList_ = [...longMeasureList];
-
-      for( let measureSet of measureSets ){
-
-        if( measureSet.measureType === STRING_SHORT_MEASURE ){
-          shortMeasureList_.push(measureSet);
-        }else if( measureSet.measureType === STRING_LONG_MEASURE ){
-          longMeasureList_.push(measureSet);
-        }
-
-        /*
-        !sensor Obj!
-        accMax : "string"
-        accMin : "string"
-        displayName : "Point 1"
-        hd : "string"
-        kp : 0
-        lf : "string"
-        measureSetId : "0825960e-0755-4e17-99b8-6f78651c35f4"
-        railTrack : "T1R"
-        sensorId : "9397149e-ba93-4573-b08f-18a417e2c172"
-        speed : "string"
-        stress : "string"
-        stressMin : "string"
-        vd : "string"
-        wlMax : "string"
-        */
-        console.log(measureSet.sensors);
-        for( let sensor of measureSet.sensors ){
-          let index = -1;
-          if( sensor.railTrack === STRING_UP_TRACK ||
-            sensor.railTrack === STRING_UP_TRACK_LEFT ||
-            sensor.railTrack === STRING_UP_TRACK_RIGHT ){
-            index = findRange(RAILROADSECTION, sensor.kp * 1000, UP_TRACK);
-          }else{
-            index = findRange(RAILROADSECTION, sensor.kp * 1000, DOWN_TRACK);
-          }
-  
-          if( sensor.railTrack === STRING_UP_TRACK_LEFT ){
-            upLeftTrackPoint_.push(sensor);
-          }else if( sensor.railTrack === STRING_UP_TRACK_RIGHT ){
-            upRightTrackPoint_.push(sensor);
-          }else if( sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
-            downLeftTrackPoint_.push(sensor);
-          }else if( sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
-            downRightTrackPoint_.push(sensor);
-          }
-  
-          dataExits_[index]++;
-        }
-      }
-      /* setDataExits(dataExits_); */
-      setUpLeftTrackPoint(upLeftTrackPoint_); 
-      setUpRightTrackPoint(upRightTrackPoint_); 
-      setDownLeftTrackPoint(downLeftTrackPoint_); 
-      setDownRightTrackPoint(downRightTrackPoint_); 
-      setShortMeasureList(shortMeasureList_);
-      setLongMeasureList(longMeasureList_);
-      setSearchRangeDate(date);
-    })
-    .catch(error => console.error('Error fetching data:', error));
-  };
-
   const handleCalendarChange = (date) => {
     let yyyymmdd = dateFormat(date.$d);
     setSelectMeasureDate(yyyymmdd);
@@ -434,7 +338,60 @@ function TrackGeometryMeasurement( props ) {
   ];
 
   useEffect(() => {
+    let param = {
+      params : {
+        railroad : "인천 1호선",
+      },
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      }
+    }
+    axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/locations', param )
+    .then(response => {
+      let dataArr = [];
+      RAILROADSECTION.forEach( data => {
+        dataArr.push(0);
+      })
 
+      let measureSets = response.data.measureSets;
+      let dataExits_ = [...dataArr];
+
+      for( let measureSet of measureSets ){
+
+        /*
+        !sensor Obj!
+        accMax : "string"
+        accMin : "string"
+        displayName : "Point 1"
+        hd : "string"
+        kp : 0
+        lf : "string"
+        measureSetId : "0825960e-0755-4e17-99b8-6f78651c35f4"
+        railTrack : "T1R"
+        sensorId : "9397149e-ba93-4573-b08f-18a417e2c172"
+        speed : "string"
+        stress : "string"
+        stressMin : "string"
+        vd : "string"
+        wlMax : "string"
+        */
+        console.log(measureSet.sensors);
+        for( let sensor of measureSet.sensors ){
+          let index = -1;
+          if( sensor.railTrack === STRING_UP_TRACK ||
+            sensor.railTrack === STRING_UP_TRACK_LEFT ||
+            sensor.railTrack === STRING_UP_TRACK_RIGHT ){
+            index = findRange(RAILROADSECTION, sensor.kp * 1000, UP_TRACK);
+          }else{
+            index = findRange(RAILROADSECTION, sensor.kp * 1000, DOWN_TRACK);
+          }
+  
+          dataExits_[index]++;
+        }
+      }
+      setDataExits(dataExits_);
+    })
+    .catch(error => console.error('Error fetching data:', error));
   }, []);
   
   useEffect( ()=>{
@@ -453,7 +410,7 @@ function TrackGeometryMeasurement( props ) {
         <RailStatus 
           railroadSection={RAILROADSECTION} 
           pathClick={pathClick}
-          /* dataExits={dataExits} */
+          dataExits={dataExits}
         ></RailStatus>
       </div>
       <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px", marginBottom:"10px"}}>

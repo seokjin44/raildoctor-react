@@ -5,17 +5,17 @@ export const ROUTE_KTX_EXPRESS = 4;
 
 export const UP_TRACK = 1;
 export const DOWN_TRACK = 2;
-export const STRING_UP_TRACK = "T1";
+export const STRING_UP_TRACK = "T2";
 export const STRING_UP_TRACK2 = "12";
-export const STRING_UP_TRACK_LEFT = "T1L";
+export const STRING_UP_TRACK_LEFT = "T2L";
 export const STRING_UP_TRACK_LEFT2 = "4";
-export const STRING_UP_TRACK_RIGHT = "T1R";
+export const STRING_UP_TRACK_RIGHT = "T2R";
 export const STRING_UP_TRACK_RIGHT2 = "8";
-export const STRING_DOWN_TRACK = "T2";
+export const STRING_DOWN_TRACK = "T1";
 export const STRING_DOWN_TRACK2 = "3";
-export const STRING_DOWN_TRACK_LEFT = "T2L";
+export const STRING_DOWN_TRACK_LEFT = "T1L";
 export const STRING_DOWN_TRACK_LEFT2 = "1";
-export const STRING_DOWN_TRACK_RIGHT = "T2R";
+export const STRING_DOWN_TRACK_RIGHT = "T1R";
 export const STRING_DOWN_TRACK_RIGHT2 = "2";
 
 export const STRING_TRACK_DIR_LEFT = "LEFT";
