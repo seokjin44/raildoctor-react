@@ -31,6 +31,11 @@
     border: 2px solid black;
     border-radius: 20px;
     position: absolute;
+    cursor: pointer;
+}
+
+.railStatusBox .pointer.selectedPath{
+    background-color: rgb(255, 217, 0);
 }
 
 .railStatusBox .path{
@@ -39,6 +44,17 @@
 }
 
 .railStatusBox .path.exist div {
+    position: absolute;
+    top: 14px;
+    right: 0;
+    bottom: 0;
+    left: 3px;
+    height: 7px;
+    pointer-events: none;
+    font-size: 7px;
+}
+
+.railStatusBox .pointer.exist div.cnt {
     position: absolute;
     top: 14px;
     right: 0;

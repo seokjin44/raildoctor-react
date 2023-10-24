@@ -177,7 +177,7 @@
     left: 295px;
     top: 0px;
     border-radius: 5px;
-    cursor: e-resize;
+    /* cursor: e-resize; */
 }
 
 .cumulativeThroughput .componentBox .guideLine .dataContainer{

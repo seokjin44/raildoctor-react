@@ -2,33 +2,20 @@ import "./sidemenu.css";
 import { useEffect, useState } from "react";
 import RaildoctorLogo from "../../assets/logo_color.png";
 import UserIcon from "../../assets/icon/403024_avatar_boy_male_user_young_icon.png";
-import ICTR from "../../assets/logo/ictr.jpg"
-import SEOUL from "../../assets/logo/seoulmetro2.png"
-
-import K_N from "../../assets/logo/k_n_railway.png"
-import K_R from "../../assets/logo/k_r_r_institute.png"
-import KORAIL from "../../assets/logo/korail.png"
-
+import ICTR from "../../assets/logo/ictr.jpg";
+import SEOUL from "../../assets/logo/seoulmetro2.png";
+import K_N from "../../assets/logo/k_n_railway.png";
+import KORAIL from "../../assets/logo/korail.png";
 import Arrow from "../../assets/icon/211689_right_arrow_icon.png";
-import classnames from "classnames"
+import classnames from "classnames";
 import { useLocation, useNavigate } from "react-router-dom";
-import MonitoringIcon from "../../assets/icon/menu/4900850_analytics_chart_marketing_monitoring_search_icon.png";
-import CumulativeThroughputIcon from "../../assets/icon/menu/9044314_drill_through_icon.png";
-import WearMaintenanceIcon from "../../assets/icon/menu/8156570_equipment_maintenance_screwdriver_tools_wrench_icon.png";
-import TrackDeviationIcon from "../../assets/icon/menu/2638283_arrows_dirrection_intersection_road_sign_icon.png";
-import TrackGeometryMeasurementIcon from "../../assets/icon/menu/7291533_compass_geometry_drawing_school_office_icon.png";
-import MeasuringTemperatureHumidityIcon from "../../assets/icon/menu/7276575_temperature_thermometer_weather_icon.png";
-import RailProfileIcon from "../../assets/icon/menu/103285_rail_aboveground_icon.png";
-import RailRoughnessIcon from "../../assets/icon/menu/134168_transportation_train_rail_icon.png";
-import RailTrackAlignmentIcon from "../../assets/icon/menu/8665879_stairs_staircase_icon.png";
-import DataIcon from "../../assets/icon/menu/2203509_cloud_data_online_storage_icon.png";
+import { STRING_ROUTE_GYEONGBU, STRING_ROUTE_INCHON, STRING_ROUTE_OSONG, STRING_ROUTE_SEOUL } from "../../constant";
 
 function Sidemenu( props ) {
   const location = useLocation();
   const navigate = useNavigate();
   const [selectRoute, setSelectRoute] = useState(0);
   console.log(location);
-
   const [routeSelectOpen, setRouteSelectOpen] = useState(false);
 
   const dateFormat = ( date ) => {
@@ -36,7 +23,15 @@ function Sidemenu( props ) {
   }
   
   useEffect( ()=> {
-  }, [location])
+    let value = sessionStorage.getItem('route');
+    console.log(value);
+    if( !value || value === null || value === undefined ){
+      sessionStorage.setItem('route', STRING_ROUTE_INCHON);
+      setSelectRoute(STRING_ROUTE_INCHON);
+    }else{
+      setSelectRoute(value);
+    }
+  }, [])
 
   return (
     <div className="sideMenu">
@@ -50,20 +45,42 @@ function Sidemenu( props ) {
         <div className="userName">{/* {(location.state?.id) ? location.state.id : "로그인해주세요"} */}Admin</div>
         <div className="lastLogin">{/* {(location.state?.id) ? dateFormat(new Date()) : ""} */}{dateFormat(new Date())}</div>
         <div className="route" onClick={()=>{setRouteSelectOpen(!routeSelectOpen)}}>
-          <img className="routeLogo" src={ICTR} />인천 1호선<img className="rightArrow" src={Arrow} />
+          {
+            (selectRoute === STRING_ROUTE_INCHON) ? <><img alt="ICTR" className="routeLogo" src={ICTR} />인천 1호선<img alt="RIGHT" className="rightArrow" src={Arrow} /></> :
+            (selectRoute === STRING_ROUTE_SEOUL) ? <><img alt="SEOUL" className="routeLogo" src={SEOUL} />서울 2호선<img alt="RIGHT" className="rightArrow" src={Arrow} /></> :
+            (selectRoute === STRING_ROUTE_OSONG) ? <><img alt="K_N" className="routeLogo" src={K_N} />오송시험선<img alt="RIGHT" className="rightArrow" src={Arrow} /></> :
+            (selectRoute === STRING_ROUTE_GYEONGBU) ? <><img alt="KORAIL" className="routeLogo" src={KORAIL} />KTX 경부고속선<img alt="RIGHT" className="rightArrow" src={Arrow} /></> : null
+          }
+          
         </div>
         {(routeSelectOpen) ? <div className="routeSelect">
-          <div className="route">
-            <img className="routeLogo" src={ICTR} />인천 1호선
+          <div className="route" onClick={()=>{
+            setSelectRoute(STRING_ROUTE_INCHON);
+            sessionStorage.setItem('route', STRING_ROUTE_INCHON);
+            window.location.reload();
+          }} >
+            <img alt="ICTR" className="routeLogo" src={ICTR} />인천 1호선
           </div>
-          <div className="route">
-            <img className="routeLogo" src={SEOUL} />서울 2호선
+          <div className="route" onClick={()=>{
+            setSelectRoute(STRING_ROUTE_SEOUL)
+            sessionStorage.setItem('route', STRING_ROUTE_SEOUL);
+            window.location.reload();
+          }}>
+            <img alt="SEOUL" className="routeLogo" src={SEOUL} />서울 2호선
           </div>
-          <div className="route">
-            <img className="routeLogo" src={K_N} /> {/* <img className="routeLogo" src={K_R} /> */}오송시험선
+          <div className="route" onClick={()=>{
+            setSelectRoute(STRING_ROUTE_OSONG)
+            sessionStorage.setItem('route', STRING_ROUTE_OSONG);
+            window.location.reload();
+          }}>
+            <img alt="K_N" className="routeLogo" src={K_N}/> {/* <img className="routeLogo" src={K_R} /> */}오송시험선
           </div>
-          <div className="route">
-            <img className="routeLogo" src={KORAIL} />KTX 경부고속선
+          <div className="route" onClick={()=>{
+            setSelectRoute(STRING_ROUTE_GYEONGBU);
+            sessionStorage.setItem('route', STRING_ROUTE_GYEONGBU);
+            window.location.reload();
+          }}>
+            <img alt="KORAIL" className="routeLogo" src={KORAIL} />KTX 경부고속선
           </div>
         </div> : null}
       </div>

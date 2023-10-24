@@ -256,17 +256,18 @@ class PlacePosition extends React.Component {
 		let context = this.state.ctx;
 		context.save();
 
-		let upTrackLength = this.props.path.end_station_up_track_location - this.props.path.start_station_up_track_location;
-		let downTrackLength = this.props.path.end_station_down_track_location - this.props.path.start_station_down_track_location;
+		let trackBeginKP = this.props.path.beginKp;
+		let trackEndKP = this.props.path.endKp;
+		let trackLength = trackEndKP - trackBeginKP;
 
 		//상선 좌
 		for(let trackPoint of this.props.upLeftTrackPoint ) {
 			let location = trackPoint.kp * 1000;
-			if( !(location >= this.props.path.start_station_up_track_location && location <= this.props.path.end_station_up_track_location) ){
+			if( !(location >= trackBeginKP && location <= trackEndKP) ){
 				continue;
 			}
 			let point = {
-				x: (location - this.props.path.start_station_up_track_location) / upTrackLength * 100,
+				x: (location - trackBeginKP) / trackLength * 100,
 				trackType: 1,
 				name: this.naming(location)
 			}
@@ -299,11 +300,11 @@ class PlacePosition extends React.Component {
 		//상선 우
 		for(let trackPoint of this.props.upRightTrackPoint ) {
 			let location = trackPoint.kp * 1000;
-			if( !(location >= this.props.path.start_station_up_track_location && location <= this.props.path.end_station_up_track_location) ){
+			if( !(location >= trackBeginKP && location <= trackEndKP) ){
 				continue;
 			}
 			let point = {
-				x: (location - this.props.path.start_station_up_track_location) / upTrackLength * 100,
+				x: (location - trackBeginKP) / trackLength * 100,
 				trackType: 1,
 				name: this.naming(location)
 			}
@@ -336,11 +337,11 @@ class PlacePosition extends React.Component {
 		//하선 좌
 		for(let trackPoint of this.props.downLeftTrackPoint ) {
 			let location = trackPoint.kp * 1000;
-			if( !(location >= this.props.path.start_station_down_track_location && location <= this.props.path.end_station_down_track_location) ){
+			if( !(location >= trackBeginKP && location <= trackEndKP) ){
 				continue;
 			}
 			let point = {
-				x: (location - this.props.path.start_station_down_track_location) / downTrackLength * 100,
+				x: (location - trackBeginKP) / trackLength * 100,
 				trackType: 1,
 				name: this.naming(location)
 			}
@@ -373,11 +374,11 @@ class PlacePosition extends React.Component {
 		//하선 우
 		for(let trackPoint of this.props.downRightTrackPoint ) {
 			let location = trackPoint.kp * 1000;
-			if( !(location >= this.props.path.start_station_down_track_location && location <= this.props.path.end_station_down_track_location) ){
+			if( !(location >= trackBeginKP && location <= trackEndKP) ){
 				continue;
 			}
 			let point = {
-				x: (location - this.props.path.start_station_down_track_location) / downTrackLength * 100,
+				x: (location - trackBeginKP) / trackLength * 100,
 				trackType: 1,
 				name: this.naming(location)
 			}
@@ -417,22 +418,22 @@ class PlacePosition extends React.Component {
 		let context = this.state.ctx;
 		context.save();
 
-		let upTrackLength = this.props.path.end_station_up_track_location - this.props.path.start_station_up_track_location;
-		let downTrackLength = this.props.path.end_station_down_track_location - this.props.path.start_station_down_track_location;
+		let trackBeginKP = this.props.path.beginKp;
+		let trackEndKP = this.props.path.endKp;
+		let trackLength = trackEndKP - trackBeginKP;
 
 		let x = 0, y = 0;
 		let data = this.props.instrumentationPoint;
 
-		for (let n = 0; n < data.length; n++) {
-			let point = data[n];
+		for (let point of data ) {
 			//상선
-			if (point.track_type == 1) {
-				x = ((point.location - this.props.path.start_station_up_track_location) / upTrackLength) * 100;
+			if (point.track_type === 1) {
+				x = ((point.location - trackBeginKP) / trackLength) * 100;
 				y = this.state.canvas.height / 2 - this.state.padding;
 			}
 			//하선
-			else if (point.track_type == 0) {
-				x = ((point.location - this.props.path.start_station_down_track_location) / downTrackLength) * 100;
+			else if (point.track_type === 0) {
+				x = ((point.location - trackBeginKP) / trackLength) * 100;
 				y = this.state.canvas.height / 2 + this.state.padding;
 			}
 

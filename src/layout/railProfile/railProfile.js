@@ -25,7 +25,7 @@ import faker from 'faker';
 import { DOWN_TRACK, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_UP_TRACK, UP_TRACK } from "../../constant";
 import { Input, DatePicker, Radio, Select } from "antd";
 import ImgSlider from "../../component/imgSlider/imgSlider";
-import { convertToCustomFormat, dateFormat, findRange } from "../../util";
+import { convertToCustomFormat, dateFormat, findRange, getRailroadSection } from "../../util";
 const { RangePicker } = DatePicker;
 
 ChartJS.register(
@@ -64,14 +64,13 @@ function RailProfile( props ) {
   const [sliderMin, setSliderMin] = useState(new Date()); 
   const [sliderMax, setSliderMax] = useState(new Date());
   const [marks, setMarks] = useState([]);
+  const [railroadSection, setRailroadSection] = useState([]);
 
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
-    let startKP = (select.start_station_up_track_location > select.start_station_down_track_location)? 
-    select.start_station_down_track_location : select.start_station_up_track_location;
-    let endKP = (select.end_station_up_track_location > select.end_station_down_track_location)? 
-    select.end_station_up_track_location : select.end_station_down_track_location;
+    let startKP = select.beginKp;
+    let endKP = select.endKp;
     let kpOptions_ = [];
     if( selectTrack === STRING_UP_TRACK ){
       for( let kp of dataExistKPs.t1 ){
@@ -111,37 +110,7 @@ function RailProfile( props ) {
   }
 
   useEffect(() => {
-    axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/locations`,{
-      paramsSerializer: params => {
-        return qs.stringify(params, { format: 'RFC3986' })
-      },
-      params : {
-        railroad : "인천 1호선",
-        begin : "계양",
-        end : "송도달빛축제공원",
-      }
-    })
-    .then(response => {
-      console.log(response.data);
-      dataExistKPs = response.data;
-      let dataArr = [];
-      let index = -1;
-      RAILROADSECTION.forEach( data => {
-        dataArr.push(0);
-      })
-      let dataExits_ = [...dataArr];
-      console.log(response.data);
-      for( let kp of response.data.t1 ){
-        index = findRange(RAILROADSECTION, kp * 1000, UP_TRACK);
-        dataExits_[index]++;
-      }
-      for( let kp of response.data.t2 ){
-        index = findRange(RAILROADSECTION, kp * 1000, DOWN_TRACK);
-        dataExits_[index]++;
-      }
-      setDataExits(dataExits_);
-    })
-    .catch(error => console.error('Error fetching data:', error));
+    getRailroadSection(setRailroadSection);
   }, []);
 
   const upTrackHandleChange = (val) => {
@@ -204,13 +173,52 @@ function RailProfile( props ) {
     return <div className="profileImg" >
       이미지가 준비되지않은 범위입니다.
     </div>;
-  } 
+  }
+
+  useEffect( () => {
+    if( railroadSection.length < 2 ){
+      return;
+    }
+    console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
+    let route = sessionStorage.getItem('route');
+    axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/locations`,{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroad : route,
+        begin : railroadSection[0].displayName,
+        end : railroadSection[railroadSection.length-1].displayName
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      dataExistKPs = response.data;
+      let dataArr = [];
+      let index = -1;
+      railroadSection.forEach( data => {
+        dataArr.push(0);
+      })
+      let dataExits_ = [...dataArr];
+      console.log(response.data);
+      for( let kp of response.data.t1 ){
+        index = findRange(railroadSection, kp * 1000);
+        dataExits_[index]++;
+      }
+      for( let kp of response.data.t2 ){
+        index = findRange(railroadSection, kp * 1000);
+        dataExits_[index]++;
+      }
+      setDataExits(dataExits_);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+  }, [railroadSection]);
     
   return (
     <div className="trackDeviation railProfile" >
       <div className="railStatusContainer">
         <RailStatus 
-          railroadSection={RAILROADSECTION} 
+          railroadSection={railroadSection} 
           pathClick={pathClick}
           dataExits={dataExits}
         ></RailStatus>
@@ -265,12 +273,13 @@ function RailProfile( props ) {
               </div> */}
               <div className="dataOption">
                 <button onClick={()=>{
+                  let route = sessionStorage.getItem('route');
                   axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles`,{
                     paramsSerializer: params => {
                       return qs.stringify(params, { format: 'RFC3986' })
                     },
                     params : {
-                      railroad : "인천 1호선",
+                      railroad : route,
                       measure_kp : selectKP,
                       /* rail_track : selectTrack */
                     }

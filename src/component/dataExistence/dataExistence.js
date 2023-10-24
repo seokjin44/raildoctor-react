@@ -29,6 +29,11 @@ function DataExistence( props ) {
   const [railtwistOpen, setRailtwistOpen] = useState(false);
   const [railwearOpen, setRailwearOpen] = useState(false);
   const [temperatureOpen, setTemperatureOpen] = useState(false);
+  const [pautOpen, setPautOpen] = useState(false);
+
+  //paut
+  const [pautData, setPautData] = useState({});
+  const [pautImgIndex, setPautImgIndex] = useState(0);
 
   const [tabValue, setTabValue] = useState('1');
   const [kptoPixel, setKPtoPixel] = useState(3000);
@@ -158,13 +163,13 @@ function DataExistence( props ) {
             {props.accumulateWeights.map( (data, i) => {
               return <div key={i} className="detailBtn" style={{left:`${(data.beginKp*1000)}px`}} onClick={()=>{
                 setRemainingData(data);
-                
+                let route = sessionStorage.getItem('route');
                 axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remaining`,{
                   paramsSerializer: params => {
                     return qs.stringify(params, { format: 'RFC3986' })
                   },
                   params : {
-                    railroad_name : "인천 1호선",
+                    railroad_name : route,
                     rail_track  : data.railTrack,
                     kp : data.beginKp,
                     measure_ts : data.measureTs
@@ -192,6 +197,7 @@ function DataExistence( props ) {
           {/* <div className="dataName">마모 유지관리</div> */}
           <div className="dataBar">
             {props.railwears.map( (data, i) => {
+              let route = sessionStorage.getItem('route');
               return <div key={i} className="detailBtn" style={{left:`${(data.kp*1000)}px`}} onClick={()=>{
                 setRailwearOpen(true)
                 setRailWearData(data);
@@ -204,7 +210,7 @@ function DataExistence( props ) {
                   minAccumulateWeight : data.accumulateWeights,
                   maxAccumulateWeight : data.accumulateWeights,
                   railTrack : data.railTrack,
-                  railroadName : "인천 1호선" ,
+                  railroadName : route,
                   graphType : "TWO_DIMENTION"
                 }
                 console.log(param);
@@ -234,6 +240,7 @@ function DataExistence( props ) {
           {/* <div className="dataName">궤도틀림</div> */}
           <div className="dataBar">
             {props.railtwists.map( (data, i) => {
+              let route = sessionStorage.getItem('route');
               return <div key={i} className="detailBtn" style={{left:`${(data.beginKp*1000)}px`}} onClick={()=>{
                 setRailtwistData(data);
                 setRailtwistOpen(true);
@@ -246,7 +253,7 @@ function DataExistence( props ) {
                     measure_ts : data.measureTs,
                     rail_track : data.railTrack,
                     data_type : option,
-                    railroad_name : "인천 1호선",
+                    railroad_name : route,
                   };
                   console.log(param);
                   axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/graph_data`,{
@@ -287,7 +294,7 @@ function DataExistence( props ) {
           {/* <div className="dataName">궤도거동계측</div> */}
           <div className="dataBar">
             {props.railbehaviors.map( (railbehaviorsData, i) => {
-              return <div key={i} className="detailBtn" style={{left:`${0}px`}} onClick={()=>{
+              return <div key={i} className="detailBtn" style={{left:`${(railbehaviorsData.kp*1000)}px`}} onClick={()=>{
                 setRailbehaviorOpen(true);
                 setRailbehaviorData(railbehaviorsData);
                 axios.get(`https://raildoctor.suredatalab.kr/api/railbehaviors/measuresets/${railbehaviorsData.measureId}`,{
@@ -394,7 +401,7 @@ function DataExistence( props ) {
           {/* <div className="dataName">온/습도 측정</div> */}
           <div className="dataBar">
             {props.temperatures.map( (tempData, i) => {
-              return <div key={i} className="detailBtn" style={{left:`0px`}} onClick={()=>{
+              return <div key={i} className="detailBtn" style={{left:`${(tempData.kp*1000)}px`}} onClick={()=>{
                 setTemperatureOpen(true);
                 setTempMeasureData(tempData);
                 let chartseries_ = [];
@@ -459,6 +466,14 @@ function DataExistence( props ) {
         <div className="line" style={{width:kptoPixel}} >
           {/* <div className="dataName">PAUT 탐상</div> */}
           <div className="dataBar">
+          {props.paut.map( (data, i) => {
+              let route = sessionStorage.getItem('route');
+              return <div key={i} className="detailBtn" style={{left:`${(data.kp*1000)}px`}} onClick={()=>{
+                setPautOpen(true);
+                setPautData(data);
+                setPautImgIndex(0);
+              }}>상세보기</div>
+            })}
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
@@ -650,6 +665,72 @@ function DataExistence( props ) {
               </div>
             </div>
             <div className="directBtn" onClick={()=>{navigate("/MeasuringTemperatureHumidity");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+          </div>
+        </Box>
+      </Modal>
+
+      <Modal
+          open={pautOpen}
+          onClose={(e)=>{setPautOpen(false)}}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+        <Box sx={BOXSTYLE} >
+          <div className="popupTitle"><img src={PopupIcon} />PAUT 상세요약</div>
+          <div className="tabPanel" style={{width:"1450px", height:"1000px"}}>
+            <div className="contentBox paut" style={{height: "100px", marginBottom:"10px"}} >
+              <div className="containerTitle">탐상 데이터</div>
+              <div className="componentBox flex section ">
+                <div className="curDate optionBox borderColorGreen">
+                  <div className="optionTitle">DA</div>
+                  <div className="optionValue">{pautData.da}</div>
+                </div>
+                <div className="curDate optionBox borderColorGreen">
+                  <div className="optionTitle">PA</div>
+                  <div className="optionValue">{pautData.pa}</div>
+                </div>
+                <div className="curDate optionBox borderColorGreen">
+                  <div className="optionTitle">SA</div>
+                  <div className="optionValue">{pautData.sa}</div>
+                </div>
+                <div className="curDate optionBox borderColorGreen">
+                  <div className="optionTitle">UMR</div>
+                  <div className="optionValue">{pautData.umr}</div>
+                </div>
+              </div>
+            </div>
+            <div className="contentBox" style={{height: "calc(100% - 110px)"}}>
+              <div className="containerTitle">사진
+                <div className="dataOption" style={{right: "250px"}}>
+                  <div className="value">
+                      위치 : {convertToCustomFormat(pautData.kp*1000)}
+                  </div>
+                </div>
+                <div className="dataOption">
+                  <div className="value">
+                    측정기간 : {formatDateTime(new Date(pautData.measureTs))}
+                  </div>
+                </div>
+              </div>
+              <div className="componentBox chartBox flex paut">
+                {
+                  (pautData.images && pautData.images.length > 0) ? 
+                  <>
+                    <div className="leftBtn" onClick={()=>{
+                      if(pautImgIndex>0){setPautImgIndex(pautImgIndex-1)}
+                    }}></div>
+                    <img src={`https://raildoctor.suredatalab.kr${pautData.images[pautImgIndex].filePath}`}  />
+                    <div className="rightBtn" onClick={()=>{
+                      if(pautImgIndex<pautData.images.length-1){
+                        setPautImgIndex(pautImgIndex+1)
+                      }
+                    }}></div>
+                  </>
+                  : null
+                }
+              </div>
+            </div>
+            {/* <div className="directBtn" onClick={()=>{navigate("/MeasuringTemperatureHumidity");}}>데이터 상세보기<img src={ArrowIcon} /></div> */}
           </div>
         </Box>
       </Modal>
@@ -1658,287 +1739,6 @@ function DataExistence( props ) {
         </Box>
       </Modal>
       
-      {/* <Modal
-          open={open}
-          onClose={(e)=>{setOpen(false)}}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box sx={BOXSTYLE} >
-            <div className="popupTitle"><img src={PopupIcon} />데이터 상세요약</div>
-          <TabContext value={tabValue} > 
-            <Box sx={{ borderBottom: 1, borderColor: 'divider'  }}>
-              <TabList onChange={handleChange} aria-label="lab API tabs example" >
-                <Tab style={{fontFamily : 'NEO_R'}} label="통과톤수" value="1" />
-                <Tab style={{fontFamily : 'NEO_R'}} label="마모유지관리" value="2" />
-                <Tab style={{fontFamily : 'NEO_R'}} label="궤도틀림" value="3" />
-                <Tab style={{fontFamily : 'NEO_R'}} label="궤도거동계측" value="4" />
-                <Tab style={{fontFamily : 'NEO_R'}} label="온/습도" value="5" />
-              </TabList>
-            </Box>
-            <TabPanel value="1">
-              <div className="tabPanel throughput">
-                <div className="contentBox" style={{height: "100px", marginBottom:"10px"}} >
-                  <div className="containerTitle">하선 - 현재 누적통과톤수</div>
-                  <div className="componentBox flex section ">
-                    <div className="curDate optionBox borderColorGreen">
-                      <div className="optionTitle">현재날짜</div>
-                      <div className="optionValue">2023/07/03</div>
-                    </div>
-                    <div className="curDate optionBox borderColorGreen">
-                      <div className="optionTitle">KP</div>
-                      <div className="optionValue">15k520</div>
-                    </div>
-                    <div className="curDate optionBox borderColorGreen">
-                      <div className="optionTitle">좌레일</div>
-                      <div className="optionValue">414,953,971</div>
-                    </div>
-                    <div className="curDate optionBox borderColorGreen" >
-                      <div className="optionTitle">우레일</div>
-                      <div className="optionValue">414,953,971</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="contentBox" style={{height: "100px"}} >
-                  <div className="containerTitle">상선 - 현재 누적통과톤수</div>
-                  <div className="componentBox flex section ">
-                    <div className="curDate optionBox borderColorGreen">
-                      <div className="optionTitle">현재날짜</div>
-                      <div className="optionValue">2023/07/03</div>
-                    </div>
-                    <div className="curDate optionBox borderColorGreen">
-                      <div className="optionTitle">KP</div>
-                      <div className="optionValue">15k520</div>
-                    </div>
-                    <div className="curDate optionBox borderColorGreen">
-                      <div className="optionTitle">좌레일</div>
-                      <div className="optionValue">414,953,971</div>
-                    </div>
-                    <div className="curDate optionBox borderColorGreen" >
-                      <div className="optionTitle">우레일</div>
-                      <div className="optionValue">414,953,971</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="directBtn" onClick={()=>{navigate("/cumulativeThroughput");}}>데이터 상세보기<img src={ArrowIcon} /></div>
-              </div>
-            </TabPanel>
-            <TabPanel value="2">
-              <div className="tabPanel"  style={{width: "915px", height: "565px" }}>
-                <div className="contentBox" style={{marginLeft : 0, height:"100%"}}>
-                  <div className="containerTitle bothEnds">
-                    <div>마모정보</div>
-                    <div className="dataOption" style={{right: "162px"}}>
-                      <div className="value">
-                        위치 : 15k520
-                      </div>
-                    </div>
-                    <div className="dataOption">
-                      <div className="value">
-                        측정기간 : 22년 2분기
-                      </div>
-                    </div>
-                  </div>
-                  <div className="componentBox separationBox">
-                    <div className="componentBox" id="directWearInfo">
-                      <WearInfo title="직마모" data={DIRECTWEARINFODUMMY} yTitle="직마모(mm)"></WearInfo>
-                    </div>
-                    <div className="componentBox" id="sideWearInfo">
-                      <WearInfo title="편마모" data={SIDEWEARINFODUMMY} yTitle="편마모(mm)"></WearInfo>
-                    </div>
-                  </div>
-                </div>
-                <div className="directBtn" onClick={()=>{navigate("/wearMaintenance");}}>데이터 상세보기<img src={ArrowIcon} /></div>
-              </div>
-            </TabPanel>
-            <TabPanel value="3">
-              <div className="tabPanel" style={{width:"763px", height:"336px"}}>
-                <div className="contentBox" style={{width:"100%", height: "100%"}}>
-                  <div className="containerTitle">
-                    Chart
-                    <div className="dataOption" style={{right: "162px"}}>
-                      <div className="value">
-                        측정구간 : 간석오거리~인천시청 
-                      </div>
-                    </div>
-                    <div className="dataOption">
-                      <div className="value">
-                        측정기간 : 22년 2분기
-                      </div>
-                    </div>
-                  </div>
-                  <div className="componentBox chartBox flex">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart
-                        width={500}
-                        height={300}
-                        data={TRACKDEVIATIONDUMMY}
-                        margin={{
-                          top: 5,
-                          right: 30,
-                          left: 20,
-                          bottom: 5,
-                        }}
-                      >
-                        <CartesianGrid />
-                        <XAxis dataKey="kp" interval={15} tickFormatter={(value) => value.toFixed(4)} fontSize={6} />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" name="좌레일" dataKey="left" stroke="#4371C4" dot={false} />
-                        <Line type="monotone" name="우레일" dataKey="right" stroke="#4371C4" dot={false} />
-                        <Line type="monotone" name="목표기준" dataKey="target1" stroke="#4BC784" dot={false} />
-                        <Line type="monotone" name="목표기준" dataKey="target2" stroke="#4BC784" dot={false} />
-                        <Line type="monotone" name="보수기준" dataKey="repair1" stroke="#FF0606" dot={false} />
-                        <Line type="monotone" name="보수기준" dataKey="repair2" stroke="#FF0606" dot={false} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-                <div className="directBtn" onClick={()=>{navigate("/trackDeviation");}}>데이터 상세보기<img src={ArrowIcon} /></div>
-              </div>
-            </TabPanel>
-            <TabPanel value="4">
-              <div className="tabPanel" style={{width:"1000px", height:"320px"}}>
-              <div className="contentBox" style={{height:"100%"}}>
-                  <div className="containerTitle">Chart
-                  <div className="dataOption" style={{right: "162px"}}>
-                    <div className="value">
-                        위치 : 15k520
-                    </div>
-                  </div>
-                  <div className="dataOption">
-                    <div className="value">
-                      측정기간 : 22년 2분기
-                    </div>
-                  </div>
-                  </div>
-                  <div className="componentBox flex flexEnd" style={{paddingTop : "5px", paddingBottom : "5px", height: "calc(100% - 35px)"}}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <ScatterChart
-                        margin={{
-                          top: 20,
-                          right: 20,
-                          bottom: 20,
-                          left: 20,
-                        }}
-                      >
-                        <CartesianGrid />
-                        <XAxis type="category" dataKey="time" name="time" fontSize={9}  />
-                        <YAxis type="number" dataKey="weight" name="weight" fontSize={10} />
-                        <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                        <Scatter name="A school" data={TRACKGMDUMMYDATA3} fill="#0041DC" />
-                      </ScatterChart>
-                    </ResponsiveContainer>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        width={500}
-                        height={300}
-                        data={TRACKGMDUMMYDATA2}
-                        margin={{
-                          top: 5,
-                          right: 30,
-                          left: 20,
-                          bottom: 5,
-                        }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" fontSize={9}/>
-                        <YAxis fontSize={10}/>
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="weight" name="윤중" fill="#0041DC" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                    <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                        width={500}
-                        height={300}
-                        data={TRACKGMDUMMYDATA1}
-                        margin={{
-                          top: 5,
-                          right: 30,
-                          left: 20,
-                          bottom: 5,
-                        }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" fontSize={9}/>
-                        <YAxis fontSize={10}/>
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="weight" name="윤중" fill="#0041DC" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-                <div className="directBtn" onClick={()=>{navigate("/trackGeometryMeasurement");}}>데이터 상세보기<img src={ArrowIcon} /></div>
-              </div>
-            </TabPanel>
-            <TabPanel value="5">
-              <div className="tabPanel" style={{width:"763px", height:"336px"}}>
-                <div className="contentBox" style={{height: "100%"}}>
-                  <div className="containerTitle">Chart
-                    <div className="dataOption" style={{right: "277px"}}>
-                      <div className="value">
-                        측정구간 : 간석오거리~인천시청
-                      </div>
-                    </div>
-                    <div className="dataOption" style={{right: "174px"}}>
-                      <div className="value">
-                          위치 : 15k515
-                      </div>
-                    </div>
-                    <div className="dataOption">
-                      <div className="value">
-                        측정기간 : 2023.06.01
-                      </div>
-                    </div>
-                  </div>
-                  <div className="componentBox chartBox flex">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart
-                        width={500}
-                        height={300}
-                        data={TEMPDATA1DUMMY}
-                        margin={{
-                          top: 5,
-                          right: 30,
-                          left: 20,
-                          bottom: 5,
-                        }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" fontSize={9} />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line dataKey="temp" stroke="#FF0000" dot={false} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-                <div className="directBtn" onClick={()=>{navigate("/MeasuringTemperatureHumidity");}}>데이터 상세보기<img src={ArrowIcon} /></div>
-              </div>
-            </TabPanel>
-            <TabPanel value="6">
-              <div className="tabPanel">
-                <div className="directBtn" onClick={()=>{navigate("/railProfile");}}>데이터 상세보기<img src={ArrowIcon} /></div>
-              </div>
-            </TabPanel>
-            <TabPanel value="7">
-              <div className="tabPanel">
-                <div className="directBtn" onClick={()=>{navigate("/railRoughness");}}>데이터 상세보기<img src={ArrowIcon} /></div>
-              </div>
-            </TabPanel>
-            <TabPanel value="8">
-              <div className="tabPanel">
-                <div className="directBtn" onClick={()=>{navigate("/railTrackAlignment");}}>데이터 상세보기<img src={ArrowIcon} /></div>
-              </div>
-            </TabPanel>
-          </TabContext>
-          </Box>
-        </Modal> */}
     </div>
   );
 }

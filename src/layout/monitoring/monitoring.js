@@ -6,7 +6,7 @@ import { DatePicker, Input } from 'antd';
 import * as PDFJS from "pdfjs-dist/build/pdf";
 import * as pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 import RailStatus from "../../component/railStatus/railStatus";
-import { BOXSTYLE, RAILROADSECTION, RANGEPICKERSTYLE, TRACKSPEEDDATA } from "../../constant";
+import { BOXSTYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, TRACKSPEEDDATA } from "../../constant";
 import classNames from "classnames";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import DataExistence from "../../component/dataExistence/dataExistence";
@@ -15,6 +15,8 @@ import axios from 'axios';
 import qs from 'qs';
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
+import { getInchonSpeedData, getRailroadSection, getSeoulSpeedData } from "../../util";
+import Papa from 'papaparse';
 
 window.PDFJS = PDFJS;
 const { RangePicker } = DatePicker;
@@ -39,21 +41,16 @@ function Monitoring( props ) {
   const [railtwists, setRailtwists] = useState([]);
   const [railwears, setRailwears] = useState([]);
   const [temperatures, setTemperatures] = useState([]);
+  const [railroadSection, setRailroadSection] = useState([]);
+  const [paut, setPaut] = useState([]);
+  const [trackSpeedData, setTrackSpeedData] = useState([{trackName:"", data:[]},{trackName:"", data:[]}]);
 
   const pathClick = (select) => {
     console.log(select);
     //getInstrumentationPoint(select);
     //setSelectedPath(select);
+    setKP(select.beginKp);
   }
-
-  /* useEffect(()=>{
-    let trackDetailContainer = document.getElementById("trackDetailContainer");
-    let trackDetailCanvas = trackDetailCanvasRef.current;
-    trackDetailCanvas.width = trackDetailContainer.clientWidth;
-    trackDetailCanvas.height = trackDetailContainer.clientHeight;
-
-    trackDetailDrawImage();
-  },[routeHidden] ); */
 
   const findPictureAndPosition = (km) => {
     for (let pic of pictureList) {
@@ -97,13 +94,25 @@ function Monitoring( props ) {
     adjustPosition();
   },[viewRailMap])
 
+  useEffect( ()=> {
+    let find = findPictureAndPosition( parseInt(kp) / 1000);
+    setViewRailMap(find);
+  },[kp])
+
   useEffect( ()=>{
+    getRailroadSection(setRailroadSection);
+    let route = sessionStorage.getItem('route');
+    if( route === STRING_ROUTE_INCHON ){
+      getInchonSpeedData(setTrackSpeedData);
+    }else if( route === STRING_ROUTE_SEOUL ){
+      getSeoulSpeedData(setRailroadSection);
+    }
     axios.get(`https://raildoctor.suredatalab.kr/api/railroads/railroadmap`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
       params : {
-        railroad : "인천 1호선"
+        railroad : route
       }
     })
     .then(response => {
@@ -117,7 +126,10 @@ function Monitoring( props ) {
   return (
     <div className="monitoringContainer" >
         <div className="railStatusContainer">
-          <RailStatus railroadSection={RAILROADSECTION} pathClick={pathClick}></RailStatus>
+          <RailStatus 
+            railroadSection={railroadSection} 
+            pathClick={pathClick}
+          ></RailStatus>
         </div>
         <div className="monitoringContent" style={{ height: "calc(100% - 135px)", width: "100%", overflow: "auto"}} >
           <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px"}}>
@@ -132,12 +144,13 @@ function Monitoring( props ) {
                     style={RANGEPICKERSTYLE}
                     onChange={(e)=>{
                         console.log(e);
+                        let route = sessionStorage.getItem('route');
                         axios.get(`https://raildoctor.suredatalab.kr/api/statistics/data`,{
                           paramsSerializer: params => {
                             return qs.stringify(params, { format: 'RFC3986' })
                           },
                           params : {
-                            railroad : "인천 1호선",
+                            railroad : route,
                             /* beginTs : e[0].$d.toISOString(),
                             endTs : e[1].$d.toISOString(),
                             beginKp : 0.23,
@@ -153,6 +166,20 @@ function Monitoring( props ) {
                           setTemperatures(response.data.temperatures);
                         })
                         .catch(error => console.error('Error fetching data:', error));
+
+                        axios.get(`https://raildoctor.suredatalab.kr/api/pauts`,{
+                          paramsSerializer: params => {
+                            return qs.stringify(params, { format: 'RFC3986' })
+                          },
+                          params : {
+                            railroad : route
+                          }
+                        })
+                        .then(response => {
+                          console.log(response.data);
+                          setPaut(response.data.entities);
+                        })
+                        .catch(error => console.error('Error fetching data:', error));
                     }}
                   />
                 </div>
@@ -161,13 +188,13 @@ function Monitoring( props ) {
               <div className="dataOption">
                 <div className="title">KP </div>
                 <div className="date">
-                  <Input placeholder="KP" onKeyDown={(e)=>{if(e.key==="Enter"){
+                  <Input 
+                    value={kp}
+                    defaultValue={kp}
+                    placeholder="KP" onKeyDown={(e)=>{if(e.key==="Enter"){
                     setKP(e.target.value);
-                    let find = findPictureAndPosition( parseInt(e.target.value) / 1000);
-                    setViewRailMap(find);
-                    //adjustPosition();
                   }}}
-                    style={RANGEPICKERSTYLE} defaultValue={kp}
+                    style={RANGEPICKERSTYLE}
                   />
                 </div>
               </div>
@@ -231,7 +258,7 @@ function Monitoring( props ) {
             </div>
             <div className="componentBox separationBox">
               <div className="boxProto speed">
-                <TrackSpeed data={TRACKSPEEDDATA} kp={kp} ></TrackSpeed>
+                <TrackSpeed data={trackSpeedData} kp={kp} ></TrackSpeed>
               </div>
             </div>
           </div>
@@ -254,6 +281,7 @@ function Monitoring( props ) {
                 railtwists={railtwists}
                 railwears={railwears}
                 temperatures={temperatures}
+                paut={paut}
               ></DataExistence>
             </div>
           </div>

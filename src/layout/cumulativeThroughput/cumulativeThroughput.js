@@ -8,12 +8,10 @@ import { RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRI
 import classNames from "classnames";
 import axios from 'axios';
 import qs from 'qs';
-import { formatDateTime, numberWithCommas } from "../../util";
+import { formatDateTime, getRailroadSection, numberWithCommas } from "../../util";
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
 
-let imgTotalWidth = 0;
-const IMGSCALING = 0.2;
 let pictureList = [];
 function CumulativeThroughput( props ) {
 
@@ -21,13 +19,8 @@ function CumulativeThroughput( props ) {
   const zoomimgRef = useRef(null);
   const [zoomImgkpMarker, setZoomImgKPMarker] = useState(0);
 
-  const [imgLoadArr, setImgLoadArr] = useState([]);
   const [kp, setKP] = useState(0);
   const [selectedPath, setSelectedPath] = useState([]);
-  const [isGuideLineDragging, setIsGuideLineDragging ] = useState(false);
-  const [guideLineLeft, setGuideLineLeft] = useState(295);
-  const [moveStartX, setMoveStartX] = useState(0);
-  const [guideLineOver, setGuideLineOver] = useState(false);
   const containerRef = useRef(null);
   const imgRef = useRef(null);
   const [kpMarker, setKPMarker] = useState(0);
@@ -35,12 +28,12 @@ function CumulativeThroughput( props ) {
   const [selectDate, setSelectDate] = useState(new Date());
   const [selectTrack, setSelectTrack] = useState(STRING_UP_TRACK);
   const [selectDir, setSelectDir] = useState(STRING_TRACK_DIR_LEFT);
-  const [accumulateweightData, setAccumulateweightData] = useState({});
   const [railmapOpen, setRailmapOpen] = useState(false);
 
   const [remainingCriteria, setRemainingCriteria] = useState(0);
   const [leftRemaining, setLeftRemaining] = useState({});
   const [rightRemaining, setRightRemaining] = useState({});
+  const [railroadSection, setRailroadSection] = useState([]);
 
   const zoomImgAdjustPosition = () => {
     if (zoomimgRef.current) {
@@ -54,58 +47,7 @@ function CumulativeThroughput( props ) {
         zoomImgcontainerRef.current.scrollLeft = adjustedPosition - center;
     }
   }
-
-  const loadImg = async (url) => {
-    return new Promise((resolve, reject)=>{
-      let img = new Image();
-      img.src = url;
-      img.onload = function() {
-        imgTotalWidth += imgTotalWidth + (img.width * IMGSCALING);
-        resolve(img);
-      };
-    })
-  }
   
-  const findKP = (kp) => {
-    let accWidth = 0;
-    for( let img of imgLoadArr ){
-      if( img.start <= kp && img.end >= kp ){
-        let range = img.end - img.start;
-        let ratio = (img.width* IMGSCALING) / range;
-        let pos = kp - img.start;
-        let left = (ratio * pos) + accWidth;
-
-        let container = document.getElementById('trackMapContainer');
-        container.scroll({
-          top: 0,
-          left: left - (guideLineLeft),
-          behavior: "smooth",
-        });
-        return;
-      }else{
-        accWidth = accWidth + (img.width * IMGSCALING);
-      }
-    }
-  }
-
-  const guideLIneFindKP = () => {
-    let container = document.getElementById('trackMapContainer');
-    console.log(container.scrollLeft);
-    let accWidth = 0;
-    for( let img of imgLoadArr ){
-      let nextImgWidth = img.width* IMGSCALING;
-      accWidth = accWidth + nextImgWidth;
-      if( accWidth > (container.scrollLeft + guideLineLeft) ){
-        accWidth = accWidth - nextImgWidth;
-        let pos = (container.scrollLeft + guideLineLeft) - accWidth;
-        let imgWidth = (img.width * IMGSCALING);
-        let dataPosition = img.start + (pos / imgWidth) * (img.end - img.start);
-        setKP( parseInt(dataPosition) );
-        return;
-      }
-    }    
-  }
-
   const findPictureAndPosition = (km) => {
     for (let pic of pictureList) {
         if (pic.beginKp <= km && km <= pic.endKp) {
@@ -145,12 +87,14 @@ function CumulativeThroughput( props ) {
     .then(response => console.log(response.data))
     .catch(error => console.error('Error fetching data:', error)); */
     /* readyImg(); */
+    getRailroadSection(setRailroadSection);
+    let route = sessionStorage.getItem('route');
     axios.get(`https://raildoctor.suredatalab.kr/api/railroads/railroadmap`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
       params : {
-        railroad : "인천 1호선"
+        railroad : route
       }
     })
     .then(response => {
@@ -162,9 +106,9 @@ function CumulativeThroughput( props ) {
   }, []);
 
   useEffect(() => {
-    if(!isGuideLineDragging){
-      findKP(kp);
-    }
+    let find = findPictureAndPosition( parseInt(kp) / 1000);
+    setViewRailMap(find);
+    getAccRemainingData();
   }, [kp]);
 
   useEffect( () => {
@@ -173,14 +117,51 @@ function CumulativeThroughput( props ) {
 
   const pathClick = (select) => {
     console.log(select);
-    //getInstrumentationPoint(select);
     setSelectedPath(select);
+    setKP(select.beginKp);
+  }
+
+  const getAccRemainingData = ()=>{
+    let track_ = "";
+    if( selectTrack === STRING_UP_TRACK && selectDir === STRING_TRACK_DIR_LEFT ){
+      track_ = STRING_UP_TRACK_LEFT;
+    }else if( selectTrack === STRING_UP_TRACK && selectDir === STRING_TRACK_DIR_RIGHT ){
+      track_ = STRING_UP_TRACK_RIGHT;
+    }else if( selectTrack === STRING_DOWN_TRACK && selectDir === STRING_TRACK_DIR_LEFT ){
+      track_ = STRING_DOWN_TRACK_LEFT;
+    }else if( selectTrack === STRING_DOWN_TRACK && selectDir === STRING_TRACK_DIR_RIGHT ){
+      track_ = STRING_DOWN_TRACK_RIGHT;
+    }
+    console.log((kp / 1000));
+    let route = sessionStorage.getItem('route');
+    let param  = {
+      railroad_name : route,
+      measure_ts : selectDate.toISOString(),
+      rail_track : track_,
+      kp : (kp / 1000)
+      /* begin_kp: (e.target.value / 1000),
+      end_kp : (e.target.value / 1000) + 0.99 */
+    }
+    console.log(param);
+    axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remaining`,{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : param
+    })
+    .then(response => {
+      console.log(response.data);
+      setRemainingCriteria(response.data.criteria);
+      setLeftRemaining(response.data.leftRemaining);
+      setRightRemaining(response.data.rightRemaining);
+    })
+    .catch(error => console.error('Error fetching data:', error));
   }
 
   return (
     <div className="cumulativeThroughput" >
       <div className="railStatusContainer">
-        <RailStatus railroadSection={RAILROADSECTION} pathClick={pathClick}></RailStatus>
+        <RailStatus railroadSection={railroadSection} pathClick={pathClick}></RailStatus>
       </div>
       <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px", marginBottom:"10px"}}>
             <div className="containerTitle bothEnds">
@@ -235,47 +216,11 @@ function CumulativeThroughput( props ) {
                 <div className="title">KP </div>
                 <div className="date">
                   <Input placeholder="KP" 
-                    /* defaultValue={kp}
-                    value={kp} */
+                    defaultValue={kp}
+                    value={kp}
                     style={RANGEPICKERSTYLE} 
                     onKeyDown={(e)=>{ if(e.key==="Enter"){
-                      setKP(e.target.value) 
-                      let find = findPictureAndPosition( parseInt(e.target.value) / 1000);
-                      setViewRailMap(find);
-
-                      let track_ = "";
-                      if( selectTrack === STRING_UP_TRACK && selectDir === STRING_TRACK_DIR_LEFT ){
-                        track_ = STRING_UP_TRACK_LEFT;
-                      }else if( selectTrack === STRING_UP_TRACK && selectDir === STRING_TRACK_DIR_RIGHT ){
-                        track_ = STRING_UP_TRACK_RIGHT;
-                      }else if( selectTrack === STRING_DOWN_TRACK && selectDir === STRING_TRACK_DIR_LEFT ){
-                        track_ = STRING_DOWN_TRACK_LEFT;
-                      }else if( selectTrack === STRING_DOWN_TRACK && selectDir === STRING_TRACK_DIR_RIGHT ){
-                        track_ = STRING_DOWN_TRACK_RIGHT;
-                      }
-                      console.log((e.target.value / 1000));
-                      let param  = {
-                        railroad_name : "인천 1호선",
-                        measure_ts : selectDate.toISOString(),
-                        rail_track : track_,
-                        kp : (e.target.value / 1000)
-                        /* begin_kp: (e.target.value / 1000),
-                        end_kp : (e.target.value / 1000) + 0.99 */
-                      }
-                      console.log(param);
-                      axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remaining`,{
-                        paramsSerializer: params => {
-                          return qs.stringify(params, { format: 'RFC3986' })
-                        },
-                        params : param
-                      })
-                      .then(response => {
-                        console.log(response.data);
-                        setRemainingCriteria(response.data.criteria);
-                        setLeftRemaining(response.data.leftRemaining);
-                        setRightRemaining(response.data.rightRemaining);
-                      })
-                      .catch(error => console.error('Error fetching data:', error));
+                      setKP(e.target.value);
                     }}}
                   />
                 </div>
@@ -291,20 +236,6 @@ function CumulativeThroughput( props ) {
       </div>
       <div className="contentBox" 
         style={{height:"calc(100% - 245px)", position:"relative"}} id="trackMapBox"
-        onMouseMove={(e)=>{
-          if(isGuideLineDragging){
-            const parent = document.getElementById("trackMapBox");
-            const parentRect = parent.getBoundingClientRect();
-            const x = e.clientX - parentRect.left;
-            setGuideLineLeft(x);
-            guideLIneFindKP();
-          }
-        }}
-        onMouseUp={()=>{
-          if( isGuideLineDragging ){
-            setIsGuideLineDragging(false);
-          }
-        }}
       >
         <div className="containerTitle">
           <div>검토구간</div>
@@ -331,16 +262,7 @@ function CumulativeThroughput( props ) {
                 container.scrollLeft = result.position - (container.offsetWidth / 2); */ // km 위치가 컨테이너의 중앙에 오도록 스크롤 조정
               }} /> : null
           }
-            <div className="guideLine" id="guideLine" style={{left:`${kpMarker}px`}}
-              onMouseDown={(e)=>{
-                setIsGuideLineDragging(true);
-                setMoveStartX(e.clientX);
-                console.log(e.clientX);
-              }}
-              onMouseUp={()=>{
-                setIsGuideLineDragging(false);
-              }}
-            >
+            <div className="guideLine" id="guideLine" style={{left:`${kpMarker}px`}}>
             </div>
           </div>
           <div className="dataContainer">

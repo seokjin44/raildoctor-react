@@ -10,7 +10,7 @@ import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRAC
 import PlacePosition from "../../component/PlacePosition/PlacePosition";
 import axios from 'axios';
 import qs from 'qs';
-import { convertObjectToArray, convertToCustomFormat, dateFormat, findAddedItems, findRange, formatDate, formatTime, formatYearMonth, getFirstDateOfThreeMonthsAgo, getLastDateOfMonth, numberToText, trackDataName, trackLeftRightToString } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, dateFormat, findAddedItems, findRange, formatDate, formatTime, formatYearMonth, getFirstDateOfThreeMonthsAgo, getLastDateOfMonth, getRailroadSection, numberToText, trackDataName, trackLeftRightToString } from "../../util";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
@@ -32,10 +32,8 @@ function TrackGeometryMeasurement( props ) {
   const [selectedPath, setSelectedPath] = useState({
     start_station_name : "",
     end_station_name : "",
-    start_station_up_track_location : 0,
-    start_station_down_track_location : 0,
-    end_station_up_track_location : 0,
-    end_station_down_track_location : 0,
+    beginKp : 0,
+    endKp : 0,
   });
   const [dataExits, setDataExits] = useState([]);
   const [upLeftTrackPoint, setUpLeftTrackPoint] = useState([]); //상선좌포인트
@@ -53,7 +51,7 @@ function TrackGeometryMeasurement( props ) {
   const [selectPoints, setSelectPoints] = useState([]);
   const [selectMeasureDate, setSelectMeasureDate] = useState(new Date());
   const [selectMeasureTime, setSelectMeasureTime] = useState("");
-  const [findDatas, setFindDatas] = useState([]);
+  const [findDatas, setFindDatas] = useState("");
 
   const [poinsts, setPoints] = useState([]);
   const [selectPoint, setSelectPoint] = useState("");
@@ -66,7 +64,8 @@ function TrackGeometryMeasurement( props ) {
   const [dailyChartseries, setDailyChartseries] = useState([]);
   const [monthlyChartseries, setMonthlyChartseries] = useState([]);
   const [timeOptions, setTimeOptions] = useState([]);
-  
+  const [railroadSection, setRailroadSection] = useState([]);
+
   const disabledDate = (current) => {
     return !dataExitsDate[dateFormat(current.$d)];
   };
@@ -75,9 +74,10 @@ function TrackGeometryMeasurement( props ) {
     console.log("pathClick");
     console.log(select);
     setSelectedPath(select);
+    let route = sessionStorage.getItem('route');
     let param = {
       params : {
-        railroad : "인천 1호선",
+        railroad : route,
         begin : select.start_station_name,
         end : select.end_station_name
       },
@@ -88,8 +88,9 @@ function TrackGeometryMeasurement( props ) {
     console.log(param);
     axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/locations', param )
     .then(response => {
+      console.log(response.data);
       let dataArr = [];
-      RAILROADSECTION.forEach( data => {
+      railroadSection.forEach( data => {
         dataArr.push(0);
       })
 
@@ -133,13 +134,7 @@ function TrackGeometryMeasurement( props ) {
         for( let sensor of measureSet.sensors ){
           let index = -1;
           sensor['measureType'] = measureSet.measureType;
-          if( sensor.railTrack === STRING_UP_TRACK ||
-            sensor.railTrack === STRING_UP_TRACK_LEFT ||
-            sensor.railTrack === STRING_UP_TRACK_RIGHT ){
-            index = findRange(RAILROADSECTION, sensor.kp * 1000, UP_TRACK);
-          }else{
-            index = findRange(RAILROADSECTION, sensor.kp * 1000, DOWN_TRACK);
-          }
+          index = findRange(railroadSection, sensor.kp * 1000);
   
           if( sensor.railTrack === STRING_UP_TRACK_LEFT ){
             upLeftTrackPoint_.push(sensor);
@@ -172,12 +167,8 @@ function TrackGeometryMeasurement( props ) {
     let longMeasureList_ = [...longMeasureList];
     let tableViewShortMeasureObj = {};
     let tableViewLongMeasureObj = {};
-    let startKP = (selectedPath.start_station_up_track_location > selectedPath.start_station_down_track_location)? 
-    selectedPath.start_station_down_track_location : selectedPath.start_station_up_track_location
-    ;
-    let endKP = (selectedPath.end_station_up_track_location > selectedPath.end_station_down_track_location)? 
-    selectedPath.end_station_up_track_location : selectedPath.end_station_down_track_location
-    ;
+    let startKP = selectedPath.beginKp;
+    let endKP = selectedPath.endKp;
 
     for( let measure of shortMeasureList_ ){
       for( let sensor of measure.sensors ){
@@ -338,9 +329,14 @@ function TrackGeometryMeasurement( props ) {
   ];
 
   useEffect(() => {
+    getRailroadSection(setRailroadSection);
+  }, []);
+  
+  useEffect( ()=> {
+    let route = sessionStorage.getItem('route');
     let param = {
       params : {
-        railroad : "인천 1호선",
+        railroad : route,
       },
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
@@ -349,7 +345,7 @@ function TrackGeometryMeasurement( props ) {
     axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/locations', param )
     .then(response => {
       let dataArr = [];
-      RAILROADSECTION.forEach( data => {
+      railroadSection.forEach( data => {
         dataArr.push(0);
       })
 
@@ -378,26 +374,19 @@ function TrackGeometryMeasurement( props ) {
         console.log(measureSet.sensors);
         for( let sensor of measureSet.sensors ){
           let index = -1;
-          if( sensor.railTrack === STRING_UP_TRACK ||
-            sensor.railTrack === STRING_UP_TRACK_LEFT ||
-            sensor.railTrack === STRING_UP_TRACK_RIGHT ){
-            index = findRange(RAILROADSECTION, sensor.kp * 1000, UP_TRACK);
-          }else{
-            index = findRange(RAILROADSECTION, sensor.kp * 1000, DOWN_TRACK);
-          }
-  
+          index = findRange(railroadSection, sensor.kp * 1000);
           dataExits_[index]++;
         }
       }
       setDataExits(dataExits_);
     })
     .catch(error => console.error('Error fetching data:', error));
-  }, []);
-  
+  }, [railroadSection]);
+
   useEffect( ()=>{
     console.log("selectedPath Change");
     pathMeasurefind();
-  }, [selectedPath, searchRangeDate] )
+  }, [selectedPath, searchRangeDate] );
   
   useEffect( ()=>{
     console.log("shortMeasureList longMeasureList Change");
@@ -408,7 +397,7 @@ function TrackGeometryMeasurement( props ) {
     <div className="trackDeviation trackGeometryMeasurement" >
       <div className="railStatusContainer">
         <RailStatus 
-          railroadSection={RAILROADSECTION} 
+          railroadSection={railroadSection} 
           pathClick={pathClick}
           dataExits={dataExits}
         ></RailStatus>
@@ -515,6 +504,22 @@ function TrackGeometryMeasurement( props ) {
                   
                   /* for( let summary of dataExitsDate[selectMeasureDate] ){ */
                     /* for( let item of findDatas_ ){ */
+                      console.log(selectPoint);
+                      if( !selectPoint || selectPoint === "" || selectPoint === undefined || selectPoint === null ){
+                        alert("Point를 선택해주세요.");
+                        return;
+                      }
+                      if( !selectMeasureDate || selectMeasureDate === "" || selectMeasureDate === undefined || selectMeasureDate === null ||
+                          !selectMeasureTime || selectMeasureTime === "" || selectMeasureTime === undefined || selectMeasureTime === null 
+                       ){
+                        alert("측정일자에서 날짜 및 시간을 선택해주세요.");
+                        return;
+                      }
+                      if( !findDatas || findDatas === "" || findDatas === undefined || findDatas === null 
+                       ){
+                        alert("조회할 데이터를 선택해주세요.");
+                        return;
+                      }
                       let point = pointsInfo[selectPoint];
                       let measureDate = new Date(`${selectMeasureDate} ${selectMeasureTime}`).toISOString();
                       let colorCode = getColor(colorIndex++);

@@ -13,7 +13,7 @@ import { DatePicker, Input, Radio, Select } from "antd";
 import { DOWN_TRACK, RADIO_STYLE, RAILROADSECTION, RAIL_ROUGHNESS_BOXSTYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, UP_TRACK } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, dateFormat, findRange, formatDateTime } from "../../util";
+import { convertToCustomFormat, dateFormat, findRange, formatDateTime, getRailroadSection } from "../../util";
 
 const { RangePicker } = DatePicker;
 
@@ -29,14 +29,13 @@ function RailTrackAlignment( props ) {
   const [reports, setReports] = useState([]);
   const [selectDateRange, setSelectDateRange] = useState([{$d:new Date()}, {$d:new Date()}]);
   const [pdfDataList , setPDFDataList] = useState([]);
+  const [railroadSection, setRailroadSection] = useState([]);
 
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
-    let startKP = (select.start_station_up_track_location > select.start_station_down_track_location)? 
-    select.start_station_down_track_location : select.start_station_up_track_location;
-    let endKP = (select.end_station_up_track_location > select.end_station_down_track_location)? 
-    select.end_station_up_track_location : select.end_station_down_track_location;
+    let startKP = select.beginKp;
+    let endKP = select.endKp;
     let kpOptions_ = [];
     if( selectTrack === STRING_UP_TRACK ){
       for( let kp of dataExistKPs.t1 ){
@@ -75,21 +74,30 @@ function RailTrackAlignment( props ) {
   }
 
   useEffect(() => {
+    getRailroadSection(setRailroadSection);
+  }, []);
+  
+  useEffect( ()=> {
+    if( railroadSection.length < 2 ){
+      return;
+    }
+    console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
+    let route = sessionStorage.getItem('route');
     axios.get('https://raildoctor.suredatalab.kr/api/railstraights/locations',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
       params : {
-        railroad : "인천 1호선",
-        begin : "계양",
-        end : "송도달빛축제공원"
+        railroad : route,
+        begin : railroadSection[0].displayName,
+        end : railroadSection[railroadSection.length-1].displayName
       }
     })
     .then(response => {
       console.log(response.data);
       let dataArr = [];
       let index = -1;
-      RAILROADSECTION.forEach( data => {
+      railroadSection.forEach( data => {
         dataArr.push(0);
       });
       let dataExits_ = [...dataArr];
@@ -97,23 +105,23 @@ function RailTrackAlignment( props ) {
       console.log(response.data);
       dataExistKPs = response.data;
       for( let kp of response.data.t1 ){
-        index = findRange(RAILROADSECTION, kp * 1000, UP_TRACK);
+        index = findRange(railroadSection, kp * 1000);
         dataExits_[index]++;
       }
       for( let kp of response.data.t2 ){
-        index = findRange(RAILROADSECTION, kp * 1000, DOWN_TRACK);
+        index = findRange(railroadSection, kp * 1000);
         dataExits_[index]++;
       }
       setDataExits(dataExits_);
     })
     .catch(error => console.error('Error fetching data:', error));
-  }, []);
-  
+  }, [railroadSection])
+
   return (
     <div className="trackDeviation railRoughness" >
       <div className="railStatusContainer">
         <RailStatus 
-          railroadSection={RAILROADSECTION} 
+          railroadSection={railroadSection} 
           pathClick={pathClick}
           dataExits={dataExits}
         ></RailStatus>
@@ -195,12 +203,13 @@ function RailTrackAlignment( props ) {
                   }else if( selectTrack === STRING_DOWN_TRACK && selectDir === STRING_TRACK_DIR_RIGHT ){
                     track_ = STRING_DOWN_TRACK_RIGHT;
                   }
+                  let route = sessionStorage.getItem('route');
                   axios.get('https://raildoctor.suredatalab.kr/api/railstraights/straights',{
                     paramsSerializer: params => {
                       return qs.stringify(params, { format: 'RFC3986' })
                     },
                     params : {
-                      railroad : "인천 1호선",
+                      railroad : route,
                       railTrack : track_,
                       kp : selectKP,
                       beginTs : selectDateRange[0].$d.toISOString(),

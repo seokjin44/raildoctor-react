@@ -10,17 +10,15 @@ import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import { Modal } from "@mui/material";
 import axios from 'axios';
 import qs from 'qs';
-import { dateFormat, findRange, transposeObjectToArray } from "../../util";
+import { dateFormat, findRange, getRailroadSection, transposeObjectToArray } from "../../util";
 
 let dataExitsDate = {};
 function TrackDeviation( props ) {
   const [selectedPath, setSelectedPath] = useState({
     start_station_name : "",
     end_station_name : "",
-    start_station_up_track_location : 0,
-    start_station_down_track_location : 0,
-    end_station_up_track_location : 0,
-    end_station_down_track_location : 0,
+    beginKp : 0,
+    endKp : 0,
   });
   const [open, setOpen] = useState(false);
   const [selectRange, setSelectRange] = useState("");
@@ -36,17 +34,22 @@ function TrackDeviation( props ) {
   const [cantChartData, setCantChartData] = useState([]);
   const [raildistanceChartData, setRaildistanceChartData] = useState([]);
   const [distortionChartData, setDistortionChartData] = useState([]);
-
+  const [railroadSection, setRailroadSection] = useState([]);
 
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
+    if( !selectRange || selectRange === "" || selectRange === null || selectRange === undefined ){
+      alert("측정분기를 먼저 선택해주세요");
+      return;
+    }
     let range = DUMMY_RANGE[selectRange];
-    let start = (selectTrack === STRING_UP_TRACK) ? select.start_station_up_track_location : select.start_station_down_track_location;
-    let end = (selectTrack === STRING_UP_TRACK) ? select.end_station_up_track_location : select.end_station_down_track_location;
+    let start = select.beginKp;
+    let end = select.endKp;
     start = (start>0) ? start/1000 : start;
     end = (end>0) ? end/1000 : end;
     console.log(start,end);
+    let route = sessionStorage.getItem('route');
     axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/ts`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat' })
@@ -57,7 +60,7 @@ function TrackDeviation( props ) {
         rail_track : selectTrack,
         begin_measure_ts : new Date(range.start).toISOString(),
         end_measure_ts : new Date(range.end).toISOString(),
-        railroad_name : "인천 1호선"
+        railroad_name : route
       }
     })
     .then(response => {
@@ -102,13 +105,14 @@ function TrackDeviation( props ) {
   ];
 
   useEffect(() => {
+    getRailroadSection(setRailroadSection);
   }, []);
   
   return (
     <div className="trackDeviation" >
       <div className="railStatusContainer">
         <RailStatus 
-          railroadSection={RAILROADSECTION} 
+          railroadSection={railroadSection} 
           pathClick={pathClick}
           dataExits={dataExits}
         ></RailStatus>
@@ -142,7 +146,7 @@ function TrackDeviation( props ) {
                 <div className="title">상하선 </div>
                 <div className="date">
                 <Radio.Group style={RADIO_STYLE} value={selectTrack} defaultValue={selectTrack} 
-                  onChange={(val)=>{setSelectTrack(val)}}
+                  onChange={(e)=>{setSelectTrack(e.target.value)}}
                 >
                   <Radio value={STRING_UP_TRACK} >상선</Radio>
                   <Radio value={STRING_DOWN_TRACK} >하선</Radio>
@@ -217,18 +221,26 @@ function TrackDeviation( props ) {
               <div className="dataOption">
                 <button onClick={()=>{
                   let searchChartView_ = [];
+                  let measureTs = new Date().toISOString();
+                  try{
+                    measureTs = dataExitsDate[selectMeasureDate][0];
+                  }catch(e){
+                    alert("측정일자를 찾을 수 없습니다. 측정분기와 측정일자가 선택되어있는지 확인해주세요.")
+                    return;
+                  }
+                  let route = sessionStorage.getItem('route');
                   for( let option of selectCheckBox ){
-                    let start = (selectTrack === STRING_UP_TRACK) ? selectedPath.start_station_up_track_location : selectedPath.start_station_down_track_location;
-                    let end = (selectTrack === STRING_UP_TRACK) ? selectedPath.end_station_up_track_location : selectedPath.end_station_down_track_location;
+                    let start = selectedPath.beginKp;
+                    let end = selectedPath.endKp;
                     start = (start>0) ? start/1000 : start;
                     end = (end>0) ? end/1000 : end;
                     let param = {
                       begin_kp : [start],
                       end_kp : [end],
-                      measure_ts : dataExitsDate[selectMeasureDate][0],
+                      measure_ts : measureTs,
                       rail_track : selectTrack,
                       data_type : option,
-                      railroad_name : "인천 1호선",
+                      railroad_name : route,
                     };
                     console.log(param);
                     axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/graph_data`,{

@@ -257,52 +257,54 @@ class PlaceGauge extends React.Component {
 		rectList = [];
 		if(this.props.path === undefined)	return;
 		if(this.props.instrumentationPoint === undefined)	return;
-		let rightMargin = this.state.rightMargin;
 		let lineSpacing = this.state.lineSpacing;
 		let context = this.state.ctx;
 		context.save();
 		console.log(this.props.path);
-		let upTrackLength = this.props.path.end_station_up_track_location - this.props.path.start_station_up_track_location;
-		let downTrackLength = this.props.path.end_station_down_track_location - this.props.path.start_station_down_track_location;
+		let trackBeginKP = this.props.path.beginKp;
+		let trackEndKP = this.props.path.endKp;
+		let trackLength = trackEndKP - trackBeginKP;
 
 		console.log("PlaceGauge - drawPlace");
 		for( let data of this.props.existData ){
 			let start = data.beginKp * 1000;
 			let end = data.endKp * 1000;
 			let railTrack = data.railTrack;
-			if( start < this.props.path.start_station_up_track_location && end > this.props.path.end_station_down_track_location ){
-				start = this.props.path.start_station_up_track_location;
-				end = this.props.path.end_station_up_track_location;
-			}else if( end < this.props.path.start_station_up_track_location ){
+			if( start < trackBeginKP && end > trackEndKP ){
+				start = trackBeginKP;
+				end = trackEndKP;
+			}else if( end < trackBeginKP ){
 				continue;
-			}else if( start > this.props.path.end_station_up_track_location ){
+			}else if( start > trackEndKP ){
 				continue;
 			}
-			if( start < this.props.path.start_station_up_track_location ){
-				start = this.props.path.start_station_up_track_location;
+			if( start < trackBeginKP ){
+				start = trackBeginKP;
 			}
-			if( end > this.props.path.end_station_up_track_location ){
-				end = this.props.path.end_station_up_track_location;
+			if( end > trackEndKP ){
+				end = trackEndKP;
 			}
 			context.strokeStyle = (this.props.selectedGauge === data.roughnessId) ? 'red' : 'black';
+			let startPoint = {
+				x: (start - trackBeginKP) / trackLength * 100,
+				trackType: 1,
+				name: this.naming(start)
+			}
+			let endPoint = {
+				x: (end - trackBeginKP) / trackLength * 100,
+				trackType: 1,
+				name: this.naming(start)
+			}
+			let boxWidth = (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10;
+			if( boxWidth < 0 ){ continue; }
 			if( railTrack === STRING_UP_TRACK_RIGHT2 ){
 				let y = this.state.canvas.height / 2 - this.state.padding + lineSpacing;
-				let startPoint = {
-					x: (start - this.props.path.start_station_up_track_location) / upTrackLength * 100,
-					trackType: 1,
-					name: this.naming(start)
-				}
-				let endPoint = {
-					x: (end - this.props.path.start_station_up_track_location) / upTrackLength * 100,
-					trackType: 1,
-					name: this.naming(start)
-				}
 				let rect = {
 					beginKp : data.beginKp,
 					endKp : data.endKp,
 					x : startPoint.x * this.state.scaleX + this.state.x, 
 					y : y - 10,
-					width : (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10,
+					width : boxWidth,
 					height : 20,
 					dataFile : data.dataFile,
 					railroadId : data.railroadId,
@@ -312,22 +314,12 @@ class PlaceGauge extends React.Component {
 				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
 			}else if( railTrack === STRING_DOWN_TRACK_LEFT2 ){
 				let y = this.state.canvas.height / 2 + this.state.padding - lineSpacing;
-				let startPoint = {
-					x: (start - this.props.path.start_station_up_track_location) / upTrackLength * 100,
-					trackType: 1,
-					name: this.naming(start)
-				}
-				let endPoint = {
-					x: (end - this.props.path.start_station_up_track_location) / upTrackLength * 100,
-					trackType: 1,
-					name: this.naming(start)
-				}
 				let rect = {
 					beginKp : data.beginKp,
 					endKp : data.endKp,
 					x : startPoint.x * this.state.scaleX + this.state.x, 
 					y : y - 10,
-					width : (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10,
+					width : boxWidth,
 					height : 20,
 					dataFile : data.dataFile,
 					railroadId : data.railroadId,
@@ -337,22 +329,12 @@ class PlaceGauge extends React.Component {
 				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
 			}else if( railTrack === STRING_DOWN_TRACK_RIGHT2 ){
 				let y = this.state.canvas.height / 2 + this.state.padding;
-				let startPoint = {
-					x: (start - this.props.path.start_station_up_track_location) / upTrackLength * 100,
-					trackType: 1,
-					name: this.naming(start)
-				}
-				let endPoint = {
-					x: (end - this.props.path.start_station_up_track_location) / upTrackLength * 100,
-					trackType: 1,
-					name: this.naming(start)
-				}
 				let rect = {
 					beginKp : data.beginKp,
 					endKp : data.endKp,
 					x : startPoint.x * this.state.scaleX + this.state.x, 
 					y : y - 10,
-					width : (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10,
+					width : boxWidth,
 					height : 20,
 					dataFile : data.dataFile,
 					railroadId : data.railroadId,
@@ -362,22 +344,12 @@ class PlaceGauge extends React.Component {
 				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
 			}else if( railTrack === STRING_UP_TRACK_LEFT2 ){
 				let y = this.state.canvas.height / 2 - this.state.padding;
-				let startPoint = {
-					x: (start - this.props.path.start_station_up_track_location) / upTrackLength * 100,
-					trackType: 1,
-					name: this.naming(start)
-				}
-				let endPoint = {
-					x: (end - this.props.path.start_station_up_track_location) / upTrackLength * 100,
-					trackType: 1,
-					name: this.naming(start)
-				}
 				let rect = {
 					beginKp : data.beginKp,
 					endKp : data.endKp,
 					x : startPoint.x * this.state.scaleX + this.state.x, 
 					y : y - 10,
-					width : (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10,
+					width : boxWidth,
 					height : 20,
 					dataFile : data.dataFile,
 					railroadId : data.railroadId,
@@ -388,75 +360,6 @@ class PlaceGauge extends React.Component {
 			}
 		}
 
-
-		//상선
-		/* for(let i = 0 ; i < this.props.upTrackPoint.length; i++) {
-			let location = this.props.upTrackPoint[i].kp;
-			if( !(location >= this.props.path.start_station_up_track_location && location <= this.props.path.end_station_up_track_location) ){
-				continue;
-			}
-			let point = {
-				x: (location - this.props.path.start_station_up_track_location) / upTrackLength * 100,
-				trackType: 1,
-				name: this.naming(location)
-			}
-
-			let y = this.state.canvas.height / 2 - this.state.padding;
-
-			context.beginPath();
-			
-			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
-			context.fillStyle = "yellow";
-			context.fill();
-			context.stroke();
-
-			context.fillStyle = "black";
-			context.textBaseline = "bottom";
-			context.textAlign = "center";
-			context.fillText(point.name, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
-			
-			context.closePath();
-			pointList.push({
-				x : point.x * this.state.scaleX + this.state.x,
-				y : y,
-				radius : this.state.pointRadius
-			});
-		} */
-
-		//하선
-		/* for(let i = 0 ; i < this.props.downTrackPoint.length; i++) {
-			let location = this.props.downTrackPoint[i].kp;
-			if( !(location >= this.props.path.start_station_down_track_location && location <= this.props.path.end_station_down_track_location) ){
-				continue;
-			}
-			let point = {
-				x: (location - this.props.path.start_station_down_track_location) / downTrackLength * 100,
-				trackType: 1,
-				name: this.naming(location)
-			}
-
-			let y = this.state.canvas.height / 2 + this.state.padding;
-
-			context.beginPath();
-			
-			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
-			context.fillStyle = "yellow";
-			context.fill();
-			context.stroke();
-
-			context.fillStyle = "black";
-			context.textBaseline = "bottom";
-			context.textAlign = "center";
-			context.fillText(point.name, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
-			
-			context.closePath();
-			pointList.push({
-				x : point.x * this.state.scaleX + this.state.x,
-				y : y,
-				radius : this.state.pointRadius
-			});
-		} */
-
 		context.restore();
 	}
 
@@ -466,23 +369,22 @@ class PlaceGauge extends React.Component {
 
 		let context = this.state.ctx;
 		context.save();
-
-		let upTrackLength = this.props.path.end_station_up_track_location - this.props.path.start_station_up_track_location;
-		let downTrackLength = this.props.path.end_station_down_track_location - this.props.path.start_station_down_track_location;
+		let trackBeginKP = this.props.path.beginKp * 1000;
+		let trackEndKP = this.props.path.endKp * 1000;
+		let trackLength = trackEndKP - trackBeginKP;
 
 		let x = 0, y = 0;
 		let data = this.props.instrumentationPoint;
 
-		for (let n = 0; n < data.length; n++) {
-			let point = data[n];
+		for (let point of data ) {
 			//상선
-			if (point.track_type == 1) {
-				x = ((point.location - this.props.path.start_station_up_track_location) / upTrackLength) * 100;
+			if (point.track_type === 1) {
+				x = ((point.location - trackBeginKP) / trackLength) * 100;
 				y = this.state.canvas.height / 2 - this.state.padding;
 			}
 			//하선
-			else if (point.track_type == 0) {
-				x = ((point.location - this.props.path.start_station_down_track_location) / downTrackLength) * 100;
+			else if (point.track_type === 0) {
+				x = ((point.location - trackBeginKP) / trackLength) * 100;
 				y = this.state.canvas.height / 2 + this.state.padding;
 			}
 

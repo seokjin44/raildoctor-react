@@ -9,13 +9,13 @@ import 'dayjs/locale/ko';
 import { Select } from 'antd';
 import { Box, Modal } from "@mui/material";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
-import { BOXSTYLE, DIRECTWEARINFO, INSTRUMENTATIONPOINT, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO, STRING_CORNER_WEAR, STRING_DOWN_TRACK, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_UP_TRACK, STRING_VERTICAL_WEAR, TRACKSPEEDDATA, UP_TRACK } from "../../constant";
+import { BOXSTYLE, DIRECTWEARINFO, INSTRUMENTATIONPOINT, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO, STRING_CORNER_WEAR, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_UP_TRACK, STRING_VERTICAL_WEAR, TRACKSPEEDDATA, UP_TRACK } from "../../constant";
 import AlertIcon from "../../assets/icon/decision/3876149_alert_emergency_light_protection_security_icon.png";
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToNumber, convertToNumber2, filterArrays, findRange, trackNumberToString } from "../../util";
+import { convertToNumber, convertToNumber2, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, trackNumberToString } from "../../util";
 import lodash from "lodash";
 
 const { TextArea } = Input;
@@ -23,19 +23,10 @@ let wear3DMinMax = [];
 let wearFilter = [STRING_VERTICAL_WEAR, STRING_CORNER_WEAR];
 function WearMaintenance( props ) {
   const [selectedPath, setSelectedPath] = useState({
-    "start_station_id": "0",
-    "end_station_id": "0",
     "start_station_name": "",
     "end_station_name": "",
-    "section_id": "",
-    "start_station_up_track_location": 0,
-    "start_station_down_track_location": 0,
-    "end_station_up_track_location": 0,
-    "end_station_down_track_location": 0,
-    "start_station_latitude": 0,
-    "start_station_longitude": 0,
-    "end_station_latitude": 0,
-    "end_station_longitude": 0
+    "beginKp": 0,
+    "endKp": 0,
   });
   const [selectKP, setSelectKP] = useState({
     name : "",
@@ -58,6 +49,8 @@ function WearMaintenance( props ) {
   const [selectModel, setSelectModel] = useState("");
   const [modelOptions, setModelOptions] = useState([{value:"선형회귀모형",label:"선형회귀모형"}]);
   const [selectWearCorrelation, setSelectWearCorrelation] = useState("");
+  const [railroadSection, setRailroadSection] = useState([]);
+  const [trackSpeedData, setTrackSpeedData] = useState([{trackName:"", data:[]},{trackName:"", data:[]}]);
 
   const handleClose = () => {
     setOpen(false);
@@ -140,6 +133,7 @@ function WearMaintenance( props ) {
     /* getWearInfo(); */
     let startKP = convertToNumber(selectKP.name);
     let endKP = startKP + 0.099;
+    let route = sessionStorage.getItem('route');
     let param = {
       begin_kp : [3.3],
       end_kp : [4.4],
@@ -148,7 +142,7 @@ function WearMaintenance( props ) {
       minAccumulateWeight : 1,
       maxAccumulateWeight : 500000000,
       railTrack : trackNumberToString(selectKP.trackType),
-      railroadName : "인천 1호선" ,
+      railroadName : route,
       graphType : "TWO_DIMENTION"
     }
     console.log(param);
@@ -174,7 +168,7 @@ function WearMaintenance( props ) {
       minAccumulateWeight : 1,
       maxAccumulateWeight : 500000000,
       railTrack : trackNumberToString(selectKP.trackType),
-      railroadName : "인천 1호선" ,
+      railroadName : route,
       graphType : "THREE_DIMENTION"
     }
     console.log(param);
@@ -291,19 +285,34 @@ function WearMaintenance( props ) {
   }
 
   useEffect(() => {
+    getRailroadSection(setRailroadSection);
+    let route = sessionStorage.getItem('route');
+    if( route === STRING_ROUTE_INCHON ){
+      getInchonSpeedData(setTrackSpeedData);
+    }else if( route === STRING_ROUTE_SEOUL ){
+      getSeoulSpeedData(setRailroadSection);
+    }
+  }, []);
+  
+  useEffect( ()=> {
+    if( railroadSection.length < 2 ){
+      return;
+    }
+    let route = sessionStorage.getItem('route');
+    console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
     axios.get('https://raildoctor.suredatalab.kr/api/railwears/kp',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
       params : {
-        railroadName : "인천 1호선",
-        begin : "계양",
-        end : "송도달빛축제공원"
+        railroadName : route,
+        begin : railroadSection[0].displayName,
+        end : railroadSection[railroadSection.length-1].displayName
       }
     })
     .then(response => {
       let dataArr = [];
-      RAILROADSECTION.forEach( data => {
+      railroadSection.forEach( data => {
         dataArr.push(0);
       });
       let dataExits_ = [...dataArr];
@@ -311,24 +320,24 @@ function WearMaintenance( props ) {
       console.log(response.data);
       for( let data of response.data.t1 ){
         let index = -1;
-        index = findRange(RAILROADSECTION, data * 1000, UP_TRACK);
+        index = findRange(railroadSection, data * 1000);
         dataExits_[index]++;        
       }
       for( let data of response.data.t2 ){
         let index = -1;
-        index = findRange(RAILROADSECTION, data * 1000, UP_TRACK);
+        index = findRange(railroadSection, data * 1000);
         dataExits_[index]++;
       }
       setDataExits(dataExits_);
     })
     .catch(error => console.error('Error fetching data:', error));
-  }, []);
-  
+  }, [railroadSection])
+
   return (
     <div className="wearMaintenance" >
       <div className="railStatusContainer">
         <RailStatus 
-          railroadSection={RAILROADSECTION} 
+          railroadSection={railroadSection} 
           pathClick={pathClick}
           dataExits={dataExits}
         ></RailStatus>
@@ -574,7 +583,7 @@ function WearMaintenance( props ) {
                 <div className="componentBox" style={{ marginRight: "10px", width: "calc(100% - 10px)", overflow: "hidden"}}>
                   <div className="demoImgContainer">
                     <TrackSpeed 
-                      data={TRACKSPEEDDATA} 
+                      data={trackSpeedData} 
                       kp={convertToNumber2(selectKP.name)} 
                     ></TrackSpeed>
                   </div>

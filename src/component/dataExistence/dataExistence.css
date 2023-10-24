@@ -48,3 +48,42 @@
 .tabPanel{
     padding-bottom: 50px;
 }
+
+.paut .componentBox {
+    padding: 10px;
+    width: calc(100% - 20px);
+    height: calc( 100% - 25px - 20px);
+}
+.paut .componentBox .curDate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    height: 100%;
+}
+
+.paut.componentBox .leftBtn,
+.paut.componentBox .rightBtn{
+    width: 30px;
+    height: 30px;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.paut.componentBox .leftBtn{
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    background-image: url(../../assets/icon/dataexist/left.png);
+}
+
+.paut.componentBox .rightBtn{
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    background-image: url(../../assets/icon/dataexist/right.png);
+}

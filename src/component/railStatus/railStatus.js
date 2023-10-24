@@ -1,6 +1,7 @@
 import React from "react";
 import "./railSTatus.css";
 import isEqual from 'lodash/isEqual';
+import { STRING_PATH, STRING_STATION } from "../../constant";
 
 class RailStatus extends React.Component {
 
@@ -38,109 +39,151 @@ class RailStatus extends React.Component {
   }
 
   init() {
+    console.log("!");
     if(this.props.railroadSection === undefined)  return;
     document.getElementById("pointer-list-" + this.state.id).innerHTML = "";
 
     let width = document.getElementById("pointer-list-" + this.state.id).offsetWidth - this.state.padding * 2;
-    let tick = width / (this.props.railroadSection.length + 2);
+    /* let tick = width / (this.props.railroadSection.length + 2); */
+    let stationList = [];
+    let pathList = [];
+    for(let section of this.props.railroadSection){
+      if( section.type === STRING_STATION ){
+        stationList.push(section);
+      }
+    }
+    for(let section of this.props.railroadSection){
+      if( section.type === STRING_PATH ){
+        pathList.push(section);
+      }
+    }
 
-    for (let i = 0; i < this.props.railroadSection.length; i++) {
-      let pointerDiv = document.createElement("div");
-      pointerDiv.className = "pointer";
-      pointerDiv.style.left = (tick * (i + 1)) + "px";
-      pointerDiv.style.top = "3px";
-      pointerDiv.style.zIndex = 10;
-      pointerDiv.style.width = this.state.pointerWidth + "px";
-
-      let pointerTextDiv = document.createElement("div");
-      pointerTextDiv.className = "pointerText";
-      pointerTextDiv.innerText = this.props.railroadSection[i].start_station_name;
-      pointerDiv.appendChild(pointerTextDiv);
-      document.getElementById("pointer-list-" + this.state.id).appendChild(pointerDiv);
-
-      if(i === this.props.railroadSection.length - 1) {
-        pointerDiv = document.createElement("div");
-        pointerDiv.className = "pointer";
-        pointerDiv.style.left = (tick * (i + 2)) + "px";
+    let tick = width / (stationList.length + 1);
+    for (let i = 0; i < stationList.length; i++) {
+        let section = stationList[i];
+        let pointerDiv = document.createElement("div");
+        pointerDiv.className = `pointer obj i${section.index}`;
+        pointerDiv.style.left = (tick * (i + 1)) + "px";
         pointerDiv.style.top = "3px";
         pointerDiv.style.zIndex = 10;
         pointerDiv.style.width = this.state.pointerWidth + "px";
+  
+        pointerDiv.dataset.start_station_name = section.displayName;
+        pointerDiv.dataset.end_station_name = section.displayName;
+        pointerDiv.dataset.beginKp = section.beginKp;
+        pointerDiv.dataset.endKp = section.endKp;
+        let this_ = this;
+        pointerDiv.onclick = function (e) {
+          console.log(e);
+          let selectedPointer = document.getElementsByClassName("pointer selectedPath")[0];
+          if (e.target === selectedPointer) {
+            return;
+          } else if (selectedPointer !== undefined) {
+            selectedPointer.classList.remove("selectedPath");
+          }
 
-        pointerTextDiv = document.createElement("div");
+          let selectedPath = document.getElementsByClassName("path selectedPath")[0];
+          if (e.target === selectedPath) {
+            return;
+          } else if (selectedPath !== undefined) {
+            selectedPath.classList.remove("selectedPath");
+          }
+
+          e.target.classList.add("selectedPath");
+  
+          let path = {
+            start_station_name: e.target.dataset.start_station_name,
+            end_station_name: e.target.dataset.end_station_name,
+            type : STRING_STATION,
+            beginKp: e.target.dataset.beginKp * 1000,
+            endKp: e.target.dataset.endKp * 1000,
+          }
+  
+          this_.pathClick(path);
+        }
+
+        let pointerTextDiv = document.createElement("div");
         pointerTextDiv.className = "pointerText";
-        pointerTextDiv.innerText = this.props.railroadSection[i].end_station_name;
+        pointerTextDiv.innerText = section.displayName;
+        
         pointerDiv.appendChild(pointerTextDiv);
         document.getElementById("pointer-list-" + this.state.id).appendChild(pointerDiv);
-      }
+    }
 
-      let pathDiv = document.createElement("div");
-      pathDiv.className = "path";
-      pathDiv.style.left = (tick * (i + 1) + (this.state.pointerWidth / 2)) + "px";
-      pathDiv.style.width = tick + "px";
-      pathDiv.style.zIndex = 9;
-      pathDiv.style.top = "3px";
-      pathDiv.dataset.start_station_id = this.props.railroadSection[i].start_station_id;
-      pathDiv.dataset.end_station_id = this.props.railroadSection[i].end_station_id;
-      pathDiv.dataset.start_station_name = this.props.railroadSection[i].start_station_name;
-      pathDiv.dataset.end_station_name = this.props.railroadSection[i].end_station_name;
-      pathDiv.dataset.section_id = this.props.railroadSection[i].id;
+    /* tick = width / (pathList.length + 2); */
+    for (let i = 0; i < pathList.length; i++) {
+      let section = pathList[i];
+        /* let section = this.props.railroadSection[i];
+        let pointerDiv = document.createElement("div");
+        pointerDiv.className = "pointer";
+        pointerDiv.style.left = (tick * (i + 1)) + "px";
+        pointerDiv.style.top = "3px";
+        pointerDiv.style.zIndex = 10;
+        pointerDiv.style.width = this.state.pointerWidth + "px";
+  
+        let pointerTextDiv = document.createElement("div");
+        pointerTextDiv.className = "pointerText";
+        pointerTextDiv.innerText = section.displayName;
+        pointerDiv.appendChild(pointerTextDiv);
+        document.getElementById("pointer-list-" + this.state.id).appendChild(pointerDiv); */
 
-      pathDiv.dataset.start_station_up_track_location = this.props.railroadSection[i].start_station_up_track_location;
-      pathDiv.dataset.start_station_down_track_location = this.props.railroadSection[i].start_station_down_track_location;
-      pathDiv.dataset.end_station_up_track_location = this.props.railroadSection[i].end_station_up_track_location;
-      pathDiv.dataset.end_station_down_track_location = this.props.railroadSection[i].end_station_down_track_location;
+      /* if(i < this.props.railroadSection.length - 1) { */
+        let pathDiv = document.createElement("div");
+        pathDiv.className = `path obj i${section.index}`;
+        pathDiv.style.left = (tick * (i + 1) + (this.state.pointerWidth / 2)) + "px";
+        pathDiv.style.width = tick + "px";
+        pathDiv.style.zIndex = 9;
+        pathDiv.style.top = "3px";
 
-      pathDiv.dataset.start_station_latitude = this.props.railroadSection[i].start_station_latitude;
-      pathDiv.dataset.start_station_longitude = this.props.railroadSection[i].start_station_longitude;
-      pathDiv.dataset.end_station_latitude = this.props.railroadSection[i].end_station_latitude;
-      pathDiv.dataset.end_station_longitude = this.props.railroadSection[i].end_station_longitude;
+        pathDiv.dataset.start_station_name = section.start_station_name;
+        pathDiv.dataset.end_station_name = section.end_station_name;
+  
+        pathDiv.dataset.beginKp = section.beginKp;
+        pathDiv.dataset.endKp = section.endKp;
 
+        let this_ = this;
+        pathDiv.onclick = function (e) {
+          let selectedPath = document.getElementsByClassName("path selectedPath")[0];
+          if (e.target === selectedPath) {
+            return;
+          } else if (selectedPath !== undefined) {
+            selectedPath.classList.remove("selectedPath");
+          }
 
-      let this_ = this;
-      pathDiv.onclick = function (e) {
-        let selectedPath = document.getElementsByClassName("path selectedPath")[0];
+          let selectedPointer = document.getElementsByClassName("pointer selectedPath")[0];
+          if (e.target === selectedPointer) {
+            return;
+          } else if (selectedPointer !== undefined) {
+            selectedPointer.classList.remove("selectedPath");
+          }
 
-        if (e.target === selectedPath) {
-          return;
-        } else if (selectedPath !== undefined) {
-          selectedPath.classList.remove("selectedPath");
+          e.target.classList.add("selectedPath");
+  
+          let path = {
+            start_station_name: e.target.dataset.start_station_name,
+            end_station_name: e.target.dataset.end_station_name,
+            type : STRING_PATH,
+            beginKp: e.target.dataset.beginKp * 1000,
+            endKp: e.target.dataset.endKp * 1000,
+          }
+  
+          this_.pathClick(path);
         }
-        e.target.classList.add("selectedPath");
-
-        let path = {
-          start_station_id: e.target.dataset.start_station_id,
-          end_station_id: e.target.dataset.end_station_id,
-          start_station_name: e.target.dataset.start_station_name,
-          end_station_name: e.target.dataset.end_station_name,
-          section_id: e.target.dataset.section_id,
-
-          start_station_up_track_location: parseInt(e.target.dataset.start_station_up_track_location),
-          start_station_down_track_location: parseInt(e.target.dataset.start_station_down_track_location),
-          end_station_up_track_location: parseInt(e.target.dataset.end_station_up_track_location),
-          end_station_down_track_location: parseInt(e.target.dataset.end_station_down_track_location),
-
-          start_station_latitude: parseFloat(e.target.dataset.start_station_latitude),
-          start_station_longitude: parseFloat(e.target.dataset.start_station_longitude),
-          end_station_latitude: parseFloat(e.target.dataset.end_station_latitude),
-          end_station_longitude: parseFloat(e.target.dataset.end_station_longitude)
-        }
-
-        this_.pathClick(path);
-      }
-      document.getElementById("pointer-list-" + this.state.id).appendChild(pathDiv);
+        document.getElementById("pointer-list-" + this.state.id).appendChild(pathDiv);
+      /* } */      
     }
   }
 
   dataExist() {
-    let pathList = document.querySelectorAll(".pointerList .path");
-    pathList.forEach( (path, i) => {
-      let cnt = this.props.dataExits[i];
+    this.props.dataExits.forEach( (cnt, i) => {
       if( cnt > 0 ){
-        console.log(path.classList);
-        path.classList.add("exist");
+        let obj = document.querySelectorAll(`.pointerList .obj.i${i}`)[0];
+        console.log(obj.classList);
+        obj.classList.add("exist");
         let cntDiv = document.createElement("div");
+        cntDiv.className = "cnt"
         cntDiv.innerHTML = "(" + cnt + ")";
-        path.appendChild(cntDiv);
+        obj.appendChild(cntDiv);
       }
     })
   }

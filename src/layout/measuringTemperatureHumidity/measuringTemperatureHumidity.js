@@ -7,7 +7,7 @@ import { Checkbox, Input, Select, DatePicker } from "antd";
 import { CHART_FORMAT_DAILY, CHART_FORMAT_TODAY, RAILROADSECTION, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, TEMPDATA1, UP_TRACK, colors } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertObjectToArray, convertToCustomFormat, findRange, tempDataName } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, findRange, getRailroadSection, tempDataName } from "../../util";
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
 
 const { RangePicker } = DatePicker;
@@ -31,6 +31,7 @@ function MeasuringTemperatureHumidity( props ) {
   const [chartData, setChartData] = useState([]);
   const [checkboxSelects, setCheckboxSelects] = useState([]);
   const [selectPoints, setSelectPoints] = useState([]);
+  const [railroadSection, setRailroadSection] = useState([]);
 
   const handleChange = (value) => {
     console.log(`selected ${value}`);
@@ -50,12 +51,8 @@ function MeasuringTemperatureHumidity( props ) {
   const pathClick = (select) => {
     console.log(select);
     let selectOptionSensors_ = [];
-    let startKP = (select.start_station_up_track_location > select.start_station_down_track_location)? 
-    select.start_station_down_track_location : select.start_station_up_track_location
-    ;
-    let endKP = (select.end_station_up_track_location > select.end_station_down_track_location)? 
-    select.end_station_up_track_location : select.end_station_down_track_location
-    ;
+    let startKP = select.beginKp;
+    let endKP = select.endKp;
     for( let sensor of sensorList ){
       if( (sensor.measureKp * 1000) >= startKP &&
           (sensor.measureKp * 1000) <= endKP
@@ -143,19 +140,28 @@ function MeasuringTemperatureHumidity( props ) {
   }
 
   useEffect(() => {
+    getRailroadSection(setRailroadSection);
+  }, []);
+
+  useEffect( ()=> {
+    if( railroadSection.length < 2 ){
+      return;
+    }
+    console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
+    let route = sessionStorage.getItem('route');
     axios.get('https://raildoctor.suredatalab.kr/api/temperatures/locations',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
       params : {
-        railroad : "인천 1호선",
-        begin : "계양",
-        end : "송도달빛축제공원"
+        railroad : route,
+        begin : railroadSection[0].displayName,
+        end : railroadSection[railroadSection.length-1].displayName
       }
     })
     .then(response => {
       let dataArr = [];
-      RAILROADSECTION.forEach( data => {
+      railroadSection.forEach( data => {
         dataArr.push(0);
       });
       let dataExits_ = [...dataArr];
@@ -164,20 +170,20 @@ function MeasuringTemperatureHumidity( props ) {
       sensorList = response.data.sensors;
       for( let sensor of response.data.sensors ){
         let index = -1;
-        index = findRange(RAILROADSECTION, sensor.measureKp * 1000, UP_TRACK);
+        index = findRange(railroadSection, sensor.measureKp * 1000);
         dataExits_[index]++;
       }
       setDataExits(dataExits_);
     })
     .catch(error => console.error('Error fetching data:', error));
-  }, []);
+  }, [railroadSection])
   
   return (
     <div className="trackDeviation measuringTemperatureHumidity" >
       <div className="scroll">
         <div className="railStatusContainer">
           <RailStatus 
-            railroadSection={RAILROADSECTION} 
+            railroadSection={railroadSection} 
             pathClick={pathClick}
             dataExits={dataExits}
           ></RailStatus>
@@ -237,7 +243,7 @@ function MeasuringTemperatureHumidity( props ) {
               <div className="line"></div>
               <div className="dataOption">
                 <button onClick={()=>{
-                  searchTempData()
+                  searchTempData();
                 }}>조회</button>
               </div>
               {/* <div className="line"></div>

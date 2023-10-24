@@ -16,7 +16,7 @@ import { DatePicker, Input, Select } from "antd";
 import PlaceGauge from "../../component/PlaceGauge/PlaceGauge";
 import axios from 'axios';
 import qs from 'qs';
-import { findRange, intervalSample, roundNumber } from "../../util";
+import { findRange, getRailroadSection, intervalSample, roundNumber } from "../../util";
 
 
 function RailRoughness( props ) {
@@ -27,18 +27,24 @@ function RailRoughness( props ) {
   const [gaugeData, setGaugeData] = useState([]);
   const [roughnessChartData, setRoughnessChartData] = useState([]);
   const [selectedGauge, setSelectedGauge] = useState("");
+  const [railroadSection, setRailroadSection] = useState([]);
 
   const selectChange = (val) => {
     setSelectRange(val);
     let range = DUMMY_RANGE[val];
+    if( railroadSection.length < 2 ){
+      return;
+    }
+    console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
+    let route = sessionStorage.getItem('route');
     axios.get('https://raildoctor.suredatalab.kr/api/railroughnesses/locations',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
       params : {
-        railroad : "인천 1호선",
-        begin : "계양",
-        end : "송도달빛축제공원",
+        railroad : route,
+        begin : railroadSection[0].displayName,
+        end : railroadSection[railroadSection.length-1].displayName,
         begin_ts : new Date(range.start).toISOString(),
         end_ts : new Date(range.end).toISOString()
       }
@@ -47,7 +53,7 @@ function RailRoughness( props ) {
       console.log(response.data);
       let dataArr = [];
       let index = -1;
-      RAILROADSECTION.forEach( data => {
+      railroadSection.forEach( data => {
         dataArr.push(0);
       })
       let dataExits_ = [...dataArr];
@@ -55,18 +61,8 @@ function RailRoughness( props ) {
       let dataList = response.data.entities;
       setGaugeData(dataList);
       for( let data of dataList ){
-        if( data.railTrack === STRING_UP_TRACK2 ||
-            data.railTrack === STRING_UP_TRACK_LEFT2 ||
-            data.railTrack === STRING_UP_TRACK_RIGHT2 ){
-          index = findRange(RAILROADSECTION, data.beginKp * 1000, UP_TRACK);
+          index = findRange(railroadSection, data.beginKp * 1000);
           dataExits_[index]++;
-        }
-        if( data.railTrack === STRING_DOWN_TRACK2 ||
-            data.railTrack === STRING_DOWN_TRACK_LEFT2 ||
-            data.railTrack === STRING_DOWN_TRACK_RIGHT2 ){
-          index = findRange(RAILROADSECTION, data.beginKp * 1000, DOWN_TRACK);
-          dataExits_[index]++;
-        }
       }
       setDataExits(dataExits_);
     })
@@ -83,13 +79,14 @@ function RailRoughness( props ) {
   }
 
   useEffect(() => {
+    getRailroadSection(setRailroadSection);
   }, []);
   
   return (
     <div className="trackDeviation railTrackAlignment" >
       <div className="railStatusContainer">
         <RailStatus 
-          railroadSection={RAILROADSECTION} 
+          railroadSection={railroadSection} 
           pathClick={pathClick}
           dataExits={dataExits}
         ></RailStatus>

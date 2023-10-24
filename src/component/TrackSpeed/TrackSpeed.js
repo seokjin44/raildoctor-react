@@ -2,6 +2,7 @@ import React from "react";
 import "./TrackSpeed.css";
 import { IncheonKP } from "../../constant";
 import { convertToCustomFormat } from "../../util";
+import isEqual from 'lodash/isEqual';
 
 class TrackSpeed extends React.Component {
 	KP1toPixel1Width = 0.125;
@@ -51,11 +52,10 @@ class TrackSpeed extends React.Component {
 	}
 
 	componentDidUpdate(prevProps, prevState){
+	  let canvas = this.state.canvas;
+	  let ctx = this.state.ctx;
 	  if (prevProps.kp !== this.props.kp) {
 		console.log('kp has changed');
-		const canvas = this.state.canvas;
-		const ctx = this.state.ctx;
-
 		//pointX * this.state.scaleX + this.state.x
 
 		/* let cneterKP = ((this.state.x + this.state.width)/2) / this.KP1toPixel1Width; */
@@ -90,6 +90,13 @@ class TrackSpeed extends React.Component {
 		this.drawLine();
 		ctx.restore(); // Restore the context to its saved state
 
+	  }
+
+	  if (!isEqual(prevProps.data, this.props.data)) {
+		ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+		this.drawYAxis();  
+		this.drawLegend();
+		this.drawLine();
 	  }
 	}
 
@@ -257,8 +264,8 @@ class TrackSpeed extends React.Component {
 		context.fillStyle = "black";  
 		context.textAlign = "right";  
 		context.textBaseline = "middle";  
-		context.fillText(": 상본선", this.state.x + this.state.padding * 3.25, this.state.padding);
-		context.fillText(": 하본선", this.state.x + this.state.padding * 7.75, this.state.padding);
+		context.fillText(`: ${this.props.data[0].trackName}`, this.state.x + this.state.padding * 3.25, this.state.padding);
+		context.fillText(`: ${this.props.data[1].trackName}`, this.state.x + this.state.padding * 7.75, this.state.padding);
 		
 		//상본선
 		context.beginPath();

@@ -1,7 +1,7 @@
 import React from "react";
 import "./PlaceInfo.css";
 import classNames from "classnames";
-import { DOWN_TRACK, UP_TRACK } from "../../constant";
+import { DOWN_TRACK, STRING_PATH, UP_TRACK } from "../../constant";
 
 let pointList = [];
 class PlaceInfo extends React.Component {
@@ -206,19 +206,19 @@ class PlaceInfo extends React.Component {
 
 		let context = this.state.ctx;
 		context.save();
+		let trackBeginKP = this.props.path.beginKp;
+		let trackEndKP = this.props.path.endKp;
+		let trackLength = trackEndKP - trackBeginKP;
 
-		let upTrackLength = this.props.path.end_station_up_track_location - this.props.path.start_station_up_track_location;
-		let downTrackLength = this.props.path.end_station_down_track_location - this.props.path.start_station_down_track_location;
-
-		let tick = 100;
-		let upTrackNumTick = parseInt(upTrackLength / tick);
-		let downTrackNumTick = parseInt(downTrackLength / tick);
+		let tick = (this.props.path.type === STRING_PATH) ? 100 : 20;
+		let upTrackNumTick = parseInt(trackLength / tick);
+		let downTrackNumTick = parseInt(trackLength / tick);
 
 		//상선
 		for(let i = 1 ; i < upTrackNumTick ; i++) {
-			let location = i * tick + this.props.path.start_station_up_track_location;
+			let location = i * tick + trackBeginKP;
 			let point = {
-				x: (location - this.props.path.start_station_up_track_location) / upTrackLength * 100,
+				x: (location - trackBeginKP) / trackLength * 100,
 				trackType: 1,
 				name: this.naming(location)
 			}
@@ -255,9 +255,9 @@ class PlaceInfo extends React.Component {
 
 		//하선
 		for(let i = 1 ; i < downTrackNumTick ; i++) {
-			let location = i * tick + this.props.path.start_station_down_track_location;
+			let location = i * tick + trackBeginKP;
 			let point = {
-				x: (location - this.props.path.start_station_down_track_location) / downTrackLength * 100,
+				x: (location - trackBeginKP) / trackLength * 100,
 				trackType: 1,
 				name: this.naming(location)
 			}
@@ -296,28 +296,29 @@ class PlaceInfo extends React.Component {
 	}
 
 	drawPoint() {
+		console.log("drawPoint");
 		if(this.props.path === undefined)	return;
 		if(this.props.instrumentationPoint === undefined)	return;
 
 		let context = this.state.ctx;
 		context.save();
 
-		let upTrackLength = this.props.path.end_station_up_track_location - this.props.path.start_station_up_track_location;
-		let downTrackLength = this.props.path.end_station_down_track_location - this.props.path.start_station_down_track_location;
+		let trackBeginKP = this.props.path.beginKp;
+		let trackEndKP = this.props.path.endKp;
+		let trackLength = trackEndKP - trackBeginKP;
 
 		let x = 0, y = 0;
 		let data = this.props.instrumentationPoint;
 
-		for (let n = 0; n < data.length; n++) {
-			let point = data[n];
+		for (let point of data) {
 			//상선
-			if (point.track_type == 1) {
-				x = ((point.location - this.props.path.start_station_up_track_location) / upTrackLength) * 100;
+			if (point.track_type === 1) {
+				x = ((point.location - trackBeginKP) / trackLength) * 100;
 				y = this.state.canvas.height / 2 - this.state.padding;
 			}
 			//하선
-			else if (point.track_type == 0) {
-				x = ((point.location - this.props.path.start_station_down_track_location) / downTrackLength) * 100;
+			else if (point.track_type === 0) {
+				x = ((point.location - trackBeginKP) / trackLength) * 100;
 				y = this.state.canvas.height / 2 + this.state.padding;
 			}
 

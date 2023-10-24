@@ -1,4 +1,7 @@
-import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
+import axios from 'axios';
+import qs from 'qs';
+import Papa from 'papaparse';
 
 export const dateFormat = ( date ) => {
     const yyyy = date.getFullYear();
@@ -52,15 +55,16 @@ export const convertToCustomFormat = (num) => {
     return `${thousandPart}k${formattedRemainder}`;
 }
 
-export const findRange = (ranges, x, trackType) => {
+export const findRange = (ranges, x) => {
+    console.log("findRange");
     let start = 0;
     let end = ranges.length - 1;
 
     while (start <= end) {
         let mid = Math.floor((start + end) / 2);
         let range = ranges[mid];
-        let rangeStart = (trackType === UP_TRACK) ? range.start_station_up_track_location : range.start_station_down_track_location;
-        let rangeEnd = (trackType === DOWN_TRACK) ? range.end_station_down_track_location : range.end_station_up_track_location;
+        let rangeStart = range.beginKp * 1000;
+        let rangeEnd = range.endKp * 1000;
 
         if (x >= rangeStart && x < rangeEnd) {
             return mid; // 범위를 찾았다면 해당 범위를 반환
@@ -282,3 +286,165 @@ export const numberToText = (value) => {
     if (value >= 1e3) return (value / 1e3) + 'K';
     return value.toString();
 };
+
+export const getRailroadSection = ( setRailroadSection ) =>{
+    let route = sessionStorage.getItem('route');
+    axios.get(`https://raildoctor.suredatalab.kr/api/railroads/structures`,{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroadName : route
+      }
+    })
+    .then(response => {
+      let pathList = [];
+      console.log(response.data.entities);
+      for( let i = 0; i < response.data.entities.length; i++ ){
+        let section = response.data.entities[i];
+        if( i < response.data.entities.length - 1 ){
+            let nextSection = response.data.entities[i+1];
+            pathList.push({
+                beginKp : section.endKp,
+                endKp : nextSection.beginKp,
+                start_station_name : section.displayName,
+                end_station_name : nextSection.displayName,
+                type : STRING_PATH,
+                index : i
+            });
+        }
+      }
+      let sumAry = [...pathList, ...response.data.entities];
+      sumAry.sort((a, b) => a.beginKp - b.beginKp);
+      let addIndexAry = sumAry.map((item, idx) => {
+        return {
+            ...item,
+            index: idx
+        };
+    });
+      setRailroadSection(addIndexAry);
+    })
+    .catch(error => console.error('Error fetching data:', error));   
+}
+
+export const getInchonSpeedData = ( setTrackSpeedData ) => {
+    let speedData = [{trackType: 1, trackName : "상본선", data : []}, {trackType: -1, trackName : "하본선", data : []}];
+    axios.all([
+        axios.get("https://raildoctor.suredatalab.kr/resources/data/railroads/operatingspeed/incheon_1_t1.csv", { responseType: 'text' }),
+        axios.get("https://raildoctor.suredatalab.kr/resources/data/railroads/operatingspeed/incheon_1_t2.csv", { responseType: 'text' })
+      ])
+      .then(axios.spread((response1, response2) => {
+        // 두 요청이 모두 완료됐을 때 실행됩니다.
+        /* console.log('Data 1:', response1.data);
+        console.log('Data 2:', response2.data); */
+        let csvData1 = response1.data;
+        let csvData2 = response2.data;
+        Papa.parse(csvData1, {
+            header: true,  // 첫 번째 행을 헤더로 사용
+            complete: function(result) {
+                let modifiedData = result.data.map(row => {
+                    if (row.hasOwnProperty('kp') && row.hasOwnProperty('speed')) {
+                        let newRow = {
+                            x: row['kp'],
+                            y: row['speed'],
+                            name: row['speed'] === '0' ? ' ' : ''
+                            /* name: "_" */
+                        };
+                        return newRow;
+                    }
+                    return row;
+                });
+                console.log(modifiedData);
+                speedData[0].data  = modifiedData;
+                /* setTrackSpeedData(speedData);
+                console.log(speedData); */
+
+                Papa.parse(csvData2, {
+                    header: true,  // 첫 번째 행을 헤더로 사용
+                    complete: function(result) {
+                        let modifiedData = result.data.map(row => {
+                            if (row.hasOwnProperty('kp') && row.hasOwnProperty('speed')) {
+                                let newRow = {
+                                    x: row['kp'],
+                                    y: row['speed'],
+                                    name: ""
+                                };
+                                return newRow;
+                            }
+                            return row;
+                        });
+                        console.log(modifiedData);
+                        speedData[1].data  = modifiedData;
+                        setTrackSpeedData(speedData);
+                        console.log(speedData);
+                    },
+                  });
+
+            },
+        });
+      }))
+      .catch(error => {
+        console.error('Error in one of the requests:', error);
+    });
+}
+
+export const getSeoulSpeedData = ( setTrackSpeedData ) => {
+    let speedData = [{trackType: 1, trackName : "내선순환", data : []}, {trackType: -1, trackName : "외선순환", data : []}];
+    axios.all([
+        axios.get("https://raildoctor.suredatalab.kr/resources/data/railroads/operatingspeed/seoul_2_t1.csv", { responseType: 'text' }),
+        axios.get("https://raildoctor.suredatalab.kr/resources/data/railroads/operatingspeed/seoul_2_t2.csv", { responseType: 'text' })
+      ])
+      .then(axios.spread((response1, response2) => {
+        // 두 요청이 모두 완료됐을 때 실행됩니다.
+        /* console.log('Data 1:', response1.data);
+        console.log('Data 2:', response2.data); */
+        let csvData1 = response1.data;
+        let csvData2 = response2.data;
+        Papa.parse(csvData1, {
+            header: true,  // 첫 번째 행을 헤더로 사용
+            complete: function(result) {
+                let modifiedData = result.data.map(row => {
+                    if (row.hasOwnProperty('kp') && row.hasOwnProperty('speed')) {
+                        let newRow = {
+                            x: row['kp'],
+                            y: row['speed'],
+                            name: row['speed'] === '0' ? ' ' : ''
+                            /* name: "_" */
+                        };
+                        return newRow;
+                    }
+                    return row;
+                });
+                console.log(modifiedData);
+                speedData[0].data  = modifiedData;
+                /* setTrackSpeedData(speedData);
+                console.log(speedData); */
+
+                Papa.parse(csvData2, {
+                    header: true,  // 첫 번째 행을 헤더로 사용
+                    complete: function(result) {
+                        let modifiedData = result.data.map(row => {
+                            if (row.hasOwnProperty('kp') && row.hasOwnProperty('speed')) {
+                                let newRow = {
+                                    x: row['kp'],
+                                    y: row['speed'],
+                                    name: ""
+                                };
+                                return newRow;
+                            }
+                            return row;
+                        });
+                        console.log(modifiedData);
+                        speedData[1].data  = modifiedData;
+                        setTrackSpeedData(speedData);
+                        console.log(speedData);
+                    },
+                  });
+
+            },
+        });
+      }))
+      .catch(error => {
+        console.error('Error in one of the requests:', error);
+    });
+}
