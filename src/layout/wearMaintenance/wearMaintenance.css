@@ -522,7 +522,8 @@
 
 .decisionPopupContent{
     padding: 15px;
-    width: 900px;
+    /* width: 900px; */
+    width: 1050px;
 }
 
 .decisionPopupContent .comment:first-child{
@@ -530,6 +531,7 @@
 }
 
 .decisionPopupContent .comment{
+    height: 115px;
 }
 
 .decisionPopupContent .comment .commentTitle{

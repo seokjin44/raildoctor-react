@@ -37,6 +37,17 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    position: relative;
+}
+
+.railProfile .componentBox .profile .railTitle{
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    font-size: 40px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    padding: 10px;
 }
 
 .railProfile .componentBox .profile:first-child{
@@ -75,10 +86,6 @@
     /* border: 1px solid #cccccc; */
     border-radius: 5px;
     margin-bottom: 45px;
-}
-
-.railProfile .table{
-    height: auto;
 }
 
 .profileData{
@@ -164,7 +171,8 @@
 }
 
 .railProfile .table{
-    font-size: 10px;
+    font-size: 15px;
+    height: auto;
 }
 
 .imageViewButton{

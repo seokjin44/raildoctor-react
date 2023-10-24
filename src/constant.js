@@ -52,6 +52,9 @@ export const STRING_DISTORTION = "DISTORTION";
 export const STRING_SELECT_WEAR_CORRELATION_MGT = "mgt";
 export const STRING_SELECT_WEAR_CORRELATION_RAILVAL = "railVal";
 
+export const STRING_VERTICAL_WEAR = "VERTICAL";
+export const STRING_CORNER_WEAR = "CORNER";
+
 export const colors = [
   "#FF5733", "#33FF57", "#5733FF", "#FF33A6", 
   "#33FFC1", "#FFC133", "#3314FF", "#FF3370", 
@@ -32860,4 +32863,35 @@ export const DUMMY_RANGE = {
   '2023_2' : { start : "2023-04-01 00:00:00", end : "2023-06-30 23:59:59" },
   '2023_3' : { start : "2023-07-01 00:00:00", end : "2023-09-30 23:59:59" },
   '2023_4' : { start : "2023-10-01 00:00:00", end : "2023-12-31 23:59:59" },  // 필요한 경우 2023년 4분기도 추가
+};
+
+export const EMPTY_MEASURE_OBJ = {
+  left : {accMax : "",
+    accMin : "",
+    displayName : "",
+    hd : "",
+    kp : 0,
+    lf : "", 
+    measureSetId : "",
+    railTrack : "",
+    sensorId: "",
+    speed : "",
+    stress : "",
+    stressMin : "",
+    vd: "",
+    wlMax: ""},
+  right : {accMax : "",
+    accMin : "",
+    displayName : "",
+    hd : "",
+    kp : 0,
+    lf : "", 
+    measureSetId : "",
+    railTrack : "",
+    sensorId: "",
+    speed : "",
+    stress : "",
+    stressMin : "",
+    vd: "",
+    wlMax: ""}
 };

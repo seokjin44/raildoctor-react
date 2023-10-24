@@ -8,12 +8,19 @@ import { RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRI
 import classNames from "classnames";
 import axios from 'axios';
 import qs from 'qs';
-import { formatDateTime } from "../../util";
+import { formatDateTime, numberWithCommas } from "../../util";
+import Modal from '@mui/material/Modal';
+import { Box } from "@mui/material";
 
 let imgTotalWidth = 0;
 const IMGSCALING = 0.2;
 let pictureList = [];
 function CumulativeThroughput( props ) {
+
+  const zoomImgcontainerRef = useRef(null);
+  const zoomimgRef = useRef(null);
+  const [zoomImgkpMarker, setZoomImgKPMarker] = useState(0);
+
   const [imgLoadArr, setImgLoadArr] = useState([]);
   const [kp, setKP] = useState(0);
   const [selectedPath, setSelectedPath] = useState([]);
@@ -29,10 +36,24 @@ function CumulativeThroughput( props ) {
   const [selectTrack, setSelectTrack] = useState(STRING_UP_TRACK);
   const [selectDir, setSelectDir] = useState(STRING_TRACK_DIR_LEFT);
   const [accumulateweightData, setAccumulateweightData] = useState({});
+  const [railmapOpen, setRailmapOpen] = useState(false);
 
   const [remainingCriteria, setRemainingCriteria] = useState(0);
   const [leftRemaining, setLeftRemaining] = useState({});
   const [rightRemaining, setRightRemaining] = useState({});
+
+  const zoomImgAdjustPosition = () => {
+    if (zoomimgRef.current) {
+        const scaleFactor = zoomimgRef.current.clientWidth / viewRailMap.originalWidth;
+        const adjustedPosition = viewRailMap.position * scaleFactor;
+        /* setKPMarker(adjustedPosition); */
+        /* zoomImgcontainerRef.current.scrollLeft = adjustedPosition - (zoomImgcontainerRef.current.offsetWidth / 2); */
+        let center = (zoomImgcontainerRef.current.offsetWidth / 2);
+        console.log(center);
+        setZoomImgKPMarker(adjustedPosition);
+        zoomImgcontainerRef.current.scrollLeft = adjustedPosition - center;
+    }
+  }
 
   const loadImg = async (url) => {
     return new Promise((resolve, reject)=>{
@@ -89,7 +110,12 @@ function CumulativeThroughput( props ) {
     for (let pic of pictureList) {
         if (pic.beginKp <= km && km <= pic.endKp) {
             const position = ((km - pic.beginKp) / (pic.endKp - pic.beginKp)) * pic.width;
-            return { url: `https://raildoctor.suredatalab.kr${pic.fileName}`, originalWidth: pic.width, position: Math.round(position) };
+            return { 
+              url: `https://raildoctor.suredatalab.kr${pic.fileName}`, 
+              originalWidth: pic.width, 
+              position: Math.round(position),
+              originalHeight: pic.height
+            };
         }
     }
     return null;
@@ -140,6 +166,10 @@ function CumulativeThroughput( props ) {
       findKP(kp);
     }
   }, [kp]);
+
+  useEffect( () => {
+    adjustPosition();
+  }, [viewRailMap] )
 
   const pathClick = (select) => {
     console.log(select);
@@ -212,7 +242,6 @@ function CumulativeThroughput( props ) {
                       setKP(e.target.value) 
                       let find = findPictureAndPosition( parseInt(e.target.value) / 1000);
                       setViewRailMap(find);
-                      adjustPosition();
 
                       let track_ = "";
                       if( selectTrack === STRING_UP_TRACK && selectDir === STRING_TRACK_DIR_LEFT ){
@@ -279,6 +308,12 @@ function CumulativeThroughput( props ) {
       >
         <div className="containerTitle">
           <div>검토구간</div>
+          <div className="flex">
+            <div className="modalButton highlight" onClick={()=>{
+                      console.log("선로열람도 상세보기");
+                      setRailmapOpen(true);
+            }} >선로열람도 상세보기</div>
+          </div>
         </div>
         <div className="componentBox">
           <div ref={containerRef} className="boxProto track" id="trackMapContainer">
@@ -289,7 +324,7 @@ function CumulativeThroughput( props ) {
           } */}
           {
             (viewRailMap) ?
-              <img ref={imgRef} src={viewRailMap.url} onLoad={()=>{
+              <img alt="선로열람도" ref={imgRef} src={viewRailMap.url} onLoad={()=>{
                 adjustPosition();
                 /* setKPMarker(viewRailMap.position); */
                 /* markerElement.style.left = `${result.position}px`;
@@ -370,10 +405,10 @@ function CumulativeThroughput( props ) {
                     <div className="td">552</div>
                     <div className="td">2007-03-16</div>
                     <div className="td">2021-12-31</div> */}
-                    <div className="td">{remainingCriteria}</div>
-                    <div className="td">{rightRemaining.accumulateweight}</div>
+                    <div className="td">{numberWithCommas(remainingCriteria)}</div>
+                    <div className="td">{numberWithCommas(rightRemaining.accumulateweight)}</div>
                     {/* <div className="td">41,915</div> */}
-                    <div className="td">{rightRemaining.remainingWeight}</div>
+                    <div className="td">{numberWithCommas(rightRemaining.remainingWeight)}</div>
                     <div className="td">{formatDateTime(new Date(rightRemaining.nextTimeToReplace))}</div>
                   </div>
                 </div>
@@ -404,10 +439,10 @@ function CumulativeThroughput( props ) {
                     <div className="td">552</div>
                     <div className="td">2007-03-16</div>
                     <div className="td">2021-12-31</div> */}
-                    <div className="td">{remainingCriteria}</div>
-                    <div className="td">{leftRemaining.accumulateweight}</div>
+                    <div className="td">{numberWithCommas(remainingCriteria)}</div>
+                    <div className="td">{numberWithCommas(leftRemaining.accumulateweight)}</div>
                     {/* <div className="td">41,915</div> */}
-                    <div className="td">{leftRemaining.remainingWeight}</div>
+                    <div className="td">{numberWithCommas(leftRemaining.remainingWeight)}</div>
                     <div className="td">{formatDateTime(new Date(leftRemaining.nextTimeToReplace))}</div>
                   </div>
                 </div>
@@ -416,6 +451,45 @@ function CumulativeThroughput( props ) {
           </div>
         </div>
       </div>
+      <Modal
+        open={railmapOpen}
+        onClose={(e)=>{console.log(e);setRailmapOpen(false)}}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '90vw',
+            bgcolor: 'background.paper',
+            border: '1px solid #000',
+            boxShadow: 24,
+            borderRadius: "5px",
+            //p: 4,
+            padding : "5px",
+            fontFamily : 'NEO_R',
+            height: '90vh',
+            overflow: 'auto'
+          }} >
+            <div className="zoomImgContainer" ref={zoomImgcontainerRef}>
+              <div className="kpMarker" style={{
+                left:`${zoomImgkpMarker}px`,
+                height : `${viewRailMap?.originalHeight}px`
+              }}></div>
+              {(viewRailMap) ? <img 
+                ref={zoomimgRef} 
+                alt="선로열람도" 
+                src={viewRailMap.url} 
+                onLoad={()=>{
+                  console.log("zoom img onload");
+                  zoomImgAdjustPosition();
+                }}  
+              /> : null}
+            </div>
+          </Box>
+        </Modal> 
     </div>
   );
 }

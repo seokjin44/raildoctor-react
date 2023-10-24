@@ -209,3 +209,76 @@ export const trackToString = ( track ) => {
     }
     return "";
 }
+
+export const trackLeftRightToString = ( track ) => {
+    if( track === STRING_UP_TRACK_LEFT ||
+        track === STRING_DOWN_TRACK_LEFT ){
+        return "좌";
+    }else if( track === STRING_UP_TRACK_RIGHT ||
+              track === STRING_DOWN_TRACK_RIGHT ){
+        return "우";
+    }
+    return "";
+}
+
+export const numberWithCommas = (x) => {
+    try{
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }catch(e){
+        return "";
+    }
+}
+
+export const mgtToM = (val) => {
+    return Math.round(val / 1e6) + 'M'; // 3억을 300M로 변환 후 소수점 제거
+}
+
+export const filterArrays = (min, max, ...arrays) => {
+    const reference = arrays[0];
+    const filteredIndexes = [];
+  
+    // 첫 번째 배열에서 조건을 확인하여 해당 인덱스를 저장
+    reference.forEach((value, index) => {
+      if (value >= min && value <= max) { 
+        filteredIndexes.push(index);
+      }
+    });
+  
+    // 필터링된 인덱스를 기반으로 각 배열을 필터링
+    return arrays.map(array => filteredIndexes.map(index => array[index]));
+}
+
+export const textToNumber = (input) => {
+    const units = {
+        'K': 1000,
+        'M': 1000000,
+        'B': 1000000000
+    };
+
+    // 숫자일 경우 그대로 반환
+    if (typeof input === 'number') {
+        return input;
+    }
+
+    if (typeof input !== 'string') {
+        throw new Error('Input is neither a string nor a number.');
+    }
+
+    // 예상하는 형식인지 확인하기 위한 정규 표현식
+    const pattern = /^[0-9]+(\.[0-9]+)?[KMB]?$/i;
+    if (!pattern.test(input)) {
+        throw new Error('Invalid format.');
+    }
+
+    const unit = input.charAt(input.length - 1).toUpperCase();
+    const number = unit in units ? parseFloat(input.slice(0, -1)) : parseFloat(input);
+
+    return number * (units[unit] || 1);
+}
+
+export const numberToText = (value) => {
+    if (value >= 1e9) return (value / 1e9) + 'B';
+    if (value >= 1e6) return (value / 1e6) + 'M';
+    if (value >= 1e3) return (value / 1e3) + 'K';
+    return value.toString();
+};

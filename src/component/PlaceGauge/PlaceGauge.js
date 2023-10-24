@@ -136,6 +136,8 @@ class PlaceGauge extends React.Component {
 		context.fillStyle = "black";
 		context.textAlign = "left";
 
+		context.fillText("상선", this.state.x - 60, this.state.canvas.height / 2 - this.state.padding + this.state.fontHeight / 2 - 2.5);
+
 		//상선 좌
 		context.beginPath();
 		context.fillText("좌", this.state.x - 30, this.state.canvas.height / 2 - this.state.padding + this.state.fontHeight / 2 - 2.5);
@@ -153,6 +155,8 @@ class PlaceGauge extends React.Component {
 		context.setLineDash([0]);
 		context.lineWidth = 2;
 		context.stroke();
+
+		context.fillText("하선", this.state.x - 60, this.state.canvas.height / 2 + this.state.padding - lineSpacing + this.state.fontHeight / 2 - 2.5);
 
 		//하선 우
 		context.beginPath();
@@ -280,7 +284,7 @@ class PlaceGauge extends React.Component {
 			if( end > this.props.path.end_station_up_track_location ){
 				end = this.props.path.end_station_up_track_location;
 			}
-
+			context.strokeStyle = (this.props.selectedGauge === data.roughnessId) ? 'red' : 'black';
 			if( railTrack === STRING_UP_TRACK_RIGHT2 ){
 				let y = this.state.canvas.height / 2 - this.state.padding + lineSpacing;
 				let startPoint = {
@@ -300,7 +304,9 @@ class PlaceGauge extends React.Component {
 					y : y - 10,
 					width : (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10,
 					height : 20,
-					dataFile : data.dataFile
+					dataFile : data.dataFile,
+					railroadId : data.railroadId,
+					roughnessId : data.roughnessId
 				}
 				rectList.push(rect);
 				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
@@ -323,7 +329,9 @@ class PlaceGauge extends React.Component {
 					y : y - 10,
 					width : (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10,
 					height : 20,
-					dataFile : data.dataFile
+					dataFile : data.dataFile,
+					railroadId : data.railroadId,
+					roughnessId : data.roughnessId
 				}
 				rectList.push(rect);
 				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
@@ -346,7 +354,9 @@ class PlaceGauge extends React.Component {
 					y : y - 10,
 					width : (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10,
 					height : 20,
-					dataFile : data.dataFile
+					dataFile : data.dataFile,
+					railroadId : data.railroadId,
+					roughnessId : data.roughnessId
 				}
 				rectList.push(rect);
 				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
@@ -369,7 +379,9 @@ class PlaceGauge extends React.Component {
 					y : y - 10,
 					width : (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10,
 					height : 20,
-					dataFile : data.dataFile
+					dataFile : data.dataFile,
+					railroadId : data.railroadId,
+					roughnessId : data.roughnessId
 				}
 				rectList.push(rect);
 				context.strokeRect(rect.x, rect.y, rect.width, rect.height);

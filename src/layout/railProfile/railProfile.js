@@ -46,6 +46,8 @@ function RailProfile( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
   const [leftTrackProfile, setLeftTrackProfile] = useState(null);
   const [rightTrackProfile, setRightTrackProfile] = useState(null);
+  const [selectLeftProfileDate, setSelectLeftProfileDate ] = useState("");
+  const [selectRightProfileDate, setSelectRightProfileDate ] = useState("");
   const [selectTrack, setSelectTrack] = useState(STRING_UP_TRACK);
   const [dataExits, setDataExits] = useState([]);
   const [kpOptions, setKpOptions] = useState([]);
@@ -142,9 +144,11 @@ function RailProfile( props ) {
     .catch(error => console.error('Error fetching data:', error));
   }, []);
 
-  const upTrackHandleChange = (e) => {
-    if( profilesMap.get(e.target.value) ){
-      let profile = profilesMap.get(e.target.value);
+  const upTrackHandleChange = (val) => {
+    setSelectLeftProfileDate(val);
+    setSelectRightProfileDate(val);
+    if( profilesMap.get(val) ){
+      let profile = profilesMap.get(val);
       axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/pictures/${profile.profileId}`,{
         paramsSerializer: params => {
           return qs.stringify(params, { format: 'RFC3986' })
@@ -158,9 +162,11 @@ function RailProfile( props ) {
     }
   }
 
-  const downTrackHandleChange = (e) => {
-    if( profilesMap.get(e.target.value) ){
-      let profile = profilesMap.get(e.target.value);
+  const downTrackHandleChange = (val) => {
+    setSelectLeftProfileDate(val);
+    setSelectRightProfileDate(val);
+    if( profilesMap.get(val) ){
+      let profile = profilesMap.get(val);
       axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/pictures/${profile.profileId}`,{
         paramsSerializer: params => {
           return qs.stringify(params, { format: 'RFC3986' })
@@ -199,8 +205,7 @@ function RailProfile( props ) {
       이미지가 준비되지않은 범위입니다.
     </div>;
   } 
-  
-  
+    
   return (
     <div className="trackDeviation railProfile" >
       <div className="railStatusContainer">
@@ -300,11 +305,21 @@ function RailProfile( props ) {
                       });
                       profiles.push(profile);
                     }
+
+                    marks_.sort((a, b) => {
+                      if (a.value < b.value) return -1;
+                      if (a.value > b.value) return 1;
+                      return 0;
+                    });
+
+                    
                     console.log(dateCnt);
                     setSliderMin(sliderMin_);
                     setSliderMax(sliderMax_);
                     setMarks(marks_);
                     setProfiles(profiles);
+                    upTrackHandleChange(marks_[marks_.length-1].value);
+                    downTrackHandleChange(marks_[marks_.length-1].value);
                   })
                   .catch(error => console.error('Error fetching data:', error));
                 }}>조회</button>
@@ -316,6 +331,7 @@ function RailProfile( props ) {
         <div className="containerTitle">프로파일 및 마모 데이터</div>
         <div className="componentBox chartBox flex" style={{overflow:"hidden"}}>
           <div className="profile left">
+            <div className="railTitle">좌</div>
             <div className="profileSlider">
               {(profileDetails.length > 0) ? <div className="imageViewButton" onClick={()=>{setLeftImgView(true)}} >이미지 보기</div> : null}
               {(leftImgView) ? <div className="picture">
@@ -328,9 +344,10 @@ function RailProfile( props ) {
               </div> : null}
               {getProfileLeftImg(leftTrackProfile)}
               <Slider
+                value={selectLeftProfileDate}
+                defaultValue={selectLeftProfileDate}
                 track={false}
                 aria-labelledby="track-false-slider"
-                defaultValue={30}
                 marks={marks}
                 step={null}
                 min={sliderMin.getTime()}
@@ -338,7 +355,10 @@ function RailProfile( props ) {
                 getAriaValueText={valueLabelFormat}
                 valueLabelFormat={valueLabelFormat}
                 valueLabelDisplay="on"
-                onChange={upTrackHandleChange}
+                onChange={(e)=>{
+                  upTrackHandleChange(e.target.value);
+                  downTrackHandleChange(e.target.value);
+                }}
                 size="medium"
               />
             </div>
@@ -382,7 +402,7 @@ function RailProfile( props ) {
                 <div className="tableBody">
                   {
                     profiles.map( (profile, i) => {
-                      return <div key={i} className="tr">
+                      return <div key={`down${i}`} className="tr">
                       <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
                       <div className="td ton ">{"-"}</div>
                       <div className="td mamo">{profile.llSideWear}</div> 
@@ -455,6 +475,7 @@ function RailProfile( props ) {
             </div>
           </div>
           <div className="profile right">
+            <div className="railTitle">우</div>
             <div className="profileSlider">
               {(profileDetails.length > 0) ? <div className="imageViewButton" onClick={()=>{setRightImgView(true)}} >이미지 보기</div> : null}
               {(rightImgView) ? <div className="picture">
@@ -467,9 +488,10 @@ function RailProfile( props ) {
               </div> : null}
               {getProfileRightImg(rightTrackProfile)}
               <Slider
+                value={selectRightProfileDate}
+                defaultValue={selectRightProfileDate}
                 track={false}
                 aria-labelledby="track-false-slider"
-                defaultValue={30}
                 marks={marks}
                 step={null}
                 min={sliderMin.getTime()}
@@ -478,7 +500,10 @@ function RailProfile( props ) {
                 valueLabelFormat={valueLabelFormat}
                 valueLabelDisplay="on"
                 size="medium"
-                onChange={downTrackHandleChange}
+                onChange={(e)=>{
+                  upTrackHandleChange(e.target.value);
+                  downTrackHandleChange(e.target.value);
+                }}
               />
             </div>
             <div className="profileData">
@@ -526,7 +551,7 @@ function RailProfile( props ) {
                 <div className="tableBody">
                   {
                     profiles.map( (profile, i) => {
-                      return <div key={i} className="tr">
+                      return <div key={`up${i}`} className="tr">
                       <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
                       <div className="td ton ">{"-"}</div>
                       <div className="td mamo">{profile.rlSideWear}</div> 

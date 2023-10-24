@@ -29,13 +29,18 @@ class WearInfo extends React.Component {
                 xaxis: {
                     title: {
                       text: '통과톤수 (MGT)'
+                    },
+                    labels: {
+                        formatter: function(val) {
+                          return Math.round(val / 1e6) + 'M'; // 3억을 300M로 변환 후 소수점 제거
+                        }
                     }
                 },
                 markers: {
                     size: [4, 4, 4, 4,5,5,5,5],
                     shape: ["circle", "circle", "circle", "circle","circle", "circle", "circle", "circle"],
-                    colors: ["#ffffff", "#0000ff", "#ffffff", "#ff0000","#FF7F27", "#A349A4", "#FF7F27", "#A349A4"],
-                    strokeColor: ["#0000ff", "#ffffff", "#ff0000", "#ffffff","#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+                    colors: ["#22B14C", "#0000ff", "#ffffff", "#ff0000","#FF7F27", "#A349A4", "#FF7F27", "#A349A4"],
+                    strokeColor: ["#22B14C", "#ffffff", "#ff0000", "#ffffff","#ffffff", "#ffffff", "#ffffff", "#ffffff"],
                     strokeWidth: [2, 0, 2, 0, 2, 0, 2, 0],
                 },
 
@@ -60,8 +65,8 @@ class WearInfo extends React.Component {
                         width: [5, 9, 5, 9],
                         height: [5, 9, 5, 9],
                         strokeWidth: 0.5,
-                        strokeColor: ["#0000ff", "#ffffff", "#ff0000", "#ffffff"],
-                        fillColors: ["#ffffff", "#0000ff", "#ffffff", "#ff0000"],
+                        strokeColor: ["#22B14C", "#ffffff", "#FFF200", "#ffffff"],
+                        fillColors: ["#22B14C", "#0000ff", "#FFF200", "#ff0000"],
                         //radius: 2,
                         customHTML: undefined,
                         onClick: undefined,

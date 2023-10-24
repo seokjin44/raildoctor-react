@@ -3,17 +3,18 @@ import { useEffect, useState } from "react";
 import RailStatus from "../../component/railStatus/railStatus";
 import 'dayjs/locale/ko';
 import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, 
-  ScatterChart, Scatter
+  ScatterChart, Scatter, Label
 } from 'recharts';
 import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
-import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRACK, INSTRUMENTATIONPOINT, RAILROADSECTION, RANGEPICKERSTYLE, STRING_ACC_KEY, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_LATERAL_LOAD_KEY, STRING_LONG_MEASURE, STRING_SHORT_MEASURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, TRACKGEODATA1, TRACKGEODATA2, TRACKGEODATA3, UP_TRACK, colors } from "../../constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRACK, EMPTY_MEASURE_OBJ, INSTRUMENTATIONPOINT, RAILROADSECTION, RANGEPICKERSTYLE, STRING_ACC_KEY, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_LATERAL_LOAD_KEY, STRING_LONG_MEASURE, STRING_SHORT_MEASURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, TRACKGEODATA1, TRACKGEODATA2, TRACKGEODATA3, UP_TRACK, colors } from "../../constant";
 import PlacePosition from "../../component/PlacePosition/PlacePosition";
 import axios from 'axios';
 import qs from 'qs';
-import { convertObjectToArray, dateFormat, findAddedItems, findRange, formatDate, formatTime, formatYearMonth, getFirstDateOfThreeMonthsAgo, getLastDateOfMonth, trackDataName } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, dateFormat, findAddedItems, findRange, formatDate, formatTime, formatYearMonth, getFirstDateOfThreeMonthsAgo, getLastDateOfMonth, numberToText, trackDataName, trackLeftRightToString } from "../../util";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
+import lodash from "lodash";
 
 dayjs.extend(customParseFormat);
 const { RangePicker } = DatePicker;
@@ -24,6 +25,8 @@ let dailyChartDataObj = {};
 let monthlyChartDataObj = {};
 let calendarDate = new Date();
 let pointsInfo = {};
+let longMeasureSneosrInfo = {};
+let shortMeasureSneosrInfo = {};
 let colorIndex = 1;
 function TrackGeometryMeasurement( props ) {
   const [selectedPath, setSelectedPath] = useState({
@@ -44,12 +47,13 @@ function TrackGeometryMeasurement( props ) {
   const [shortMeasureList, setShortMeasureList] = useState([]); //단기계측
   const [longMeasureList, setLongMeasureList] = useState([]); //장기계측
 
-  const [tableViewShortMeasureList, setTableViewShortMeasureList] = useState([]); //테이블에 보여지는 단기계측
-  const [tableViewLongMeasureList, setTableViewLongMeasureList] = useState([]); //테이블에 보여지는 장기계측
+  const [tableViewShortSensorList, setTableViewShortSensorList] = useState([]); //테이블에 보여지는 단기계측
+  const [tableViewLongSensorList, setTableViewLongSensorList] = useState([]); //테이블에 보여지는 장기계측
 
   const [searchRangeDate, setSearchRangeDate] = useState([]);
   const [selectPoints, setSelectPoints] = useState([]);
   const [selectMeasureDate, setSelectMeasureDate] = useState(new Date());
+  const [selectMeasureTime, setSelectMeasureTime] = useState("");
   const [findDatas, setFindDatas] = useState([]);
 
   const [poinsts, setPoints] = useState([]);
@@ -62,7 +66,8 @@ function TrackGeometryMeasurement( props ) {
   const [todayChartseries, setTodayChartseries] = useState([]);
   const [dailyChartseries, setDailyChartseries] = useState([]);
   const [monthlyChartseries, setMonthlyChartseries] = useState([]);
-
+  const [timeOptions, setTimeOptions] = useState([]);
+  
   const disabledDate = (current) => {
     return !dataExitsDate[dateFormat(current.$d)];
   };
@@ -74,8 +79,8 @@ function TrackGeometryMeasurement( props ) {
     let param = {
       params : {
         railroad : "인천 1호선",
-        begin : "계양",
-        end : "송도달빛축제공원"
+        begin : /* "계양" */select.start_station_name,
+        end : /* "송도달빛축제공원" */select.end_station_name
       },
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
@@ -92,13 +97,13 @@ function TrackGeometryMeasurement( props ) {
       let measureSets = response.data.measureSets;
       let dataExits_ = [...dataArr];
 
-      let upLeftTrackPoint_ = [...upLeftTrackPoint];
-      let upRightTrackPoint_ = [...upRightTrackPoint];
-      let downLeftTrackPoint_ = [...downLeftTrackPoint];
-      let downRightTrackPoint_ = [...downRightTrackPoint];
+      let upLeftTrackPoint_ = [];
+      let upRightTrackPoint_ = [];
+      let downLeftTrackPoint_ = [];
+      let downRightTrackPoint_ = [];
 
-      let shortMeasureList_ = [...shortMeasureList];
-      let longMeasureList_ = [...longMeasureList];
+      let shortMeasureList_ = [];
+      let longMeasureList_ = [];
 
       for( let measureSet of measureSets ){
 
@@ -128,6 +133,7 @@ function TrackGeometryMeasurement( props ) {
         console.log(measureSet.sensors);
         for( let sensor of measureSet.sensors ){
           let index = -1;
+          sensor['measureType'] = measureSet.measureType;
           if( sensor.railTrack === STRING_UP_TRACK ||
             sensor.railTrack === STRING_UP_TRACK_LEFT ||
             sensor.railTrack === STRING_UP_TRACK_RIGHT ){
@@ -162,58 +168,91 @@ function TrackGeometryMeasurement( props ) {
 
   const pathMeasurefind = () => {
     let poinsts_ = [];
+    pointsInfo = {};
     let shortMeasureList_ = [...shortMeasureList];
     let longMeasureList_ = [...longMeasureList];
-    let tableViewShortMeasureList_ = [];
-    let tableViewLongMeasureList_ = [];
+    let tableViewShortMeasureObj = {};
+    let tableViewLongMeasureObj = {};
     let startKP = (selectedPath.start_station_up_track_location > selectedPath.start_station_down_track_location)? 
     selectedPath.start_station_down_track_location : selectedPath.start_station_up_track_location
     ;
     let endKP = (selectedPath.end_station_up_track_location > selectedPath.end_station_down_track_location)? 
     selectedPath.end_station_up_track_location : selectedPath.end_station_down_track_location
     ;
+
     for( let measure of shortMeasureList_ ){
-      let add = true;
       for( let sensor of measure.sensors ){
-        if( !(sensor.kp >= startKP && sensor.kp <= endKP) ){
-          add = false;
-        }
-      }
-      if(add){
-        tableViewShortMeasureList_.push(measure);
-        for( let sensor of measure.sensors ){
-          if(sensor.kp >= startKP && sensor.kp <= endKP){
-            poinsts_.push({
-              value : sensor.sensorId,
-              label : sensor.displayName
-            });
-            pointsInfo[sensor.sensorId] = sensor;
+        let kp = sensor.kp * 1000;
+        if( kp >= startKP && kp <= endKP ){
+          //sensor select box
+          poinsts_.push({
+            label : `${convertToCustomFormat(kp)}(${trackLeftRightToString(sensor.railTrack)})`,
+            value : sensor.sensorId
+          });
+          if( !tableViewShortMeasureObj[convertToCustomFormat(kp)] ){
+            tableViewShortMeasureObj[convertToCustomFormat(kp)] = lodash.cloneDeep(EMPTY_MEASURE_OBJ);
           }
+
+          //table
+          if(sensor.railTrack === STRING_UP_TRACK_LEFT || 
+             sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
+              tableViewShortMeasureObj[convertToCustomFormat(kp)].left = sensor;
+          }else if(sensor.railTrack === STRING_UP_TRACK_RIGHT || 
+                   sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
+              tableViewShortMeasureObj[convertToCustomFormat(kp)].right = sensor;
+          }
+
+          //sensor
+          if( !pointsInfo[sensor.sensorId] ){
+            console.log();
+            pointsInfo[sensor.sensorId] = sensor;
+            pointsInfo[sensor.sensorId].measureDate = {};
+          }
+
+          /* if( !pointsInfo[sensor.sensorId].measureDate[dateFormat(new Date(measure.measureTs))] ){
+            pointsInfo[sensor.sensorId].measureDate[dateFormat(new Date(measure.measureTs))] = [];
+          }
+          pointsInfo[sensor.sensorId].measureDate[dateFormat(new Date(measure.measureTs))].push(measure.measureTs); */
         }
       };
     }
     for( let measure of longMeasureList_ ){
-      let add = true;
       for( let sensor of measure.sensors ){
-        if( !(sensor.kp >= startKP && sensor.kp <= endKP) ){
-          add = false;
-        }
-      }
-      if(add){
-        tableViewLongMeasureList_.push(measure);
-        for( let sensor of measure.sensors ){
-          if(sensor.kp >= startKP && sensor.kp <= endKP){
-            poinsts_.push({
-              value : sensor.sensorId,
-              label : sensor.displayName
-            });
-            pointsInfo[sensor.sensorId] = sensor;
+        let kp = sensor.kp * 1000;
+        if( kp >= startKP && kp <= endKP ){
+          poinsts_.push({
+            label : `${convertToCustomFormat(kp)}(${trackLeftRightToString(sensor.railTrack)})`,
+            value : sensor.sensorId
+          });
+          if( !tableViewLongMeasureObj[convertToCustomFormat(kp)] ){
+            tableViewLongMeasureObj[convertToCustomFormat(kp)] = lodash.cloneDeep(EMPTY_MEASURE_OBJ);
+          }
+
+          if(sensor.railTrack === STRING_UP_TRACK_LEFT || 
+            sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
+              tableViewLongMeasureObj[convertToCustomFormat(kp)].left = sensor;
+          }else if(sensor.railTrack === STRING_UP_TRACK_RIGHT || 
+                   sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
+              tableViewLongMeasureObj[convertToCustomFormat(kp)].right = sensor;
           }
         }
+        //sensor
+        if( !pointsInfo[sensor.sensorId] ){
+          console.log();
+          pointsInfo[sensor.sensorId] = sensor;
+          pointsInfo[sensor.sensorId].measureDate = {};
+        }
+
+        /* if( !pointsInfo[sensor.sensorId].measureDate[dateFormat(new Date(measure.measureTs))] ){
+          pointsInfo[sensor.sensorId].measureDate[dateFormat(new Date(measure.measureTs))] = [];
+        }
+        pointsInfo[sensor.sensorId].measureDate[dateFormat(new Date(measure.measureTs))].push(measure.measureTs); */
       };
     }
-    setTableViewShortMeasureList(tableViewShortMeasureList_);
-    setTableViewLongMeasureList(tableViewLongMeasureList_);
+    shortMeasureSneosrInfo = tableViewShortMeasureObj;
+    longMeasureSneosrInfo  = tableViewLongMeasureObj;
+    setTableViewShortSensorList(Object.keys(tableViewShortMeasureObj));
+    setTableViewLongSensorList(Object.keys(tableViewLongMeasureObj));
     setPoints(poinsts_);
   }
   
@@ -253,9 +292,8 @@ function TrackGeometryMeasurement( props ) {
         summary['displayName'] = point.displayName;
         if( !dataExitsDate[ dateFormat(new Date(summary.measureTs)) ] ){
           dataExitsDate[ dateFormat(new Date(summary.measureTs)) ] = [];
-          dataExitsDate[ dateFormat(new Date(summary.measureTs)) ].push(summary);
         }
-        /* console.log(dataExitsDate); */
+        dataExitsDate[ dateFormat(new Date(summary.measureTs)) ].push(formatTime(new Date(summary.measureTs)));
       }
     })
     .catch(error => console.error('Error fetching data:', error));
@@ -367,7 +405,22 @@ function TrackGeometryMeasurement( props ) {
   };
 
   const handleCalendarChange = (date) => {
-    setSelectMeasureDate(dateFormat(date.$d));
+    let yyyymmdd = dateFormat(date.$d);
+    setSelectMeasureDate(yyyymmdd);
+    let timeOptions_ = [];
+    for( let time of dataExitsDate[yyyymmdd] ){
+      let option = {
+        label : time,
+        value : time
+      }
+      timeOptions_.push(option);
+    }
+    timeOptions_.sort((a, b) => {
+      if (a.value < b.value) return -1;
+      if (a.value > b.value) return 1;
+      return 0;
+    });
+    setTimeOptions(timeOptions_);
   };
 
   const dataOption = [
@@ -424,11 +477,6 @@ function TrackGeometryMeasurement( props ) {
               <div className="dataOption">
                 <div className="title">Point </div>
                 <div className="date">
-                  {/* <RangePicker 
-                    style={RANGEPICKERSTYLE} 
-                    onChange={findPoints}
-                    onPanelChange={handlePanelChange} 
-                  /> */}
                   <Select
                     defaultValue={selectPoint}
                     style={{
@@ -455,9 +503,8 @@ function TrackGeometryMeasurement( props ) {
                           summary['displayName'] = pointsInfo[e].displayName;
                           if( !dataExitsDate[ dateFormat(new Date(summary.measureTs)) ] ){
                             dataExitsDate[ dateFormat(new Date(summary.measureTs)) ] = [];
-                            dataExitsDate[ dateFormat(new Date(summary.measureTs)) ].push(summary);
                           }
-                          console.log(dataExitsDate);
+                          dataExitsDate[ dateFormat(new Date(summary.measureTs)) ].push(formatTime(new Date(summary.measureTs)));
                         }
                       })
                       .catch(error => console.error('Error fetching data:', error));
@@ -478,6 +525,15 @@ function TrackGeometryMeasurement( props ) {
                     onPanelChange={handlePanelChange} 
                     onChange={handleCalendarChange}
                   />
+                  <Select
+                    value={selectMeasureTime}
+                    defaultValue={selectMeasureTime}
+                    style={{width:'120px'}}
+                    options={timeOptions}
+                    onChange={(val)=>{
+                      setSelectMeasureTime(val);
+                    }}
+                  />
                 </div>
               </div>
               <div className="line"></div>
@@ -493,16 +549,19 @@ function TrackGeometryMeasurement( props ) {
               <div className="line"></div>
               <div className="dataOption">
                 <button onClick={()=>{
+                  console.log("조회");
                   /* let findDatas_ = findDatas; */
                   /* let selectPoints_ = [...selectPoints]; */
                   let todayChartseries_ = [...todayChartseries];
                   let dailyChartseries_ = [...dailyChartseries];
                   let monthlyChartseries_ = [...monthlyChartseries];
                   
-                  for( let summary of dataExitsDate[selectMeasureDate] ){
+                  /* for( let summary of dataExitsDate[selectMeasureDate] ){ */
                     /* for( let item of findDatas_ ){ */
+                      let point = pointsInfo[selectPoint];
+                      let measureDate = new Date(`${selectMeasureDate} ${selectMeasureTime}`).toISOString();
                       let colorCode = getColor(colorIndex++);
-                      axios.get(`https://raildoctor.suredatalab.kr/api/railbehaviors/data/${selectPoint}?measureDate=${summary.measureTs}&data=${findDatas}`,{
+                      axios.get(`https://raildoctor.suredatalab.kr/api/railbehaviors/data/${selectPoint}?measureDate=${measureDate}&data=${findDatas}`,{
                         paramsSerializer: params => {
                           return qs.stringify(params, { format: 'RFC3986' })
                         }
@@ -510,7 +569,7 @@ function TrackGeometryMeasurement( props ) {
                       .then(response => {
                         console.log(response.data);
                         let chartData = (response.data.data) ? response.data.data : response.data.range;
-                        let dataKey = `${summary.sensorId}_${findDatas}`;
+                        let dataKey = `${point.sensorId}_${findDatas}`;
                         for( let data of chartData.today ){
                           let addData = {};
                           addData[dataKey] = (data.data) ? data.data : data.maxValue;
@@ -534,24 +593,24 @@ function TrackGeometryMeasurement( props ) {
                         console.log(convertObjectToArray(monthlyChartDataObj, CHART_FORMAT_MONTHLY));
                         
                         
-                        todayChartseries_.push({ sensorId : summary.sensorId, 
+                        todayChartseries_.push({ sensorId : point.sensorId, 
                           datakey : dataKey, 
-                          displayName : summary.displayName, 
+                          displayName : point.displayName, 
                           data : convertObjectToArray(todayChartDataObj, CHART_FORMAT_TODAY),
                           item : findDatas,
                           colorCode : colorCode
                         });
                         dailyChartseries_.push({ 
-                          sensorId : summary.sensorId, 
+                          sensorId : point.sensorId, 
                           datakey : dataKey, 
-                          displayName : summary.displayName,
+                          displayName : point.displayName,
                           item : findDatas,
                           colorCode : colorCode
                         });
                         monthlyChartseries_.push({ 
-                          sensorId : summary.sensorId, 
+                          sensorId : point.sensorId, 
                           datakey : dataKey, 
-                          displayName : summary.displayName,
+                          displayName : point.displayName,
                           item : findDatas,
                           colorCode : colorCode
                         });
@@ -562,7 +621,7 @@ function TrackGeometryMeasurement( props ) {
                       })
                       .catch(error => console.error('Error fetching data:', error));
                     /* } */
-                  }
+                  /* } */
                 }}>조회</button>
               </div>
             </div>
@@ -600,9 +659,8 @@ function TrackGeometryMeasurement( props ) {
                     summary['displayName'] = e.displayName;
                     if( !dataExitsDate[ dateFormat(new Date(summary.measureTs)) ] ){
                       dataExitsDate[ dateFormat(new Date(summary.measureTs)) ] = [];
-                      dataExitsDate[ dateFormat(new Date(summary.measureTs)) ].push(summary);
                     }
-                    console.log(dataExitsDate);
+                    dataExitsDate[ dateFormat(new Date(summary.measureTs)) ].push(formatTime(new Date(summary.measureTs)));
                   }
                 })
                 .catch(error => console.error('Error fetching data:', error));
@@ -620,10 +678,10 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail colspan2"><div className="colspan2">세부항목</div></div>
                   {
-                    tableViewLongMeasureList.map( measure => {
+                    tableViewLongSensorList.map( key => {
                       return <>
                         <div className="td point rowspan2">
-                          <div className="rowspan2">{measure.displayName}</div>
+                          <div className="rowspan2">{key}</div>
                         </div>
                         <div className="td point "></div>
                       </>
@@ -647,7 +705,7 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail"></div>
                   {
-                    tableViewLongMeasureList.map( measure => {
+                    tableViewLongSensorList.map( key => {
                       return <>
                         <div className="td point">좌 </div>
                         <div className="td point">우</div>
@@ -674,21 +732,10 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail">윤중(V)</div>
                   {
-                    tableViewShortMeasureList.map( measure => {
-                      let leftVal = '-';
-                      let RightVal = '-';
-                      for( let sensor of measure.sensors ){
-                        if( sensor.railTrack === STRING_UP_TRACK_LEFT ||
-                            sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
-                              leftVal = sensor.wlMax;
-                        }else if( sensor.railTrack === STRING_UP_TRACK_RIGHT ||
-                                  sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
-                              RightVal = sensor.wlMax;
-                        }
-                      }
+                    tableViewLongSensorList.map( key => {
                       return <>
-                        <div className="td point">{leftVal}</div>
-                        <div className="td point">{RightVal}</div>
+                        <div className="td point">{longMeasureSneosrInfo[key].left.wlMax}</div>
+                        <div className="td point">{longMeasureSneosrInfo[key].right.wlMax}</div>
                       </>
                     })
                   }
@@ -710,21 +757,10 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail">횡압(L)</div>
                   {
-                    tableViewShortMeasureList.map( measure => {
-                      let leftVal = '-';
-                      let RightVal = '-';
-                      for( let sensor of measure.sensors ){
-                        if( sensor.railTrack === STRING_UP_TRACK_LEFT ||
-                            sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
-                              leftVal = sensor.lf;
-                        }else if( sensor.railTrack === STRING_UP_TRACK_RIGHT ||
-                                  sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
-                              RightVal = sensor.lf;
-                        }
-                      }
+                    tableViewLongSensorList.map( key => {
                       return <>
-                        <div className="td point">{leftVal}</div>
-                        <div className="td point">{RightVal}</div>
+                        <div className="td point">{longMeasureSneosrInfo[key].left.lf}</div>
+                        <div className="td point">{longMeasureSneosrInfo[key].right.lf}</div>
                       </>
                     })
                   }
@@ -746,21 +782,10 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail">레일응력</div>
                   {
-                    tableViewShortMeasureList.map( measure => {
-                      let leftVal = '-';
-                      let RightVal = '-';
-                      for( let sensor of measure.sensors ){
-                        if( sensor.railTrack === STRING_UP_TRACK_LEFT ||
-                            sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
-                              leftVal = sensor.stress;
-                        }else if( sensor.railTrack === STRING_UP_TRACK_RIGHT ||
-                                  sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
-                              RightVal = sensor.stress;
-                        }
-                      }
+                    tableViewLongSensorList.map( key => {
                       return <>
-                        <div className="td point">{leftVal}</div>
-                        <div className="td point">{RightVal}</div>
+                        <div className="td point">{longMeasureSneosrInfo[key].left.stress}</div>
+                        <div className="td point">{longMeasureSneosrInfo[key].right.stress}</div>
                       </>
                     })
                   }
@@ -783,21 +808,10 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail">레일수평변위</div>
                   {
-                    tableViewShortMeasureList.map( measure => {
-                      let leftVal = '-';
-                      let RightVal = '-';
-                      for( let sensor of measure.sensors ){
-                        if( sensor.railTrack === STRING_UP_TRACK_LEFT ||
-                            sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
-                              leftVal = sensor.hd;
-                        }else if( sensor.railTrack === STRING_UP_TRACK_RIGHT ||
-                                  sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
-                              RightVal = sensor.hd;
-                        }
-                      }
+                    tableViewLongSensorList.map( key => {
                       return <>
-                        <div className="td point">{leftVal}</div>
-                        <div className="td point">{RightVal}</div>
+                        <div className="td point">{longMeasureSneosrInfo[key].left.hd}</div>
+                        <div className="td point">{longMeasureSneosrInfo[key].right.hd}</div>
                       </>
                     })
                   }
@@ -819,21 +833,10 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail">레일수직변위</div>
                   {
-                    tableViewShortMeasureList.map( measure => {
-                      let leftVal = '-';
-                      let RightVal = '-';
-                      for( let sensor of measure.sensors ){
-                        if( sensor.railTrack === STRING_UP_TRACK_LEFT ||
-                            sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
-                              leftVal = sensor.vd;
-                        }else if( sensor.railTrack === STRING_UP_TRACK_RIGHT ||
-                                  sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
-                              RightVal = sensor.vd;
-                        }
-                      }
+                    tableViewLongSensorList.map( key => {
                       return <>
-                        <div className="td point">{leftVal}</div>
-                        <div className="td point">{RightVal}</div>
+                        <div className="td point">{longMeasureSneosrInfo[key].left.vd}</div>
+                        <div className="td point">{longMeasureSneosrInfo[key].right.vd}</div>
                       </>
                     })
                   }
@@ -855,21 +858,10 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail" style={{fontSize: "12px"}}>레일수직가속도</div>
                   {
-                    tableViewShortMeasureList.map( measure => {
-                      let leftVal = '-';
-                      let RightVal = '-';
-                      for( let sensor of measure.sensors ){
-                        if( sensor.railTrack === STRING_UP_TRACK_LEFT ||
-                            sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
-                              leftVal = sensor.accMax;
-                        }else if( sensor.railTrack === STRING_UP_TRACK_RIGHT ||
-                                  sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
-                              RightVal = sensor.accMax;
-                        }
-                      }
+                    tableViewLongSensorList.map( key => {
                       return <>
-                        <div className="td point">{leftVal}</div>
-                        <div className="td point">{RightVal}</div>
+                        <div className="td point">{longMeasureSneosrInfo[key].left.accMax}</div>
+                        <div className="td point">{longMeasureSneosrInfo[key].right.accMax}</div>
                       </>
                     })
                   }
@@ -900,10 +892,10 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail2 colspan2"><div className="colspan2">세부항목</div></div>
                   {
-                    tableViewShortMeasureList.map( measure => {
+                    tableViewShortSensorList.map( key => {
                       return <>
                       <div className="td point2 rowspan2">
-                        <div className="rowspan2">{measure.displayName}</div>
+                        <div className="rowspan2">{key}</div>
                       </div>
                       <div className="td point2"></div>
                       </>
@@ -917,7 +909,7 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail2"></div>
                   {
-                    tableViewShortMeasureList.map( measure => {
+                    tableViewShortSensorList.map( key => {
                       return <>
                         <div className="td point2">좌</div>
                         <div className="td point2">우</div>
@@ -934,21 +926,10 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail2">윤중(V)</div>
                   {
-                    tableViewShortMeasureList.map( measure => {
-                      let leftVal = '-';
-                      let RightVal = '-';
-                      for( let sensor of measure.sensors ){
-                        if( sensor.railTrack === STRING_UP_TRACK_LEFT ||
-                            sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
-                              leftVal = sensor.wlMax;
-                        }else if( sensor.railTrack === STRING_UP_TRACK_RIGHT ||
-                                  sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
-                              RightVal = sensor.wlMax;
-                        }
-                      }
+                    tableViewShortSensorList.map( key => {
                       return <>
-                        <div className="td point2">{leftVal}</div>
-                        <div className="td point2">{RightVal}</div>
+                        <div className="td point2">{shortMeasureSneosrInfo[key].left.wlMax}</div>
+                        <div className="td point2">{shortMeasureSneosrInfo[key].right.wlMax}</div>
                       </>
                     })
                   }
@@ -956,21 +937,10 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail2">레일응력</div>
                   {
-                    tableViewShortMeasureList.map( measure => {
-                      let leftVal = '-';
-                      let RightVal = '-';
-                      for( let sensor of measure.sensors ){
-                        if( sensor.railTrack === STRING_UP_TRACK_LEFT ||
-                            sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
-                              leftVal = sensor.stress;
-                        }else if( sensor.railTrack === STRING_UP_TRACK_RIGHT ||
-                                  sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
-                              RightVal = sensor.stress;
-                        }
-                      }
+                    tableViewShortSensorList.map( key => {
                       return <>
-                        <div className="td point2">{leftVal}</div>
-                        <div className="td point2">{RightVal}</div>
+                        <div className="td point2">{shortMeasureSneosrInfo[key].left.wlMax}</div>
+                        <div className="td point2">{shortMeasureSneosrInfo[key].right.wlMax}</div>
                       </>
                     })
                   }
@@ -978,21 +948,10 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail2">트리거용가속도</div>
                   {
-                    tableViewShortMeasureList.map( measure => {
-                      let leftVal = '-';
-                      let RightVal = '-';
-                      for( let sensor of measure.sensors ){
-                        if( sensor.railTrack === STRING_UP_TRACK_LEFT ||
-                            sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
-                              leftVal = sensor.accMax;
-                        }else if( sensor.railTrack === STRING_UP_TRACK_RIGHT ||
-                                  sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
-                              RightVal = sensor.accMax;
-                        }
-                      }
+                    tableViewShortSensorList.map( key => {
                       return <>
-                        <div className="td point2">{leftVal}</div>
-                        <div className="td point2">{RightVal}</div>
+                        <div className="td point2">{shortMeasureSneosrInfo[key].left.accMax}</div>
+                        <div className="td point2">{shortMeasureSneosrInfo[key].right.accMax}</div>
                       </>
                     })
                   }
@@ -1001,21 +960,10 @@ function TrackGeometryMeasurement( props ) {
                 <div className="tr">
                   <div className="td detail2">레일수평변위</div>
                   {
-                    tableViewShortMeasureList.map( measure => {
-                      let leftVal = '-';
-                      let RightVal = '-';
-                      for( let sensor of measure.sensors ){
-                        if( sensor.railTrack === STRING_UP_TRACK_LEFT ||
-                            sensor.railTrack === STRING_DOWN_TRACK_LEFT ){
-                              leftVal = sensor.hd;
-                        }else if( sensor.railTrack === STRING_UP_TRACK_RIGHT ||
-                                  sensor.railTrack === STRING_DOWN_TRACK_RIGHT ){
-                              RightVal = sensor.hd;
-                        }
-                      }
+                    tableViewShortSensorList.map( key => {
                       return <>
-                        <div className="td point2">{leftVal}</div>
-                        <div className="td point2">{RightVal}</div>
+                        <div className="td point2">{shortMeasureSneosrInfo[key].left.hd}</div>
+                        <div className="td point2">{shortMeasureSneosrInfo[key].right.hd}</div>
                       </>
                     })
                   }
@@ -1065,8 +1013,12 @@ function TrackGeometryMeasurement( props ) {
             >
               <CartesianGrid />
               <Legend />
-              <XAxis type="category" dataKey="time" name="time" fontSize={9}  />
-              <YAxis type="number" name="data" fontSize={12}/>
+              <XAxis type="category" dataKey="time" name="time" fontSize={9}>
+                <Label value="Time" offset={-5} position="insideBottom" />
+              </XAxis>
+              <YAxis type="number" name="data" fontSize={12} >
+                <Label value="kN" angle={-90} position="insideLeft" />
+              </YAxis>
               <Tooltip cursor={{ strokeDasharray: '3 3' }} />
               {
                 todayChartseries.map( (series, i) => {
@@ -1091,8 +1043,12 @@ function TrackGeometryMeasurement( props ) {
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" fontSize={12}/>
-              <YAxis fontSize={12}/>
+              <XAxis dataKey="time" fontSize={12} >
+                <Label value="1Month accumulation(Day)" offset={-5} position="insideBottom" />
+              </XAxis>
+              <YAxis fontSize={12} tickFormatter={numberToText} >
+                <Label value="kN" angle={-90} position="insideLeft" />
+              </YAxis>
               <Tooltip />
               <Legend />
               {/* <Bar dataKey="weight" name="윤중" fill="#0041DC" /> */}
@@ -1120,8 +1076,12 @@ function TrackGeometryMeasurement( props ) {
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" fontSize={12}/>
-              <YAxis fontSize={12}/>
+              <XAxis dataKey="time" fontSize={12} >
+                <Label value="Month" offset={-5} position="insideBottom" />
+              </XAxis>
+              <YAxis fontSize={12} tickFormatter={numberToText}>
+                <Label value="kN" angle={-90} position="insideLeft" />
+              </YAxis>
               <Tooltip />
               <Legend />
               {

@@ -24,12 +24,15 @@ function Monitoring( props ) {
   PDFJS.GlobalWorkerOptions.workerSrc = pdfjsWorker;
   /* const [routeHidden, setRouteHidden] = useState(true); */
   const containerRef = useRef(null);
+  const zoomImgcontainerRef = useRef(null);
   const imgRef = useRef(null);
+  const zoomimgRef = useRef(null);
   const [routeHidden, setRouteHidden] = useState(false);
   const [kp, setKP] = useState(0);
   const [railmapOpen, setRailmapOpen] = useState(false);
   const [viewRailMap, setViewRailMap] = useState(null);
   const [kpMarker, setKPMarker] = useState(0);
+  const [zoomImgkpMarker, setZoomImgKPMarker] = useState(0);
 
   const [accumulateWeights, setAccumulateWeights] = useState([]);
   const [railbehaviors, setRailbehaviors] = useState([]);
@@ -56,7 +59,12 @@ function Monitoring( props ) {
     for (let pic of pictureList) {
         if (pic.beginKp <= km && km <= pic.endKp) {
             const position = ((km - pic.beginKp) / (pic.endKp - pic.beginKp)) * pic.width;
-            return { url: `https://raildoctor.suredatalab.kr${pic.fileName}`, originalWidth: pic.width, position: Math.round(position) };
+            return { 
+                url: `https://raildoctor.suredatalab.kr${pic.fileName}`, 
+                originalWidth: pic.width, 
+                position: Math.round(position),
+                originalHeight: pic.height
+            };
         }
     }
     return null;
@@ -69,8 +77,25 @@ function Monitoring( props ) {
         setKPMarker(adjustedPosition);
         containerRef.current.scrollLeft = adjustedPosition - (containerRef.current.offsetWidth / 2);
     }
-}
+  }
 
+  const zoomImgAdjustPosition = () => {
+    if (zoomimgRef.current) {
+        const scaleFactor = zoomimgRef.current.clientWidth / viewRailMap.originalWidth;
+        const adjustedPosition = viewRailMap.position * scaleFactor;
+        /* setKPMarker(adjustedPosition); */
+        /* zoomImgcontainerRef.current.scrollLeft = adjustedPosition - (zoomImgcontainerRef.current.offsetWidth / 2); */
+        let center = (zoomImgcontainerRef.current.offsetWidth / 2);
+        console.log(center);
+        setZoomImgKPMarker(adjustedPosition);
+        zoomImgcontainerRef.current.scrollLeft = adjustedPosition - center;
+    }
+  }
+
+  useEffect( ()=> {
+    console.log("adjustPosition");
+    adjustPosition();
+  },[viewRailMap])
 
   useEffect( ()=>{
     axios.get(`https://raildoctor.suredatalab.kr/api/railroads/railroadmap`,{
@@ -140,11 +165,7 @@ function Monitoring( props ) {
                     setKP(e.target.value);
                     let find = findPictureAndPosition( parseInt(e.target.value) / 1000);
                     setViewRailMap(find);
-                    adjustPosition();
-                    /* setKPMarker(find.position); */
-
-                    /* markerElement.style.left = `${result.position}px`;
-                    container.scrollLeft = result.position - (container.offsetWidth / 2); */ // km 위치가 컨테이너의 중앙에 오도록 스크롤 조정
+                    //adjustPosition();
                   }}}
                     style={RANGEPICKERSTYLE} defaultValue={kp}
                   />
@@ -177,8 +198,8 @@ function Monitoring( props ) {
                 }} >선로열람도 상세보기</div>
               </div>
             </div>
-            <div className={classNames("componentBox separationBox",{hidden : routeHidden} )} style={{overflow: "auto"}}>
-              <div ref={containerRef} className="boxProto track">
+            <div ref={containerRef} className={classNames("componentBox separationBox",{hidden : routeHidden} )} style={{overflow: "auto"}}  id="viewMapScroll">
+              <div className="boxProto track">
                 {/* <canvas id="trackDetailCanvas"
                     ref={trackDetailCanvasRef}
                     onMouseDown={(e)=>{trackDetailHandleMouseDown(e)}}
@@ -192,7 +213,7 @@ function Monitoring( props ) {
                 /> */}
                 {
                   (viewRailMap) ?
-                    <img ref={imgRef} src={viewRailMap.url} onLoad={()=>{
+                    <img alt="선로열람도" ref={imgRef} src={viewRailMap.url} onLoad={()=>{
                       adjustPosition();
                       /* setKPMarker(viewRailMap.position); */
                       /* markerElement.style.left = `${result.position}px`;
@@ -238,7 +259,7 @@ function Monitoring( props ) {
           </div>
         </div>
 
-        <Modal
+      <Modal
         open={railmapOpen}
         onClose={(e)=>{console.log(e);setRailmapOpen(false)}}
         aria-labelledby="modal-modal-title"
@@ -260,7 +281,21 @@ function Monitoring( props ) {
           height: '90vh',
           overflow: 'auto'
         }} >
-            {(viewRailMap) ? <img src={viewRailMap.url} /> : null}
+          <div className="zoomImgContainer" ref={zoomImgcontainerRef}>
+            <div className="kpMarker" style={{
+              left:`${zoomImgkpMarker}px`,
+              height : `${viewRailMap?.originalHeight}px`
+            }}></div>
+            {(viewRailMap) ? <img 
+              ref={zoomimgRef} 
+              alt="선로열람도" 
+              src={viewRailMap.url} 
+              onLoad={()=>{
+                console.log("zoom img onload");
+                zoomImgAdjustPosition();
+              }}  
+            /> : null}
+          </div>
         </Box>
       </Modal> 
     </div>

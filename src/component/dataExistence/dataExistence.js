@@ -13,7 +13,7 @@ import { LineChart, Line, XAxis,
   YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer,
   ScatterChart, Scatter, Bar, BarChart } from 'recharts';
-import { convertObjectToArray, convertToCustomFormat, convertToNumber, dateFormat, formatDateTime, tempDataName, trackDataName, trackToString, transposeObjectToArray } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, convertToNumber, dateFormat, formatDateTime, numberWithCommas, tempDataName, trackDataName, trackToString, transposeObjectToArray } from "../../util";
 import axios from 'axios';
 import qs from 'qs';
 
@@ -110,7 +110,7 @@ function DataExistence( props ) {
   },[ props.kp ]);
 
   return (
-    <div className="boxProto datafinder" id="dataExistenceContainer">
+    <div className="boxProto datafinder">
       <div className="dataList header">
         <div className="line" >
           <div className="dataName">KP</div>
@@ -140,7 +140,7 @@ function DataExistence( props ) {
           <div className="dataName">LWD</div>
         </div>
       </div>
-      <div className="scroll">
+      <div className="scroll" id="dataExistenceContainer">
       <div className="dataList">
         <div className="line" style={{width:kptoPixel}} >
           {/* <div className="dataName">KP</div> */}
@@ -491,7 +491,7 @@ function DataExistence( props ) {
                   </div>
                   <div className="curDate optionBox borderColorGreen">
                     <div className="optionTitle">기준</div>
-                    <div className="optionValue">{remainingCriteria}</div>
+                    <div className="optionValue">{numberWithCommas(remainingCriteria)}</div>
                   </div>
                   <div className="curDate optionBox borderColorGreen">
                     <div className="optionTitle">상하선</div>
@@ -507,11 +507,11 @@ function DataExistence( props ) {
                   </div>
                   <div className="curDate optionBox borderColorGreen">
                     <div className="optionTitle">누적통과톤수</div>
-                    <div className="optionValue">{leftRemaining.accumulateweight}</div>
+                    <div className="optionValue">{numberWithCommas(leftRemaining.accumulateweight)}</div>
                   </div>
                   <div className="curDate optionBox borderColorGreen" >
                     <div className="optionTitle">잔여통과톤수</div>
-                    <div className="optionValue">{leftRemaining.remainingWeight}</div>
+                    <div className="optionValue">{numberWithCommas(leftRemaining.remainingWeight)}</div>
                   </div>
                   <div className="curDate optionBox borderColorGreen" >
                     <div className="optionTitle">갱환일</div>
@@ -528,7 +528,7 @@ function DataExistence( props ) {
                   </div>
                   <div className="curDate optionBox borderColorGreen">
                     <div className="optionTitle">기준</div>
-                    <div className="optionValue">{remainingCriteria}</div>
+                    <div className="optionValue">{numberWithCommas(remainingCriteria)}</div>
                   </div>
                   <div className="curDate optionBox borderColorGreen">
                     <div className="optionTitle">상하선</div>
@@ -544,11 +544,11 @@ function DataExistence( props ) {
                   </div>
                   <div className="curDate optionBox borderColorGreen">
                     <div className="optionTitle">누적통과톤수</div>
-                    <div className="optionValue">{rightRemaining.accumulateweight}</div>
+                    <div className="optionValue">{numberWithCommas(rightRemaining.accumulateweight)}</div>
                   </div>
                   <div className="curDate optionBox borderColorGreen" >
                     <div className="optionTitle">잔여통과톤수</div>
-                    <div className="optionValue">{rightRemaining.remainingWeight}</div>
+                    <div className="optionValue">{numberWithCommas(rightRemaining.remainingWeight)}</div>
                   </div>
                   <div className="curDate optionBox borderColorGreen" >
                     <div className="optionTitle">갱환일</div>

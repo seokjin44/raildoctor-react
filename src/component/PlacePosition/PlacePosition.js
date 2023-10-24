@@ -1,6 +1,8 @@
 import React from "react";
 import "./PlacePosition.css";
 import classNames from "classnames";
+import { convertToCustomFormat } from "../../util";
+import { STRING_SHORT_MEASURE } from "../../constant";
 
 let pointList = [];
 class PlacePosition extends React.Component {
@@ -129,6 +131,8 @@ class PlacePosition extends React.Component {
 		context.fillStyle = "black";
 		context.textAlign = "left";
 
+		context.fillText("상선", this.state.x - 60, this.state.canvas.height / 2 - this.state.padding - lineSpacing + this.state.fontHeight / 2 - 2.5);
+
 		//상선 좌
 		context.beginPath();
 		context.fillText("좌", this.state.x - 30, this.state.canvas.height / 2 - this.state.padding - lineSpacing + this.state.fontHeight / 2 - 2.5);
@@ -146,6 +150,8 @@ class PlacePosition extends React.Component {
 		context.setLineDash([0]);
 		context.lineWidth = 2;
 		context.stroke();
+
+		context.fillText("하선", this.state.x - 60, this.state.canvas.height / 2 + this.state.padding - (lineSpacing / 2) + this.state.fontHeight / 2 - 2.5);
 
 		//하선 좌
 		context.beginPath();
@@ -255,7 +261,7 @@ class PlacePosition extends React.Component {
 
 		//상선 좌
 		for(let trackPoint of this.props.upLeftTrackPoint ) {
-			let location = trackPoint.kp;
+			let location = trackPoint.kp * 1000;
 			if( !(location >= this.props.path.start_station_up_track_location && location <= this.props.path.end_station_up_track_location) ){
 				continue;
 			}
@@ -270,14 +276,14 @@ class PlacePosition extends React.Component {
 			context.beginPath();
 			
 			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
-			context.fillStyle = "yellow";
+			context.fillStyle = (trackPoint.measureType === STRING_SHORT_MEASURE) ? "yellow" : "blue";
 			context.fill();
 			context.stroke();
 
 			context.fillStyle = "black";
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
-			context.fillText(trackPoint.displayName, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
+			context.fillText(`${convertToCustomFormat(trackPoint.kp*1000)}(좌)`, point.x * this.state.scaleX + this.state.x, y - 10);
 			
 			context.closePath();
 			pointList.push({
@@ -292,7 +298,7 @@ class PlacePosition extends React.Component {
 
 		//상선 우
 		for(let trackPoint of this.props.upRightTrackPoint ) {
-			let location = trackPoint.kp;
+			let location = trackPoint.kp * 1000;
 			if( !(location >= this.props.path.start_station_up_track_location && location <= this.props.path.end_station_up_track_location) ){
 				continue;
 			}
@@ -307,15 +313,15 @@ class PlacePosition extends React.Component {
 			context.beginPath();
 			
 			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
-			context.fillStyle = "yellow";
+			context.fillStyle = (trackPoint.measureType === STRING_SHORT_MEASURE) ? "yellow" : "blue";
 			context.fill();
 			context.stroke();
 
 			context.fillStyle = "black";
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
-			context.fillText(trackPoint.displayName, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
-			
+			context.fillText(`${convertToCustomFormat(trackPoint.kp*1000)}(우)`, point.x * this.state.scaleX + this.state.x, y - 10);
+
 			context.closePath();
 			pointList.push({
 				x : point.x * this.state.scaleX + this.state.x,
@@ -329,7 +335,7 @@ class PlacePosition extends React.Component {
 
 		//하선 좌
 		for(let trackPoint of this.props.downLeftTrackPoint ) {
-			let location = trackPoint.kp;
+			let location = trackPoint.kp * 1000;
 			if( !(location >= this.props.path.start_station_down_track_location && location <= this.props.path.end_station_down_track_location) ){
 				continue;
 			}
@@ -344,15 +350,15 @@ class PlacePosition extends React.Component {
 			context.beginPath();
 			
 			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
-			context.fillStyle = "yellow";
+			context.fillStyle = (trackPoint.measureType === STRING_SHORT_MEASURE) ? "yellow" : "blue";
 			context.fill();
 			context.stroke();
 
 			context.fillStyle = "black";
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
-			context.fillText(trackPoint.displayName, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
-			
+			context.fillText(`${convertToCustomFormat(trackPoint.kp*1000)}(좌)`, point.x * this.state.scaleX + this.state.x, y - 10);
+
 			context.closePath();
 			pointList.push({
 				x : point.x * this.state.scaleX + this.state.x,
@@ -366,7 +372,7 @@ class PlacePosition extends React.Component {
 
 		//하선 우
 		for(let trackPoint of this.props.downRightTrackPoint ) {
-			let location = trackPoint.kp;
+			let location = trackPoint.kp * 1000;
 			if( !(location >= this.props.path.start_station_down_track_location && location <= this.props.path.end_station_down_track_location) ){
 				continue;
 			}
@@ -381,15 +387,15 @@ class PlacePosition extends React.Component {
 			context.beginPath();
 			
 			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
-			context.fillStyle = "yellow";
+			context.fillStyle = (trackPoint.measureType === STRING_SHORT_MEASURE) ? "yellow" : "blue";
 			context.fill();
 			context.stroke();
 
 			context.fillStyle = "black";
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
-			context.fillText(trackPoint.displayName, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
-			
+			context.fillText(`${convertToCustomFormat(trackPoint.kp*1000)}(우)`, point.x * this.state.scaleX + this.state.x, y - 10);
+
 			context.closePath();
 			pointList.push({
 				x : point.x * this.state.scaleX + this.state.x,

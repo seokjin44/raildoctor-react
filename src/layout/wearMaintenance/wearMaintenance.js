@@ -9,30 +9,33 @@ import 'dayjs/locale/ko';
 import { Select } from 'antd';
 import { Box, Modal } from "@mui/material";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
-import { BOXSTYLE, DIRECTWEARINFO, INSTRUMENTATIONPOINT, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO, STRING_DOWN_TRACK, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_UP_TRACK, TRACKSPEEDDATA, UP_TRACK } from "../../constant";
+import { BOXSTYLE, DIRECTWEARINFO, INSTRUMENTATIONPOINT, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO, STRING_CORNER_WEAR, STRING_DOWN_TRACK, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_UP_TRACK, STRING_VERTICAL_WEAR, TRACKSPEEDDATA, UP_TRACK } from "../../constant";
 import AlertIcon from "../../assets/icon/decision/3876149_alert_emergency_light_protection_security_icon.png";
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToNumber, convertToNumber2, findRange, trackNumberToString } from "../../util";
+import { convertToNumber, convertToNumber2, filterArrays, findRange, trackNumberToString } from "../../util";
+import lodash from "lodash";
 
 const { TextArea } = Input;
+let wear3DMinMax = [];
+let wearFilter = [STRING_VERTICAL_WEAR, STRING_CORNER_WEAR];
 function WearMaintenance( props ) {
   const [selectedPath, setSelectedPath] = useState({
-    "start_station_id": "15",
-    "end_station_id": "16",
-    "start_station_name": "간석오거리",
-    "end_station_name": "인천시청",
-    "section_id": "16",
-    "start_station_up_track_location": 14000,
-    "start_station_down_track_location": 14000,
-    "end_station_up_track_location": 15400,
-    "end_station_down_track_location": 15400,
-    "start_station_latitude": 37.4669093,
-    "start_station_longitude": 126.7079019,
-    "end_station_latitude": 37.4576187,
-    "end_station_longitude": 126.7022161
+    "start_station_id": "0",
+    "end_station_id": "0",
+    "start_station_name": "",
+    "end_station_name": "",
+    "section_id": "",
+    "start_station_up_track_location": 0,
+    "start_station_down_track_location": 0,
+    "end_station_up_track_location": 0,
+    "end_station_down_track_location": 0,
+    "start_station_latitude": 0,
+    "start_station_longitude": 0,
+    "end_station_latitude": 0,
+    "end_station_longitude": 0
   });
   const [selectKP, setSelectKP] = useState({
     name : "",
@@ -45,12 +48,14 @@ function WearMaintenance( props ) {
     endMGT: 3000
   });
   const [wear3dData, setWear3dData] = useState([]);
+  const [viewWear3dData, setViewWear3dData] = useState([]);
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
   /* const [kp, setKP] = useState("0"); */
   const [dataExits, setDataExits] = useState([]);
   const [cornerWearGraphData, setCornerWearGraphData] = useState([]);
   const [verticalWearGraphData, setVerticalWearGraphData] = useState([]);
+  const [selectModel, setSelectModel] = useState("");
   const [modelOptions, setModelOptions] = useState([{value:"선형회귀모형",label:"선형회귀모형"}]);
   const [selectWearCorrelation, setSelectWearCorrelation] = useState("");
 
@@ -185,12 +190,14 @@ function WearMaintenance( props ) {
       let verticalWearGraph = response.data.verticalWearGraph;
       setCornerWearGraphData(cornerWearGraph);
       setVerticalWearGraphData(verticalWearGraph);
-      makeWear3dData(cornerWearGraph, verticalWearGraph);
+      let wear3DData = makeWear3dData(cornerWearGraph, verticalWearGraph, [STRING_VERTICAL_WEAR, STRING_CORNER_WEAR], []);
+      setWear3dData(wear3DData);
+      setViewWear3dData(wear3DData);
     })
     .catch(error => console.error('Error fetching data:', error));
   }
 
-  const makeWear3dData = (cornerWearGraph, verticalWearGraph) => {
+  const makeWear3dData = (cornerWearGraph, verticalWearGraph, fliter, minmax) => {
     let upTrackMGT = [];
     let upTrackKP = [];
     let upTrackWear = [];
@@ -199,45 +206,50 @@ function WearMaintenance( props ) {
     let downTrackKP = [];
     let downTrackWear = [];
 
-    for( let data of cornerWearGraph ){
-      if( data.railTrack === STRING_UP_TRACK ){
-        upTrackMGT.push( data.accumulateWeight );
-        upTrackKP.push( data.kp * 1000 );
-        upTrackWear.push( data.wear );
+    if( fliter.indexOf(STRING_CORNER_WEAR) > -1 ){
+      for( let data of cornerWearGraph ){
+        if( data.railTrack === STRING_UP_TRACK ){
+          upTrackMGT.push( data.accumulateWeight );
+          upTrackKP.push( data.kp * 1000 );
+          upTrackWear.push( data.wear );
+        }
+        if( data.railTrack === STRING_DOWN_TRACK ){
+          downTrackMGT.push( data.accumulateWeight );
+          downTrackKP.push( data.kp * 1000 );
+          downTrackWear.push( data.wear );
+        }else{
+          upTrackMGT.push( data.accumulateWeight );
+          upTrackKP.push( data.kp * 1000 );
+          upTrackWear.push( data.wear );
+          downTrackMGT.push( data.accumulateWeight );
+          downTrackKP.push( data.kp * 1000 );
+          downTrackWear.push( data.wear );
+        }
       }
-      if( data.railTrack === STRING_DOWN_TRACK ){
-        downTrackMGT.push( data.accumulateWeight );
-        downTrackKP.push( data.kp * 1000 );
-        downTrackWear.push( data.wear );
-      }else{
-        upTrackMGT.push( data.accumulateWeight );
-        upTrackKP.push( data.kp * 1000 );
-        upTrackWear.push( data.wear );
-        downTrackMGT.push( data.accumulateWeight );
-        downTrackKP.push( data.kp * 1000 );
-        downTrackWear.push( data.wear );
+    }
+    if( fliter.indexOf(STRING_VERTICAL_WEAR) > -1 ){
+      for( let data of verticalWearGraph ){
+        if( data.railTrack === STRING_UP_TRACK ){
+          upTrackMGT.push( data.accumulateWeight );
+          upTrackKP.push( data.kp * 1000 );
+          upTrackWear.push( data.wear );
+        }
+        if( data.railTrack === STRING_DOWN_TRACK ){
+          downTrackMGT.push( data.accumulateWeight );
+          downTrackKP.push( data.kp * 1000 );
+          downTrackWear.push( data.wear );
+        }else{
+          upTrackMGT.push( data.accumulateWeight );
+          upTrackKP.push( data.kp * 1000 );
+          upTrackWear.push( data.wear );
+          downTrackMGT.push( data.accumulateWeight );
+          downTrackKP.push( data.kp * 1000 );
+          downTrackWear.push( data.wear );
+        }
       }
     }
 
-    for( let data of verticalWearGraph ){
-      if( data.railTrack === STRING_UP_TRACK ){
-        upTrackMGT.push( data.accumulateWeight );
-        upTrackKP.push( data.kp * 1000 );
-        upTrackWear.push( data.wear );
-      }
-      if( data.railTrack === STRING_DOWN_TRACK ){
-        downTrackMGT.push( data.accumulateWeight );
-        downTrackKP.push( data.kp * 1000 );
-        downTrackWear.push( data.wear );
-      }else{
-        upTrackMGT.push( data.accumulateWeight );
-        upTrackKP.push( data.kp * 1000 );
-        upTrackWear.push( data.wear );
-        downTrackMGT.push( data.accumulateWeight );
-        downTrackKP.push( data.kp * 1000 );
-        downTrackWear.push( data.wear );
-      }
-    }
+
 
     let data = [
       {
@@ -246,7 +258,7 @@ function WearMaintenance( props ) {
         z: upTrackWear, //마모
         mode: 'markers',
         type: 'scatter3d',
-        name: 'T2 L 0',
+        name: STRING_UP_TRACK,
         marker: {
           size: 3,
           color: "red" //상선
@@ -258,7 +270,7 @@ function WearMaintenance( props ) {
         z: downTrackWear,
         mode: 'markers',
         type: 'scatter3d',
-        name: 'T2 L 45',
+        name: STRING_DOWN_TRACK,
         marker: {
           size: 3,
           color: "blue" //하선
@@ -266,7 +278,16 @@ function WearMaintenance( props ) {
       }
     ];
 
-    setWear3dData(data);
+    let min = minmax[0];
+    let max = minmax[1];
+    if( minmax && minmax.length === 2 ){
+      let [x1, y1, z1] = filterArrays(min, max, data[0].x, data[0].y, data[0].z);
+      let [x2, y2, z2] = filterArrays(min, max, data[1].x, data[1].y, data[1].z);
+      data[0].x = x1; data[0].y = y1; data[0].z = z1;
+      data[1].x = x2; data[1].y = y2; data[1].z = z2;
+    }
+
+    return data;
   }
 
   useEffect(() => {
@@ -400,6 +421,7 @@ function WearMaintenance( props ) {
                                 setModelOptions([
                                   {value:"선형회귀모형",label:"선형회귀모형"}
                                 ])
+                                setSelectModel("선형회귀모형");
                               }else if( val === STRING_SELECT_WEAR_CORRELATION_RAILVAL ){
                                 setModelOptions([
                                   {value:"선형회귀모형",label:"선형회귀모형"},
@@ -409,7 +431,8 @@ function WearMaintenance( props ) {
                                   {value:"XGBoost",label:"XGBoost"},
                                   {value:"Light GBM",label:"Light GBM"},
                                   {value:"CatBoost",label:"CatBoost"}
-                                ])
+                                ]);
+                                setSelectModel("선형회귀모형");
                               }
                             }}
                             options={
@@ -425,9 +448,10 @@ function WearMaintenance( props ) {
                       <div className="title flex textBold">예측모델</div>
                       <div className="flex">
                           <Select
-                            defaultValue=""
+                            defaultValue={selectModel}
+                            value={selectModel}
                             style={{ width: 190 }}
-                            /* onChange={handleChange} */
+                            onChange={(val)=>{setSelectModel(val)}}
                             options={
                               /* [
                                 {value:"선형회귀모형",label:"선형회귀모형"},
@@ -468,8 +492,44 @@ function WearMaintenance( props ) {
                   <div className="containerTitle bothEnds">
                     <div>마모정보</div>
                     <div className="flex">
-                      <ModalCustom buttonLabel="상선상세" title="상선 상세보기" data={wear3dData}></ModalCustom>
-                      <ModalCustom buttonLabel="하선상세" title="하선 상세보기" data={wear3dData}></ModalCustom>
+                      <ModalCustom buttonLabel="상선상세" title="상선 상세보기" 
+                        data={viewWear3dData}
+                        dataSliderSort={(e)=>{
+                          console.log("dataSliderSort");
+                          let wear3DData = makeWear3dData(cornerWearGraphData, verticalWearGraphData, wearFilter, [e[0], e[1]]);
+                          wear3DMinMax = e;
+                          setViewWear3dData(wear3DData);
+                        }}
+                        changeCheckBox={(e)=>{
+                          let wear3DData = makeWear3dData(cornerWearGraphData, verticalWearGraphData, e, wear3DMinMax);
+                          wearFilter = e;
+                          setViewWear3dData(wear3DData);
+                        }}
+                        closeModal={()=>{
+                          setViewWear3dData(lodash.cloneDeep(wear3dData))
+                          wearFilter = [STRING_VERTICAL_WEAR, STRING_CORNER_WEAR];
+                          wear3DMinMax = [];
+                        }}
+                      ></ModalCustom>
+                      <ModalCustom buttonLabel="하선상세" title="하선 상세보기" 
+                        data={viewWear3dData}
+                        dataSliderSort={(e)=>{
+                          console.log("dataSliderSort");
+                          let wear3DData = makeWear3dData(cornerWearGraphData, verticalWearGraphData, wearFilter, [e[0], e[1]]);
+                          wear3DMinMax = e;
+                          setViewWear3dData(wear3DData);
+                        }}
+                        changeCheckBox={(e)=>{
+                          let wear3DData = makeWear3dData(cornerWearGraphData, verticalWearGraphData, e, wear3DMinMax);
+                          wearFilter = e;
+                          setViewWear3dData(wear3DData);
+                        }}
+                        closeModal={()=>{
+                          setViewWear3dData(lodash.cloneDeep(wear3dData))
+                          wearFilter = [STRING_VERTICAL_WEAR, STRING_CORNER_WEAR];
+                          wear3DMinMax = [];
+                        }}
+                      ></ModalCustom>
                       <div className="modalButton highlight" onClick={()=>{
                         console.log("예측데이터 상세보기");
                         setOpen(true);
@@ -774,7 +834,7 @@ function WearMaintenance( props ) {
               <div className="closeBtn" onClick={()=>{setOpen2(false)}} ><img src={CloseIcon} /></div>
             </div>
             <div className="decisionPopupContent">
-              <div className="contentBox wearContainer" style={{marginLeft : 0, height:"450px"}}>
+              <div className="contentBox wearContainer" style={{marginLeft : 0, height:"575px"}}>
                   <div className="containerTitle bothEnds">
                     <div>마모정보</div>
                   </div>
@@ -797,7 +857,7 @@ function WearMaintenance( props ) {
               <div className="comment" style={{ marginTop: "50px"}} >
                 <div className="commentTitle">유지보수 지침</div>
                 <div className="commentInput">
-                  <TextArea rows={6} />
+                  <TextArea rows={3} />
                 </div>
               </div>
               <div className="comment" style={{ marginTop: "15px"}} >
@@ -811,7 +871,7 @@ function WearMaintenance( props ) {
                   </div>
                 </div>
                 <div className="commentInput">
-                  <TextArea rows={6} />
+                  <TextArea rows={3} />
                 </div>
               </div>
 

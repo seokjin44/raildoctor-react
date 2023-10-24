@@ -26,6 +26,7 @@ function RailRoughness( props ) {
   const [dataExits, setDataExits] = useState([]);
   const [gaugeData, setGaugeData] = useState([]);
   const [roughnessChartData, setRoughnessChartData] = useState([]);
+  const [selectedGauge, setSelectedGauge] = useState("");
 
   const selectChange = (val) => {
     setSelectRange(val);
@@ -156,8 +157,11 @@ function RailRoughness( props ) {
                   start : 200,
                   end : 900
                 }]} */
+                selectedGauge={selectedGauge}
                 existData={gaugeData}
                 selectGauge={( findRects )=>{
+                  console.log("findRects::::::::",findRects[0].roughnessId );
+                  setSelectedGauge( findRects[0].roughnessId );
                   let roughnessChartData_ = [];
                   /* for( let rect of findRects  ){ */
                     axios.get("https://raildoctor.suredatalab.kr/"+findRects[0].dataFile, { responseType: 'text' })
@@ -234,7 +238,7 @@ function RailRoughness( props ) {
                 <Tooltip formatter={(value) => (value / 1000).toFixed(3)} />
                 <Legend />
                 <Line dataKey="Roughness(mm)" stroke="#82ca9d" dot={false} />
-                <Brush startIndex={0} endIndex={500} dataKey="KP(m)" height={30} stroke="#8884d8" />
+                <Brush dataKey="KP(m)" height={30} stroke="#8884d8" />
               </LineChart>
             </ResponsiveContainer>
           </div>
