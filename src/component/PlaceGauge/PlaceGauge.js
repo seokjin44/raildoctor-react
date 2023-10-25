@@ -126,7 +126,6 @@ class PlaceGauge extends React.Component {
 	}
 
 	drawAxis = function () {
-		console.log("PlaceGauge - drawAxis");
 		let context = this.state.ctx;
 		let rightMargin = this.state.rightMargin;
 		let lineSpacing = this.state.lineSpacing;
@@ -265,7 +264,6 @@ class PlaceGauge extends React.Component {
 		let trackEndKP = this.props.path.endKp;
 		let trackLength = trackEndKP - trackBeginKP;
 
-		console.log("PlaceGauge - drawPlace");
 		for( let data of this.props.existData ){
 			let start = data.beginKp * 1000;
 			let end = data.endKp * 1000;
@@ -285,6 +283,7 @@ class PlaceGauge extends React.Component {
 				end = trackEndKP;
 			}
 			context.strokeStyle = (this.props.selectedGauge === data.roughnessId) ? 'red' : 'black';
+			context.fillStyle = (this.props.selectedGauge === data.roughnessId) ? 'red' : 'orange';
 			let startPoint = {
 				x: (start - trackBeginKP) / trackLength * 100,
 				trackType: 1,
@@ -311,7 +310,7 @@ class PlaceGauge extends React.Component {
 					roughnessId : data.roughnessId
 				}
 				rectList.push(rect);
-				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+				context.fillRect(rect.x, rect.y, rect.width, rect.height);
 			}else if( railTrack === STRING_DOWN_TRACK_LEFT2 ){
 				let y = this.state.canvas.height / 2 + this.state.padding - lineSpacing;
 				let rect = {
@@ -326,7 +325,7 @@ class PlaceGauge extends React.Component {
 					roughnessId : data.roughnessId
 				}
 				rectList.push(rect);
-				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+				context.fillRect(rect.x, rect.y, rect.width, rect.height);
 			}else if( railTrack === STRING_DOWN_TRACK_RIGHT2 ){
 				let y = this.state.canvas.height / 2 + this.state.padding;
 				let rect = {
@@ -341,7 +340,7 @@ class PlaceGauge extends React.Component {
 					roughnessId : data.roughnessId
 				}
 				rectList.push(rect);
-				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+				context.fillRect(rect.x, rect.y, rect.width, rect.height);
 			}else if( railTrack === STRING_UP_TRACK_LEFT2 ){
 				let y = this.state.canvas.height / 2 - this.state.padding;
 				let rect = {
@@ -356,7 +355,7 @@ class PlaceGauge extends React.Component {
 					roughnessId : data.roughnessId
 				}
 				rectList.push(rect);
-				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+				context.fillRect(rect.x, rect.y, rect.width, rect.height);
 			}
 		}
 

@@ -25,7 +25,7 @@ import faker from 'faker';
 import { DOWN_TRACK, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_UP_TRACK, UP_TRACK } from "../../constant";
 import { Input, DatePicker, Radio, Select } from "antd";
 import ImgSlider from "../../component/imgSlider/imgSlider";
-import { convertToCustomFormat, dateFormat, findRange, getRailroadSection } from "../../util";
+import { convertToCustomFormat, dateFormat, findRange, getRailroadSection, nonData, numberWithCommas } from "../../util";
 const { RangePicker } = DatePicker;
 
 ChartJS.register(
@@ -66,6 +66,11 @@ function RailProfile( props ) {
   const [marks, setMarks] = useState([]);
   const [railroadSection, setRailroadSection] = useState([]);
 
+  const [leftAcc, setLeftAcc] = useState(0);
+  const [rightAcc, setRightAcc] = useState(0);
+  
+  const [trackGeo, setTrackGeo] = useState({});
+  
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
@@ -213,7 +218,52 @@ function RailProfile( props ) {
     })
     .catch(error => console.error('Error fetching data:', error));
   }, [railroadSection]);
+
+  useEffect( ()=>{
+    let route = sessionStorage.getItem('route');
+    axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroad : route,
+        kp :  parseInt(selectKP) / 1000 
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      setTrackGeo(response.data);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+  }, [selectKP]);
     
+  useEffect( ()=>{
+    if( !profiles || profiles === null || profiles === undefined || profiles.length < 1 ){
+      return;
+    }
+    let route = sessionStorage.getItem('route');
+    let param  = {
+      railroad_name : route,
+      measure_ts : profiles[profiles.length -1].measureTs,
+      rail_track : selectTrack,
+      kp : selectKP
+      /* begin_kp: (e.target.value / 1000),
+      end_kp : (e.target.value / 1000) + 0.99 */
+    }
+    console.log(param);
+    axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remaining`,{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : param
+    })
+    .then(response => {
+      console.log(response.data);
+      setLeftAcc(response.data.leftRemaining.accumulateweight);
+      setRightAcc(response.data.rightRemaining.accumulateweight);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+  }, [profiles])
   return (
     <div className="trackDeviation railProfile" >
       <div className="railStatusContainer">
@@ -256,11 +306,8 @@ function RailProfile( props ) {
                 </div>
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
-                완화곡선 /
-                R=우곡선 400 (C=55, S=0) /
-                체감 C=40, S=0 /
-                종구배=+10‰ /
-                V=+40km/h
+              {trackGeo.shapeDisplay} /
+                R={trackGeo.direction} {trackGeo.radius} (C={trackGeo.cant}, S={trackGeo.slack})
               </div>
               <div className="line"></div>
               {/* <div className="dataOption">
@@ -338,9 +385,13 @@ function RailProfile( props ) {
       
       <div className="contentBox" style={{marginTop:"10px", height: "calc(100% - 255px)"}}>
         <div className="containerTitle">프로파일 및 마모 데이터</div>
-        <div className="componentBox chartBox flex" style={{overflow:"hidden"}}>
+        <div className="componentBox chartBox flex" style={{overflowY:'auto'}}>
           <div className="profile left">
             <div className="railTitle">좌</div>
+            <div className="accData">
+              <div className="title">최근누적통과톤수</div>
+              <div className="value">{numberWithCommas(leftAcc)}</div>
+            </div>
             <div className="profileSlider">
               {(profileDetails.length > 0) ? <div className="imageViewButton" onClick={()=>{setLeftImgView(true)}} >이미지 보기</div> : null}
               {(leftImgView) ? <div className="picture">
@@ -376,7 +427,7 @@ function RailProfile( props ) {
                 <div className="tableHeader">
                   <div className="tr">
                     <div className="td measurementDate colspan3"><div className="colspan3">측정일</div></div>
-                    <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div>
+                    {/* <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div> */}
                     <div className="td mamo rowspan7"><div className="rowspan7">좌레일</div></div>
                     <div className="td mamo rowspan7"></div>
                     <div className="td mamo rowspan7"></div>
@@ -387,7 +438,7 @@ function RailProfile( props ) {
                   </div>
                   <div className="tr">
                     <div className="td measurementDate colspan3"></div>
-                    <div className="td ton colspan3"></div>
+                    {/* <div className="td ton colspan3"></div> */}
                     <div className="td mamo rowspan2"><div className="rowspan2">좌측</div></div>
                     <div className="td mamo rowspan2"></div>
                     <div className="td mamo colspan2"><div className="colspan2">직마모(0º)</div></div>
@@ -398,7 +449,7 @@ function RailProfile( props ) {
                   </div>
                   <div className="tr" style={{ height: "45px"}}>
                     <div className="td measurementDate"></div>
-                    <div className="td ton colspan3"></div>
+                    {/* <div className="td ton colspan3"></div> */}
                     <div className="td mamo">측마모(-90º)</div>
                     <div className="td mamo">편마모(-45º)</div>
                     <div className="td mamo"></div>
@@ -413,78 +464,27 @@ function RailProfile( props ) {
                     profiles.map( (profile, i) => {
                       return <div key={`down${i}`} className="tr">
                       <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
-                      <div className="td ton ">{"-"}</div>
-                      <div className="td mamo">{profile.llSideWear}</div> 
-                      <div className="td mamo">{profile.llCornerWear}</div> 
-                      <div className="td mamo">{profile.lVerticalWear}</div> 
-                      <div className="td mamo">{profile.lrCornerWear}</div> 
-                      <div className="td mamo">{profile.lrSideWear}</div> 
-                      <div className="td mamo">{profile.lWearArea}</div> 
-                      <div className="td mamo">{profile.lWearRate}</div> 
+                      {/* <div className="td ton ">{"-"}</div> */}
+                      <div className="td mamo">{nonData(profile.llSideWear)}</div> 
+                      <div className="td mamo">{nonData(profile.llCornerWear)}</div> 
+                      <div className="td mamo">{nonData(profile.lVerticalWear)}</div> 
+                      <div className="td mamo">{nonData(profile.lrCornerWear)}</div> 
+                      <div className="td mamo">{nonData(profile.lrSideWear)}</div> 
+                      <div className="td mamo">{nonData(profile.lWearArea)}</div> 
+                      <div className="td mamo">{nonData(profile.lWearRate)}</div> 
                     </div>
                     })
                   }
-                  {/* <div className="tr">
-                    <div className="td measurementDate">21.09.16</div>
-                    <div className="td ton ">413,584,122</div>
-                    <div className="td mamo">-0.28</div>
-                    <div className="td mamo">6.79</div>
-                    <div className="td mamo">8.75</div>
-                    <div className="td mamo">9.66</div>
-                    <div className="td mamo">-0.36</div>
-                    <div className="td mamo">534.46</div>
-                    <div className="td mamo">19.19</div>
-                  </div>
-                  <div className="tr">
-                    <div className="td measurementDate">22.04.27</div>
-                    <div className="td ton ">413,587,242</div>
-                    <div className="td mamo">-0.26</div>
-                    <div className="td mamo">7.49</div>
-                    <div className="td mamo">9.28</div>
-                    <div className="td mamo">10.28</div>
-                    <div className="td mamo">-0.29</div>
-                    <div className="td mamo">574.87</div>
-                    <div className="td mamo">20.64</div>
-                  </div>
-                  <div className="tr">
-                    <div className="td measurementDate">22.06.24</div>
-                    <div className="td ton ">413,588,125</div>
-                    <div className="td mamo">-0.21</div>
-                    <div className="td mamo">7.23</div>
-                    <div className="td mamo">8.95</div>
-                    <div className="td mamo">9.79</div>
-                    <div className="td mamo">-0.38</div>
-                    <div className="td mamo">552.44</div>
-                    <div className="td mamo">19.83</div>
-                  </div>
-                  <div className="tr">
-                    <div className="td measurementDate">23.01.20</div>
-                    <div className="td ton ">413,590,914</div>
-                    <div className="td mamo">-0.19</div>
-                    <div className="td mamo">8.28</div>
-                    <div className="td mamo">9.8</div>
-                    <div className="td mamo">10.67</div>
-                    <div className="td mamo">-0.32</div>
-                    <div className="td mamo">607.96</div>
-                    <div className="td mamo">21.81</div>
-                  </div>
-                  <div className="tr">
-                    <div className="td measurementDate">23.03.15</div>
-                    <div className="td ton ">413,594,152</div>
-                    <div className="td mamo">-</div>
-                    <div className="td mamo">-</div>
-                    <div className="td mamo">10.5</div>
-                    <div className="td mamo">11.57</div>
-                    <div className="td mamo">-0.35</div>
-                    <div className="td mamo">608.55</div>
-                    <div className="td mamo">22.78</div>
-                  </div> */}
                 </div>
               </div>
             </div>
           </div>
           <div className="profile right">
             <div className="railTitle">우</div>
+            <div className="accData">
+              <div className="title">최근누적통과톤수</div>
+              <div className="value">{numberWithCommas(rightAcc)}</div>
+            </div>
             <div className="profileSlider">
               {(profileDetails.length > 0) ? <div className="imageViewButton" onClick={()=>{setRightImgView(true)}} >이미지 보기</div> : null}
               {(rightImgView) ? <div className="picture">
@@ -525,7 +525,7 @@ function RailProfile( props ) {
                 <div className="tableHeader">
                   <div className="tr">
                     <div className="td measurementDate colspan3"><div className="colspan3">측정일</div></div>
-                    <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div>
+                    {/* <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div> */}
                     <div className="td mamo rowspan7"><div className="rowspan7">우레일</div></div>
                     <div className="td mamo rowspan7"></div>
                     <div className="td mamo rowspan7"></div>
@@ -536,7 +536,7 @@ function RailProfile( props ) {
                   </div>
                   <div className="tr">
                     <div className="td measurementDate colspan3"></div>
-                    <div className="td ton colspan3"></div>
+                    {/* <div className="td ton colspan3"></div> */}
                     <div className="td mamo rowspan2"><div className="rowspan2">좌측</div></div>
                     <div className="td mamo rowspan2"></div>
                     <div className="td mamo colspan2"><div className="colspan2">직마모(0º)</div></div>
@@ -547,7 +547,7 @@ function RailProfile( props ) {
                   </div>
                   <div className="tr" style={{ height: "45px"}}>
                     <div className="td measurementDate"></div>
-                    <div className="td ton "></div>
+                    {/* <div className="td ton "></div> */}
                     <div className="td mamo">측마모(-90º)</div>
                     <div className="td mamo">편마모(-45º)</div>
                     <div className="td mamo"></div>
@@ -562,72 +562,17 @@ function RailProfile( props ) {
                     profiles.map( (profile, i) => {
                       return <div key={`up${i}`} className="tr">
                       <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
-                      <div className="td ton ">{"-"}</div>
-                      <div className="td mamo">{profile.rlSideWear}</div> 
-                      <div className="td mamo">{profile.rlCornerWear}</div> 
-                      <div className="td mamo">{profile.rVerticalWear}</div> 
-                      <div className="td mamo">{profile.rrCornerWear}</div> 
-                      <div className="td mamo">{profile.rrSideWear}</div> 
-                      <div className="td mamo">{profile.rWearArea}</div> 
-                      <div className="td mamo">{profile.rWearRate}</div> 
+                      {/* <div className="td ton ">{"-"}</div> */}
+                      <div className="td mamo">{nonData(profile.rlSideWear)}</div> 
+                      <div className="td mamo">{nonData(profile.rlCornerWear)}</div> 
+                      <div className="td mamo">{nonData(profile.rVerticalWear)}</div> 
+                      <div className="td mamo">{nonData(profile.rrCornerWear)}</div> 
+                      <div className="td mamo">{nonData(profile.rrSideWear)}</div> 
+                      <div className="td mamo">{nonData(profile.rWearArea)}</div> 
+                      <div className="td mamo">{nonData(profile.rWearRate)}</div> 
                     </div>
                     })
                   }
-                  {/* <div className="tr">
-                    <div className="td measurementDate">21.09.16</div>
-                    <div className="td ton ">413,584,122</div>
-                    <div className="td mamo">2.33</div>
-                    <div className="td mamo">9.63</div>
-                    <div className="td mamo">6.46</div>
-                    <div className="td mamo">3.02</div>
-                    <div className="td mamo">-0.46</div>
-                    <div className="td mamo">439.62</div>
-                    <div className="td mamo">15.78</div>
-                  </div>
-                  <div className="tr">
-                    <div className="td measurementDate">22.04.27</div>
-                    <div className="td ton ">413,604,122</div>
-                    <div className="td mamo">2.33</div>
-                    <div className="td mamo">9.88</div>
-                    <div className="td mamo">6.64</div>
-                    <div className="td mamo">3.22</div>
-                    <div className="td mamo">-0.33</div>
-                    <div className="td mamo">455.47</div>
-                    <div className="td mamo">16.35</div>
-                  </div>
-                  <div className="tr">
-                    <div className="td measurementDate">22.06.24</div>
-                    <div className="td ton ">413,624,122</div>
-                    <div className="td mamo">2.76</div>
-                    <div className="td mamo">9.9</div>
-                    <div className="td mamo">6.44</div>
-                    <div className="td mamo">2.91</div>
-                    <div className="td mamo">-0.62</div>
-                    <div className="td mamo">445.79</div>
-                    <div className="td mamo">16</div>
-                  </div>
-                  <div className="tr">
-                    <div className="td measurementDate">23.01.20</div>
-                    <div className="td ton ">413,628,653</div>
-                    <div className="td mamo">2.64</div>
-                    <div className="td mamo">10.32</div>
-                    <div className="td mamo">6.89</div>
-                    <div className="td mamo">3.63</div>
-                    <div className="td mamo">-0.56</div>
-                    <div className="td mamo">477.08</div>
-                    <div className="td mamo">17.12</div>
-                  </div>
-                  <div className="tr">
-                    <div className="td measurementDate">23.03.15</div>
-                    <div className="td ton ">413,630,233</div>
-                    <div className="td mamo">-</div>
-                    <div className="td mamo">-</div>
-                    <div className="td mamo">-</div>
-                    <div className="td mamo">-</div>
-                    <div className="td mamo">-</div>
-                    <div className="td mamo">-</div>
-                    <div className="td mamo">-</div>
-                  </div> */}
                 </div>
               </div>
             </div>

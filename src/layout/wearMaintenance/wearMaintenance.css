@@ -487,6 +487,16 @@
     width: 16%;
 }
 
+.popupContent .table .tableHeader .tr .td.value4.mgt,
+.popupContent .table .tableBody .tr .td.value4.mgt {
+    width: 19%;
+}
+
+.popupContent .table .tableHeader .tr .td.value5.mgt,
+.popupContent .table .tableBody .tr .td.value5.mgt {
+    width: 20%;
+}
+
 .table .tableHeader .tr .td .rowspan4{
     width: 400%;
     height: 100%;

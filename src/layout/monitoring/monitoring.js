@@ -31,10 +31,12 @@ function Monitoring( props ) {
   const zoomimgRef = useRef(null);
   const [routeHidden, setRouteHidden] = useState(false);
   const [kp, setKP] = useState(0);
+  const [inputKp, setInputKp] = useState(0);
   const [railmapOpen, setRailmapOpen] = useState(false);
   const [viewRailMap, setViewRailMap] = useState(null);
   const [kpMarker, setKPMarker] = useState(0);
   const [zoomImgkpMarker, setZoomImgKPMarker] = useState(0);
+  const inputRef = useRef(null);
 
   const [accumulateWeights, setAccumulateWeights] = useState([]);
   const [railbehaviors, setRailbehaviors] = useState([]);
@@ -44,12 +46,15 @@ function Monitoring( props ) {
   const [railroadSection, setRailroadSection] = useState([]);
   const [paut, setPaut] = useState([]);
   const [trackSpeedData, setTrackSpeedData] = useState([{trackName:"", data:[]},{trackName:"", data:[]}]);
-
+  
+  const [trackGeo, setTrackGeo] = useState({});
+  
   const pathClick = (select) => {
     console.log(select);
     //getInstrumentationPoint(select);
     //setSelectedPath(select);
     setKP(select.beginKp);
+    setInputKp(select.beginKp);
   }
 
   const findPictureAndPosition = (km) => {
@@ -95,8 +100,24 @@ function Monitoring( props ) {
   },[viewRailMap])
 
   useEffect( ()=> {
-    let find = findPictureAndPosition( parseInt(kp) / 1000);
+    let find = findPictureAndPosition( parseInt(kp) / 1000 );
     setViewRailMap(find);
+
+    let route = sessionStorage.getItem('route');
+    axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroad : route,
+        kp :  parseInt(kp) / 1000 
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      setTrackGeo(response.data);
+    })
+    .catch(error => console.error('Error fetching data:', error));
   },[kp])
 
   useEffect( ()=>{
@@ -189,21 +210,28 @@ function Monitoring( props ) {
                 <div className="title">KP </div>
                 <div className="date">
                   <Input 
-                    value={kp}
-                    defaultValue={kp}
-                    placeholder="KP" onKeyDown={(e)=>{if(e.key==="Enter"){
-                    setKP(e.target.value);
-                  }}}
+                    value={inputKp}
+                    defaultValue={inputKp}
+                    placeholder="KP" 
+                    onKeyDown={(e)=>{
+                      if(e.key==="Enter"){
+                        setKP(e.target.value);
+                      }
+                    }}
+                    onChange={(e)=>{
+                      const { value: inputValue } = e.target;
+                      const reg = /^-?\d*(\.\d*)?$/;
+                      if (reg.test(inputValue) || inputValue === '' || inputValue === '-') {
+                        setInputKp(e.target.value);
+                      }
+                    }}
                     style={RANGEPICKERSTYLE}
                   />
                 </div>
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
-                완화곡선 /
-                R=우곡선 400 (C=55, S=0) /
-                체감 C=40, S=0 /
-                종구배=+10‰ /
-                V=+40km/h
+              {trackGeo.shapeDisplay} /
+                R={trackGeo.direction} {trackGeo.radius} (C={trackGeo.cant}, S={trackGeo.slack})
               </div>
             </div>
           </div>

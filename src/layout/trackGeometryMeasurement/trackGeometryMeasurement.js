@@ -10,7 +10,7 @@ import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRAC
 import PlacePosition from "../../component/PlacePosition/PlacePosition";
 import axios from 'axios';
 import qs from 'qs';
-import { convertObjectToArray, convertToCustomFormat, dateFormat, findAddedItems, findRange, formatDate, formatTime, formatYearMonth, getFirstDateOfThreeMonthsAgo, getLastDateOfMonth, getRailroadSection, numberToText, trackDataName, trackLeftRightToString } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, dateFormat, deleteGeoChartData, deleteObjData, findAddedItems, findRange, formatDate, formatTime, formatYearMonth, getFirstDateOfThreeMonthsAgo, getLastDateOfMonth, getRailroadSection, numberToText, trackDataName, trackLeftRightToString, valueOneOrNone } from "../../util";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
@@ -49,6 +49,7 @@ function TrackGeometryMeasurement( props ) {
 
   const [searchRangeDate, setSearchRangeDate] = useState([]);
   const [selectPoints, setSelectPoints] = useState([]);
+  const [viewMeasureDate, setViewMeasureDate] = useState(null);
   const [selectMeasureDate, setSelectMeasureDate] = useState(new Date());
   const [selectMeasureTime, setSelectMeasureTime] = useState("");
   const [findDatas, setFindDatas] = useState("");
@@ -302,6 +303,7 @@ function TrackGeometryMeasurement( props ) {
   const handleCalendarChange = (date) => {
     let yyyymmdd = dateFormat(date.$d);
     setSelectMeasureDate(yyyymmdd);
+    setViewMeasureDate(date);
     let timeOptions_ = [];
     for( let time of dataExitsDate[yyyymmdd] ){
       let option = {
@@ -331,6 +333,13 @@ function TrackGeometryMeasurement( props ) {
   useEffect(() => {
     getRailroadSection(setRailroadSection);
   }, []);
+
+  useEffect(() => {
+    setSelectMeasureDate(null);
+    setViewMeasureDate(null);
+    setTimeOptions([]);
+    setSelectMeasureTime("");
+  }, [selectPoint]);
   
   useEffect( ()=> {
     let route = sessionStorage.getItem('route');
@@ -466,6 +475,7 @@ function TrackGeometryMeasurement( props ) {
                 <div className="title">측정일자 </div>
                 <div className="date">
                   <DatePicker 
+                    value={viewMeasureDate}
                     style={RANGEPICKERSTYLE} 
                     disabledDate={disabledDate}
                     onPanelChange={handlePanelChange} 
@@ -521,8 +531,15 @@ function TrackGeometryMeasurement( props ) {
                         return;
                       }
                       let point = pointsInfo[selectPoint];
+                      console.log(point);
                       let measureDate = new Date(`${selectMeasureDate} ${selectMeasureTime}`).toISOString();
                       let colorCode = getColor(colorIndex++);
+                      for( let sensor of selectPoints ){
+                        if( sensor.sensorId === point.sensorId ){
+                          alert("하나에 센서의 한가지유형만 추가할 수 있습니다. 제거 후 추가해주세요.");
+                          return ;
+                        }
+                      }
                       axios.get(`https://raildoctor.suredatalab.kr/api/railbehaviors/data/${selectPoint}?measureDate=${measureDate}&data=${findDatas}`,{
                         paramsSerializer: params => {
                           return qs.stringify(params, { format: 'RFC3986' })
@@ -554,27 +571,29 @@ function TrackGeometryMeasurement( props ) {
                         console.log(convertObjectToArray(dailyChartDataObj, CHART_FORMAT_DAILY));
                         console.log(convertObjectToArray(monthlyChartDataObj, CHART_FORMAT_MONTHLY));
                         
-                        
                         todayChartseries_.push({ sensorId : point.sensorId, 
                           datakey : dataKey, 
                           displayName : point.displayName, 
                           data : convertObjectToArray(todayChartDataObj, CHART_FORMAT_TODAY),
                           item : findDatas,
-                          colorCode : colorCode
+                          colorCode : colorCode,
+                          point : point.kp
                         });
                         dailyChartseries_.push({ 
                           sensorId : point.sensorId, 
                           datakey : dataKey, 
                           displayName : point.displayName,
                           item : findDatas,
-                          colorCode : colorCode
+                          colorCode : colorCode,
+                          point : point.kp
                         });
                         monthlyChartseries_.push({ 
                           sensorId : point.sensorId, 
                           datakey : dataKey, 
                           displayName : point.displayName,
                           item : findDatas,
-                          colorCode : colorCode
+                          colorCode : colorCode,
+                          point : point.kp
                         });
                         setTodayChartseries(todayChartseries_);
                         setDailyChartseries(dailyChartseries_);
@@ -696,8 +715,8 @@ function TrackGeometryMeasurement( props ) {
                   {
                     tableViewLongSensorList.map( key => {
                       return <>
-                        <div className="td point">{longMeasureSneosrInfo[key].left.wlMax}</div>
-                        <div className="td point">{longMeasureSneosrInfo[key].right.wlMax}</div>
+                        <div className="td point">{valueOneOrNone(longMeasureSneosrInfo[key].left.wlMax)}</div>
+                        <div className="td point">{valueOneOrNone(longMeasureSneosrInfo[key].right.wlMax)}</div>
                       </>
                     })
                   }
@@ -721,8 +740,8 @@ function TrackGeometryMeasurement( props ) {
                   {
                     tableViewLongSensorList.map( key => {
                       return <>
-                        <div className="td point">{longMeasureSneosrInfo[key].left.lf}</div>
-                        <div className="td point">{longMeasureSneosrInfo[key].right.lf}</div>
+                        <div className="td point">{valueOneOrNone(longMeasureSneosrInfo[key].left.lf)}</div>
+                        <div className="td point">{valueOneOrNone(longMeasureSneosrInfo[key].right.lf)}</div>
                       </>
                     })
                   }
@@ -746,8 +765,8 @@ function TrackGeometryMeasurement( props ) {
                   {
                     tableViewLongSensorList.map( key => {
                       return <>
-                        <div className="td point">{longMeasureSneosrInfo[key].left.stress}</div>
-                        <div className="td point">{longMeasureSneosrInfo[key].right.stress}</div>
+                        <div className="td point">{valueOneOrNone(longMeasureSneosrInfo[key].left.stress)}</div>
+                        <div className="td point">{valueOneOrNone(longMeasureSneosrInfo[key].right.stress)}</div>
                       </>
                     })
                   }
@@ -772,8 +791,8 @@ function TrackGeometryMeasurement( props ) {
                   {
                     tableViewLongSensorList.map( key => {
                       return <>
-                        <div className="td point">{longMeasureSneosrInfo[key].left.hd}</div>
-                        <div className="td point">{longMeasureSneosrInfo[key].right.hd}</div>
+                        <div className="td point">{valueOneOrNone(longMeasureSneosrInfo[key].left.hd)}</div>
+                        <div className="td point">{valueOneOrNone(longMeasureSneosrInfo[key].right.hd)}</div>
                       </>
                     })
                   }
@@ -797,8 +816,8 @@ function TrackGeometryMeasurement( props ) {
                   {
                     tableViewLongSensorList.map( key => {
                       return <>
-                        <div className="td point">{longMeasureSneosrInfo[key].left.vd}</div>
-                        <div className="td point">{longMeasureSneosrInfo[key].right.vd}</div>
+                        <div className="td point">{valueOneOrNone(longMeasureSneosrInfo[key].left.vd)}</div>
+                        <div className="td point">{valueOneOrNone(longMeasureSneosrInfo[key].right.vd)}</div>
                       </>
                     })
                   }
@@ -822,8 +841,8 @@ function TrackGeometryMeasurement( props ) {
                   {
                     tableViewLongSensorList.map( key => {
                       return <>
-                        <div className="td point">{longMeasureSneosrInfo[key].left.accMax}</div>
-                        <div className="td point">{longMeasureSneosrInfo[key].right.accMax}</div>
+                        <div className="td point">{valueOneOrNone(longMeasureSneosrInfo[key].left.accMax)}</div>
+                        <div className="td point">{valueOneOrNone(longMeasureSneosrInfo[key].right.accMax)}</div>
                       </>
                     })
                   }
@@ -890,8 +909,8 @@ function TrackGeometryMeasurement( props ) {
                   {
                     tableViewShortSensorList.map( key => {
                       return <>
-                        <div className="td point2">{shortMeasureSneosrInfo[key].left.wlMax}</div>
-                        <div className="td point2">{shortMeasureSneosrInfo[key].right.wlMax}</div>
+                        <div className="td point2">{valueOneOrNone(shortMeasureSneosrInfo[key].left.wlMax)}</div>
+                        <div className="td point2">{valueOneOrNone(shortMeasureSneosrInfo[key].right.wlMax)}</div>
                       </>
                     })
                   }
@@ -901,8 +920,8 @@ function TrackGeometryMeasurement( props ) {
                   {
                     tableViewShortSensorList.map( key => {
                       return <>
-                        <div className="td point2">{shortMeasureSneosrInfo[key].left.wlMax}</div>
-                        <div className="td point2">{shortMeasureSneosrInfo[key].right.wlMax}</div>
+                        <div className="td point2">{valueOneOrNone(shortMeasureSneosrInfo[key].left.wlMax)}</div>
+                        <div className="td point2">{valueOneOrNone(shortMeasureSneosrInfo[key].right.wlMax)}</div>
                       </>
                     })
                   }
@@ -912,8 +931,8 @@ function TrackGeometryMeasurement( props ) {
                   {
                     tableViewShortSensorList.map( key => {
                       return <>
-                        <div className="td point2">{shortMeasureSneosrInfo[key].left.accMax}</div>
-                        <div className="td point2">{shortMeasureSneosrInfo[key].right.accMax}</div>
+                        <div className="td point2">{valueOneOrNone(shortMeasureSneosrInfo[key].left.accMax)}</div>
+                        <div className="td point2">{valueOneOrNone(shortMeasureSneosrInfo[key].right.accMax)}</div>
                       </>
                     })
                   }
@@ -924,8 +943,8 @@ function TrackGeometryMeasurement( props ) {
                   {
                     tableViewShortSensorList.map( key => {
                       return <>
-                        <div className="td point2">{shortMeasureSneosrInfo[key].left.hd}</div>
-                        <div className="td point2">{shortMeasureSneosrInfo[key].right.hd}</div>
+                        <div className="td point2">{valueOneOrNone(shortMeasureSneosrInfo[key].left.hd)}</div>
+                        <div className="td point2">{valueOneOrNone(shortMeasureSneosrInfo[key].right.hd)}</div>
                       </>
                     })
                   }
@@ -955,6 +974,14 @@ function TrackGeometryMeasurement( props ) {
                       setTodayChartseries(todayChartseries_);
                       setDailyChartseries(dailyChartseries_);
                       setMonthlyChartseries(monthlyChartseries_);
+
+                      deleteObjData(todayChartDataObj, point.sensorId);
+                      deleteObjData(dailyChartDataObj, point.sensorId);
+                      deleteObjData(monthlyChartDataObj, point.sensorId);
+                      setToDayChartData(convertObjectToArray(todayChartDataObj, CHART_FORMAT_TODAY));
+                      setDailyChartData(convertObjectToArray(dailyChartDataObj, CHART_FORMAT_DAILY));
+                      setMonthlyChartData(convertObjectToArray(monthlyChartDataObj, CHART_FORMAT_MONTHLY));
+
                     }}
                   />
                 </div>

@@ -1,4 +1,4 @@
-import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_LATERAL_LOAD_KEY, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_LATERAL_LOAD_KEY, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
 import axios from 'axios';
 import qs from 'qs';
 import Papa from 'papaparse';
@@ -147,6 +147,8 @@ export const convertObjectToArray = (obj, type) => {
         return formatDate(new Date(key));
       }else if( type === CHART_FORMAT_MONTHLY ){
         return formatYearMonth(new Date(key));
+      }else if( type === CHART_FORMAT_RAW ){
+        return formatDateTime(new Date(key));
       }
       return key;
     }
@@ -585,4 +587,38 @@ export const wearModelTableBody = (model, detail, mamo) => {
             <div className="td value1_4 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalCatBoostWear.toFixed(3) : detail.cornerCatBoostWear.toFixed(3) }</div>
         </>
     }
+}
+
+export const valueOneOrNone = ( value )=>{
+    if( !value || value === undefined || value === null || value === ""  ){
+        return '-'
+    }
+    return '1'
+}
+
+export const getYear2Length = (date) => {
+    try{
+        const fullYear = date.getFullYear().toString();
+        const lastTwoDigits = fullYear.slice(-2);
+        return lastTwoDigits;
+    }catch(e){
+        return "";
+    }
+}
+
+export const deleteObjData = ( data, sensorId ) => {
+      for (let date in data) {
+        for (let key in data[date]) {
+          if (key.includes(sensorId)) {
+            delete data[date][key];
+          }
+        }
+      }
+}
+
+export const nonData = (value) => {
+    if( value === "NaN" ){
+        return "";
+    }
+    return value;
 }

@@ -211,6 +211,8 @@
 .dataContainer .dataLine{
     margin-bottom: 10px;
     width: 98%;
+    padding-bottom: 20px;
+    padding-top: 10px;
 }
 
 .dataContainer .dataLine .table .tableBody .tr{
@@ -220,10 +222,12 @@
 
 .cumulativeThroughput .dataContainer{
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     flex-direction: column;
     width: 100%;
+    height: 280px;
+    overflow-y: auto;
 }
 
 .cumulativeThroughput .dataContainer .table .tableBody .tr .td {

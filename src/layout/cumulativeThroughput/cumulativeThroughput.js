@@ -4,11 +4,11 @@ import RailStatus from "../../component/railStatus/railStatus";
 import { useEffect, useRef, useState } from "react";
 import { DatePicker, Input } from 'antd';
 import { Radio } from 'antd';
-import { RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
+import { RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_PATH, STRING_STATION, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
 import classNames from "classnames";
 import axios from 'axios';
 import qs from 'qs';
-import { formatDateTime, getRailroadSection, numberWithCommas } from "../../util";
+import { formatDateTime, getRailroadSection, getYear2Length, numberWithCommas } from "../../util";
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
 
@@ -20,6 +20,7 @@ function CumulativeThroughput( props ) {
   const [zoomImgkpMarker, setZoomImgKPMarker] = useState(0);
 
   const [kp, setKP] = useState(0);
+  const [inputKp, setInputKp] = useState(0);
   const [selectedPath, setSelectedPath] = useState([]);
   const containerRef = useRef(null);
   const imgRef = useRef(null);
@@ -33,7 +34,10 @@ function CumulativeThroughput( props ) {
   const [remainingCriteria, setRemainingCriteria] = useState(0);
   const [leftRemaining, setLeftRemaining] = useState({});
   const [rightRemaining, setRightRemaining] = useState({});
+  const [remainings, setRemainings] = useState([]);
   const [railroadSection, setRailroadSection] = useState([]);
+  
+  const [trackGeo, setTrackGeo] = useState({});
 
   const zoomImgAdjustPosition = () => {
     if (zoomimgRef.current) {
@@ -109,6 +113,22 @@ function CumulativeThroughput( props ) {
     let find = findPictureAndPosition( parseInt(kp) / 1000);
     setViewRailMap(find);
     getAccRemainingData();
+
+    let route = sessionStorage.getItem('route');
+    axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroad : route,
+        kp :  parseInt(kp) / 1000 
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      setTrackGeo(response.data);
+    })
+    .catch(error => console.error('Error fetching data:', error));
   }, [kp]);
 
   useEffect( () => {
@@ -119,6 +139,7 @@ function CumulativeThroughput( props ) {
     console.log(select);
     setSelectedPath(select);
     setKP(select.beginKp);
+    setInputKp(select.beginKp);
   }
 
   const getAccRemainingData = ()=>{
@@ -157,6 +178,44 @@ function CumulativeThroughput( props ) {
     })
     .catch(error => console.error('Error fetching data:', error));
   }
+
+  const getAccRemainingsData = ()=>{
+    let track_ = "";
+    if( selectTrack === STRING_UP_TRACK && selectDir === STRING_TRACK_DIR_LEFT ){
+      track_ = STRING_UP_TRACK_LEFT;
+    }else if( selectTrack === STRING_UP_TRACK && selectDir === STRING_TRACK_DIR_RIGHT ){
+      track_ = STRING_UP_TRACK_RIGHT;
+    }else if( selectTrack === STRING_DOWN_TRACK && selectDir === STRING_TRACK_DIR_LEFT ){
+      track_ = STRING_DOWN_TRACK_LEFT;
+    }else if( selectTrack === STRING_DOWN_TRACK && selectDir === STRING_TRACK_DIR_RIGHT ){
+      track_ = STRING_DOWN_TRACK_RIGHT;
+    }
+    
+    let route = sessionStorage.getItem('route');
+    let param  = {
+      railroad_name : route,
+      measure_ts : selectDate.toISOString(),
+      rail_track : track_,
+      begin_kp: (selectedPath.beginKp / 1000),
+      end_kp : (selectedPath.beginKp / 1000)
+    }
+    console.log(param);
+    axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remainings`,{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : param
+    })
+    .then(response => {
+      console.log(response.data);
+      setRemainings(response.data.remainings);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+  }
+
+  useEffect( ()=>{
+    getAccRemainingsData();
+  }, [selectedPath]);
 
   return (
     <div className="cumulativeThroughput" >
@@ -216,21 +275,25 @@ function CumulativeThroughput( props ) {
                 <div className="title">KP </div>
                 <div className="date">
                   <Input placeholder="KP" 
-                    defaultValue={kp}
-                    value={kp}
+                    value={inputKp}
+                    defaultValue={inputKp}
                     style={RANGEPICKERSTYLE} 
                     onKeyDown={(e)=>{ if(e.key==="Enter"){
                       setKP(e.target.value);
                     }}}
+                    onChange={(e)=>{
+                      const { value: inputValue } = e.target;
+                      const reg = /^-?\d*(\.\d*)?$/;
+                      if (reg.test(inputValue) || inputValue === '' || inputValue === '-') {
+                        setInputKp(e.target.value);
+                      }
+                    }}
                   />
                 </div>
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
-                완화곡선 /
-                R=우곡선 400 (C=55, S=0) /
-                체감 C=40, S=0 /
-                종구배=+10‰ /
-                V=+40km/h
+                {trackGeo.shapeDisplay} /
+                R={trackGeo.direction} {trackGeo.radius} (C={trackGeo.cant}, S={trackGeo.slack})
               </div>
             </div>
       </div>
@@ -266,124 +329,162 @@ function CumulativeThroughput( props ) {
             </div>
           </div>
           <div className="dataContainer">
-            {/* <div className="dataLine">
-              <div className="table">
-                <div className="tableHeader">
-                  <div className="tr">
-                    <div className="td">조회일자</div>
-                    <div className="td">좌레일</div>
-                    <div className="td">우레일</div>
-                  </div>
-                </div>
-                <div className="tableBody">
-                  <div className="tr">
-                    <div className="td">2023.01.01</div>
-                    <div className="td">414,939,971</div>
-                    <div className="td">414,939,971</div>
-                  </div>
-                </div>
-              </div>
-            </div> */}
-            {/* <div className="dataLine">
-              <div className="table">
-                <div className="tableHeader">
-                  <div className="tr">
-                    <div className="td">검토일자</div>
-                    <div className="td">좌레일</div>
-                    <div className="td">우레일</div>
-                  </div>
-                </div>
-                <div className="tableBody">
-                  <div className="tr">
-                    <div className="td">2023.01.01</div>
-                    <div className="td">414,939,971</div>
-                    <div className="td">414,939,971</div>
-                  </div>
-                </div>
-              </div>
-            </div> */}
-            <div className="dataLine">
-              <div className="table">
-                <div className="tableHeader">
-                  <div className="tr">
-                    <div className="td">좌우</div>
-                    {/* <div className="td">시점</div>
-                    <div className="td">종점</div>
-                    <div className="td">연장</div>
-                    <div className="td">교체</div>
-                    <div className="td">계측</div> */}
-                    <div className="td">기준</div>
-                    <div className="td">누적</div>
-                    {/* <div className="td">일평균</div> */}
-                    <div className="td">잔여톤수</div>
-                    <div className="td">갱환예상</div>
-                    <div className="td">first</div>
-                    <div className="td">second</div>
-                    <div className="td">갱환/부설일자</div>
-                  </div>
-                </div>
-                <div className="tableBody">
-                  <div className="tr">
-                    <div className="td">우</div>
-                    {/* <div className="td">117</div>
-                    <div className="td">669</div>
-                    <div className="td">552</div>
-                    <div className="td">2007-03-16</div>
-                    <div className="td">2021-12-31</div> */}
-                    <div className="td">{numberWithCommas(remainingCriteria)}</div>
-                    <div className="td">{numberWithCommas(rightRemaining.accumulateweight)}</div>
-                    {/* <div className="td">41,915</div> */}
-                    <div className="td">{numberWithCommas(rightRemaining.remainingWeight)}</div>
-                    <div className="td">{formatDateTime(new Date(rightRemaining.nextTimeToReplace))}</div>
+            {
+              ( selectedPath.type === STRING_STATION ) ? 
+              <>
+                <div className="dataLine">
+                  <div className="table">
+                    <div className="tableHeader">
+                      <div className="tr">
+                        <div className="td">좌우</div>
+                        {/* <div className="td">시점</div>
+                        <div className="td">종점</div>
+                        <div className="td">연장</div>
+                        <div className="td">교체</div>
+                        <div className="td">계측</div> */}
+                        <div className="td">기준</div>
+                        <div className="td">누적</div>
+                        {/* <div className="td">일평균</div> */}
+                        <div className="td">잔여톤수('{getYear2Length(new Date(rightRemaining.standardMeasureTs))}년 기준)</div>
+                        <div className="td">갱환예상</div>
+                        {/* <div className="td">first</div>
+                        <div className="td">second</div> */}
+                        <div className="td">갱환/부설일자</div>
+                      </div>
+                    </div>
+                    <div className="tableBody">
+                      <div className="tr">
+                        <div className="td">우</div>
+                        {/* <div className="td">117</div>
+                        <div className="td">669</div>
+                        <div className="td">552</div>
+                        <div className="td">2007-03-16</div>
+                        <div className="td">2021-12-31</div> */}
+                        <div className="td">{numberWithCommas(remainingCriteria)}</div>
+                        <div className="td">{numberWithCommas(rightRemaining.accumulateweight)}</div>
+                        {/* <div className="td">41,915</div> */}
+                        <div className="td">{numberWithCommas(rightRemaining.remainingWeight)}</div>
+                        <div className="td">{formatDateTime(new Date(rightRemaining.nextTimeToReplace))}</div>
 
-                    <div className="td">{formatDateTime(new Date(leftRemaining.firstMeasureTs))}</div>
-                    <div className="td">{formatDateTime(new Date(leftRemaining.secondMeasureTs))}</div>
-                    <div className="td">{formatDateTime(new Date(leftRemaining.zeroMeasureTs))}</div>
+                        {/* <div className="td">{formatDateTime(new Date(leftRemaining.firstMeasureTs))}</div>
+                        <div className="td">{formatDateTime(new Date(leftRemaining.secondMeasureTs))}</div> */}
+                        <div className="td">{formatDateTime(new Date(leftRemaining.zeroMeasureTs))}</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-            <div className="dataLine">
-              <div className="table">
-                <div className="tableHeader">
-                  <div className="tr">
-                    <div className="td">좌우</div>
-                    {/* <div className="td">시점</div>
-                    <div className="td">종점</div>
-                    <div className="td">연장</div>
-                    <div className="td">교체</div>
-                    <div className="td">계측</div> */}
-                    <div className="td">기준</div>
-                    <div className="td">누적</div>
-                    {/* <div className="td">일평균</div> */}
-                    <div className="td">잔여톤수</div>
-                    <div className="td">갱환예상</div>
-                    <div className="td">first</div>
-                    <div className="td">second</div>
-                    <div className="td">갱환/부설일자</div>
-                  </div>
-                </div>
-                <div className="tableBody">
-                  <div className="tr">
-                    <div className="td">좌</div>
-                    {/* <div className="td">117</div>
-                    <div className="td">669</div>
-                    <div className="td">552</div>
-                    <div className="td">2007-03-16</div>
-                    <div className="td">2021-12-31</div> */}
-                    <div className="td">{numberWithCommas(remainingCriteria)}</div>
-                    <div className="td">{numberWithCommas(leftRemaining.accumulateweight)}</div>
-                    {/* <div className="td">41,915</div> */}
-                    <div className="td">{numberWithCommas(leftRemaining.remainingWeight)}</div>
-                    <div className="td">{formatDateTime(new Date(leftRemaining.nextTimeToReplace))}</div>
+                <div className="dataLine">
+                  <div className="table">
+                    <div className="tableHeader">
+                      <div className="tr">
+                        <div className="td">좌우</div>
+                        {/* <div className="td">시점</div>
+                        <div className="td">종점</div>
+                        <div className="td">연장</div>
+                        <div className="td">교체</div>
+                        <div className="td">계측</div> */}
+                        <div className="td">기준</div>
+                        <div className="td">누적</div>
+                        {/* <div className="td">일평균</div> */}
+                        <div className="td">잔여톤수('{getYear2Length(new Date(leftRemaining.standardMeasureTs))}년 기준)</div>
+                        <div className="td">갱환예상</div>
+                        {/* <div className="td">first</div>
+                        <div className="td">second</div> */}
+                        <div className="td">갱환/부설일자</div>
+                      </div>
+                    </div>
+                    <div className="tableBody">
+                      <div className="tr">
+                        <div className="td">좌</div>
+                        {/* <div className="td">117</div>
+                        <div className="td">669</div>
+                        <div className="td">552</div>
+                        <div className="td">2007-03-16</div>
+                        <div className="td">2021-12-31</div> */}
+                        <div className="td">{numberWithCommas(remainingCriteria)}</div>
+                        <div className="td">{numberWithCommas(leftRemaining.accumulateweight)}</div>
+                        {/* <div className="td">41,915</div> */}
+                        <div className="td">{numberWithCommas(leftRemaining.remainingWeight)}</div>
+                        <div className="td">{formatDateTime(new Date(leftRemaining.nextTimeToReplace))}</div>
 
-                    <div className="td">{formatDateTime(new Date(leftRemaining.firstMeasureTs))}</div>
-                    <div className="td">{formatDateTime(new Date(leftRemaining.secondMeasureTs))}</div>
-                    <div className="td">{formatDateTime(new Date(leftRemaining.zeroMeasureTs))}</div>
+                        {/* <div className="td">{formatDateTime(new Date(leftRemaining.firstMeasureTs))}</div>
+                        <div className="td">{formatDateTime(new Date(leftRemaining.secondMeasureTs))}</div> */}
+                        <div className="td">{formatDateTime(new Date(leftRemaining.zeroMeasureTs))}</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </>
+              : 
+              ( selectedPath.type === STRING_PATH ) ?
+              <>
+                <div className="dataLine">
+                  <div className="table">
+                    <div className="tableHeader">
+                      <div className="tr">
+                        <div className="td">좌우</div>
+                        {/* <div className="td">시점</div>
+                        <div className="td">종점</div>
+                        <div className="td">연장</div>
+                        <div className="td">교체</div>
+                        <div className="td">계측</div> */}
+                        <div className="td">기준</div>
+                        <div className="td">누적</div>
+                        {/* <div className="td">일평균</div> */}
+                        <div className="td">잔여톤수</div>
+                        <div className="td">갱환예상</div>
+                        {/* <div className="td">first</div>
+                        <div className="td">second</div> */}
+                        <div className="td">갱환/부설일자</div>
+                      </div>
+                    </div>
+                    <div className="tableBody">
+                      {remainings.map( (remaining, i) => {
+                        return <>
+                        <div key={i} className="tr">
+                          <div className="td">좌</div>
+                          {/* <div className="td">117</div>
+                          <div className="td">669</div>
+                          <div className="td">552</div>
+                          <div className="td">2007-03-16</div>
+                          <div className="td">2021-12-31</div> */}
+                          <div className="td">{numberWithCommas(remaining.criteria)}</div>
+                          <div className="td">{numberWithCommas(remaining.leftRemaining.accumulateweight)}</div>
+                          {/* <div className="td">41,915</div> */}
+                          <div className="td">{numberWithCommas(remaining.leftRemaining.remainingWeight)}</div>
+                          <div className="td">{formatDateTime(new Date(remaining.leftRemaining.nextTimeToReplace))}</div>
+
+                          {/* <div className="td">{formatDateTime(new Date(remaining.leftRemaining.firstMeasureTs))}</div>
+                          <div className="td">{formatDateTime(new Date(remaining.leftRemaining.secondMeasureTs))}</div> */}
+                          <div className="td">{formatDateTime(new Date(remaining.leftRemaining.zeroMeasureTs))}</div>
+                        </div>
+                        <div key={i} className="tr">
+                          <div className="td">우</div>
+                          {/* <div className="td">117</div>
+                          <div className="td">669</div>
+                          <div className="td">552</div>
+                          <div className="td">2007-03-16</div>
+                          <div className="td">2021-12-31</div> */}
+                          <div className="td">{numberWithCommas(remaining.criteria)}</div>
+                          <div className="td">{numberWithCommas(remaining.rightRemaining.accumulateweight)}</div>
+                          {/* <div className="td">41,915</div> */}
+                          <div className="td">{numberWithCommas(remaining.rightRemaining.remainingWeight)}</div>
+                          <div className="td">{formatDateTime(new Date(remaining.rightRemaining.nextTimeToReplace))}</div>
+
+                          {/* <div className="td">{formatDateTime(new Date(remaining.rightRemaining.firstMeasureTs))}</div>
+                          <div className="td">{formatDateTime(new Date(remaining.rightRemaining.secondMeasureTs))}</div> */}
+                          <div className="td">{formatDateTime(new Date(remaining.rightRemaining.zeroMeasureTs))}</div>
+                        </div>
+                      </>
+                      })}
+                      
+                    </div>
+                  </div>
+                </div>
+              </>
+              : null
+            }
+            
           </div>
         </div>
       </div>

@@ -263,6 +263,7 @@ function DataExistence( props ) {
                     params : param
                   })
                   .then(response => {
+                    console.log(option);
                     console.log(response.data);
                     let dataAry = transposeObjectToArray(response.data);
                     console.log(dataAry);
@@ -754,7 +755,7 @@ function DataExistence( props ) {
               </TabList>
             </Box>
             <TabPanel value="1">
-            <div className="tabPanel" style={{width:"763px", height:"336px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
               <div className="contentBox" style={{width:"100%", height: "100%"}}>
                 <div className="containerTitle">
                   Chart
@@ -783,7 +784,7 @@ function DataExistence( props ) {
                     }}
                   >
                     <CartesianGrid />
-                    <XAxis dataKey="kp" interval={100} tickFormatter={(value) => value.toFixed(4)} />
+                    <XAxis dataKey="kp" interval={200} tickFormatter={(value) => value.toFixed(4)} />
                     <YAxis />
                     <Tooltip />
                     <Legend />
@@ -835,7 +836,7 @@ function DataExistence( props ) {
                     }}
                   >
                     <CartesianGrid />
-                    <XAxis dataKey="kp" interval={100} tickFormatter={(value) => value.toFixed(4)} />
+                    <XAxis dataKey="kp" interval={200} tickFormatter={(value) => value.toFixed(4)} />
                     <YAxis />
                     <Tooltip />
                     <Legend />
@@ -887,7 +888,7 @@ function DataExistence( props ) {
                     }}
                   >
                     <CartesianGrid />
-                    <XAxis dataKey="kp" interval={100} tickFormatter={(value) => value.toFixed(4)} />
+                    <XAxis dataKey="kp" interval={200} tickFormatter={(value) => value.toFixed(4)} />
                     <YAxis />
                     <Tooltip />
                     <Legend />
@@ -938,7 +939,7 @@ function DataExistence( props ) {
                     }}
                   >
                     <CartesianGrid />
-                    <XAxis dataKey="kp" interval={100} tickFormatter={(value) => value.toFixed(4)} />
+                    <XAxis dataKey="kp" interval={200} tickFormatter={(value) => value.toFixed(4)} />
                     <YAxis />
                     <Tooltip />
                     <Legend />
@@ -989,7 +990,7 @@ function DataExistence( props ) {
                     }}
                   >
                     <CartesianGrid />
-                    <XAxis dataKey="kp" interval={100} tickFormatter={(value) => value.toFixed(4)} />
+                    <XAxis dataKey="kp" interval={200} tickFormatter={(value) => value.toFixed(4)} />
                     <YAxis />
                     <Tooltip />
                     <Legend />

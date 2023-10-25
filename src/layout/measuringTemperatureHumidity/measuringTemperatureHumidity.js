@@ -4,10 +4,10 @@ import RailStatus from "../../component/railStatus/railStatus";
 import 'dayjs/locale/ko';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Checkbox, Input, Select, DatePicker } from "antd";
-import { CHART_FORMAT_DAILY, CHART_FORMAT_TODAY, RAILROADSECTION, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, TEMPDATA1, UP_TRACK, colors } from "../../constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, RAILROADSECTION, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, TEMPDATA1, UP_TRACK, colors } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertObjectToArray, convertToCustomFormat, findRange, getRailroadSection, tempDataName } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, deleteObjData, findRange, getRailroadSection, tempDataName } from "../../util";
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
 
 const { RangePicker } = DatePicker;
@@ -32,6 +32,8 @@ function MeasuringTemperatureHumidity( props ) {
   const [checkboxSelects, setCheckboxSelects] = useState([]);
   const [selectPoints, setSelectPoints] = useState([]);
   const [railroadSection, setRailroadSection] = useState([]);
+  
+  const [trackGeo, setTrackGeo] = useState({});
 
   const handleChange = (value) => {
     console.log(`selected ${value}`);
@@ -145,7 +147,7 @@ function MeasuringTemperatureHumidity( props ) {
           });
         }
       }
-      setChartData(convertObjectToArray(chartDataObj, CHART_FORMAT_DAILY));
+      setChartData(convertObjectToArray(chartDataObj, CHART_FORMAT_RAW));
       setChartseries(chartseries_);
     })
     .catch(error => console.error('Error fetching data:', error));
@@ -154,6 +156,29 @@ function MeasuringTemperatureHumidity( props ) {
   useEffect(() => {
     getRailroadSection(setRailroadSection);
   }, []);
+
+  useEffect(()=>{
+    let route = sessionStorage.getItem('route');
+    for( let sensor of sensorList ){
+      if( sensor.deviceId === selectDeviceID ){
+        axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
+          paramsSerializer: params => {
+            return qs.stringify(params, { format: 'RFC3986' })
+          },
+          params : {
+            railroad : route,
+            kp : sensor.measureKp
+          }
+        })
+        .then(response => {
+          console.log(response.data);
+          setTrackGeo(response.data);
+        })
+        .catch(error => console.error('Error fetching data:', error));
+      }
+    }
+
+  }, [selectDeviceID])
 
   useEffect( ()=> {
     if( railroadSection.length < 2 ){
@@ -222,11 +247,8 @@ function MeasuringTemperatureHumidity( props ) {
                 </div>
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
-                완화곡선 /
-                R=우곡선 400 (C=55, S=0) /
-                체감 C=40, S=0 /
-                종구배=+10‰ /
-                V=+40km/h
+              {trackGeo.shapeDisplay} /
+                R={trackGeo.direction} {trackGeo.radius} (C={trackGeo.cant}, S={trackGeo.slack})
               </div>
               <div className="line"></div>
               <div className="dataOption">
@@ -258,59 +280,8 @@ function MeasuringTemperatureHumidity( props ) {
                   searchTempData();
                 }}>조회</button>
               </div>
-              {/* <div className="line"></div>
-              <div className="dataOption">
-                <div className="title">센서목록 </div>
-                <div className="date">
-                
-                </div>
-              </div> */}
-
-              {/* <div className="dataOption" style={{marginLeft:"10px"}}>
-                완화곡선 /
-                R=우곡선 400 (C=55, S=0) /
-                체감 C=40, S=0 /
-                종구배=+10‰ /
-                V=+40km/h
-              </div> */}
-              {/* <div className="line"></div> */}
             </div>
       </div>
-        {/* <div className="contentBox" style={{ height: "220px"}} >
-          <div className="containerTitle">검토구간</div>
-          <div className="componentBox flex section ">
-
-            <div className="position optionBox borderColorGreen" style={{width: "935px"}} >
-              <div className="optionTitle">위치</div>
-              <div className="optionValue">
-                <img src={TempPosition} />
-              </div>
-            </div>
-
-            <div className="position optionBox h75">
-              <div className="optionTitle">데이터</div>
-              <div className="optionValue">
-                <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">데이터</InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    //value={age}
-                    label="데이터 선택"
-                    //onChange={handleChange}
-                  >
-                    <MenuItem>레일온도</MenuItem>
-                    <MenuItem>대기온도</MenuItem>
-                    <MenuItem>대기습도</MenuItem>
-                    <MenuItem>(기상청)외부온도</MenuItem>
-                  </Select>
-                </FormControl>
-              </div>
-            </div>
-
-          </div>
-        </div> */}
-
         <div className="contentBox" style={{marginTop:"10px", height: "calc(100% - 250px)"}}>
           <div className="containerTitle">Chart
             <div className="selectPoints">
@@ -323,6 +294,7 @@ function MeasuringTemperatureHumidity( props ) {
                         let chartseries_ = [...chartseries];
                         chartseries_ = chartseries_.filter(series => !(series.deviceID === point.deviceID && series.item === point.item));
                         setChartseries(chartseries_);
+                        deleteObjData(chartDataObj, point.deviceID);
                       }}
                     />
                   </div>

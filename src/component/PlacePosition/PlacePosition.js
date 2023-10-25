@@ -13,7 +13,7 @@ class PlacePosition extends React.Component {
 			id: Math.random().toString(36).substring(2, 11),
 			canvas: undefined,
 			ctx: undefined,
-			hoverPoint : null,
+			hoverPoint : {sensorId : ""},
 			lineSpacing : 20,
 
 			// user defined properties  
@@ -122,7 +122,6 @@ class PlacePosition extends React.Component {
 	}
 
 	drawAxis = function () {
-		console.log("PlacePosition - drawAxis");
 		let context = this.state.ctx;
 		let lineSpacing = this.state.lineSpacing;
 		context.save();
@@ -281,7 +280,7 @@ class PlacePosition extends React.Component {
 			context.fill();
 			context.stroke();
 
-			context.fillStyle = "black";
+			context.fillStyle = (this.state.hoverPoint.sensorId === trackPoint.sensorId) ? "black" : "rgba(0, 0, 0, 0.25)" ;
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
 			context.fillText(`${convertToCustomFormat(trackPoint.kp*1000)}(좌)`, point.x * this.state.scaleX + this.state.x, y - 10);
@@ -318,7 +317,7 @@ class PlacePosition extends React.Component {
 			context.fill();
 			context.stroke();
 
-			context.fillStyle = "black";
+			context.fillStyle = (this.state.hoverPoint.sensorId === trackPoint.sensorId) ? "black" : "rgba(0, 0, 0, 0.25)" ;
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
 			context.fillText(`${convertToCustomFormat(trackPoint.kp*1000)}(우)`, point.x * this.state.scaleX + this.state.x, y - 10);
@@ -355,7 +354,7 @@ class PlacePosition extends React.Component {
 			context.fill();
 			context.stroke();
 
-			context.fillStyle = "black";
+			context.fillStyle = (this.state.hoverPoint.sensorId === trackPoint.sensorId) ? "black" : "rgba(0, 0, 0, 0.25)" ;
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
 			context.fillText(`${convertToCustomFormat(trackPoint.kp*1000)}(좌)`, point.x * this.state.scaleX + this.state.x, y - 10);
@@ -392,7 +391,7 @@ class PlacePosition extends React.Component {
 			context.fill();
 			context.stroke();
 
-			context.fillStyle = "black";
+			context.fillStyle = (this.state.hoverPoint.sensorId === trackPoint.sensorId) ? "black" : "rgba(0, 0, 0, 0.25)" ;
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
 			context.fillText(`${convertToCustomFormat(trackPoint.kp*1000)}(우)`, point.x * this.state.scaleX + this.state.x, y - 10);
@@ -469,12 +468,11 @@ class PlacePosition extends React.Component {
 					pointList.forEach(circle => {
 						const distance = Math.sqrt((x - circle.x) ** 2 + (y - circle.y) ** 2);
 						if (distance < circle.radius) {
-							console.log("find");
 							isInsideCircle = true;
 							this.setState({hoverPoint : circle})
 						}
 					});
-					
+					if( !isInsideCircle ){ this.setState({hoverPoint : {sensorId : ""}}) }
 					container.style.cursor = isInsideCircle ? 'pointer' : 'default';
 				}}
 				onMouseUp={()=>{
@@ -482,7 +480,7 @@ class PlacePosition extends React.Component {
 						this.props.pointClick(this.state.hoverPoint);
 					}
 					this.setState({
-						hoverPoint : null
+						hoverPoint : {sensorId : ""}
 					})
 				}}
 			></div>

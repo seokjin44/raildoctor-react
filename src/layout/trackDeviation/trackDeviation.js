@@ -24,7 +24,7 @@ function TrackDeviation( props ) {
   const [selectRange, setSelectRange] = useState("");
   const [dataExits, setDataExits] = useState([]);
   const [selectTrack, setSelectTrack] = useState(STRING_UP_TRACK);
-  const [selectMeasureDate, setSelectMeasureDate] = useState(new Date());
+  const [selectMeasureDate, setSelectMeasureDate] = useState(null);
   const [selectCheckBox, setSelectCheckBox] = useState([]);
   
   const [searchChartView, setSearchChartView] = useState([]);
@@ -36,9 +36,13 @@ function TrackDeviation( props ) {
   const [distortionChartData, setDistortionChartData] = useState([]);
   const [railroadSection, setRailroadSection] = useState([]);
 
+  const [viewMeasureDate, setViewMeasureDate] = useState(null);
+
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
+    setViewMeasureDate(null);
+    setSelectMeasureDate(null);
     if( !selectRange || selectRange === "" || selectRange === null || selectRange === undefined ){
       alert("측정분기를 먼저 선택해주세요");
       return;
@@ -90,6 +94,7 @@ function TrackDeviation( props ) {
 
   const handleCalendarChange = (date) => {
     setSelectMeasureDate(dateFormat(date.$d));
+    setViewMeasureDate(date);
   };
 
   const selectChange = (val) => {
@@ -174,6 +179,7 @@ function TrackDeviation( props ) {
                     style={RANGEPICKERSTYLE}
                   /> */}
                   <DatePicker 
+                    value={viewMeasureDate}
                     style={RANGEPICKERSTYLE} 
                     disabledDate={disabledDate}
                     onChange={handleCalendarChange}
@@ -181,29 +187,6 @@ function TrackDeviation( props ) {
                 </div>
               </div>
               <div className="line"></div>
-              {/* <div className="dataOption">
-                <div className="title">KP </div>
-                <div className="date">
-                  <Input placeholder="KP"
-                    style={RANGEPICKERSTYLE}
-                  />
-                </div>
-              </div>
-              <div className="dataOption" style={{marginLeft:"10px"}}>
-                완화곡선 /
-                R=우곡선 400 (C=55, S=0) /
-                체감 C=40, S=0 /
-                종구배=+10‰ /
-                V=+40km/h
-              </div> */}
-
-              {/* <div className="dataOption" style={{marginLeft:"10px"}}>
-                완화곡선 /
-                R=우곡선 400 (C=55, S=0) /
-                체감 C=40, S=0 /
-                종구배=+10‰ /
-                V=+40km/h
-              </div> */}
               <div className="dataOption">
                 <div className="title">데이터 </div>
                 <div className="date">
@@ -251,7 +234,13 @@ function TrackDeviation( props ) {
                     })
                     .then(response => {
                       console.log(response.data);
-                      let dataAry = transposeObjectToArray(response.data);
+                      let dataAry = [];
+                      try{
+                        dataAry = transposeObjectToArray(response.data);
+                      }catch(e){
+                        alert("데이터가 없습니다.");
+                        return;
+                      }
                       console.log(dataAry);
                       if( option === STRING_HEIGHT ){
                         setHeightChartData(dataAry);

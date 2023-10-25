@@ -2,11 +2,13 @@ import React from 'react';
 import "./WearInfo.css";
 import Chart from "react-apexcharts";
 import { DOWN_TRACK, STRING_DOWN_TRACK, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, STRING_UP_TRACK, UP_TRACK } from '../../constant';
+import lodash from "lodash";
 
 class WearInfo extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            chartKey : 1,
             options: {
                 chart: {
                     animations: {
@@ -241,7 +243,14 @@ class WearInfo extends React.Component {
         }
 
         let series_ = series.filter(s => s.data.length !== 0);
+        if( series_.length < 1 ){
+            series_.push({
+                name: "",
+                data: []
+            })
+        }
         this.setState({
+            key: lodash.cloneDeep(this.state.chartKey++),
             series: series_
         });
     }
@@ -249,6 +258,7 @@ class WearInfo extends React.Component {
     render() {
         return (
             <Chart
+                key={this.state.chartKey}
                 options={this.state.options}
                 series={this.state.series}
                 type="scatter"

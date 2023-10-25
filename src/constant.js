@@ -38,6 +38,7 @@ export const STRING_LONG_MEASURE = "LONG";
 export const CHART_FORMAT_TODAY = 1;
 export const CHART_FORMAT_DAILY = 2;
 export const CHART_FORMAT_MONTHLY = 3;
+export const CHART_FORMAT_RAW = 4;
 
 export const STRING_RAIL_TEMPERATURE = "RAIL_TEMPERATURE";
 export const STRING_TEMPERATURE = "TEMPERATURE";

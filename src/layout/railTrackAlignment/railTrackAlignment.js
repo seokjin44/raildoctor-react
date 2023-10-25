@@ -30,7 +30,9 @@ function RailTrackAlignment( props ) {
   const [selectDateRange, setSelectDateRange] = useState([{$d:new Date()}, {$d:new Date()}]);
   const [pdfDataList , setPDFDataList] = useState([]);
   const [railroadSection, setRailroadSection] = useState([]);
-
+  
+  const [trackGeo, setTrackGeo] = useState({});
+  
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
@@ -117,6 +119,24 @@ function RailTrackAlignment( props ) {
     .catch(error => console.error('Error fetching data:', error));
   }, [railroadSection])
 
+  useEffect(()=>{
+    let route = sessionStorage.getItem('route');
+    axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroad : route,
+        kp :  selectKP
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      setTrackGeo(response.data);
+    })
+    .catch(error => console.error('Error fetching data:', error));    
+  }, [selectKP])
+  
   return (
     <div className="trackDeviation railRoughness" >
       <div className="railStatusContainer">
@@ -173,11 +193,8 @@ function RailTrackAlignment( props ) {
                 </div>
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
-                완화곡선 /
-                R=우곡선 400 (C=55, S=0) /
-                체감 C=40, S=0 /
-                종구배=+10‰ /
-                V=+40km/h
+              {trackGeo.shapeDisplay} /
+                R={trackGeo.direction} {trackGeo.radius} (C={trackGeo.cant}, S={trackGeo.slack})
               </div>
               <div className="line"></div>
               <div className="dataOption">
@@ -246,7 +263,7 @@ function RailTrackAlignment( props ) {
                 {
                   reports.map( (report, i) => {
                     return <div key={i+1} className="tr">
-                    <div className="td no">{i}</div>
+                    <div className="td no">{i+1}</div>
                     <div className="td regDate">{formatDateTime(new Date(report.measureTs))}</div>
                     <div className="td track">{report.railTrack}</div>
                     {/* <div className="td rail">Right</div> */}

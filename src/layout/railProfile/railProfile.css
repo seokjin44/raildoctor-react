@@ -40,6 +40,24 @@
     position: relative;
 }
 
+.railProfile .componentBox .profile .accData {
+    position: absolute;
+    left: 10px;
+    top: 95px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    padding: 0px;
+}
+
+.railProfile .componentBox .profile .accData .title {
+    padding: 5px;
+    background: #cccccc94;
+}
+
+.railProfile .componentBox .profile .accData .value{
+    padding: 5px;
+}
+
 .railProfile .componentBox .profile .railTitle{
     position: absolute;
     left: 10px;
@@ -162,7 +180,7 @@
 
 .table .tableHeader .tr .td.mamo,
 .table .tableBody .tr .td.mamo{
-    width: 10%;
+    width: 12%;
 }
 
 .table .tableHeader .tr .td.ton,

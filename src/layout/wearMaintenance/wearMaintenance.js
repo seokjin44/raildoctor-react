@@ -691,9 +691,9 @@ function WearMaintenance( props ) {
 
                         {/* <div className="td value2 colspan2"><div className="colspan2">레일 실측마모량</div></div> */}
                         {/* <div className="td value3 colspan2"><div className="colspan2">마모량(예측-실측)</div></div> */}
-                        <div className="td value4 rowspan3"><div className="rowspan3">갱환시기 예측</div></div>
-                        <div className="td value5 "></div>
-                        <div className="td value5 "></div>
+                        <div className={`td value4 ${tableViewWearCorrelation} rowspan3`}><div className="rowspan3">갱환시기 예측</div></div>
+                        <div className={`td value5 ${tableViewWearCorrelation}`}></div>
+                        <div className={`td value5 ${tableViewWearCorrelation}`}></div>
                       </div>
                       <div className="tr">
                         <div className="td driving"></div>
@@ -712,15 +712,15 @@ function WearMaintenance( props ) {
                         }
                         {/* <div className="td value2 "></div> */}
                         {/* <div className="td value3 "></div> */}
-                        <div className="td value4 ">로지스틱 마모량 기준</div>
-                        <div className="td value5 ">선형회귀 마모량 기준</div>
-                        <div className="td value5 ">누적통과톤수기준</div>
+                        <div className={`td value4 ${tableViewWearCorrelation}`}>로지스틱 마모량 기준</div>
+                        <div className={`td value5 ${tableViewWearCorrelation}`}>선형회귀 마모량 기준</div>
+                        <div className={`td value5 ${tableViewWearCorrelation}`}>누적통과톤수기준</div>
                       </div>
                     </div>
                     <div className="tableBody" style={{ /* overflow: "auto", */ height: "calc(100% - 48px)", justifyContent: "flex-start"}}>
                       {
                         predictionDetails.map( (detail, i) => {
-                          return <><div key={i} className="tr">
+                          return <><div key={`ver${i}`} className="tr">
                             <div className="td driving">{trackToString(detail.railTrack)}</div>
                             <div className="td kp colspan2"><div className="colspan2">{convertToCustomFormat(detail.kp*1000)}</div></div>
                             <div className="td rail colspan2"><div className="colspan2">{trackLeftRightToString(detail.railTrack)}</div></div>
@@ -737,11 +737,11 @@ function WearMaintenance( props ) {
                             }
                             {/* <div className="td value2 ">-</div> */}
                             {/* <div className="td value3 ">10mm</div> */}
-                            <div className="td value4 colspan2"><div className="colspan2">{`${numberWithCommas(detail.logiNextWeightToReplace)} - ${dateFormat(new Date(detail.logiNextTimeToReplace))}`}</div></div>
-                            <div className="td value5 colspan2"><div className="colspan2">{`${numberWithCommas(detail.lrNextWeightToReplace)} - ${dateFormat(new Date(detail.lrNextTimeToReplace))}`}</div></div>
-                            <div className="td value5 colspan2"><div className="colspan2">{`${numberWithCommas(detail.kpNextWeightToReplace)} - ${dateFormat(new Date(detail.kpNextTimeToReplace))}`}</div></div>
+                            <div className={`td value4 ${tableViewWearCorrelation} colspan2`}><div className="colspan2">{`${numberWithCommas(detail.logiNextWeightToReplace)} - ${dateFormat(new Date(detail.logiNextTimeToReplace))}`}</div></div>
+                            <div className={`td value5 ${tableViewWearCorrelation} colspan2`}><div className="colspan2">{`${numberWithCommas(detail.lrNextWeightToReplace)} - ${dateFormat(new Date(detail.lrNextTimeToReplace))}`}</div></div>
+                            <div className={`td value5 ${tableViewWearCorrelation} colspan2`}><div className="colspan2">{`${numberWithCommas(detail.kpNextWeightToReplace)} - ${dateFormat(new Date(detail.kpNextTimeToReplace))}`}</div></div>
                           </div>
-                          <div key={i} className="tr">
+                          <div key={`cor${i}`} className="tr">
                             <div className="td driving">{trackToString(detail.railTrack)}</div>
                             <div className="td kp"></div>
                             <div className="td rail"></div>
@@ -758,9 +758,9 @@ function WearMaintenance( props ) {
                             }
                             {/* <div className="td value2 ">-</div> */}
                             {/* <div className="td value3 ">10mm</div> */}
-                            <div className="td value4 "></div>
-                            <div className="td value5 "></div>
-                            <div className="td value5 "></div>
+                            <div className={`td value4 ${tableViewWearCorrelation}`}></div>
+                            <div className={`td value5 ${tableViewWearCorrelation}`}></div>
+                            <div className={`td value5 ${tableViewWearCorrelation}`}></div>
                           </div>
                           </>
                         })
