@@ -1,4 +1,4 @@
-import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_LATERAL_LOAD_KEY, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_LATERAL_LOAD_KEY, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STATION, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
 import axios from 'axios';
 import qs from 'qs';
 import Papa from 'papaparse';
@@ -300,12 +300,15 @@ export const getRailroadSection = ( setRailroadSection ) =>{
         return qs.stringify(params, { format: 'RFC3986' })
       },
       params : {
-        railroadName : route
+        railroadName : route,
+        structureType : STRING_STATION
       }
     })
     .then(response => {
       let pathList = [];
       console.log(response.data.entities);
+      let filterList = response.data.entities.filter(obj => obj.type === STRING_STATION);
+      console.log(filterList);
       for( let i = 0; i < response.data.entities.length; i++ ){
         let section = response.data.entities[i];
         if( i < response.data.entities.length - 1 ){
@@ -419,6 +422,15 @@ export const getSeoulSpeedData = ( setTrackSpeedData ) => {
                         };
                         return newRow;
                     }
+                    if (row.hasOwnProperty('KP') && row.hasOwnProperty('speed')) {
+                        let newRow = {
+                            x: row['KP'],
+                            y: row['speed'],
+                            name: row['speed'] === '0' ? ' ' : ''
+                            /* name: "_" */
+                        };
+                        return newRow;
+                    }
                     return row;
                 });
                 console.log(modifiedData);
@@ -435,6 +447,15 @@ export const getSeoulSpeedData = ( setTrackSpeedData ) => {
                                     x: row['kp'],
                                     y: row['speed'],
                                     name: ""
+                                };
+                                return newRow;
+                            }
+                            if (row.hasOwnProperty('KP') && row.hasOwnProperty('speed')) {
+                                let newRow = {
+                                    x: row['KP'],
+                                    y: row['speed'],
+                                    name: row['speed'] === '0' ? ' ' : ''
+                                    /* name: "_" */
                                 };
                                 return newRow;
                             }

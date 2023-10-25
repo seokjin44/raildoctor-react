@@ -122,11 +122,12 @@ function Monitoring( props ) {
 
   useEffect( ()=>{
     getRailroadSection(setRailroadSection);
+    console.log("monitoring init");
     let route = sessionStorage.getItem('route');
     if( route === STRING_ROUTE_INCHON ){
       getInchonSpeedData(setTrackSpeedData);
     }else if( route === STRING_ROUTE_SEOUL ){
-      getSeoulSpeedData(setRailroadSection);
+      getSeoulSpeedData(setTrackSpeedData);
     }
     axios.get(`https://raildoctor.suredatalab.kr/api/railroads/railroadmap`,{
       paramsSerializer: params => {

@@ -31137,6 +31137,12 @@ export const IncheonKP = {
   end : 30814
 }
 
+export const seoulKP = {
+  start : 0,
+  end : 48961
+}
+
+
 export const TRACKGEODATA1 = [{"time":"2023-01-23","weight":14313476},
 {"time":"2023-02-23","weight":14976334},
 {"time":"2023-03-23","weight":12924761},

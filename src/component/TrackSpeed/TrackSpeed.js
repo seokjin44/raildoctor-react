@@ -1,6 +1,6 @@
 import React from "react";
 import "./TrackSpeed.css";
-import { IncheonKP } from "../../constant";
+import { IncheonKP, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, seoulKP } from "../../constant";
 import { convertToCustomFormat } from "../../util";
 import isEqual from 'lodash/isEqual';
 
@@ -201,12 +201,15 @@ class TrackSpeed extends React.Component {
 		context.setLineDash([4]);
 		context.stroke();  
 		context.restore();  
-	
+		
+		let route = sessionStorage.getItem('route');
+		let minKP = (route === STRING_ROUTE_INCHON) ? IncheonKP.start : seoulKP.start;
+		let maxKP = (route === STRING_ROUTE_INCHON) ? IncheonKP.end : seoulKP.end;
 	
 		// draw tick marks  
 		for (let n = 0; n < this.state.numYTicks; n++) {  
 			if( n === 0 ){
-				for( let i = IncheonKP.start; i < IncheonKP.end; i++ ){
+				for( let i = minKP; i < maxKP; i++ ){
 					if( i % 1000 === 0 ){
 						context.beginPath();  
 						context.font = "bold 12px NEO_R";  
@@ -222,7 +225,7 @@ class TrackSpeed extends React.Component {
 			}
 			context.beginPath();  
 			context.moveTo(this.state.x, n * this.state.height / this.state.numYTicks + this.state.y);  
-			context.lineTo(this.state.x + IncheonKP.end, n * this.state.height / this.state.numYTicks + this.state.y);
+			context.lineTo(this.state.x + maxKP, n * this.state.height / this.state.numYTicks + this.state.y);
 			context.setLineDash([4]);
 			context.lineWidth = 0.5; 
 			context.stroke();  
@@ -297,13 +300,7 @@ class TrackSpeed extends React.Component {
 		context.save();  
 		console.log("drawLine");
 		let trackData = [...this.props.data];
-		/* let minKP = (this.props.kp - this.state.rangeX/2 < this.IncheonKP.start) ? 0 : this.props.kp - this.state.rangeX/2;
-		let maxKP = this.props.kp + this.state.rangeX/2;
-		if( maxKP > this.IncheonKP.end ){
-			minKP = this.IncheonKP.end - this.state.rangeX;
-			maxKP = this.IncheonKP.end;
-		} */
-
+		console.log("drawLine ::: ",trackData);
 		for(let track of trackData) {
 			let arrowCoordinates = [];
 
@@ -318,6 +315,9 @@ class TrackSpeed extends React.Component {
 			context.setLineDash([0]);
 			context.lineWidth = 1.5; 
 
+			let route = sessionStorage.getItem('route');
+			let minKP = (route === STRING_ROUTE_INCHON) ? IncheonKP.start : seoulKP.start;
+
 			/* let kpPrint = 0; */
 			for (let n = 0; n < track.data.length; n++) {
 				context.strokeStyle = color;  
@@ -326,11 +326,11 @@ class TrackSpeed extends React.Component {
 				/* if( point.x < minKP || point.x > maxKP ){
 					continue;
 				} */
-				let pointX = point.x - IncheonKP.start;
+				let pointX = point.x - minKP;
 				//draw line
 				if(n > 0) {
 					let _point = track.data[n-1];
-					let _pointX = _point.x - IncheonKP.start;
+					let _pointX = _point.x - minKP;
 					context.beginPath(); 
 					context.moveTo(_pointX * this.state.scaleX + this.state.x, this.state.y + this.state.height - _point.y * this.state.scaleY);  
 					

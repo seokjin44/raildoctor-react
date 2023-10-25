@@ -320,7 +320,7 @@ function WearMaintenance( props ) {
     if( route === STRING_ROUTE_INCHON ){
       getInchonSpeedData(setTrackSpeedData);
     }else if( route === STRING_ROUTE_SEOUL ){
-      getSeoulSpeedData(setRailroadSection);
+      getSeoulSpeedData(setTrackSpeedData);
     }
   }, []);
   
