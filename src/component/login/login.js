@@ -4,7 +4,7 @@ import "./login.css"
 import Modal from "../Modal/Modal";
 import ExplainIcon from "../../assets/8725674_comment_info_alt_icon (1).svg";
 import { useNavigate } from "react-router-dom";
-import RaildoctorLogo from "../../assets/logo_color.png";
+import RaildoctorLogo from "../../assets/KakaoTalk_20231026_002922251.png";
 
 function Login( props ) {
   const navigate = useNavigate();
