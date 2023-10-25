@@ -32,10 +32,10 @@ function Login( props ) {
     </div>
     <div className="containerBackground">
       <div id="loginContainer">
-        <div id="greetings">
-          {/* <div id="greetingsMain">Welcome Back !</div>
-          <div id="greetingsSub">Sign in to continue to Veltrix</div> */}
-        </div>
+        {/* <div id="greetings">
+          <div id="greetingsMain">Welcome Back !</div>
+          <div id="greetingsSub">Sign in to continue to Veltrix</div>
+        </div> */}
         <div id="login">
           <div className="line subject">ID</div>
           <div className="line"><input className="loginInput" id="id" placeholder="Enter username" 
@@ -45,10 +45,10 @@ function Login( props ) {
                 onKeyUp={(e)=>{ if(e.key === "Enter" ){ login() } }} 
               /></div>
           <div className="line flexEnd">
-            <div className="remeberMe">
+            {/* <div className="remeberMe">
               <div className="checkBox MR5"></div>
               Remember me
-            </div>
+            </div> */}
             <button className="loginButton" onClick={(e)=>{login(e)}}>Log in</button>
           </div>
           <div className="line FS10 ALIGN_TOP TA_LEFT COL_P">

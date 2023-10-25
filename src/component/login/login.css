@@ -29,7 +29,7 @@
 #loginContainer {
     width: 300px;
     height: 350px;
-    background-color: #626ED4;
+    background-color: white;
     border-radius: 5px;
     display: flex;
     justify-content: center;
