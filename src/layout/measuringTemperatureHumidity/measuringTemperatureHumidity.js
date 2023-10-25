@@ -4,7 +4,7 @@ import RailStatus from "../../component/railStatus/railStatus";
 import 'dayjs/locale/ko';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Checkbox, Input, Select, DatePicker } from "antd";
-import { CHART_FORMAT_DAILY, CHART_FORMAT_TODAY, RAILROADSECTION, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, TEMPDATA1, UP_TRACK, colors } from "../../constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_TODAY, RAILROADSECTION, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, TEMPDATA1, UP_TRACK, colors } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
 import { convertObjectToArray, convertToCustomFormat, findRange, getRailroadSection, tempDataName } from "../../util";
@@ -12,10 +12,10 @@ import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
 
 const { RangePicker } = DatePicker;
 const dataOption = [
-  { label: '레일온도', value: 'RAIL_TEMPERATURE' },
-  { label: '대기온도', value: 'TEMPERATURE' },
-  { label: '대기습도', value: 'HUMIDITY' },
-  { label: '(기상청)외부온도', value: '(기상청)외부온도' },
+  { label: '레일온도', value: STRING_RAIL_TEMPERATURE },
+  { label: '대기온도', value: STRING_TEMPERATURE },
+  { label: '대기습도', value: STRING_HUMIDITY },
+  { label: '(기상청)외부온도', value: STRING_KMA_TEMPERATURE },
 ];
 
 let sensorList = [];
@@ -129,6 +129,18 @@ function MeasuringTemperatureHumidity( props ) {
           }
           chartseries_.push({
             sensorName : sensorName, dataKey : dataKey, item : tempDataName(STRING_HUMIDITY),
+            deviceID : selectDeviceID, color : getColor(colorIndex++)
+          });
+        }
+        if( select === STRING_KMA_TEMPERATURE ){
+          let dataAry = response.data.kmaTemperature
+          for( let i in dataAry ){
+            let addData = {};
+            addData[dataKey] = dataAry[i];
+            chartDataObj[tsAry[i]] = {...chartDataObj[tsAry[i]], ...addData};
+          }
+          chartseries_.push({
+            sensorName : sensorName, dataKey : dataKey, item : tempDataName(STRING_KMA_TEMPERATURE),
             deviceID : selectDeviceID, color : getColor(colorIndex++)
           });
         }
@@ -340,7 +352,6 @@ function MeasuringTemperatureHumidity( props ) {
                 {/* <Line dataKey="temp" stroke="#FF0000" dot={false} /> */}
                 {
                   chartseries.map( (series, i) => {
-                    console.log(series.colorCode);
                     return <Line key={i} 
                       dataKey={series.dataKey} name={`${series.sensorName}_${series.item}`} 
                       stroke={series.color} dot={false} />;

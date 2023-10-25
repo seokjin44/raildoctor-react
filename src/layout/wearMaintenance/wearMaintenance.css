@@ -462,6 +462,11 @@
     width: 7%;
 }
 
+.popupContent .table .tableHeader .tr .td.value1_4,
+.popupContent .table .tableBody .tr .td.value1_4 {
+    width: 7%;
+}
+
 .popupContent .table .tableHeader .tr .td.value2,
 .popupContent .table .tableBody .tr .td.value2 {
     width: 9%;
@@ -484,6 +489,29 @@
 
 .table .tableHeader .tr .td .rowspan4{
     width: 400%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.table .tableHeader .tr .td .rowspan5{
+    width: 500%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+
+.table .tableHeader .tr .td .rowspan3{
+    width: 300%;
     height: 100%;
     display: flex;
     justify-content: center;
@@ -567,4 +595,19 @@
     display: flex;
     justify-content: left;
     align-items: center;
+}
+
+.table .tableBody .tr .td.colspan2{
+    border-bottom: 0px;
+}
+
+.table .tableBody .tr .td .colspan2{
+    height: 200%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 0;
+    top: 0;
+    position: absolute;
+    width: 100%;
 }

@@ -42,6 +42,7 @@ export const CHART_FORMAT_MONTHLY = 3;
 export const STRING_RAIL_TEMPERATURE = "RAIL_TEMPERATURE";
 export const STRING_TEMPERATURE = "TEMPERATURE";
 export const STRING_HUMIDITY = "HUMIDITY";
+export const STRING_KMA_TEMPERATURE = "KMA_TEMPERATURE";
 
 export const STRING_WHEEL_LOAD_KEY = "WL_MAX"
 export const STRING_LATERAL_LOAD_KEY = "LF"
@@ -62,6 +63,17 @@ export const STRING_SELECT_WEAR_CORRELATION_RAILVAL = "railVal";
 
 export const STRING_VERTICAL_WEAR = "VERTICAL";
 export const STRING_CORNER_WEAR = "CORNER";
+
+export const STRING_WEAR_MODEL_KP = "KP"; //누적통과톤수만 고려한 KP 별 선형회귀 예측
+export const STRING_WEAR_MODEL_LOGI_LASSO = "LOGI_LASSO"; //레일특성변수사용, 로지스틱 LASSO
+export const STRING_WEAR_MODEL_LOGI_STEPWISE = "LOGI_STEPWISE"; //레일특성변수사용, 로지스틱 Stepwise
+export const STRING_WEAR_MODEL_LR_LASSO = "LR_LASSO"; //레일특성변수사용, 선형회귀 LASSO
+export const STRING_WEAR_MODEL_LR_STEPWISE = "LR_STEPWISE"; //레일특성변수사용, 선형회귀 Stepwise
+export const STRING_WEAR_MODEL_SVR = "SVR"; //레일특성변수사용, 머신러닝 SVM
+export const STRING_WEAR_MODEL_RANDOM_FOREST = "RANDOM_FOREST"; //레일특성변수사용, 머신러닝 Random Forest
+export const STRING_WEAR_MODEL_XGB = "XGB"; //레일특성변수사용, 머신러닝 XGBoost
+export const STRING_WEAR_MODEL_LGBM = "LGBM"; //레일특성변수사용, 머신러닝 LightGBM
+export const STRING_WEAR_MODEL_CAT_BOOST = "CAT_BOOST";//레일특성변수사용, 머신러닝 CatBoost
 
 export const colors = [
   "#FF5733", "#33FF57", "#5733FF", "#FF33A6", 

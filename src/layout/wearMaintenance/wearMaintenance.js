@@ -9,13 +9,13 @@ import 'dayjs/locale/ko';
 import { Select } from 'antd';
 import { Box, Modal } from "@mui/material";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
-import { BOXSTYLE, DIRECTWEARINFO, INSTRUMENTATIONPOINT, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO, STRING_CORNER_WEAR, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_UP_TRACK, STRING_VERTICAL_WEAR, TRACKSPEEDDATA, UP_TRACK } from "../../constant";
+import { BOXSTYLE, DIRECTWEARINFO, INSTRUMENTATIONPOINT, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, SIDEWEARINFO, STRING_CORNER_WEAR, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_UP_TRACK, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_KP, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, TRACKSPEEDDATA, UP_TRACK } from "../../constant";
 import AlertIcon from "../../assets/icon/decision/3876149_alert_emergency_light_protection_security_icon.png";
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToNumber, convertToNumber2, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, trackNumberToString } from "../../util";
+import { convertToCustomFormat, convertToNumber, convertToNumber2, dateFormat, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, numberWithCommas, trackLeftRightToString, trackNumberToString, trackToString, wearModelTableBody, wearModelTableHeader, wearModelTableHeader1, wearModelTableHeader2 } from "../../util";
 import lodash from "lodash";
 
 const { TextArea } = Input;
@@ -47,11 +47,14 @@ function WearMaintenance( props ) {
   const [cornerWearGraphData, setCornerWearGraphData] = useState([]);
   const [verticalWearGraphData, setVerticalWearGraphData] = useState([]);
   const [selectModel, setSelectModel] = useState("");
-  const [modelOptions, setModelOptions] = useState([{value:"선형회귀모형",label:"선형회귀모형"}]);
+  const [tableViewModel, setTableViewModel] = useState("");
+  const [modelOptions, setModelOptions] = useState([{value:"",label:""}]);
   const [selectWearCorrelation, setSelectWearCorrelation] = useState("");
+  const [tableViewWearCorrelation, setTableViewWearCorrelation] = useState("");
   const [railroadSection, setRailroadSection] = useState([]);
   const [trackSpeedData, setTrackSpeedData] = useState([{trackName:"", data:[]},{trackName:"", data:[]}]);
-
+  const [predictionDetails, setPredictionDetails] = useState([]);
+  
   const handleClose = () => {
     setOpen(false);
   }
@@ -131,19 +134,22 @@ function WearMaintenance( props ) {
 
   const onClickWearSearch = () => {
     /* getWearInfo(); */
-    let startKP = convertToNumber(selectKP.name);
-    let endKP = startKP + 0.099;
+    let startKP = selectKP.beginKp / 1000;
+    let endKP = selectKP.endKp / 1000;
+    console.log(startKP);
+    console.log(endKP);
     let route = sessionStorage.getItem('route');
     let param = {
-      begin_kp : [3.3],
-      end_kp : [4.4],
+      begin_kp : [startKP],
+      end_kp : [endKP],
       beginMeasureTs : new Date(wearSearchCondition.startDate).toISOString(),
       endMeasureTs : new Date(wearSearchCondition.endDate).toISOString(),
       minAccumulateWeight : 1,
       maxAccumulateWeight : 500000000,
       railTrack : trackNumberToString(selectKP.trackType),
       railroadName : route,
-      graphType : "TWO_DIMENTION"
+      graphType : "TWO_DIMENTION",
+      prediction_method : selectModel
     }
     console.log(param);
     axios.get('https://raildoctor.suredatalab.kr/api/railwears/graph_data',{
@@ -161,15 +167,16 @@ function WearMaintenance( props ) {
 
 
     param = {
-      begin_kp : [3.3],
-      end_kp : [4.4],
+      begin_kp : [startKP],
+      end_kp : [endKP],
       beginMeasureTs : new Date(wearSearchCondition.startDate).toISOString(),
       endMeasureTs : new Date(wearSearchCondition.endDate).toISOString(),
       minAccumulateWeight : 1,
       maxAccumulateWeight : 500000000,
       railTrack : trackNumberToString(selectKP.trackType),
       railroadName : route,
-      graphType : "THREE_DIMENTION"
+      graphType : "THREE_DIMENTION",
+      prediction_method : selectModel
     }
     console.log(param);
     axios.get('https://raildoctor.suredatalab.kr/api/railwears/graph_data',{
@@ -189,6 +196,30 @@ function WearMaintenance( props ) {
       setViewWear3dData(wear3DData);
     })
     .catch(error => console.error('Error fetching data:', error));
+
+    param = {
+      begin_kp : [startKP],
+      end_kp : [endKP],
+      beginMeasureTs : new Date(wearSearchCondition.startDate).toISOString(),
+      endMeasureTs : new Date(wearSearchCondition.endDate).toISOString(),
+      railTrack : trackNumberToString(selectKP.trackType),
+      railroadName : route,
+      prediction_method : selectModel
+    }
+    console.log(param);
+    axios.get('https://raildoctor.suredatalab.kr/api/railwears/predictions',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
+      },
+      params : param
+    })
+    .then(response => {
+      console.log(response.data);
+      setPredictionDetails(response.data.predictionDetails);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+    setTableViewModel(lodash.cloneDeep(selectModel));
+    setTableViewWearCorrelation(lodash.cloneDeep(selectWearCorrelation));
   }
 
   const makeWear3dData = (cornerWearGraph, verticalWearGraph, fliter, minmax) => {
@@ -221,6 +252,7 @@ function WearMaintenance( props ) {
         }
       }
     }
+
     if( fliter.indexOf(STRING_VERTICAL_WEAR) > -1 ){
       for( let data of verticalWearGraph ){
         if( data.railTrack === STRING_UP_TRACK ){
@@ -242,8 +274,6 @@ function WearMaintenance( props ) {
         }
       }
     }
-
-
 
     let data = [
       {
@@ -428,20 +458,22 @@ function WearMaintenance( props ) {
                               setSelectWearCorrelation(val);
                               if( val === STRING_SELECT_WEAR_CORRELATION_MGT ){
                                 setModelOptions([
-                                  {value:"선형회귀모형",label:"선형회귀모형"}
+                                  {value:STRING_WEAR_MODEL_KP,label:"선형회귀모형"}
                                 ])
-                                setSelectModel("선형회귀모형");
+                                setSelectModel(STRING_WEAR_MODEL_KP);
                               }else if( val === STRING_SELECT_WEAR_CORRELATION_RAILVAL ){
                                 setModelOptions([
-                                  {value:"선형회귀모형",label:"선형회귀모형"},
-                                  {value:"로지스틱 회귀모형",label:"로지스틱 회귀모형"},
-                                  {value:"SVM",label:"SVM"},
-                                  {value:"랜덤포레스트",label:"랜덤포레스트"},
-                                  {value:"XGBoost",label:"XGBoost"},
-                                  {value:"Light GBM",label:"Light GBM"},
-                                  {value:"CatBoost",label:"CatBoost"}
+                                  {value:STRING_WEAR_MODEL_LR_LASSO,label:"선형회귀모형 LASSO"},
+                                  {value:STRING_WEAR_MODEL_LR_STEPWISE,label:"선형회귀모형 Stepwise"},
+                                  {value:STRING_WEAR_MODEL_LOGI_LASSO,label:"로지스틱 LASSO"},
+                                  {value:STRING_WEAR_MODEL_LOGI_STEPWISE,label:"로지스틱 Stepwise"},
+                                  {value:STRING_WEAR_MODEL_SVR,label:"SVR"},
+                                  {value:STRING_WEAR_MODEL_RANDOM_FOREST,label:"랜덤포레스트"},
+                                  {value:STRING_WEAR_MODEL_XGB,label:"XGBoost"},
+                                  {value:STRING_WEAR_MODEL_LGBM,label:"Light GBM"},
+                                  {value:STRING_WEAR_MODEL_CAT_BOOST,label:"CatBoost"}
                                 ]);
-                                setSelectModel("선형회귀모형");
+                                setSelectModel(STRING_WEAR_MODEL_LR_LASSO);
                               }
                             }}
                             options={
@@ -554,13 +586,19 @@ function WearMaintenance( props ) {
                         borderRadius: "5px",
                         margin: "5px",
                         width: "calc(100% - 12px)"}} >
-                      <WearInfo title="직마모(mm)" data={verticalWearGraphData} ></WearInfo>
+                      <WearInfo title="직마모(mm)" 
+                        data={verticalWearGraphData} 
+                        selectKP={selectKP}
+                      ></WearInfo>
                     </div>
                     <div className="componentBox" id="sideWearInfo" style={{ border: "1px solid #cccccc",
                         borderRadius: "5px",
                         margin: "5px",
                         width: "calc(100% - 12px)"}}>
-                      <WearInfo title="편마모(mm)" data={cornerWearGraphData} ></WearInfo>
+                      <WearInfo title="편마모(mm)" 
+                        data={cornerWearGraphData} 
+                        selectKP={selectKP}
+                      ></WearInfo>
                     </div>
                   </div>
                 </div>
@@ -602,13 +640,13 @@ function WearMaintenance( props ) {
           <Box sx={BOXSTYLE} >
             <div className="popupTitle"><img src={PopupIcon} />예측데이터 상세</div>
             <div className="popupContent">
-              <div className="contentBox" style={{ height: "300px", marginTop : "10px", width: "1248px"}} >
+              <div className="contentBox" style={{ height: "700px", marginTop : "10px", width: "1500px", overflow:"auto"}} >
                 <div className="containerTitle">예측결과
-                  <div className="dataOption">
+                  {/* <div className="dataOption">
                     <div className="value">
                       Update : 2023.01.25
                     </div>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="componentBox flex section " style={{ paddingTop: "5px",
                       paddingBottom: "5px",
@@ -616,7 +654,7 @@ function WearMaintenance( props ) {
                       paddingLeft: "5px",
                       flexDirection: "column",
                       width: "calc( 100% - 12px)" }} >
-                  <div className="dataBox" style={{display:"flex"}}>
+                  {/* <div className="dataBox" style={{display:"flex"}}>
                     <div class="curDate optionBox borderColorGreen" style={{height:"55px", width: "315px", marginBottom : "10px"}}>
                       <div class="optionTitle" style={{width:"212px"}}>예측 누적통과톤수</div>
                       <div class="optionValue">414,953,971</div>
@@ -633,31 +671,28 @@ function WearMaintenance( props ) {
                       <div class="optionTitle" style={{width:"212px"}}>갱환시기</div>
                       <div class="optionValue">6억톤</div>
                     </div>
-                  </div>
-                  <div className={`table ${selectWearCorrelation}`} style={{ justifyContent: "flex-start" }}>
+                  </div> */}
+                  <div className={`table ${tableViewWearCorrelation}`} style={{ justifyContent: "flex-start" }}>
                     <div className="tableHeader">
                       <div className="tr">
                         <div className="td driving colspan2"><div className="colspan2">열차운행방향</div></div>
                         <div className="td kp colspan2"><div className="colspan2">KP</div></div>
                         <div className="td rail colspan2"><div className="colspan2">좌우레일</div></div>
                         <div className="td mamo colspan2"><div className="colspan2">마모</div></div>
-                        <div className="td date colspan2"><div className="colspan2">예측일자</div></div>
+                        {/* <div className="td date colspan2"><div className="colspan2">예측일자</div></div> */}
                         <div className="td ton colspan2"><div className="colspan2">누적통과톤수</div></div>
-                        {(selectWearCorrelation === STRING_SELECT_WEAR_CORRELATION_MGT)? 
+                        {(tableViewWearCorrelation === STRING_SELECT_WEAR_CORRELATION_MGT)? 
                         <>
                           <div className="td value1"><div className="">레일 예측마모량(mm)</div></div>
                         </>
                         :
-                        <>
-                          <div className="td value1 rowspan4"><div className="rowspan4">레일 예측마모량(mm)</div></div>
-                          <div className="td value1_1 rowspan4"></div>
-                          <div className="td value1_2 rowspan4"></div>
-                          <div className="td value1_3 rowspan4"></div>
-                        </>}
+                          wearModelTableHeader1(tableViewModel)
+                        }
 
-                        <div className="td value2 colspan2"><div className="colspan2">레일 실측마모량</div></div>
-                        <div className="td value3 colspan2"><div className="colspan2">마모량(예측-실측)</div></div>
-                        <div className="td value4 rowspan2"><div className="rowspan2">갱환시기 예측</div></div>
+                        {/* <div className="td value2 colspan2"><div className="colspan2">레일 실측마모량</div></div> */}
+                        {/* <div className="td value3 colspan2"><div className="colspan2">마모량(예측-실측)</div></div> */}
+                        <div className="td value4 rowspan3"><div className="rowspan3">갱환시기 예측</div></div>
+                        <div className="td value5 "></div>
                         <div className="td value5 "></div>
                       </div>
                       <div className="tr">
@@ -665,164 +700,72 @@ function WearMaintenance( props ) {
                         <div className="td kp"></div>
                         <div className="td rail"></div>
                         <div className="td mamo"></div>
-                        <div className="td date "></div>
+                        {/* <div className="td date "></div> */}
                         <div className="td ton "></div>
 
-                        {(selectWearCorrelation === STRING_SELECT_WEAR_CORRELATION_MGT)? 
+                        {(tableViewWearCorrelation === STRING_SELECT_WEAR_CORRELATION_MGT)? 
                         <>
                           <div className="td value1 ">선형회귀</div>
                         </>
                         :
-                        <>
-                          <div className="td value1 ">선형회귀</div>
-                          <div className="td value1_1 ">XGBoost</div>
-                          <div className="td value1_2 ">LightGBM</div>
-                          <div className="td value1_3 ">CatBoost</div>
-                        </>}
-                        <div className="td value2 "></div>
-                        <div className="td value3 "></div>
-                        <div className="td value4 ">마모량 기준</div>
+                          wearModelTableHeader2(tableViewModel)
+                        }
+                        {/* <div className="td value2 "></div> */}
+                        {/* <div className="td value3 "></div> */}
+                        <div className="td value4 ">로지스틱 마모량 기준</div>
+                        <div className="td value5 ">선형회귀 마모량 기준</div>
                         <div className="td value5 ">누적통과톤수기준</div>
                       </div>
                     </div>
-                    <div className="tableBody" style={{ overflow: "auto", height: "calc(100% - 48px)", justifyContent: "flex-start"}}>
-                      <div className="tr">
-                        <div className="td driving">상선</div>
-                        <div className="td kp">14k800</div>
-                        <div className="td rail">좌</div>
-                        <div className="td mamo">직마모</div>
-                        <div className="td date ">2024.01.10</div>
-                        <div className="td ton ">5ton  </div>
-
-                        {(selectWearCorrelation === STRING_SELECT_WEAR_CORRELATION_MGT)? 
-                        <>
-                          <div className="td value1 ">10</div>
-                        </>
-                        :
-                        <>
-                          <div className="td value1 ">10</div>
-                          <div className="td value1_1 ">10</div>
-                          <div className="td value1_2 ">10</div>
-                          <div className="td value1_3 ">10</div>
-                        </>}
-                        <div className="td value2 ">-</div>
-                        <div className="td value3 ">10mm</div>
-                        <div className="td value4 ">7.09억톤 - 2029.01.15</div>
-                        <div className="td value5 ">6억톤 - 2027.01.15</div>
-                      </div>
-                      {/* <div className="tr">
-                        <div className="td driving">상선</div>
-                        <div className="td kp">14k800</div>
-                        <div className="td rail">좌</div>
-                        <div className="td mamo">편마모</div>
-                        <div className="td date ">2024.01.10</div>
-                        <div className="td ton ">5ton  </div>
-                        <div className="td value1 ">10</div>
-                        <div className="td value1_1 ">10</div>
-                        <div className="td value1_2 ">10</div>
-                        <div className="td value1_3 ">10</div>
-                        <div className="td value2 ">-</div>
-                        <div className="td value3 ">10mm</div>
-                        <div className="td value4 ">7.09억톤 - 2029.01.15</div>
-                        <div className="td value5 ">6억톤 - 2027.01.15</div>
-                      </div>
-                      <div className="tr">
-                        <div className="td driving">상선</div>
-                        <div className="td kp">14k800</div>
-                        <div className="td rail">우</div>
-                        <div className="td mamo">직마모</div>
-                        <div className="td date ">2024.01.10</div>
-                        <div className="td ton">5ton  </div>
-                        <div className="td value1 ">10</div>
-                        <div className="td value1_1 ">10</div>
-                        <div className="td value1_2 ">10</div>
-                        <div className="td value1_3 ">10</div>
-                        <div className="td value2 ">-</div>
-                        <div className="td value3 ">10mm</div>
-                        <div className="td value4 ">7.09억톤 - 2029.01.15</div>
-                        <div className="td value5 ">6억톤 - 2027.01.15</div>
-                      </div>
-                      <div className="tr">
-                        <div className="td driving">상선</div>
-                        <div className="td kp">14k800</div>
-                        <div className="td rail">우</div>
-                        <div className="td mamo">편마모</div>
-                        <div className="td date ">2024.01.10</div>
-                        <div className="td ton">5ton  </div>
-                        <div className="td value1 ">10</div>
-                        <div className="td value1_1 ">10</div>
-                        <div className="td value1_2 ">10</div>
-                        <div className="td value1_3 ">10</div>
-                        <div className="td value2 ">-</div>
-                        <div className="td value3 ">10mm</div>
-                        <div className="td value4 ">7.09억톤 - 2029.01.15</div>
-                        <div className="td value5 ">6억톤 - 2027.01.15</div>
-                      </div>
-
-                      <div className="tr">
-                        <div className="td driving">하선</div>
-                        <div className="td kp">14k800</div>
-                        <div className="td rail">좌</div>
-                        <div className="td mamo">직마모</div>
-                        <div className="td date ">2024.01.10</div>
-                        <div className="td ton ">5ton  </div>
-                        <div className="td value1 ">10</div>
-                        <div className="td value1_1 ">10</div>
-                        <div className="td value1_2 ">10</div>
-                        <div className="td value1_3 ">10</div>
-                        <div className="td value2 ">-</div>
-                        <div className="td value3 ">10mm</div>
-                        <div className="td value4 ">7.09억톤 - 2029.01.15</div>
-                        <div className="td value5 ">6억톤 - 2027.01.15</div>
-                      </div>
-                      <div className="tr">
-                        <div className="td driving">하선</div>
-                        <div className="td kp">14k800</div>
-                        <div className="td rail">좌</div>
-                        <div className="td mamo">편마모</div>
-                        <div className="td date ">2024.01.10</div>
-                        <div className="td ton ">5ton  </div>
-                        <div className="td value1 ">10</div>
-                        <div className="td value1_1 ">10</div>
-                        <div className="td value1_2 ">10</div>
-                        <div className="td value1_3 ">10</div>
-                        <div className="td value2 ">-</div>
-                        <div className="td value3 ">10mm</div>
-                        <div className="td value4 ">7.09억톤 - 2029.01.15</div>
-                        <div className="td value5 ">6억톤 - 2027.01.15</div>
-                      </div>
-                      <div className="tr">
-                        <div className="td driving">하선</div>
-                        <div className="td kp">14k800</div>
-                        <div className="td rail">우</div>
-                        <div className="td mamo">직마모</div>
-                        <div className="td date ">2024.01.10</div>
-                        <div className="td ton">5ton  </div>
-                        <div className="td value1 ">10</div>
-                        <div className="td value1_1 ">10</div>
-                        <div className="td value1_2 ">10</div>
-                        <div className="td value1_3 ">10</div>
-                        <div className="td value2 ">-</div>
-                        <div className="td value3 ">10mm</div>
-                        <div className="td value4 ">7.09억톤 - 2029.01.15</div>
-                        <div className="td value5 ">6억톤 - 2027.01.15</div>
-                      </div>
-                      <div className="tr">
-                        <div className="td driving">하선</div>
-                        <div className="td kp">14k800</div>
-                        <div className="td rail">우</div>
-                        <div className="td mamo">편마모</div>
-                        <div className="td date ">2024.01.10</div>
-                        <div className="td ton">5ton  </div>
-                        <div className="td value1 ">10</div>
-                        <div className="td value1_1 ">10</div>
-                        <div className="td value1_2 ">10</div>
-                        <div className="td value1_3 ">10</div>
-                        <div className="td value2 ">-</div>
-                        <div className="td value3 ">10mm</div>
-                        <div className="td value4 ">7.09억톤 - 2029.01.15</div>
-                        <div className="td value5 ">6억톤 - 2027.01.15</div>
-                      </div> */}
+                    <div className="tableBody" style={{ /* overflow: "auto", */ height: "calc(100% - 48px)", justifyContent: "flex-start"}}>
+                      {
+                        predictionDetails.map( (detail, i) => {
+                          return <><div key={i} className="tr">
+                            <div className="td driving">{trackToString(detail.railTrack)}</div>
+                            <div className="td kp colspan2"><div className="colspan2">{convertToCustomFormat(detail.kp*1000)}</div></div>
+                            <div className="td rail colspan2"><div className="colspan2">{trackLeftRightToString(detail.railTrack)}</div></div>
+                            <div className="td mamo">직마모</div>
+                            {/* <div className="td date ">{dateFormat(new Date(detail.predictionTs))}</div> */}
+                            <div className="td ton colspan2"><div className="colspan2">{numberWithCommas(detail.accumulateWeight)} </div></div>
+    
+                            {(tableViewWearCorrelation === STRING_SELECT_WEAR_CORRELATION_MGT)? 
+                            <>
+                              <div className="td value1 ">{detail.verticalKpWear}</div>
+                            </>
+                            :
+                              wearModelTableBody(tableViewModel, detail, STRING_VERTICAL_WEAR)
+                            }
+                            {/* <div className="td value2 ">-</div> */}
+                            {/* <div className="td value3 ">10mm</div> */}
+                            <div className="td value4 colspan2"><div className="colspan2">{`${numberWithCommas(detail.logiNextWeightToReplace)} - ${dateFormat(new Date(detail.logiNextTimeToReplace))}`}</div></div>
+                            <div className="td value5 colspan2"><div className="colspan2">{`${numberWithCommas(detail.lrNextWeightToReplace)} - ${dateFormat(new Date(detail.lrNextTimeToReplace))}`}</div></div>
+                            <div className="td value5 colspan2"><div className="colspan2">{`${numberWithCommas(detail.kpNextWeightToReplace)} - ${dateFormat(new Date(detail.kpNextTimeToReplace))}`}</div></div>
+                          </div>
+                          <div key={i} className="tr">
+                            <div className="td driving">{trackToString(detail.railTrack)}</div>
+                            <div className="td kp"></div>
+                            <div className="td rail"></div>
+                            <div className="td mamo">편마모</div>
+                            {/* <div className="td date ">{dateFormat(new Date(detail.predictionTs))}</div> */}
+                            <div className="td ton "></div>
+    
+                            {(tableViewWearCorrelation === STRING_SELECT_WEAR_CORRELATION_MGT)? 
+                            <>
+                              <div className="td value1 ">{detail.cornerKpWear}</div>
+                            </>
+                            :
+                              wearModelTableBody(tableViewModel, detail, STRING_CORNER_WEAR)
+                            }
+                            {/* <div className="td value2 ">-</div> */}
+                            {/* <div className="td value3 ">10mm</div> */}
+                            <div className="td value4 "></div>
+                            <div className="td value5 "></div>
+                            <div className="td value5 "></div>
+                          </div>
+                          </>
+                        })
+                      }
+                      
                     </div>
                   </div>
                 </div>
@@ -852,13 +795,19 @@ function WearMaintenance( props ) {
                         borderRadius: "5px",
                         margin: "5px",
                         width: "calc(100% - 12px)"}} >
-                      <WearInfo title="직마모(mm)" data={verticalWearGraphData}></WearInfo>
+                      <WearInfo title="직마모(mm)" 
+                        data={verticalWearGraphData}
+                        selectKP={selectKP}
+                      ></WearInfo>
                     </div>
                     <div className="componentBox" id="sideWearInfo" style={{ border: "1px solid #cccccc",
                         borderRadius: "5px",
                         margin: "5px",
                         width: "calc(100% - 12px)"}}>
-                      <WearInfo title="편마모(mm)" data={cornerWearGraphData}></WearInfo>
+                      <WearInfo title="편마모(mm)" 
+                        data={cornerWearGraphData}
+                        selectKP={selectKP}
+                      ></WearInfo>
                     </div>
                   </div>
               </div>

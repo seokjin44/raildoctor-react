@@ -317,6 +317,9 @@ function CumulativeThroughput( props ) {
                     {/* <div className="td">일평균</div> */}
                     <div className="td">잔여톤수</div>
                     <div className="td">갱환예상</div>
+                    <div className="td">first</div>
+                    <div className="td">second</div>
+                    <div className="td">갱환/부설일자</div>
                   </div>
                 </div>
                 <div className="tableBody">
@@ -332,6 +335,10 @@ function CumulativeThroughput( props ) {
                     {/* <div className="td">41,915</div> */}
                     <div className="td">{numberWithCommas(rightRemaining.remainingWeight)}</div>
                     <div className="td">{formatDateTime(new Date(rightRemaining.nextTimeToReplace))}</div>
+
+                    <div className="td">{formatDateTime(new Date(leftRemaining.firstMeasureTs))}</div>
+                    <div className="td">{formatDateTime(new Date(leftRemaining.secondMeasureTs))}</div>
+                    <div className="td">{formatDateTime(new Date(leftRemaining.zeroMeasureTs))}</div>
                   </div>
                 </div>
               </div>
@@ -351,6 +358,9 @@ function CumulativeThroughput( props ) {
                     {/* <div className="td">일평균</div> */}
                     <div className="td">잔여톤수</div>
                     <div className="td">갱환예상</div>
+                    <div className="td">first</div>
+                    <div className="td">second</div>
+                    <div className="td">갱환/부설일자</div>
                   </div>
                 </div>
                 <div className="tableBody">
@@ -366,6 +376,10 @@ function CumulativeThroughput( props ) {
                     {/* <div className="td">41,915</div> */}
                     <div className="td">{numberWithCommas(leftRemaining.remainingWeight)}</div>
                     <div className="td">{formatDateTime(new Date(leftRemaining.nextTimeToReplace))}</div>
+
+                    <div className="td">{formatDateTime(new Date(leftRemaining.firstMeasureTs))}</div>
+                    <div className="td">{formatDateTime(new Date(leftRemaining.secondMeasureTs))}</div>
+                    <div className="td">{formatDateTime(new Date(leftRemaining.zeroMeasureTs))}</div>
                   </div>
                 </div>
               </div>

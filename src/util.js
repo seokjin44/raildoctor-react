@@ -1,4 +1,4 @@
-import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_LATERAL_LOAD_KEY, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
 import axios from 'axios';
 import qs from 'qs';
 import Papa from 'papaparse';
@@ -7,7 +7,9 @@ export const dateFormat = ( date ) => {
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하기 때문에 +1이 필요합니다.
     const dd = String(date.getDate()).padStart(2, '0');
-  
+    if( isNaN(yyyy) || isNaN(mm) || isNaN(dd) ){
+        return '-';
+    }
     return `${yyyy}-${mm}-${dd}`;
 }
 
@@ -110,6 +112,8 @@ export const tempDataName = ( value ) => {
         return "대기온도";
     }else if( STRING_HUMIDITY === value ){
         return "대기습도";
+    }else if( STRING_KMA_TEMPERATURE === value ){
+        return "기상청온도";
     }else{
         return "";
     }
@@ -447,4 +451,138 @@ export const getSeoulSpeedData = ( setTrackSpeedData ) => {
       .catch(error => {
         console.error('Error in one of the requests:', error);
     });
+}
+
+export const wearModelTableHeader1 = (model) => {
+    if( model === STRING_WEAR_MODEL_LR_LASSO ||
+        model === STRING_WEAR_MODEL_LR_STEPWISE ||
+        model === STRING_WEAR_MODEL_XGB ||
+        model === STRING_WEAR_MODEL_LGBM ||
+        model === STRING_WEAR_MODEL_CAT_BOOST ){  
+        return <>
+            <div className="td value1 rowspan4"><div className="rowspan4">레일 예측마모량(mm)</div></div>
+            <div className="td value1_1 rowspan4"></div>
+            <div className="td value1_2 rowspan4"></div>
+            <div className="td value1_3 rowspan4"></div>
+        </>
+    }else if( model === STRING_WEAR_MODEL_LOGI_LASSO ||
+              model === STRING_WEAR_MODEL_LOGI_STEPWISE ){
+        return <>
+            <div className="td value1 rowspan5"><div className="rowspan5">레일 예측마모량(mm)</div></div>
+            <div className="td value1_1 rowspan5"></div>
+            <div className="td value1_2 rowspan5"></div>
+            <div className="td value1_3 rowspan5"></div>
+            <div className="td value1_4 rowspan5"></div>
+        </>
+    }else if( model === STRING_WEAR_MODEL_SVR ){
+            return <>
+                <div className="td value1 rowspan5"><div className="rowspan5">레일 예측마모량(mm)</div></div>
+                <div className="td value1_1 rowspan5"></div>
+                <div className="td value1_2 rowspan5"></div>
+                <div className="td value1_3 rowspan5"></div>
+                <div className="td value1_4 rowspan5"></div>
+             </>
+    }else if( model === STRING_WEAR_MODEL_RANDOM_FOREST ){
+        return <>
+            <div className="td value1 rowspan5"><div className="rowspan5">레일 예측마모량(mm)</div></div>
+            <div className="td value1_1 rowspan5"></div>
+            <div className="td value1_2 rowspan5"></div>
+            <div className="td value1_3 rowspan5"></div>
+            <div className="td value1_4 rowspan5"></div>
+        </>
+    }
+}
+
+export const wearModelTableHeader2 = (model) => {
+    if( model === STRING_WEAR_MODEL_LR_LASSO ||
+        model === STRING_WEAR_MODEL_LR_STEPWISE ||
+        model === STRING_WEAR_MODEL_XGB ||
+        model === STRING_WEAR_MODEL_LGBM ||
+        model === STRING_WEAR_MODEL_CAT_BOOST ){  
+        return <>
+            <div className="td value1 ">선형회귀</div>
+            <div className="td value1_1 ">XGBoost</div>
+            <div className="td value1_2 ">LightGBM</div>
+            <div className="td value1_3 ">CatBoost</div>
+        </>
+    }else if( model === STRING_WEAR_MODEL_LOGI_LASSO ||
+              model === STRING_WEAR_MODEL_LOGI_STEPWISE ){
+        return <>
+            <div className="td value1 ">선형회귀</div>
+            <div className="td value1_1 ">XGBoost</div>
+            <div className="td value1_2 ">LightGBM</div>
+            <div className="td value1_3 ">CatBoost</div>
+            <div className="td value1_4 ">로지스틱</div>
+        </>
+    }else if( model === STRING_WEAR_MODEL_SVR ){
+            return <>
+                <div className="td value1 ">선형회귀</div>
+                <div className="td value1_1 ">XGBoost</div>
+                <div className="td value1_2 ">LightGBM</div>
+                <div className="td value1_3 ">CatBoost</div>
+                <div className="td value1_4 ">SVR</div>
+            </>
+    }else if( model === STRING_WEAR_MODEL_RANDOM_FOREST ){
+        return <>
+            <div className="td value1 ">선형회귀</div>
+            <div className="td value1_1 ">XGBoost</div>
+            <div className="td value1_2 ">LightGBM</div>
+            <div className="td value1_3 ">CatBoost</div>
+            <div className="td value1_4 ">랜덤포레스트</div>
+        </>
+    }
+}
+
+
+export const wearModelTableBody = (model, detail, mamo) => {
+    if( model === STRING_WEAR_MODEL_LR_STEPWISE ){
+        return <>
+            <div className="td value1 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLrStepwiseWear.toFixed(3) : detail.cornerLrStepwiseWear.toFixed(3) }</div>
+            <div className="td value1_1 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalXgbWear.toFixed(3) : detail.cornerXgbWear.toFixed(3) }</div>
+            <div className="td value1_2 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLgbmWear.toFixed(3) : detail.cornerLgbmWear.toFixed(3) }</div>
+            <div className="td value1_3 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalCatBoostWear.toFixed(3) : detail.cornerCatBoostWear.toFixed(3) }</div>
+        </>
+    }else if( model === STRING_WEAR_MODEL_LR_LASSO ||
+        model === STRING_WEAR_MODEL_XGB ||
+        model === STRING_WEAR_MODEL_LGBM ||
+        model === STRING_WEAR_MODEL_CAT_BOOST ){  
+        return <>
+            <div className="td value1 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLrLassoWear.toFixed(3) : detail.cornerLrLassoWear.toFixed(3) }</div>
+            <div className="td value1_1 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalXgbWear.toFixed(3) : detail.cornerXgbWear.toFixed(3) }</div>
+            <div className="td value1_2 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLgbmWear.toFixed(3) : detail.cornerLgbmWear.toFixed(3) }</div>
+            <div className="td value1_3 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalCatBoostWear.toFixed(3) : detail.cornerCatBoostWear.toFixed(3) }</div>
+        </>
+    }else if( model === STRING_WEAR_MODEL_LOGI_LASSO ){
+        return <>
+            <div className="td value1 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLogiLassoWear.toFixed(3) : detail.cornerLogiLassoWear.toFixed(3) }</div>
+            <div className="td value1_1 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLrLassoWear.toFixed(3) : detail.cornerLrLassoWear.toFixed(3) }</div>
+            <div className="td value1_2 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalXgbWear.toFixed(3) : detail.cornerXgbWear.toFixed(3) }</div>
+            <div className="td value1_3 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLgbmWear.toFixed(3) : detail.cornerLgbmWear.toFixed(3) }</div>
+            <div className="td value1_4 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalCatBoostWear.toFixed(3) : detail.cornerCatBoostWear.toFixed(3) }</div>
+        </>
+    }else if( model === STRING_WEAR_MODEL_LOGI_STEPWISE ){
+        return <>
+            <div className="td value1 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLogiStepwiseWear.toFixed(3) : detail.cornerLogiStepwiseWear.toFixed(3) }</div>
+            <div className="td value1_1 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLrLassoWear.toFixed(3) : detail.cornerLrLassoWear.toFixed(3) }</div>
+            <div className="td value1_2 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalXgbWear.toFixed(3) : detail.cornerXgbWear.toFixed(3) }</div>
+            <div className="td value1_3 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLgbmWear.toFixed(3) : detail.cornerLgbmWear.toFixed(3) }</div>
+            <div className="td value1_4 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalCatBoostWear.toFixed(3) : detail.cornerCatBoostWear.toFixed(3) }</div>
+        </>
+    }else if( model === STRING_WEAR_MODEL_SVR ){
+            return <>
+                <div className="td value1 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalSvrWear.toFixed(3) : detail.cornerSvrWear.toFixed(3) }</div>
+                <div className="td value1_1 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLrLassoWear.toFixed(3) : detail.cornerLrLassoWear.toFixed(3) }</div>
+                <div className="td value1_2 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalXgbWear.toFixed(3) : detail.cornerXgbWear.toFixed(3) }</div>
+                <div className="td value1_3 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLgbmWear.toFixed(3) : detail.cornerLgbmWear.toFixed(3) }</div>
+                <div className="td value1_4 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalCatBoostWear.toFixed(3) : detail.cornerCatBoostWear.toFixed(3) }</div>
+            </>
+    }else if( model === STRING_WEAR_MODEL_RANDOM_FOREST ){
+        return <>
+            <div className="td value1 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalRandomForestWear.toFixed(3) : detail.cornerRandomForestWear.toFixed(3) }</div>
+            <div className="td value1_1 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLrLassoWear.toFixed(3) : detail.cornerLrLassoWear.toFixed(3) }</div>
+            <div className="td value1_2 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalXgbWear.toFixed(3) : detail.cornerXgbWear.toFixed(3) }</div>
+            <div className="td value1_3 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalLgbmWear.toFixed(3) : detail.cornerLgbmWear.toFixed(3) }</div>
+            <div className="td value1_4 ">{(mamo === STRING_VERTICAL_WEAR)? detail.verticalCatBoostWear.toFixed(3) : detail.cornerCatBoostWear.toFixed(3) }</div>
+        </>
+    }
 }

@@ -249,7 +249,9 @@ class PlaceInfo extends React.Component {
 				y : y,
 				radius : this.state.pointRadius + 3,
 				name: point.name,
-				trackType : UP_TRACK
+				trackType : UP_TRACK,
+				beginKp : location,
+				endKp : location + tick
 			});
 		}
 
@@ -288,7 +290,9 @@ class PlaceInfo extends React.Component {
 				y : y,
 				radius : this.state.pointRadius + 3,
 				name: point.name,
-				trackType : DOWN_TRACK
+				trackType : DOWN_TRACK,
+				beginKp : location,
+				endKp : location + tick
 			});
 		}
 

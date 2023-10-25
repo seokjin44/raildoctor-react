@@ -1,7 +1,7 @@
 import React from 'react';
 import "./WearInfo.css";
 import Chart from "react-apexcharts";
-import { STRING_DOWN_TRACK, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, STRING_UP_TRACK } from '../../constant';
+import { DOWN_TRACK, STRING_DOWN_TRACK, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, STRING_UP_TRACK, UP_TRACK } from '../../constant';
 
 class WearInfo extends React.Component {
     constructor(props) {
@@ -24,6 +24,11 @@ class WearInfo extends React.Component {
                 yaxis: {
                     title: {
                       text: this.props.title,
+                    },
+                    labels: {
+                        formatter: (value) => {
+                          return value.toFixed(2); // 소수점 두 자리까지 표시
+                        }
                     }
                 },
                 xaxis: {
@@ -206,33 +211,38 @@ class WearInfo extends React.Component {
                 series[3].data.push([data.mgt, data.w_right]);
             } */
 
-            if( data.railTrack === STRING_UP_TRACK && data.railSide === STRING_TRACK_SIDE_LEFT ){
-                series[1].data.push([data.accumulateWeight, data.wear]);
-                series[5].data.push([data.accumulateWeight, data.prediction]);
-            }else if( data.railTrack === STRING_UP_TRACK && data.railSide === STRING_TRACK_SIDE_RIGHT ){
-                series[3].data.push([data.accumulateWeight, data.wear]);
-                series[7].data.push([data.accumulateWeight, data.prediction]);
-            }else if( data.railTrack === STRING_DOWN_TRACK && data.railSide === STRING_TRACK_SIDE_LEFT ){
-                series[0].data.push([data.accumulateWeight, data.wear]);
-                series[4].data.push([data.accumulateWeight, data.prediction]);
-            }else if( data.railTrack === STRING_DOWN_TRACK && data.railSide === STRING_TRACK_SIDE_RIGHT ){
-                series[2].data.push([data.accumulateWeight, data.wear]);
-                series[6].data.push([data.accumulateWeight, data.prediction]);
-            }else{
-                series[1].data.push([data.accumulateWeight, data.wear]);
-                series[3].data.push([data.accumulateWeight, data.wear]);
-                series[0].data.push([data.accumulateWeight, data.wear]);
-                series[2].data.push([data.accumulateWeight, data.wear]);
-
-                series[4].data.push([data.accumulateWeight, data.prediction]);
-                series[5].data.push([data.accumulateWeight, data.prediction]);
-                series[6].data.push([data.accumulateWeight, data.prediction]);
-                series[7].data.push([data.accumulateWeight, data.prediction]);
-            }
+            if( this.props.selectKP.trackType === DOWN_TRACK ){
+                if( data.railSide === STRING_TRACK_SIDE_LEFT ){
+                    series[1].data.push([data.accumulateWeight, data.wear]);
+                    series[5].data.push([data.accumulateWeight, data.prediction]);
+                }else if( data.railSide === STRING_TRACK_SIDE_RIGHT ){
+                    series[3].data.push([data.accumulateWeight, data.wear]);
+                    series[7].data.push([data.accumulateWeight, data.prediction]);
+                }else{
+                    series[1].data.push([data.accumulateWeight, data.wear]);
+                    series[5].data.push([data.accumulateWeight, data.prediction]);
+                    series[3].data.push([data.accumulateWeight, data.wear]);
+                    series[7].data.push([data.accumulateWeight, data.prediction]);
+                }
+            }else if( this.props.selectKP.trackType === UP_TRACK ){
+                if( data.railSide === STRING_TRACK_SIDE_LEFT ){
+                    series[0].data.push([data.accumulateWeight, data.wear]);
+                    series[4].data.push([data.accumulateWeight, data.prediction]);
+                }else if( data.railSide === STRING_TRACK_SIDE_RIGHT ){
+                    series[2].data.push([data.accumulateWeight, data.wear]);
+                    series[6].data.push([data.accumulateWeight, data.prediction]);
+                }else{
+                    series[0].data.push([data.accumulateWeight, data.wear]);
+                    series[4].data.push([data.accumulateWeight, data.prediction]);
+                    series[2].data.push([data.accumulateWeight, data.wear]);
+                    series[6].data.push([data.accumulateWeight, data.prediction]);
+                }
+            } 
         }
 
+        let series_ = series.filter(s => s.data.length !== 0);
         this.setState({
-            series: series
+            series: series_
         });
     }
 
