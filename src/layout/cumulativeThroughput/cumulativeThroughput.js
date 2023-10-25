@@ -8,7 +8,7 @@ import { RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRI
 import classNames from "classnames";
 import axios from 'axios';
 import qs from 'qs';
-import { formatDateTime, getRailroadSection, getYear2Length, numberWithCommas } from "../../util";
+import { convertToCustomFormat, formatDateTime, getRailroadSection, getYear2Length, numberWithCommas } from "../../util";
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
 
@@ -197,7 +197,7 @@ function CumulativeThroughput( props ) {
       measure_ts : selectDate.toISOString(),
       rail_track : track_,
       begin_kp: (selectedPath.beginKp / 1000),
-      end_kp : (selectedPath.beginKp / 1000)
+      end_kp : (selectedPath.endKp / 1000)
     }
     console.log(param);
     axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remainings`,{
@@ -428,6 +428,8 @@ function CumulativeThroughput( props ) {
                         <div className="td">연장</div>
                         <div className="td">교체</div>
                         <div className="td">계측</div> */}
+                        <div className="td">시작KP</div>
+                        <div className="td">종점KP</div>
                         <div className="td">기준</div>
                         <div className="td">누적</div>
                         {/* <div className="td">일평균</div> */}
@@ -448,6 +450,8 @@ function CumulativeThroughput( props ) {
                           <div className="td">552</div>
                           <div className="td">2007-03-16</div>
                           <div className="td">2021-12-31</div> */}
+                          <div className="td">{convertToCustomFormat(remaining.leftRemaining.beginKp*1000)}</div>
+                          <div className="td">{convertToCustomFormat(remaining.leftRemaining.endKp*1000)}</div>
                           <div className="td">{numberWithCommas(remaining.criteria)}</div>
                           <div className="td">{numberWithCommas(remaining.leftRemaining.accumulateweight)}</div>
                           {/* <div className="td">41,915</div> */}
@@ -465,6 +469,8 @@ function CumulativeThroughput( props ) {
                           <div className="td">552</div>
                           <div className="td">2007-03-16</div>
                           <div className="td">2021-12-31</div> */}
+                          <div className="td">{convertToCustomFormat(remaining.rightRemaining.beginKp*1000)}</div>
+                          <div className="td">{convertToCustomFormat(remaining.rightRemaining.endKp*1000)}</div>
                           <div className="td">{numberWithCommas(remaining.criteria)}</div>
                           <div className="td">{numberWithCommas(remaining.rightRemaining.accumulateweight)}</div>
                           {/* <div className="td">41,915</div> */}

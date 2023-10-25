@@ -356,7 +356,7 @@ export const getInchonSpeedData = ( setTrackSpeedData ) => {
                         let newRow = {
                             x: row['kp'],
                             y: row['speed'],
-                            name: row['speed'] === '0' ? ' ' : ''
+                            name: ''
                             /* name: "_" */
                         };
                         return newRow;
@@ -376,7 +376,7 @@ export const getInchonSpeedData = ( setTrackSpeedData ) => {
                                 let newRow = {
                                     x: row['kp'],
                                     y: row['speed'],
-                                    name: ""
+                                    name: ''
                                 };
                                 return newRow;
                             }
@@ -417,8 +417,7 @@ export const getSeoulSpeedData = ( setTrackSpeedData ) => {
                         let newRow = {
                             x: row['kp'],
                             y: row['speed'],
-                            name: row['speed'] === '0' ? ' ' : ''
-                            /* name: "_" */
+                            name: ''
                         };
                         return newRow;
                     }
@@ -426,8 +425,7 @@ export const getSeoulSpeedData = ( setTrackSpeedData ) => {
                         let newRow = {
                             x: row['KP'],
                             y: row['speed'],
-                            name: row['speed'] === '0' ? ' ' : ''
-                            /* name: "_" */
+                            name: ''
                         };
                         return newRow;
                     }

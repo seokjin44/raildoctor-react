@@ -894,7 +894,7 @@ function DataExistence( props ) {
                     <Legend />
 
                     <Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} />
-                    <Line type="monotone" name="캔트틀림" dataKey="value" stroke="#4371C4" dot={false} />
+                    <Line type="monotone" name="캔트틀림" dataKey="cantTwist" stroke="#4371C4" dot={false} />
       
                     <Line type="monotone" name="목표기준" dataKey="maxTargetCriteria" stroke="#4BC784" dot={false} />
                     <Line type="monotone" name="목표기준" dataKey="minTargetCriteria" stroke="#4BC784" dot={false} />
