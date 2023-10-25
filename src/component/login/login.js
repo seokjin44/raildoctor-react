@@ -33,11 +33,11 @@ function Login( props ) {
     <div className="containerBackground">
       <div id="loginContainer">
         <div id="greetings">
-          <div id="greetingsMain">Welcome Back !</div>
-          <div id="greetingsSub">Sign in to continue to Veltrix</div>
+          {/* <div id="greetingsMain">Welcome Back !</div>
+          <div id="greetingsSub">Sign in to continue to Veltrix</div> */}
         </div>
         <div id="login">
-          <div className="line subject">Username</div>
+          <div className="line subject">ID</div>
           <div className="line"><input className="loginInput" id="id" placeholder="Enter username" 
                 onKeyUp={(e)=>{ if(e.key === "Enter" ){ document.getElementById("password").focus() } }} /></div>
           <div className="line subject">Password</div>

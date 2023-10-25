@@ -129,6 +129,7 @@ function Monitoring( props ) {
     }else if( route === STRING_ROUTE_SEOUL ){
       getSeoulSpeedData(setTrackSpeedData);
     }
+    
     axios.get(`https://raildoctor.suredatalab.kr/api/railroads/railroadmap`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
