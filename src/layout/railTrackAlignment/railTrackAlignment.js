@@ -4,7 +4,6 @@ import RailStatus from "../../component/railStatus/railStatus";
 import 'dayjs/locale/ko';
 import ReportIcon from "../../assets/icon/1291748_magnify_magnifying glass_marketing_report_financial_icon.svg";
 import ReportImg from "../../assets/ReportImg.png";
-import { Document, Page } from 'react-pdf';
 
 import Box from '@mui/material/Box';
 import faker from 'faker';
