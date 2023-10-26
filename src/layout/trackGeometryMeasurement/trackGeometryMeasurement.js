@@ -52,7 +52,7 @@ function TrackGeometryMeasurement( props ) {
   const [selectPoints, setSelectPoints] = useState([]);
   const [viewMeasureDate, setViewMeasureDate] = useState(null);
   const [selectMeasureDate, setSelectMeasureDate] = useState(new Date());
-  const [selectMeasureTime, setSelectMeasureTime] = useState("");
+  /* const [selectMeasureTime, setSelectMeasureTime] = useState(""); */
   const [findDatas, setFindDatas] = useState("");
 
   const [poinsts, setPoints] = useState([]);
@@ -339,7 +339,7 @@ function TrackGeometryMeasurement( props ) {
     setSelectMeasureDate(null);
     setViewMeasureDate(null);
     setTimeOptions([]);
-    setSelectMeasureTime("");
+    /* setSelectMeasureTime(""); */
   }, [selectPoint]);
   
   useEffect( ()=> {
@@ -482,7 +482,7 @@ function TrackGeometryMeasurement( props ) {
                     onPanelChange={handlePanelChange} 
                     onChange={handleCalendarChange}
                   />
-                  <Select
+                  {/* <Select
                     value={selectMeasureTime}
                     defaultValue={selectMeasureTime}
                     style={{width:'120px'}}
@@ -490,7 +490,7 @@ function TrackGeometryMeasurement( props ) {
                     onChange={(val)=>{
                       setSelectMeasureTime(val);
                     }}
-                  />
+                  /> */}
                 </div>
               </div>
               <div className="line"></div>
@@ -520,8 +520,8 @@ function TrackGeometryMeasurement( props ) {
                         alert("Point를 선택해주세요.");
                         return;
                       }
-                      if( !selectMeasureDate || selectMeasureDate === "" || selectMeasureDate === undefined || selectMeasureDate === null ||
-                          !selectMeasureTime || selectMeasureTime === "" || selectMeasureTime === undefined || selectMeasureTime === null 
+                      if( !selectMeasureDate || selectMeasureDate === "" || selectMeasureDate === undefined || selectMeasureDate === null 
+                          /* !selectMeasureTime || selectMeasureTime === "" || selectMeasureTime === undefined || selectMeasureTime === null */ 
                        ){
                         alert("측정일자에서 날짜 및 시간을 선택해주세요.");
                         return;
@@ -533,7 +533,7 @@ function TrackGeometryMeasurement( props ) {
                       }
                       let point = pointsInfo[selectPoint];
                       console.log(point);
-                      let measureDate = new Date(`${selectMeasureDate} ${selectMeasureTime}`).toISOString();
+                      let measureDate = new Date(`${selectMeasureDate}`).toISOString();
                       let colorCode = getColor(colorIndex++);
                       for( let sensor of selectPoints ){
                         if( sensor.sensorId === point.sensorId ){
