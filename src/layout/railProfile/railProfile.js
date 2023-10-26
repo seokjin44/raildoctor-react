@@ -74,11 +74,14 @@ function RailProfile( props ) {
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
-    let startKP = select.beginKp;
-    let endKP = select.endKp;
+  }
+
+  const getKPOptions = ()=> {
+    let startKP = selectedPath.beginKp;
+    let endKP = selectedPath.endKp;
     let kpOptions_ = [];
     if( selectTrack === STRING_UP_TRACK ){
-      for( let kp of dataExistKPs.t1 ){
+      for( let kp of dataExistKPs.t2 ){
         if( (kp * 1000) >= startKP &&
             (kp * 1000) <= endKP
         ){
@@ -92,7 +95,7 @@ function RailProfile( props ) {
         }
       }
     }else if( selectTrack === STRING_DOWN_TRACK ){
-      for( let kp of dataExistKPs.t2 ){
+      for( let kp of dataExistKPs.t1 ){
         if( (kp * 1000) >= startKP &&
             (kp * 1000) <= endKP
         ){
@@ -236,6 +239,10 @@ function RailProfile( props ) {
     })
     .catch(error => console.error('Error fetching data:', error));
   }, [selectKP]);
+
+  useEffect(()=>{
+    getKPOptions();
+  }, [selectedPath, selectTrack])
 
   return (
     <div className="trackDeviation railProfile" >
