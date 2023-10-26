@@ -159,37 +159,70 @@ export const convertObjectToArray = (obj, type) => {
         };
     });
 }
-export const convertObjectToArray_ = (obj, startDate, endDate) => {
-    const format = (date) => date.toISOString();
-  
+
+export const convertObjectToArray_ = (obj, type, startDate, endDate) => {
+    const format = (date) => {
+        if (type === CHART_FORMAT_TODAY) {
+            return formatTime(date);
+        } else if (type === CHART_FORMAT_DAILY) {
+            return formatDate(date);
+        } else if (type === CHART_FORMAT_MONTHLY) {
+            return formatYearMonth(date);
+        } else if (type === CHART_FORMAT_RAW) {
+            return formatDateTime(date);
+        }
+        return date.toISOString();
+    };
+
     // 모든 키들을 추출하고 0으로 초기화된 객체를 생성
     const allKeys = Object.values(obj).reduce((acc, curr) => {
-      return {...acc, ...curr};
+        return { ...acc, ...curr };
     }, {});
     const defaultData = Object.keys(allKeys).reduce((acc, key) => {
-      acc[key] = 0;
-      return acc;
+        acc[key] = null;
+        return acc;
     }, {});
-  
-    const result = {};
+
+    const resultObj = {};
     let currentDate = new Date(startDate);
     const stopDate = new Date(endDate);
-  
+
     // 이미 데이터가 있는 날짜들을 추출
     const existingDates = new Set(Object.keys(obj).map(key => key.slice(0, 10)));
-  
+
     while (currentDate <= stopDate) {
-      const formattedDate = format(currentDate).slice(0, 10); // YYYY-MM-DD format
-  
-      if (!existingDates.has(formattedDate)) {
-        result[`${formattedDate}T00:00:00Z`] = {...defaultData};
-      }
-      currentDate.setDate(currentDate.getDate() + 1);
+        const dayStart = new Date(currentDate);
+        dayStart.setHours(0, 0, 0, 0);
+        
+        const dayEnd = new Date(currentDate);
+        dayEnd.setHours(23, 59, 59, 999);
+
+        const formattedDate = format(currentDate).slice(0, 10); // YYYY-MM-DD format
+
+        if (!existingDates.has(formattedDate)) {
+            /* resultObj[`${formattedDate}T00:00:00Z`] = { ...defaultData }; */
+            let currentTime = dayStart;
+            while (currentTime <= dayEnd) {
+                const formattedTime = format(currentTime);
+                resultObj[formattedTime] = { ...defaultData };
+                currentTime.setMinutes(currentTime.getMinutes() + 5);
+            }
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
     }
-  
-    // 기존의 obj 데이터를 결과에 병합
-    return { ...result, ...obj };
-  };
+
+    const mergedData = {
+        ...resultObj,
+        ...obj
+    };
+
+    // Convert the merged object to the desired array format
+    return Object.keys(mergedData).map(key => ({
+        time: format(new Date(key)),
+        ...mergedData[key]
+    })).sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+};
+
   
 
 export const intervalSample = (array, interval) => {

@@ -107,8 +107,6 @@ function MeasuringTemperatureHumidity( props ) {
         }
       }
       let tsAry = response.data.measureTs;
-      chartDataObj[searchRangeDate[0].$d.toISOString()] = {};
-      chartDataObj[searchRangeDate[1].$d.toISOString()] = {};
       for( let select of checkboxSelects ){
         let dataKey = `${selectDeviceID}_${select}`;
         if( select === STRING_RAIL_TEMPERATURE ){
@@ -160,7 +158,8 @@ function MeasuringTemperatureHumidity( props ) {
           });
         }
       }
-      setChartData(convertObjectToArray(chartDataObj, CHART_FORMAT_RAW, searchRangeDate[0].$d.toISOString(), searchRangeDate[1].$d.toISOString()));
+      setChartData(convertObjectToArray_(chartDataObj, CHART_FORMAT_RAW, searchRangeDate[0].$d.toISOString(), searchRangeDate[1].$d.toISOString()));
+      console.log(convertObjectToArray_(chartDataObj, CHART_FORMAT_RAW, searchRangeDate[0].$d.toISOString(), searchRangeDate[1].$d.toISOString()));
       setChartseries(chartseries_);
     })
     .catch(error => console.error('Error fetching data:', error));
