@@ -789,7 +789,7 @@ function DataExistence( props ) {
                     <Tooltip />
                     <Legend />
 
-                    <Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} />
+                    {/* <Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} /> */}
                     <Line type="monotone" name="좌레일-고저틀림" dataKey="valueLeft" stroke="#4371C4" dot={false} />
                     <Line type="monotone" name="우레일-고저틀림" dataKey="valueRight" stroke="#4371C4" dot={false} />
       
@@ -841,7 +841,7 @@ function DataExistence( props ) {
                     <Tooltip />
                     <Legend />
 
-                    <Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} />
+                    {/* <Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} /> */}
                     <Line type="monotone" name="좌레일-방향틀림" dataKey="valueLeft" stroke="#4371C4" dot={false} />
                     <Line type="monotone" name="우레일-방향틀림" dataKey="valueRight" stroke="#4371C4" dot={false} />
       
@@ -944,7 +944,7 @@ function DataExistence( props ) {
                     <Tooltip />
                     <Legend />
 
-                    <Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} />
+                    {/* <Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} /> */}
                     <Line type="monotone" name="궤간틀림" dataKey="value" stroke="#4371C4" dot={false} />
       
                     <Line type="monotone" name="목표기준" dataKey="maxTargetCriteria" stroke="#4BC784" dot={false} />
@@ -995,7 +995,7 @@ function DataExistence( props ) {
                     <Tooltip />
                     <Legend />
 
-                    <Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} />
+                    {/* <Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} /> */}
                     <Line type="monotone" name="비틀림" dataKey="value" stroke="#4371C4" dot={false} />
       
                     <Line type="monotone" name="목표기준" dataKey="maxTargetCriteria" stroke="#4BC784" dot={false} />

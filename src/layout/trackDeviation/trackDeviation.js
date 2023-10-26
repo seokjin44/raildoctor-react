@@ -324,6 +324,7 @@ function TrackDeviation( props ) {
                   series.push(<Line type="monotone" name="우레일-방향틀림" dataKey="valueRight" stroke="#4371C4" dot={false} />);
                 }else if( type === STRING_CANT ){
                   data = cantChartData
+                  series.push(<Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} />);
                   series.push(<Line type="monotone" name="캔트틀림" dataKey="cantTwist" stroke="#4371C4" dot={false} />);
                 }else if( type === STRING_RAIL_DISTANCE ){
                   data = raildistanceChartData
@@ -351,7 +352,6 @@ function TrackDeviation( props ) {
                   <Tooltip />
                   <Legend />
 
-                  <Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} />
                   {series.map( obj => {
                     return obj;
                   })}
