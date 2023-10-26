@@ -45,33 +45,38 @@
 
 .railStatusBox .path.exist div {
     position: absolute;
-    top: 18px;
+    top: 12px;
     right: 0;
     bottom: 0;
-    left: 29px;
+    left: 26px;
     height: 7px;
     pointer-events: none;
     font-size: 7px;
-    width: 10px;
-    height: 6px;
-    background: #a9ff00;
+    width: 20px;
+    height: 20px;
+    /* background: #a9ff00; */
     border-radius: 4px;
+    background-image: url(../../assets/icon/railstatus/KakaoTalk_20231026_151854255.png);
+    background-position: center;
+    background-size: contain;
 }
 
 .railStatusBox .pointer.exist div.cnt {
     position: absolute;
-    top: 17px;
+    top: 10px;
     right: 0;
     bottom: 0;
-    left: 0px;
+    left: -4px;
     height: 7px;
     pointer-events: none;
     font-size: 7px;
-    width: 10px;
-    height: 6px;
-    background: #a9ff00;
+    width: 20px;
+    height: 20px;
+    /* background: #a9ff00; */
     border-radius: 4px;
-
+    background-image: url(../../assets/icon/railstatus/KakaoTalk_20231026_151854255.png);
+    background-position: center;
+    background-size: contain;
 }
 
 .railStatusBox .path.selectedPath{

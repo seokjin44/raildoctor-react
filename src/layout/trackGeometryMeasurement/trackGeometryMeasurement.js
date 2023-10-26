@@ -523,7 +523,7 @@ function TrackGeometryMeasurement( props ) {
                       if( !selectMeasureDate || selectMeasureDate === "" || selectMeasureDate === undefined || selectMeasureDate === null 
                           /* !selectMeasureTime || selectMeasureTime === "" || selectMeasureTime === undefined || selectMeasureTime === null */ 
                        ){
-                        alert("측정일자에서 날짜 및 시간을 선택해주세요.");
+                        alert("측정일자에서 날짜를 선택해주세요.");
                         return;
                       }
                       if( !findDatas || findDatas === "" || findDatas === undefined || findDatas === null 
@@ -537,7 +537,7 @@ function TrackGeometryMeasurement( props ) {
                       let colorCode = getColor(colorIndex++);
                       for( let sensor of selectPoints ){
                         if( sensor.sensorId === point.sensorId ){
-                          alert("하나에 센서의 한가지유형만 추가할 수 있습니다. 제거 후 추가해주세요.");
+                          alert("Point 마다 한가지 종류의 데이터만 추가할 수 있습니다. Point는 최대 2개까지 추가가 가능합니다.");
                           return ;
                         }
                       }

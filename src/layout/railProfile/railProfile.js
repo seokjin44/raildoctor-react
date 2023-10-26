@@ -236,34 +236,7 @@ function RailProfile( props ) {
     })
     .catch(error => console.error('Error fetching data:', error));
   }, [selectKP]);
-    
-  useEffect( ()=>{
-    if( !profiles || profiles === null || profiles === undefined || profiles.length < 1 ){
-      return;
-    }
-    let route = sessionStorage.getItem('route');
-    let param  = {
-      railroad_name : route,
-      measure_ts : profiles[profiles.length -1].measureTs,
-      rail_track : selectTrack,
-      kp : selectKP
-      /* begin_kp: (e.target.value / 1000),
-      end_kp : (e.target.value / 1000) + 0.99 */
-    }
-    console.log(param);
-    axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remaining`,{
-      paramsSerializer: params => {
-        return qs.stringify(params, { format: 'RFC3986' })
-      },
-      params : param
-    })
-    .then(response => {
-      console.log(response.data);
-      setLeftAcc(response.data.leftRemaining.accumulateweight);
-      setRightAcc(response.data.rightRemaining.accumulateweight);
-    })
-    .catch(error => console.error('Error fetching data:', error));
-  }, [profiles])
+
   return (
     <div className="trackDeviation railProfile" >
       <div className="railStatusContainer">
@@ -281,7 +254,11 @@ function RailProfile( props ) {
               <div className="dataOption">
                 <div className="title">상하선 </div>
                 <div className="date">
-                <Radio.Group style={RADIO_STYLE} defaultValue={selectTrack} value={selectTrack} >
+                <Radio.Group style={RADIO_STYLE} defaultValue={selectTrack} value={selectTrack} 
+                  onChange={(e)=>{
+                    setSelectTrack(e.target.value);
+                  }}
+                >
                   <Radio value={STRING_UP_TRACK}>상선</Radio>
                   <Radio value={STRING_DOWN_TRACK}>하선</Radio>
                 </Radio.Group>
@@ -328,7 +305,7 @@ function RailProfile( props ) {
                     params : {
                       railroad : route,
                       measure_kp : selectKP,
-                      /* rail_track : selectTrack */
+                      rail_track : selectTrack
                     }
                   })
                   .then(response => {
@@ -388,10 +365,10 @@ function RailProfile( props ) {
         <div className="componentBox flex" style={{overflowY:'auto', overflowX:'hidden'}}>
           <div className="profile left">
             <div className="railTitle">좌</div>
-            <div className="accData">
+            {/* <div className="accData">
               <div className="title">최근누적통과톤수</div>
               <div className="value">{numberWithCommas(leftAcc)}</div>
-            </div>
+            </div> */}
             <div className="profileSlider">
               {(profileDetails.length > 0) ? <div className="imageViewButton" onClick={()=>{setLeftImgView(true)}} >이미지 보기</div> : null}
               {(leftImgView) ? <div className="picture">
@@ -427,7 +404,7 @@ function RailProfile( props ) {
                 <div className="tableHeader">
                   <div className="tr">
                     <div className="td measurementDate colspan3"><div className="colspan3">측정일</div></div>
-                    {/* <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div> */}
+                    <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div>
                     <div className="td mamo rowspan7"><div className="rowspan7">좌레일</div></div>
                     <div className="td mamo rowspan7"></div>
                     <div className="td mamo rowspan7"></div>
@@ -438,7 +415,7 @@ function RailProfile( props ) {
                   </div>
                   <div className="tr">
                     <div className="td measurementDate colspan3"></div>
-                    {/* <div className="td ton colspan3"></div> */}
+                    <div className="td ton colspan3"></div>
                     <div className="td mamo rowspan2"><div className="rowspan2">좌측</div></div>
                     <div className="td mamo rowspan2"></div>
                     <div className="td mamo colspan2"><div className="colspan2">직마모(0º)</div></div>
@@ -449,7 +426,7 @@ function RailProfile( props ) {
                   </div>
                   <div className="tr" style={{ height: "45px"}}>
                     <div className="td measurementDate"></div>
-                    {/* <div className="td ton colspan3"></div> */}
+                    <div className="td ton colspan3"></div>
                     <div className="td mamo">측마모(-90º)</div>
                     <div className="td mamo">편마모(-45º)</div>
                     <div className="td mamo"></div>
@@ -464,7 +441,7 @@ function RailProfile( props ) {
                     profiles.map( (profile, i) => {
                       return <div key={`down${i}`} className="tr">
                       <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
-                      {/* <div className="td ton ">{"-"}</div> */}
+                      <div className="td ton ">{numberWithCommas(nonData(profile.accumulateLeft))}</div>
                       <div className="td mamo">{nonData(profile.llSideWear)}</div> 
                       <div className="td mamo">{nonData(profile.llCornerWear)}</div> 
                       <div className="td mamo">{nonData(profile.lVerticalWear)}</div> 
@@ -481,10 +458,10 @@ function RailProfile( props ) {
           </div>
           <div className="profile right">
             <div className="railTitle">우</div>
-            <div className="accData">
+            {/* <div className="accData">
               <div className="title">최근누적통과톤수</div>
               <div className="value">{numberWithCommas(rightAcc)}</div>
-            </div>
+            </div> */}
             <div className="profileSlider">
               {(profileDetails.length > 0) ? <div className="imageViewButton" onClick={()=>{setRightImgView(true)}} >이미지 보기</div> : null}
               {(rightImgView) ? <div className="picture">
@@ -525,7 +502,7 @@ function RailProfile( props ) {
                 <div className="tableHeader">
                   <div className="tr">
                     <div className="td measurementDate colspan3"><div className="colspan3">측정일</div></div>
-                    {/* <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div> */}
+                    <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div>
                     <div className="td mamo rowspan7"><div className="rowspan7">우레일</div></div>
                     <div className="td mamo rowspan7"></div>
                     <div className="td mamo rowspan7"></div>
@@ -536,7 +513,7 @@ function RailProfile( props ) {
                   </div>
                   <div className="tr">
                     <div className="td measurementDate colspan3"></div>
-                    {/* <div className="td ton colspan3"></div> */}
+                    <div className="td ton colspan3"></div>
                     <div className="td mamo rowspan2"><div className="rowspan2">좌측</div></div>
                     <div className="td mamo rowspan2"></div>
                     <div className="td mamo colspan2"><div className="colspan2">직마모(0º)</div></div>
@@ -547,7 +524,7 @@ function RailProfile( props ) {
                   </div>
                   <div className="tr" style={{ height: "45px"}}>
                     <div className="td measurementDate"></div>
-                    {/* <div className="td ton "></div> */}
+                    <div className="td ton "></div>
                     <div className="td mamo">측마모(-90º)</div>
                     <div className="td mamo">편마모(-45º)</div>
                     <div className="td mamo"></div>
@@ -562,7 +539,7 @@ function RailProfile( props ) {
                     profiles.map( (profile, i) => {
                       return <div key={`up${i}`} className="tr">
                       <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
-                      {/* <div className="td ton ">{"-"}</div> */}
+                      <div className="td ton ">{numberWithCommas(nonData(profile.accumulateRight))}</div>
                       <div className="td mamo">{nonData(profile.rlSideWear)}</div> 
                       <div className="td mamo">{nonData(profile.rlCornerWear)}</div> 
                       <div className="td mamo">{nonData(profile.rVerticalWear)}</div> 

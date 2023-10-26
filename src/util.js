@@ -159,6 +159,38 @@ export const convertObjectToArray = (obj, type) => {
         };
     });
 }
+export const convertObjectToArray_ = (obj, startDate, endDate) => {
+    const format = (date) => date.toISOString();
+  
+    // 모든 키들을 추출하고 0으로 초기화된 객체를 생성
+    const allKeys = Object.values(obj).reduce((acc, curr) => {
+      return {...acc, ...curr};
+    }, {});
+    const defaultData = Object.keys(allKeys).reduce((acc, key) => {
+      acc[key] = 0;
+      return acc;
+    }, {});
+  
+    const result = {};
+    let currentDate = new Date(startDate);
+    const stopDate = new Date(endDate);
+  
+    // 이미 데이터가 있는 날짜들을 추출
+    const existingDates = new Set(Object.keys(obj).map(key => key.slice(0, 10)));
+  
+    while (currentDate <= stopDate) {
+      const formattedDate = format(currentDate).slice(0, 10); // YYYY-MM-DD format
+  
+      if (!existingDates.has(formattedDate)) {
+        result[`${formattedDate}T00:00:00Z`] = {...defaultData};
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+  
+    // 기존의 obj 데이터를 결과에 병합
+    return { ...result, ...obj };
+  };
+  
 
 export const intervalSample = (array, interval) => {
     const sampled = [];

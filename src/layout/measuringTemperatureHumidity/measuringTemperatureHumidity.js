@@ -7,7 +7,7 @@ import { Checkbox, Input, Select, DatePicker } from "antd";
 import { CHART_FORMAT_DAILY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, RAILROADSECTION, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, TEMPDATA1, UP_TRACK, colors } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertObjectToArray, convertToCustomFormat, deleteNonObj, deleteObjData, findRange, getRailroadSection, nonData, tempDataName } from "../../util";
+import { convertObjectToArray, convertObjectToArray_, convertToCustomFormat, deleteNonObj, deleteObjData, findRange, getRailroadSection, nonData, tempDataName } from "../../util";
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 
@@ -106,10 +106,11 @@ function MeasuringTemperatureHumidity( props ) {
           sensorName = convertToCustomFormat(sensor.measureKp * 1000)
         }
       }
-
+      let tsAry = response.data.measureTs;
+      chartDataObj[searchRangeDate[0].$d.toISOString()] = {};
+      chartDataObj[searchRangeDate[1].$d.toISOString()] = {};
       for( let select of checkboxSelects ){
         let dataKey = `${selectDeviceID}_${select}`;
-        let tsAry = response.data.measureTs;
         if( select === STRING_RAIL_TEMPERATURE ){
           let dataAry = response.data.railTemperature;
           for( let i in dataAry ){
@@ -159,7 +160,7 @@ function MeasuringTemperatureHumidity( props ) {
           });
         }
       }
-      setChartData(convertObjectToArray(chartDataObj, CHART_FORMAT_RAW));
+      setChartData(convertObjectToArray(chartDataObj, CHART_FORMAT_RAW, searchRangeDate[0].$d.toISOString(), searchRangeDate[1].$d.toISOString()));
       setChartseries(chartseries_);
     })
     .catch(error => console.error('Error fetching data:', error));
