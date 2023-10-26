@@ -20,7 +20,12 @@ import { findRange, getRailroadSection, intervalSample, roundNumber } from "../.
 
 
 function RailRoughness( props ) {
-  const [selectedPath, setSelectedPath] = useState([]);
+  const [selectedPath, setSelectedPath] = useState({
+    start_station_name : "",
+    end_station_name : "",
+    beginKp : 0,
+    endKp : 0,
+  });
   const [open, setOpen] = useState(false);
   const [selectRange, setSelectRange] = useState("");
   const [dataExits, setDataExits] = useState([]);
@@ -130,7 +135,10 @@ function RailRoughness( props ) {
               <div className="dataOption">
                 <div className="title">선택구간 </div>
                 <div className="date">
-                  <Input placeholder="KP" value={"간석오거리 - 인천시청"}
+                  <Input placeholder="KP" value={
+                    selectedPath.start_station_name+
+                    " - "+
+                    selectedPath.end_station_name}
                     style={RANGEPICKERSTYLE}
                     readOnly={true}
                   />
