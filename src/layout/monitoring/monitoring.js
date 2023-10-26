@@ -15,7 +15,7 @@ import axios from 'axios';
 import qs from 'qs';
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
-import { getInchonSpeedData, getRailroadSection, getSeoulSpeedData } from "../../util";
+import { getInchonSpeedData, getRailroadSection, getSeoulSpeedData, nonData } from "../../util";
 import Papa from 'papaparse';
 
 window.PDFJS = PDFJS;
@@ -232,8 +232,8 @@ function Monitoring( props ) {
                 </div>
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
-              {trackGeo.shapeDisplay} /
-                R={trackGeo.direction} {trackGeo.radius} (C={trackGeo.cant}, S={trackGeo.slack})
+              {nonData(trackGeo.shapeDisplay)} /
+                R={nonData(trackGeo.direction)} {nonData(trackGeo.radius)} (C={nonData(trackGeo.cant)}, S={nonData(trackGeo.slack)})
               </div>
             </div>
           </div>

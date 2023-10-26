@@ -672,8 +672,8 @@ function WearMaintenance( props ) {
                       <div class="optionValue">6억톤</div>
                     </div>
                   </div> */}
-                  <div className={`table ${tableViewWearCorrelation}`} style={{ justifyContent: "flex-start" }}>
-                    <div className="tableHeader">
+                  <div className={`table ${tableViewWearCorrelation}`} style={{ justifyContent: "flex-start", alignItems: 'baseline' }}>
+                    <div className="tableHeader" style={{width: 'calc(100% - 20px)'}}>
                       <div className="tr">
                         <div className="td driving colspan2"><div className="colspan2">열차운행방향</div></div>
                         <div className="td kp colspan2"><div className="colspan2">KP</div></div>
@@ -717,11 +717,11 @@ function WearMaintenance( props ) {
                         <div className={`td value5 ${tableViewWearCorrelation}`}>누적통과톤수기준</div>
                       </div>
                     </div>
-                    <div className="tableBody" style={{ /* overflow: "auto", */ height: "calc(100% - 48px)", justifyContent: "flex-start"}}>
+                    <div className="tableBody" style={{ display:"block", overflowY: "scroll", height: "calc(100% - 48px)", justifyContent: "flex-start"}}>
                       {
                         predictionDetails.map( (detail, i) => {
                           return <><div key={`ver${i}`} className="tr">
-                            <div className="td driving">{trackToString(detail.railTrack)}</div>
+                            <div className="td driving colspan2"><div className="colspan2">{trackToString(detail.railTrack)}</div></div>
                             <div className="td kp colspan2"><div className="colspan2">{convertToCustomFormat(detail.kp*1000)}</div></div>
                             <div className="td rail colspan2"><div className="colspan2">{trackLeftRightToString(detail.railTrack)}</div></div>
                             <div className="td mamo">직마모</div>
@@ -742,7 +742,7 @@ function WearMaintenance( props ) {
                             <div className={`td value5 ${tableViewWearCorrelation} colspan2`}><div className="colspan2">{`${numberWithCommas(detail.kpNextWeightToReplace)} - ${dateFormat(new Date(detail.kpNextTimeToReplace))}`}</div></div>
                           </div>
                           <div key={`cor${i}`} className="tr">
-                            <div className="td driving">{trackToString(detail.railTrack)}</div>
+                            <div className="td driving"></div>
                             <div className="td kp"></div>
                             <div className="td rail"></div>
                             <div className="td mamo">편마모</div>

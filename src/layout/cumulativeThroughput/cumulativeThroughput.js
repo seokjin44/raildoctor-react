@@ -8,7 +8,7 @@ import { RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRI
 import classNames from "classnames";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, formatDateTime, getRailroadSection, getYear2Length, numberWithCommas } from "../../util";
+import { convertToCustomFormat, formatDateTime, getRailroadSection, getYear2Length, nonData, numberWithCommas } from "../../util";
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
 
@@ -292,8 +292,8 @@ function CumulativeThroughput( props ) {
                 </div>
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
-                {trackGeo.shapeDisplay} /
-                R={trackGeo.direction} {trackGeo.radius} (C={trackGeo.cant}, S={trackGeo.slack})
+              {nonData(trackGeo.shapeDisplay)} /
+                R={nonData(trackGeo.direction)} {nonData(trackGeo.radius)} (C={nonData(trackGeo.cant)}, S={nonData(trackGeo.slack)})
               </div>
             </div>
       </div>

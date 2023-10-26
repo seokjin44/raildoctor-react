@@ -93,22 +93,12 @@
 
 .table .tableHeader .tr .td.detail,
 .table .tableBody .tr .td.detail{
-    width: 20%;
+    width: 110px;
 }
 
 .table .tableHeader .tr .td.point,
 .table .tableBody .tr .td.point{
-    width: 10%;
-}
-
-.table .tableHeader .tr .td.detail2,
-.table .tableBody .tr .td.detail2{
-    width: 40%;
-}
-
-.table .tableHeader .tr .td.point2,
-.table .tableBody .tr .td.point2{
-    width: 20%;
+    width: 50px;
 }
 
 .table .tableHeader .tr .td.colspan2{

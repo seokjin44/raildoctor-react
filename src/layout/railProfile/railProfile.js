@@ -306,8 +306,8 @@ function RailProfile( props ) {
                 </div>
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
-              {trackGeo.shapeDisplay} /
-                R={trackGeo.direction} {trackGeo.radius} (C={trackGeo.cant}, S={trackGeo.slack})
+              {nonData(trackGeo.shapeDisplay)} /
+                R={nonData(trackGeo.direction)} {nonData(trackGeo.radius)} (C={nonData(trackGeo.cant)}, S={nonData(trackGeo.slack)})
               </div>
               <div className="line"></div>
               {/* <div className="dataOption">
@@ -385,7 +385,7 @@ function RailProfile( props ) {
       
       <div className="contentBox" style={{marginTop:"10px", height: "calc(100% - 255px)"}}>
         <div className="containerTitle">프로파일 및 마모 데이터</div>
-        <div className="componentBox chartBox flex" style={{overflowY:'auto'}}>
+        <div className="componentBox flex" style={{overflowY:'auto', overflowX:'hidden'}}>
           <div className="profile left">
             <div className="railTitle">좌</div>
             <div className="accData">

@@ -11,6 +11,7 @@ import { Modal } from "@mui/material";
 import axios from 'axios';
 import qs from 'qs';
 import { dateFormat, findRange, getRailroadSection, transposeObjectToArray } from "../../util";
+import EmptyImg from "../../assets/icon/empty/empty5.png";
 
 let dataExitsDate = {};
 function TrackDeviation( props ) {
@@ -43,13 +44,15 @@ function TrackDeviation( props ) {
     setSelectedPath(select);
     setViewMeasureDate(null);
     setSelectMeasureDate(null);
+  }
+
+  const getMeasureDatas = () => {
     if( !selectRange || selectRange === "" || selectRange === null || selectRange === undefined ){
-      alert("측정분기를 먼저 선택해주세요");
       return;
     }
     let range = DUMMY_RANGE[selectRange];
-    let start = select.beginKp;
-    let end = select.endKp;
+    let start = selectedPath.beginKp;
+    let end = selectedPath.endKp;
     start = (start>0) ? start/1000 : start;
     end = (end>0) ? end/1000 : end;
     console.log(start,end);
@@ -112,6 +115,19 @@ function TrackDeviation( props ) {
   useEffect(() => {
     getRailroadSection(setRailroadSection);
   }, []);
+
+  useEffect( () => {
+    if( !selectRange || selectRange === "" || selectRange === null || selectRange === undefined ){
+      return;
+    }
+    if( !selectTrack || selectTrack === "" || selectTrack === null || selectTrack === undefined ){
+      return;
+    }
+    if( !selectedPath || selectedPath === "" || selectedPath === null || selectedPath === undefined ){
+      return;
+    }
+    getMeasureDatas();
+  }, [selectedPath, selectTrack, selectRange])
   
   return (
     <div className="trackDeviation" >
@@ -211,7 +227,20 @@ function TrackDeviation( props ) {
                     alert("측정일자를 찾을 수 없습니다. 측정분기와 측정일자가 선택되어있는지 확인해주세요.")
                     return;
                   }
+
+                  if( !selectTrack || selectTrack === "" || selectTrack === null || selectTrack === undefined ){
+                    return;
+                  }
+                  if( !selectedPath || selectedPath === "" || selectedPath === null || selectedPath === undefined ){
+                    return;
+                  }
+
                   let route = sessionStorage.getItem('route');
+                  setHeightChartData([]);
+                  setDirectionChartData([]);
+                  setCantChartData([]);
+                  setRaildistanceChartData([]);
+                  setDistortionChartData([]);
                   for( let option of selectCheckBox ){
                     let start = selectedPath.beginKp;
                     let end = selectedPath.endKp;
@@ -272,63 +301,72 @@ function TrackDeviation( props ) {
           </div>
         </div>
         <div className="componentBox chartBox">
-          {/* <Chart type='bar' data={data} /> */}
-          {
-            searchChartView.map( (type, i) => {
-              let data = [];
-              let series = [];
-              if( type === STRING_HEIGHT ){
-                data = heightChartData;
-                series.push(<Line type="monotone" name="좌레일-고저틀림" dataKey="valueLeft" stroke="#4371C4" dot={false} />);
-                series.push(<Line type="monotone" name="우레일-고저틀림" dataKey="valueRight" stroke="#4371C4" dot={false} />);
-              }else if( type === STRING_DIRECTION ){
-                data = directionChartData
-                series.push(<Line type="monotone" name="좌레일-방향틀림" dataKey="valueLeft" stroke="#4371C4" dot={false} />);
-                series.push(<Line type="monotone" name="우레일-방향틀림" dataKey="valueRight" stroke="#4371C4" dot={false} />);
-              }else if( type === STRING_CANT ){
-                data = cantChartData
-                series.push(<Line type="monotone" name="캔트틀림" dataKey="cantTwist" stroke="#4371C4" dot={false} />);
-              }else if( type === STRING_RAIL_DISTANCE ){
-                data = raildistanceChartData
-                series.push(<Line type="monotone" name="궤간틀림" dataKey="value" stroke="#4371C4" dot={false} />);
-              }else if( type === STRING_DISTORTION ){
-                data = distortionChartData
-                series.push(<Line type="monotone" name="비틀림" dataKey="value" stroke="#4371C4" dot={false} />);
-              }
+        {
+            (heightChartData.length < 1 && directionChartData.length < 1 && cantChartData.length < 1 && raildistanceChartData.length < 1 && distortionChartData.length < 1 ) ? 
+            <div className="emptyBox">
+              <img src={EmptyImg} />
+              <h1>차트데이터가 없습니다</h1>
+              <div>
+                차트에 출력할 데이터가 없습니다. <br/>
+                측정분기 선택 - 상하선 선택 - 구간 선택 - 측정일자 선택 - 측정일자 선택 - 조회버튼 클릭
+              </div>
+            </div> : 
+              (searchChartView.map( (type, i) => {
+                let data = [];
+                let series = [];
+                if( type === STRING_HEIGHT ){
+                  data = heightChartData;
+                  series.push(<Line type="monotone" name="좌레일-고저틀림" dataKey="valueLeft" stroke="#4371C4" dot={false} />);
+                  series.push(<Line type="monotone" name="우레일-고저틀림" dataKey="valueRight" stroke="#4371C4" dot={false} />);
+                }else if( type === STRING_DIRECTION ){
+                  data = directionChartData
+                  series.push(<Line type="monotone" name="좌레일-방향틀림" dataKey="valueLeft" stroke="#4371C4" dot={false} />);
+                  series.push(<Line type="monotone" name="우레일-방향틀림" dataKey="valueRight" stroke="#4371C4" dot={false} />);
+                }else if( type === STRING_CANT ){
+                  data = cantChartData
+                  series.push(<Line type="monotone" name="캔트틀림" dataKey="cantTwist" stroke="#4371C4" dot={false} />);
+                }else if( type === STRING_RAIL_DISTANCE ){
+                  data = raildistanceChartData
+                  series.push(<Line type="monotone" name="궤간틀림" dataKey="value" stroke="#4371C4" dot={false} />);
+                }else if( type === STRING_DISTORTION ){
+                  data = distortionChartData
+                  series.push(<Line type="monotone" name="비틀림" dataKey="value" stroke="#4371C4" dot={false} />);
+                }
 
-              return <ResponsiveContainer key={i} width="100%" height="100%">
-              <LineChart
-                width={500}
-                height={300}
-                data={data}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid />
-                <XAxis dataKey="kp" interval={100} tickFormatter={(value) => value.toFixed(4)} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
+                return <ResponsiveContainer key={i} width="100%" height="100%">
+                <LineChart
+                  width={500}
+                  height={300}
+                  data={data}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid />
+                  <XAxis dataKey="kp" interval={150} tickFormatter={(value) => value.toFixed(2)} />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
 
-                <Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} />
-                {series.map( obj => {
-                  return obj;
-                })}
-  
-                <Line type="monotone" name="목표기준" dataKey="maxTargetCriteria" stroke="#4BC784" dot={false} />
-                <Line type="monotone" name="목표기준" dataKey="minTargetCriteria" stroke="#4BC784" dot={false} />
-                <Line type="monotone" name="보수기준" dataKey="maxRepairCriteria" stroke="#FF0606" dot={false} />
-                <Line type="monotone" name="보수기준" dataKey="minRepairCriteria" stroke="#FF0606" dot={false} />
-                <Line type="monotone" name="주의기준" dataKey="maxCautionCriteria" stroke="#FFF200" dot={false} />
-                <Line type="monotone" name="주의기준" dataKey="minCautionCriteria" stroke="#FFF200" dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-            })
-          }
+                  <Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} />
+                  {series.map( obj => {
+                    return obj;
+                  })}
+    
+                  <Line type="monotone" name="목표기준" dataKey="maxTargetCriteria" stroke="#4BC784" dot={false} />
+                  <Line type="monotone" name="목표기준" dataKey="minTargetCriteria" stroke="#4BC784" dot={false} />
+                  <Line type="monotone" name="보수기준" dataKey="maxRepairCriteria" stroke="#FF0606" dot={false} />
+                  <Line type="monotone" name="보수기준" dataKey="minRepairCriteria" stroke="#FF0606" dot={false} />
+                  <Line type="monotone" name="주의기준" dataKey="maxCautionCriteria" stroke="#FFF200" dot={false} />
+                  <Line type="monotone" name="주의기준" dataKey="minCautionCriteria" stroke="#FFF200" dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+              }))
+            
+        }
         </div>
       </div>
 

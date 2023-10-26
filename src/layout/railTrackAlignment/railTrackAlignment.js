@@ -13,7 +13,7 @@ import { DatePicker, Input, Radio, Select } from "antd";
 import { DOWN_TRACK, RADIO_STYLE, RAILROADSECTION, RAIL_ROUGHNESS_BOXSTYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, UP_TRACK } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, dateFormat, findRange, formatDateTime, getRailroadSection } from "../../util";
+import { convertToCustomFormat, dateFormat, findRange, formatDateTime, getRailroadSection, nonData } from "../../util";
 
 const { RangePicker } = DatePicker;
 
@@ -193,8 +193,8 @@ function RailTrackAlignment( props ) {
                 </div>
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
-              {trackGeo.shapeDisplay} /
-                R={trackGeo.direction} {trackGeo.radius} (C={trackGeo.cant}, S={trackGeo.slack})
+              {nonData(trackGeo.shapeDisplay)} /
+                R={nonData(trackGeo.direction)} {nonData(trackGeo.radius)} (C={nonData(trackGeo.cant)}, S={nonData(trackGeo.slack)})
               </div>
               <div className="line"></div>
               <div className="dataOption">

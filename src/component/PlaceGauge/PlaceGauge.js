@@ -282,7 +282,7 @@ class PlaceGauge extends React.Component {
 			if( end > trackEndKP ){
 				end = trackEndKP;
 			}
-			context.strokeStyle = (this.props.selectedGauge === data.roughnessId) ? 'red' : 'black';
+			context.strokeStyle = 'black';
 			context.fillStyle = (this.props.selectedGauge === data.roughnessId) ? 'red' : 'orange';
 			let startPoint = {
 				x: (start - trackBeginKP) / trackLength * 100,
@@ -311,6 +311,7 @@ class PlaceGauge extends React.Component {
 				}
 				rectList.push(rect);
 				context.fillRect(rect.x, rect.y, rect.width, rect.height);
+				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
 			}else if( railTrack === STRING_DOWN_TRACK_LEFT2 ){
 				let y = this.state.canvas.height / 2 + this.state.padding - lineSpacing;
 				let rect = {
@@ -326,6 +327,7 @@ class PlaceGauge extends React.Component {
 				}
 				rectList.push(rect);
 				context.fillRect(rect.x, rect.y, rect.width, rect.height);
+				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
 			}else if( railTrack === STRING_DOWN_TRACK_RIGHT2 ){
 				let y = this.state.canvas.height / 2 + this.state.padding;
 				let rect = {
@@ -341,6 +343,7 @@ class PlaceGauge extends React.Component {
 				}
 				rectList.push(rect);
 				context.fillRect(rect.x, rect.y, rect.width, rect.height);
+				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
 			}else if( railTrack === STRING_UP_TRACK_LEFT2 ){
 				let y = this.state.canvas.height / 2 - this.state.padding;
 				let rect = {
@@ -356,6 +359,7 @@ class PlaceGauge extends React.Component {
 				}
 				rectList.push(rect);
 				context.fillRect(rect.x, rect.y, rect.width, rect.height);
+				context.strokeRect(rect.x, rect.y, rect.width, rect.height);
 			}
 		}
 

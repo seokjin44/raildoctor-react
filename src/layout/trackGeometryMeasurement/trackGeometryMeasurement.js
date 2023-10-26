@@ -10,11 +10,12 @@ import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRAC
 import PlacePosition from "../../component/PlacePosition/PlacePosition";
 import axios from 'axios';
 import qs from 'qs';
-import { convertObjectToArray, convertToCustomFormat, dateFormat, deleteGeoChartData, deleteObjData, findAddedItems, findRange, formatDate, formatTime, formatYearMonth, getFirstDateOfThreeMonthsAgo, getLastDateOfMonth, getRailroadSection, numberToText, trackDataName, trackLeftRightToString, valueOneOrNone } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, dateFormat, deleteGeoChartData, deleteNonObj, deleteObjData, findAddedItems, findRange, formatDate, formatTime, formatYearMonth, getFirstDateOfThreeMonthsAgo, getLastDateOfMonth, getRailroadSection, numberToText, trackDataName, trackLeftRightToString, valueOneOrNone } from "../../util";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
 import lodash from "lodash";
+import EmptyImg from "../../assets/icon/empty/empty5.png";
 
 dayjs.extend(customParseFormat);
 const { RangePicker } = DatePicker;
@@ -651,11 +652,11 @@ function TrackGeometryMeasurement( props ) {
             ></PlacePosition>
           </div>
         </div>
-        <div className="contentBox" style={{width:"700px", height:"100%", marginRight:"10px"}}>
+        <div className="contentBox" style={{width:"515px", height:"100%", marginRight:"10px"}}>
           <div className="containerTitle">장기계측 항목</div>
           <div className="componentBox">
-            <div className="table" >
-              <div className="tableHeader">
+            <div className="table table4" style={{ justifyContent: 'flex-start', alignItems: 'baseline', overflowX: 'scroll'}} >
+              <div className="tableHeader" style={{ width: 'auto', height : "60px"}}>
                 <div className="tr">
                   <div className="td detail colspan2"><div className="colspan2">세부항목</div></div>
                   {
@@ -668,20 +669,6 @@ function TrackGeometryMeasurement( props ) {
                       </>
                     })
                   }
-                  {/* <div className="td point rowspan2"><div className="rowspan2">(하)15k526</div></div>
-                  <div className="td point"></div>
-                  <div className="td point rowspan2"><div className="rowspan2">(하)15k503</div></div>
-                  <div className="td point"></div>
-                  <div className="td point rowspan2"><div className="rowspan2">(하)15k065</div></div>
-                  <div className="td point"></div>
-                  <div className="td point rowspan2"><div className="rowspan2">(상)15k110</div></div>
-                  <div className="td point"></div>
-                  <div className="td point rowspan2"><div className="rowspan2">(상)15k230</div></div>
-                  <div className="td point"></div>
-                  <div className="td point rowspan2"><div className="rowspan2">(상)15k290</div></div>
-                  <div className="td point"></div>
-                  <div className="td point rowspan2"><div className="rowspan2">(하)15k400</div></div>
-                  <div className="td point"></div> */}
                 </div>
                 <div className="tr">
                   <div className="td detail"></div>
@@ -693,23 +680,9 @@ function TrackGeometryMeasurement( props ) {
                       </>
                     })
                   }
-                  {/* <div className="td point">좌 </div>
-                  <div className="td point">우</div>
-                  <div className="td point">좌</div>
-                  <div className="td point">우</div>
-                  <div className="td point">좌</div>
-                  <div className="td point">우</div>
-                  <div className="td point">좌</div>
-                  <div className="td point">우</div>
-                  <div className="td point">좌</div>
-                  <div className="td point">우</div>
-                  <div className="td point">좌</div>
-                  <div className="td point">우</div>
-                  <div className="td point">좌</div>
-                  <div className="td point">우</div> */}
                 </div>
               </div>
-              <div className="tableBody">
+              <div className="tableBody" style={{ width: 'auto', height: 'calc(100% - 60px)'}}>
                 <div className="tr">
                   <div className="td detail">윤중(V)</div>
                   {
@@ -720,20 +693,6 @@ function TrackGeometryMeasurement( props ) {
                       </>
                     })
                   }
-                  {/* <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>  */}
                 </div>
                 <div className="tr">
                   <div className="td detail">횡압(L)</div>
@@ -745,20 +704,6 @@ function TrackGeometryMeasurement( props ) {
                       </>
                     })
                   }
-                  {/* <div className="td point">-</div>
-                  <div className="td point">-</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>  */}
                 </div>
                 <div className="tr">
                   <div className="td detail">레일응력</div>
@@ -770,20 +715,6 @@ function TrackGeometryMeasurement( props ) {
                       </>
                     })
                   }
-                  {/* <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>  */}
                 </div>
 
                 <div className="tr">
@@ -796,20 +727,6 @@ function TrackGeometryMeasurement( props ) {
                       </>
                     })
                   }
-                  {/* <div className="td point" style={{ fontSize: "1px"}} >1(외측)</div>
-                  <div className="td point">-</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>   */}
                 </div>
                 <div className="tr">
                   <div className="td detail">레일수직변위</div>
@@ -821,20 +738,6 @@ function TrackGeometryMeasurement( props ) {
                       </>
                     })
                   }
-                  {/* <div className="td point" style={{ fontSize: "1px"}} >1(외측)</div>
-                  <div className="td point">-</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>  */}
                 </div>
                 <div className="tr">
                   <div className="td detail" style={{fontSize: "12px"}}>레일수직가속도</div>
@@ -846,30 +749,16 @@ function TrackGeometryMeasurement( props ) {
                       </>
                     })
                   }
-                  {/* <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div> 
-                  <div className="td point">1</div>
-                  <div className="td point">1</div>  */}
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="contentBox" style={{width:"330px", height:"100%"}}>
+        <div className="contentBox" style={{width:"515px", height:"100%"}}>
           <div className="containerTitle">단기계측 항목</div>
           <div className="componentBox">
-          <div className="table table2" style={{justifyContent: "flex-start"}} >
-              <div className="tableHeader">
+          <div className="table table2" style={{ justifyContent: 'flex-start', alignItems: 'baseline', overflowX: 'scroll'}} >
+              <div className="tableHeader" style={{ width: 'auto', height: '60px' }}>
                 <div className="tr">
                   <div className="td detail2 colspan2"><div className="colspan2">세부항목</div></div>
                   {
@@ -882,10 +771,6 @@ function TrackGeometryMeasurement( props ) {
                       </>
                     })
                   }
-                  {/* <div className="td point2 rowspan2"><div className="rowspan2">(하)15k526</div></div>
-                  <div className="td point2"></div>
-                  <div className="td point2 rowspan2"><div className="rowspan2">(하)15k503</div></div>
-                  <div className="td point2"></div> */}
                 </div>
                 <div className="tr">
                   <div className="td detail2"></div>
@@ -897,13 +782,9 @@ function TrackGeometryMeasurement( props ) {
                       </>
                     })
                   }
-                  {/* <div className="td point2">좌</div>
-                  <div className="td point2">우</div>
-                  <div className="td point2">좌</div>
-                  <div className="td point2">우</div> */}
                 </div>
               </div>
-              <div className="tableBody">
+              <div className="tableBody" style={{ width: 'auto', height: 'calc(100% - 60px)'}}>
                 <div className="tr">
                   <div className="td detail2">윤중(V)</div>
                   {
@@ -982,6 +863,9 @@ function TrackGeometryMeasurement( props ) {
                       setDailyChartData(convertObjectToArray(dailyChartDataObj, CHART_FORMAT_DAILY));
                       setMonthlyChartData(convertObjectToArray(monthlyChartDataObj, CHART_FORMAT_MONTHLY));
 
+                      deleteNonObj(todayChartDataObj);
+                      deleteNonObj(dailyChartDataObj);
+                      deleteNonObj(monthlyChartDataObj);
                     }}
                   />
                 </div>
@@ -990,99 +874,114 @@ function TrackGeometryMeasurement( props ) {
           </div>
         </div>
         <div className="componentBox flex flexEnd">
-          <ResponsiveContainer width="100%" height="100%">
-            <ScatterChart
-              margin={{
-                top: 20,
-                right: 20,
-                bottom: 20,
-                left: 20,
-              }}
-              data={toDayChartData}
-            >
-              <CartesianGrid />
-              <Legend />
-              <XAxis type="category" dataKey="time" name="time" fontSize={9}>
-                <Label value="Time" offset={-5} position="insideBottom" />
-              </XAxis>
-              <YAxis type="number" name="data" fontSize={12} >
-                <Label value="kN" angle={-90} position="insideLeft" />
-              </YAxis>
-              <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-              {
-                todayChartseries.map( (series, i) => {
-                  console.log(series.datakey);
-                  return <Scatter key={i}
-                    name={`${series.displayName}_${trackDataName(series.item)}`} 
-                    dataKey={series.datakey} fill={series.colorCode} />
-                })
-              }
-            </ScatterChart>
-          </ResponsiveContainer>
-          <ResponsiveContainer width="100%" height="100%">
+          {
+            (toDayChartData.length < 1 && toDayChartData.length < 1 && toDayChartData.length < 1 ) ? 
+            <div className="emptyBox">
+              <img src={EmptyImg} />
+              <h1>차트데이터가 없습니다</h1>
+              <div>
+                차트에 출력할 데이터가 없습니다. <br/>
+                구간선택 - Point 선택 - 측정일자 선택 - 조회할 데이터 선택 - 조회버튼 클릭
+              </div>
+            </div> :
+            <>
+            <ResponsiveContainer width="100%" height="100%">
+              <ScatterChart
+                width={500}
+                height={300}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+                data={toDayChartData}
+              >
+                <CartesianGrid />
+                <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '10px' }} />
+                <XAxis type="category" dataKey="time" name="time" fontSize={9} height={40} >
+                  <Label value="Time" offset={0} position="insideBottom" />
+                </XAxis>
+                <YAxis type="number" name="data" fontSize={12} >
+                  <Label value="kN" angle={-90} position="insideLeft" />
+                </YAxis>
+                <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                {
+                  todayChartseries.map( (series, i) => {
+                    console.log(series.datakey);
+                    return <Scatter key={i}
+                      name={`${series.displayName}_${trackDataName(series.item)}`} 
+                      dataKey={series.datakey} fill={series.colorCode} />
+                  })
+                }
+              </ScatterChart>
+            </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                width={500}
+                height={300}
+                data={dailyChartData}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" fontSize={12} height={40} >
+                  <Label value="1Month accumulation(Day)" offset={0} position="insideBottom" fontSize={12} />
+                </XAxis>
+                <YAxis fontSize={12} tickFormatter={numberToText} >
+                  <Label value="kN" angle={-90} position="insideLeft" />
+                </YAxis>
+                <Tooltip />
+                <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '10px' }} />
+                {/* <Bar dataKey="weight" name="윤중" fill="#0041DC" /> */}
+                {
+                  dailyChartseries.map( (series, i) => {
+                    console.log(series);
+                    return <Bar key={i}
+                      dataKey={series.datakey} 
+                      name={`${series.displayName}_${trackDataName(series.item)}`}
+                      fill={series.colorCode} />
+                  })
+                }
+              </BarChart>
+            </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              width={500}
-              height={300}
-              data={dailyChartData}
-              margin={{
-                top: 5,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" fontSize={12} >
-                <Label value="1Month accumulation(Day)" offset={-5} position="insideBottom" />
-              </XAxis>
-              <YAxis fontSize={12} tickFormatter={numberToText} >
-                <Label value="kN" angle={-90} position="insideLeft" />
-              </YAxis>
-              <Tooltip />
-              <Legend />
-              {/* <Bar dataKey="weight" name="윤중" fill="#0041DC" /> */}
-              {
-                dailyChartseries.map( (series, i) => {
-                  console.log(series);
-                  return <Bar key={i}
-                    dataKey={series.datakey} 
-                    name={`${series.displayName}_${trackDataName(series.item)}`}
-                    fill={series.colorCode} />
-                })
-              }
-            </BarChart>
-          </ResponsiveContainer>
-          <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-              width={500}
-              height={300}
-              data={MonthlyChartData}
-              margin={{
-                top: 5,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" fontSize={12} >
-                <Label value="Month" offset={-5} position="insideBottom" />
-              </XAxis>
-              <YAxis fontSize={12} tickFormatter={numberToText}>
-                <Label value="kN" angle={-90} position="insideLeft" />
-              </YAxis>
-              <Tooltip />
-              <Legend />
-              {
-                monthlyChartseries.map( (series, i) => {
-                  return <Bar key={i} 
-                    dataKey={series.datakey} 
-                    name={`${series.displayName}_${trackDataName(series.item)}`} 
-                    fill={series.colorCode} />
-                })
-              }
-            </BarChart>
-          </ResponsiveContainer>
+                width={500}
+                height={300}
+                data={MonthlyChartData}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" fontSize={12} height={40} >
+                  <Label value="Month" offset={0} position="insideBottom" />
+                </XAxis>
+                <YAxis fontSize={12} tickFormatter={numberToText}>
+                  <Label value="kN" angle={-90} position="insideLeft" />
+                </YAxis>
+                <Tooltip />
+                <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '10px' }} />
+                {
+                  monthlyChartseries.map( (series, i) => {
+                    return <Bar key={i} 
+                      dataKey={series.datakey} 
+                      name={`${series.displayName}_${trackDataName(series.item)}`} 
+                      fill={series.colorCode} />
+                  })
+                }
+              </BarChart>
+            </ResponsiveContainer>
+            </>
+          }
         </div>
       </div>
 

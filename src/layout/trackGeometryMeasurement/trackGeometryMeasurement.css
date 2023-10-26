@@ -98,12 +98,12 @@
 
 .table .tableHeader .tr .td.detail2,
 .table .tableBody .tr .td.detail2{
-    width: 40%;
+    width: 110px;
 }
 
 .table .tableHeader .tr .td.point2,
 .table .tableBody .tr .td.point2{
-    width: 20%;
+    width: 50px;
 }
 
 .table .tableHeader .tr .td.colspan2{
@@ -148,13 +148,20 @@
     height: 100%;
 }
 
-.trackGeometryMeasurement .table .tableHeader .tr, .table .tableBody .tr{
-    height: 32px;
+.trackGeometryMeasurement .table .tableHeader .tr, 
+.trackGeometryMeasurement .table .tableBody .tr{
+    height: 100%;
+    justify-content: left;
 }
 
-.trackGeometryMeasurement .table .tableHeader .tr,
-.trackGeometryMeasurement .table .tableBody .tr{
-    justify-content: left;
+.trackGeometryMeasurement .table .tableBody .tr:last-child,
+.trackGeometryMeasurement .table .tableBody .tr:last-child .td{
+    border-bottom: none;
+}
+
+.trackGeometryMeasurement .table4 .tableHeader .tr, 
+.trackGeometryMeasurement .table4 .tableBody .tr{
+    height: 22px;
 }
 
 .trackGeometryMeasurement .selectPoints{

@@ -2,6 +2,7 @@ import React from "react";
 import "./PlaceInfo.css";
 import classNames from "classnames";
 import { DOWN_TRACK, STRING_PATH, UP_TRACK } from "../../constant";
+import { convertToCustomFormat } from "../../util";
 
 let pointList = [];
 class PlaceInfo extends React.Component {
@@ -186,7 +187,7 @@ class PlaceInfo extends React.Component {
 		context.restore();
 	}
 
-	naming(location) {
+	/* naming(location) {
 		let km = 1000;
 
 		let front = parseInt(location / km);
@@ -197,7 +198,7 @@ class PlaceInfo extends React.Component {
 		if(back === 0)	back = "000";
 
 		return front + back;
-	}
+	} */
 
 	drawPlace() {
 		pointList = [];
@@ -220,7 +221,7 @@ class PlaceInfo extends React.Component {
 			let point = {
 				x: (location - trackBeginKP) / trackLength * 100,
 				trackType: 1,
-				name: this.naming(location)
+				name: convertToCustomFormat(location)
 			}
 
 			let y = this.state.canvas.height / 2 - this.state.padding + this.state.topPadding;
@@ -261,7 +262,7 @@ class PlaceInfo extends React.Component {
 			let point = {
 				x: (location - trackBeginKP) / trackLength * 100,
 				trackType: 1,
-				name: this.naming(location)
+				name: convertToCustomFormat(location)
 			}
 
 			let y = this.state.canvas.height / 2 + this.state.padding - this.state.bottomPadding;

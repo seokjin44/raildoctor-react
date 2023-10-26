@@ -182,7 +182,7 @@ class RailStatus extends React.Component {
         obj.classList.add("exist");
         let cntDiv = document.createElement("div");
         cntDiv.className = "cnt"
-        cntDiv.innerHTML = "(" + cnt + ")";
+        /* cntDiv.innerHTML = "(" + cnt + ")"; */
         obj.appendChild(cntDiv);
       }
     })

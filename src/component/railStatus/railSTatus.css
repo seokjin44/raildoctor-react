@@ -45,24 +45,33 @@
 
 .railStatusBox .path.exist div {
     position: absolute;
-    top: 14px;
+    top: 18px;
     right: 0;
     bottom: 0;
-    left: 3px;
+    left: 29px;
     height: 7px;
     pointer-events: none;
     font-size: 7px;
+    width: 10px;
+    height: 6px;
+    background: #a9ff00;
+    border-radius: 4px;
 }
 
 .railStatusBox .pointer.exist div.cnt {
     position: absolute;
-    top: 14px;
+    top: 17px;
     right: 0;
     bottom: 0;
-    left: 3px;
+    left: 0px;
     height: 7px;
     pointer-events: none;
     font-size: 7px;
+    width: 10px;
+    height: 6px;
+    background: #a9ff00;
+    border-radius: 4px;
+
 }
 
 .railStatusBox .path.selectedPath{

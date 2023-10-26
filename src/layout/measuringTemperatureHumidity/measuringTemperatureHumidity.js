@@ -7,8 +7,9 @@ import { Checkbox, Input, Select, DatePicker } from "antd";
 import { CHART_FORMAT_DAILY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, RAILROADSECTION, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, TEMPDATA1, UP_TRACK, colors } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertObjectToArray, convertToCustomFormat, deleteObjData, findRange, getRailroadSection, tempDataName } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, deleteNonObj, deleteObjData, findRange, getRailroadSection, nonData, tempDataName } from "../../util";
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
+import EmptyImg from "../../assets/icon/empty/empty5.png";
 
 const { RangePicker } = DatePicker;
 const dataOption = [
@@ -70,6 +71,7 @@ function MeasuringTemperatureHumidity( props ) {
     }
     setSelectOptionSensors(selectOptionSensors_);
     setSelectedPath(select);
+    setSelectDeviceID(null);
   }
 
   const getColor = (index) => {
@@ -78,8 +80,18 @@ function MeasuringTemperatureHumidity( props ) {
 
   const searchTempData = () => {
     console.log(selectDeviceID);
-    console.log(searchRangeDate[0].$d.toISOString());
-    console.log(searchRangeDate[1].$d.toISOString());
+    if( !selectDeviceID || selectDeviceID === null || selectDeviceID === undefined ){
+      alert("위치를 선택해주세요.");
+      return;
+    }
+    try{
+      console.log(searchRangeDate[0].$d.toISOString());
+      console.log(searchRangeDate[1].$d.toISOString());
+    }catch(e){
+      alert("날짜를 선택해주세요.");
+      return;
+    }
+    
     let chartseries_ = [...chartseries];
     axios.get(`https://raildoctor.suredatalab.kr/api/temperatures/period/${selectDeviceID}?begin=${searchRangeDate[0].$d.toISOString()}&end=${searchRangeDate[1].$d.toISOString()}`,{
       paramsSerializer: params => {
@@ -237,7 +249,8 @@ function MeasuringTemperatureHumidity( props ) {
                     style={RANGEPICKERSTYLE}
                   /> */}
                   <Select
-                    defaultValue=""
+                    value={selectDeviceID}
+                    defaultValue={selectDeviceID}
                     style={{
                       width: 200,
                     }}
@@ -247,8 +260,8 @@ function MeasuringTemperatureHumidity( props ) {
                 </div>
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
-              {trackGeo.shapeDisplay} /
-                R={trackGeo.direction} {trackGeo.radius} (C={trackGeo.cant}, S={trackGeo.slack})
+              {nonData(trackGeo.shapeDisplay)} /
+                R={nonData(trackGeo.direction)} {nonData(trackGeo.radius)} (C={nonData(trackGeo.cant)}, S={nonData(trackGeo.slack)})
               </div>
               <div className="line"></div>
               <div className="dataOption">
@@ -295,6 +308,7 @@ function MeasuringTemperatureHumidity( props ) {
                         chartseries_ = chartseries_.filter(series => !(series.deviceID === point.deviceID && series.item === point.item));
                         setChartseries(chartseries_);
                         deleteObjData(chartDataObj, point.deviceID);
+                        deleteNonObj(chartDataObj);
                       }}
                     />
                   </div>
@@ -303,34 +317,42 @@ function MeasuringTemperatureHumidity( props ) {
             </div>          
           </div>
           <div className="componentBox chartBox flex">
-            {/* <Chart type='bar' data={data} /> */}
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                width={500}
-                height={300}
-                data={chartData}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" fontSize={9} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                {/* <Line dataKey="temp" stroke="#FF0000" dot={false} /> */}
-                {
-                  chartseries.map( (series, i) => {
-                    return <Line key={i} 
-                      dataKey={series.dataKey} name={`${series.sensorName}_${series.item}`} 
-                      stroke={series.color} dot={false} />;
-                  })
-                }
-              </LineChart>
-            </ResponsiveContainer>
+            {
+              (chartData.length < 1) ? <div className="emptyBox">
+                <img src={EmptyImg} />
+                <h1>차트데이터가 없습니다</h1>
+                <div>
+                차트에 출력할 데이터가 없습니다. <br/>
+                구간선택 - 센서목록에서 센서선택 - 조회기간 선택 - 조회할 데이터 선택 - 조회버튼 클릭
+                </div>
+              </div> : 
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  width={500}
+                  height={300}
+                  data={chartData}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="time" fontSize={9} />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  {
+                    chartseries.map( (series, i) => {
+                      return <Line key={i} 
+                        dataKey={series.dataKey} name={`${series.sensorName}_${series.item}`} 
+                        stroke={series.color} dot={false} />;
+                    })
+                  }
+                </LineChart>
+              </ResponsiveContainer>
+            }
           </div>
         </div>
       </div>

@@ -157,7 +157,12 @@ function RailRoughness( props ) {
                 selectedGauge={selectedGauge}
                 existData={gaugeData}
                 selectGauge={( findRects )=>{
-                  console.log("findRects::::::::",findRects[0].roughnessId );
+                  try{
+                    console.log("findRects::::::::",findRects[0].roughnessId );
+                  }catch(e){
+                    console.log("Rect가 없음");
+                    return;
+                  }
                   setSelectedGauge( findRects[0].roughnessId );
                   let roughnessChartData_ = [];
                   /* for( let rect of findRects  ){ */
@@ -184,7 +189,7 @@ function RailRoughness( props ) {
                         }
                       });
                       console.log(results);
-                      /* results = intervalSample(results, 100); */
+                      results = intervalSample(results, 100);
                       roughnessChartData_.push(...results);
                       setRoughnessChartData(roughnessChartData_);
                     })
@@ -231,8 +236,8 @@ function RailRoughness( props ) {
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="KP(m)" />
-                <YAxis tickFormatter={(tick) => (tick / 1000).toFixed(3)} />
-                <Tooltip formatter={(value) => (value / 1000).toFixed(3)} />
+                <YAxis tickFormatter={(tick) => (tick / 1000).toFixed(2)} />
+                <Tooltip formatter={(value) => (value / 1000).toFixed(2)} />
                 <Legend />
                 <Line dataKey="Roughness(mm)" stroke="#82ca9d" dot={false} />
                 <Brush dataKey="KP(m)" height={30} stroke="#8884d8" />

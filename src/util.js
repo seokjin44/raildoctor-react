@@ -161,7 +161,29 @@ export const convertObjectToArray = (obj, type) => {
 }
 
 export const intervalSample = (array, interval) => {
-    return array.filter((_, index) => index % interval === 0);
+    const sampled = [];
+
+    for (let i = 0; i < array.length; i += interval) {
+        // 현재 구간의 최대값 및 최소값을 찾기 위한 슬라이스
+        const slice = array.slice(i, i + interval);
+        
+        // 최대값을 가진 항목 찾기
+        const maxItem = slice.reduce((max, curr) => {
+            return curr['Roughness(mm)'] > max['Roughness(mm)'] ? curr : max;
+        }, {'KP(m)': Number.MIN_SAFE_INTEGER, 'Roughness(mm)': Number.MIN_SAFE_INTEGER});
+        
+        // 최소값을 가진 항목 찾기
+        const minItem = slice.reduce((min, curr) => {
+            return curr['Roughness(mm)'] < min['Roughness(mm)'] ? curr : min;
+        }, {'KP(m)': Number.MAX_SAFE_INTEGER, 'Roughness(mm)': Number.MAX_SAFE_INTEGER});
+
+        sampled.push(maxItem);
+        if (maxItem['KP(m)'] !== minItem['KP(m)'] || maxItem['Roughness(mm)'] !== minItem['Roughness(mm)']) {
+            sampled.push(minItem);
+        }
+    }
+
+    return sampled;
 }
   
 export const roundNumber = (num, decimalPlaces) => {
@@ -637,7 +659,16 @@ export const deleteObjData = ( data, sensorId ) => {
 
 export const nonData = (value) => {
     if( value === "NaN" ){
-        return "";
+        return "-";
     }
     return value;
+}
+
+
+export const deleteNonObj = (data) => {
+    for (const key in data) {
+        if (Object.keys(data[key]).length === 0 && data[key].constructor === Object) {
+            delete data[key];
+        }
+    }
 }

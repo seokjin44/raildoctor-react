@@ -73,8 +73,8 @@ class TrackSpeed extends React.Component {
 			ctx.translate( -move, 0); // Apply translation
 		}
 		ctx.beginPath();
-		ctx.strokeStyle = this.axisColor;
-		ctx.lineWidth = 0.5; 
+		ctx.strokeStyle = "red";
+		ctx.lineWidth = 1; 
 		ctx.moveTo( this.props.kp * this.state.scaleX + this.state.x, 0 );
 		ctx.lineTo( this.props.kp * this.state.scaleX + this.state.x, 125 );
 		ctx.stroke();
