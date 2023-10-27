@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./dataExistence.css"
 import { Box, Modal, Tab } from "@mui/material";
-import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DIRECTWEARINFODUMMY, IncheonKP, SIDEWEARINFODUMMY, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, TEMPDATA1DUMMY, TRACKDEVIATIONDUMMY, TRACKGMDUMMYDATA1, TRACKGMDUMMYDATA2, TRACKGMDUMMYDATA3, colors } from "../../constant";
+import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, IncheonKP, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, colors } from "../../constant";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -13,14 +13,11 @@ import { LineChart, Line, XAxis,
   YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer,
   ScatterChart, Scatter, Bar, BarChart } from 'recharts';
-import { convertObjectToArray, convertToCustomFormat, convertToNumber, dateFormat, formatDateTime, numberWithCommas, tempDataName, trackDataName, trackToString, transposeObjectToArray } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, dateFormat, formatDateTime, numberWithCommas, tempDataName, trackDataName, trackToString, transposeObjectToArray } from "../../util";
 import axios from 'axios';
 import qs from 'qs';
 
 let colorIndex = 1;
-let todayChartDataObj = {};
-let dailyChartDataObj = {};
-let monthlyChartDataObj = {};
 function DataExistence( props ) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);

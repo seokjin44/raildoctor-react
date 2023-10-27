@@ -1,7 +1,7 @@
 import React from 'react';
 import "./WearInfo.css";
 import Chart from "react-apexcharts";
-import { DOWN_TRACK, STRING_DOWN_TRACK, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, STRING_UP_TRACK, UP_TRACK } from '../../constant';
+import { DOWN_TRACK, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, UP_TRACK } from '../../constant';
 import lodash from "lodash";
 
 class WearInfo extends React.Component {

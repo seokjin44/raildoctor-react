@@ -11,12 +11,12 @@ import Papa from 'papaparse';
 import Box from '@mui/material/Box';
 import { Modal } from "@mui/material";
 import TextArea from "antd/es/input/TextArea";
-import { BOXSTYLE, DOWN_TRACK, DUMMY_RANGE, INSTRUMENTATIONPOINT, RAILROADSECTION, RAILTRACKALIGNMENTDUMMYDATA1, RANGEPICKERSTYLE, STRING_DOWN_TRACK2, STRING_DOWN_TRACK_LEFT2, STRING_DOWN_TRACK_RIGHT2, STRING_UP_TRACK2, STRING_UP_TRACK_LEFT2, STRING_UP_TRACK_RIGHT2, UP_TRACK } from "../../constant";
+import { BOXSTYLE,  DUMMY_RANGE, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE } from "../../constant";
 import { DatePicker, Input, Select } from "antd";
 import PlaceGauge from "../../component/PlaceGauge/PlaceGauge";
 import axios from 'axios';
 import qs from 'qs';
-import { findRange, getRailroadSection, intervalSample, roundNumber } from "../../util";
+import { findRange, getRailroadSection, intervalSample } from "../../util";
 
 
 function RailRoughness( props ) {

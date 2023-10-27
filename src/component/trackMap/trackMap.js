@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Box, Modal } from "@mui/material";
-/* import IncheonTrackImg from "../../assets/track/incheon_track2.png"; */
 import "./trackMap.css";
 import { BOXSTYLE } from "../../constant";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";

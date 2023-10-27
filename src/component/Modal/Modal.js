@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import ModalView from './ModalView';
 import './Modal.css';
-import ShortTermInstrumentation from "../Instrumentation/ShortTermInstrumentation";
 import Wear3D from "../Wear3D/Wear3D";
 
 

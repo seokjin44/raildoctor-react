@@ -1,6 +1,6 @@
 import React from "react";
 import "./TrackSpeed.css";
-import { IncheonKP, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, seoulKP } from "../../constant";
+import { IncheonKP, STRING_ROUTE_INCHON, seoulKP } from "../../constant";
 import { convertToCustomFormat } from "../../util";
 import isEqual from 'lodash/isEqual';
 

@@ -5,12 +5,12 @@ import 'dayjs/locale/ko';
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import Box from '@mui/material/Box';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { BOXSTYLE, DOWN_TRACK, DUMMY_RANGE, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_DOWN_TRACK, STRING_HEIGHT, STRING_RAIL_DISTANCE, STRING_UP_TRACK, TRACK_DEVIATION_DUMMY, UP_TRACK } from "../../constant";
+import { BOXSTYLE, DUMMY_RANGE, RADIO_STYLE, RANGEPICKERSTYLE, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_DOWN_TRACK, STRING_HEIGHT, STRING_RAIL_DISTANCE, STRING_UP_TRACK } from "../../constant";
 import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import { Modal } from "@mui/material";
 import axios from 'axios';
 import qs from 'qs';
-import { dateFormat, findRange, getRailroadSection, transposeObjectToArray } from "../../util";
+import { dateFormat, getRailroadSection, transposeObjectToArray } from "../../util";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 
 let dataExitsDate = {};

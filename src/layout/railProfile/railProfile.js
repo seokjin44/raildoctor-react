@@ -2,8 +2,6 @@ import "./railProfile.css";
 import { useEffect, useState } from "react";
 import RailStatus from "../../component/railStatus/railStatus";
 import 'dayjs/locale/ko';
-import LeftProfile from "../../assets/left_profile.png"; 
-import RightProfile from "../../assets/right_profile.png"; 
 import Slider from '@mui/material/Slider';
 import axios from 'axios';
 import qs from 'qs';
@@ -22,7 +20,7 @@ import {
   BarController,
 } from 'chart.js';
 import faker from 'faker';
-import { DOWN_TRACK, RADIO_STYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_UP_TRACK, UP_TRACK } from "../../constant";
+import { RADIO_STYLE, STRING_DOWN_TRACK, STRING_UP_TRACK } from "../../constant";
 import { Input, DatePicker, Radio, Select } from "antd";
 import ImgSlider from "../../component/imgSlider/imgSlider";
 import { convertToCustomFormat, dateFormat, findRange, getRailroadSection, nonData, numberWithCommas } from "../../util";

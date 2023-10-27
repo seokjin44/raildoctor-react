@@ -3,16 +3,13 @@ import { useEffect, useState } from "react";
 import RailStatus from "../../component/railStatus/railStatus";
 import 'dayjs/locale/ko';
 import ReportIcon from "../../assets/icon/1291748_magnify_magnifying glass_marketing_report_financial_icon.svg";
-import ReportImg from "../../assets/ReportImg.png";
 
-import Box from '@mui/material/Box';
 import faker from 'faker';
-import Modal from '@mui/material/Modal';
 import { DatePicker, Input, Radio, Select } from "antd";
-import { DOWN_TRACK, RADIO_STYLE, RAILROADSECTION, RAIL_ROUGHNESS_BOXSTYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, UP_TRACK } from "../../constant";
+import { RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, dateFormat, findRange, formatDateTime, getRailroadSection, nonData } from "../../util";
+import { convertToCustomFormat, findRange, formatDateTime, getRailroadSection, nonData } from "../../util";
 
 const { RangePicker } = DatePicker;
 
