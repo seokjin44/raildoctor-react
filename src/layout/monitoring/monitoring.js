@@ -6,7 +6,7 @@ import { DatePicker, Input } from 'antd';
 import * as PDFJS from "pdfjs-dist/build/pdf";
 import * as pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 import RailStatus from "../../component/railStatus/railStatus";
-import { BOXSTYLE, RAILROADSECTION, RANGEPICKERSTYLE, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, TRACKSPEEDDATA } from "../../constant";
+import { RANGEPICKERSTYLE, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL } from "../../constant";
 import classNames from "classnames";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import DataExistence from "../../component/dataExistence/dataExistence";
@@ -174,9 +174,9 @@ function Monitoring( props ) {
                           },
                           params : {
                             railroad : route,
-                            /* beginTs : e[0].$d.toISOString(),
+                            beginTs : e[0].$d.toISOString(),
                             endTs : e[1].$d.toISOString(),
-                            beginKp : 0.23,
+                            /* beginKp : 0.23,
                             endKp : 16.84 */
                           }
                         })
@@ -296,12 +296,12 @@ function Monitoring( props ) {
           <div className="contentBox" style={{marginLeft : 0}}>
             <div className="containerTitle bothEnds">
               <div>데이터여부</div>
-              <div className="dataOption">
+              {/* <div className="dataOption">
                 <div className="date">
                   <img src={CalendarIcon} />
                   2022.01.01 ~ 2023.05.05
                 </div>
-              </div>
+              </div> */}
             </div>
             <div className="componentBox separationBox">
               <DataExistence 
