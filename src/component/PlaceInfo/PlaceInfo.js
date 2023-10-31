@@ -3,6 +3,7 @@ import "./PlaceInfo.css";
 import classNames from "classnames";
 import { DOWN_TRACK, STRING_PATH, UP_TRACK } from "../../constant";
 import { convertToCustomFormat } from "../../util";
+import isEqual from 'lodash/isEqual';
 
 let pointList = [];
 class PlaceInfo extends React.Component {
@@ -60,6 +61,14 @@ class PlaceInfo extends React.Component {
 			this.drawPoint();
 			this.drawPlace();
 		} else if(this.props.path.section_id !== prevProps.path.section_id) {
+			this.init();
+			this.drawPoint();
+			this.drawPlace();
+		} else if(!isEqual(prevProps.upTrackMeasurePoint, this.props.upTrackMeasurePoint)) {
+			this.init();
+			this.drawPoint();
+			this.drawPlace();
+		} else if(!isEqual(prevProps.downTrackMeasurePoint, this.props.downTrackMeasurePoint)) {
 			this.init();
 			this.drawPoint();
 			this.drawPlace();
@@ -201,6 +210,7 @@ class PlaceInfo extends React.Component {
 	} */
 
 	drawPlace() {
+		console.log("drawPlace");
 		pointList = [];
 		if(this.props.path === undefined)	return;
 		if(this.props.instrumentationPoint === undefined)	return;
@@ -211,13 +221,14 @@ class PlaceInfo extends React.Component {
 		let trackEndKP = this.props.path.endKp;
 		let trackLength = trackEndKP - trackBeginKP;
 
-		let tick = (this.props.path.type === STRING_PATH) ? 100 : 20;
+		/* let tick = (this.props.path.type === STRING_PATH) ? 100 : 20;
 		let upTrackNumTick = parseInt(trackLength / tick);
-		let downTrackNumTick = parseInt(trackLength / tick);
+		let downTrackNumTick = parseInt(trackLength / tick); */
 
 		//상선
-		for(let i = 1 ; i < upTrackNumTick ; i++) {
-			let location = i * tick + trackBeginKP;
+		for(let i = 1 ; i < this.props.upTrackMeasurePoint.length; i++) {
+			let location = this.props.upTrackMeasurePoint[i] * 1000;
+			if( location < trackBeginKP || trackEndKP < location ){continue;}
 			let point = {
 				x: (location - trackBeginKP) / trackLength * 100,
 				trackType: 1,
@@ -236,15 +247,21 @@ class PlaceInfo extends React.Component {
 			context.fill();
 			context.stroke();
 
-			context.fillStyle = (
-				point.name === this.props.selectKP.name &&
-				this.props.selectKP.trackType === UP_TRACK 
-			) ? "orange" : "black";
+			let fontColor = "rgba(0, 0, 0, 0.25)";
+			if( this.state.hoverPoint?.name === point.name &&
+				this.state.hoverPoint?.trackType === UP_TRACK ){
+				fontColor = "black";
+			}
+			if(point.name === this.props.selectKP.name &&
+				this.props.selectKP.trackType === UP_TRACK ){
+				fontColor = "orange" ;
+			}
+			context.fillStyle = fontColor;
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
 			context.fillText(point.name, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
-			
 			context.closePath();
+
 			pointList.push({
 				x : point.x * this.state.scaleX + this.state.x,
 				y : y,
@@ -252,13 +269,14 @@ class PlaceInfo extends React.Component {
 				name: point.name,
 				trackType : UP_TRACK,
 				beginKp : location,
-				endKp : location + tick
+				endKp : location + 999
 			});
 		}
 
 		//하선
-		for(let i = 1 ; i < downTrackNumTick ; i++) {
-			let location = i * tick + trackBeginKP;
+		for(let i = 1 ; i < this.props.downTrackMeasurePoint.length; i++) {
+			let location = this.props.downTrackMeasurePoint[i] * 1000;
+			if( location < trackBeginKP || trackEndKP < location ){continue;}
 			let point = {
 				x: (location - trackBeginKP) / trackLength * 100,
 				trackType: 1,
@@ -277,10 +295,16 @@ class PlaceInfo extends React.Component {
 			context.fill();
 			context.stroke();
 
-			context.fillStyle = (
-				point.name === this.props.selectKP.name &&
-				this.props.selectKP.trackType === DOWN_TRACK 
-			) ? "orange" : "black";
+			let fontColor = "rgba(0, 0, 0, 0.25)";
+			if( this.state.hoverPoint?.name === point.name &&
+				this.state.hoverPoint?.trackType === DOWN_TRACK ){
+				fontColor = "black";
+			}
+			if(point.name === this.props.selectKP.name &&
+				this.props.selectKP.trackType === DOWN_TRACK ){
+				fontColor = "orange" ;
+			}
+			context.fillStyle = fontColor;
 			context.textBaseline = "bottom";
 			context.textAlign = "center";
 			context.fillText(point.name, point.x * this.state.scaleX + this.state.x, y + (this.state.padding * 0.5));
@@ -293,7 +317,7 @@ class PlaceInfo extends React.Component {
 				name: point.name,
 				trackType : DOWN_TRACK,
 				beginKp : location,
-				endKp : location + tick
+				endKp : location + 999
 			});
 		}
 
@@ -364,7 +388,7 @@ class PlaceInfo extends React.Component {
 							isInsideCircle = true;
 						}
 					});
-					
+					if( !isInsideCircle ){this.setState({ hoverPoint : null })}
 					container.style.cursor = isInsideCircle ? 'pointer' : 'default';
 				}}
 				onMouseUp={(e)=>{

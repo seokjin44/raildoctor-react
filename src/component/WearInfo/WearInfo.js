@@ -221,10 +221,10 @@ class WearInfo extends React.Component {
                     series[3].data.push([data.accumulateWeight, data.wear]);
                     series[7].data.push([data.accumulateWeight, data.prediction]);
                 }else{
-                    series[1].data.push([data.accumulateWeight, data.wear]);
+                    /* series[1].data.push([data.accumulateWeight, data.wear]);
                     series[5].data.push([data.accumulateWeight, data.prediction]);
                     series[3].data.push([data.accumulateWeight, data.wear]);
-                    series[7].data.push([data.accumulateWeight, data.prediction]);
+                    series[7].data.push([data.accumulateWeight, data.prediction]); */
                 }
             }else if( this.props.selectKP.trackType === UP_TRACK ){
                 if( data.railSide === STRING_TRACK_SIDE_LEFT ){
@@ -234,10 +234,10 @@ class WearInfo extends React.Component {
                     series[2].data.push([data.accumulateWeight, data.wear]);
                     series[6].data.push([data.accumulateWeight, data.prediction]);
                 }else{
-                    series[0].data.push([data.accumulateWeight, data.wear]);
+                    /* series[0].data.push([data.accumulateWeight, data.wear]);
                     series[4].data.push([data.accumulateWeight, data.prediction]);
                     series[2].data.push([data.accumulateWeight, data.wear]);
-                    series[6].data.push([data.accumulateWeight, data.prediction]);
+                    series[6].data.push([data.accumulateWeight, data.prediction]); */
                 }
             } 
         }

@@ -54,11 +54,10 @@ export const convertToCustomFormat = (num) => {
     
     let formattedRemainder = remainderPart.toString().padStart(3, '0'); // 0을 채워서 3자리 문자열로 만듭니다.
     
-    return `${thousandPart}k${formattedRemainder}`;
+    return `${thousandPart}K${formattedRemainder}`;
 }
 
 export const findRange = (ranges, x) => {
-    console.log("findRange");
     let start = 0;
     let end = ranges.length - 1;
 

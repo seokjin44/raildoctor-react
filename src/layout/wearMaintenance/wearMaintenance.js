@@ -54,6 +54,9 @@ function WearMaintenance( props ) {
   const [railroadSection, setRailroadSection] = useState([]);
   const [trackSpeedData, setTrackSpeedData] = useState([{trackName:"", data:[]},{trackName:"", data:[]}]);
   const [predictionDetails, setPredictionDetails] = useState([]);
+
+  const [upTrackMeasurePoint, setUpTrackMeasurePoint] = useState([]);
+  const [downTrackMeasurePoint, setDownTrackMeasurePoint] = useState([]);
   
   const handleClose = () => {
     setOpen(false);
@@ -223,6 +226,7 @@ function WearMaintenance( props ) {
   }
 
   const makeWear3dData = (cornerWearGraph, verticalWearGraph, fliter, minmax) => {
+    console.log("makeWear3dData");
     let upTrackMGT = [];
     let upTrackKP = [];
     let upTrackWear = [];
@@ -233,44 +237,44 @@ function WearMaintenance( props ) {
 
     if( fliter.indexOf(STRING_CORNER_WEAR) > -1 ){
       for( let data of cornerWearGraph ){
-        if( data.railTrack === STRING_UP_TRACK ){
+        if( data.railSide === STRING_UP_TRACK ){
           upTrackMGT.push( data.accumulateWeight );
           upTrackKP.push( data.kp * 1000 );
           upTrackWear.push( data.wear );
         }
-        if( data.railTrack === STRING_DOWN_TRACK ){
+        if( data.railSide === STRING_DOWN_TRACK ){
           downTrackMGT.push( data.accumulateWeight );
           downTrackKP.push( data.kp * 1000 );
           downTrackWear.push( data.wear );
         }else{
-          upTrackMGT.push( data.accumulateWeight );
+          /* upTrackMGT.push( data.accumulateWeight );
           upTrackKP.push( data.kp * 1000 );
           upTrackWear.push( data.wear );
           downTrackMGT.push( data.accumulateWeight );
           downTrackKP.push( data.kp * 1000 );
-          downTrackWear.push( data.wear );
+          downTrackWear.push( data.wear ); */
         }
       }
     }
 
     if( fliter.indexOf(STRING_VERTICAL_WEAR) > -1 ){
       for( let data of verticalWearGraph ){
-        if( data.railTrack === STRING_UP_TRACK ){
+        if( data.railSide === STRING_UP_TRACK ){
           upTrackMGT.push( data.accumulateWeight );
           upTrackKP.push( data.kp * 1000 );
           upTrackWear.push( data.wear );
         }
-        if( data.railTrack === STRING_DOWN_TRACK ){
+        if( data.railSide === STRING_DOWN_TRACK ){
           downTrackMGT.push( data.accumulateWeight );
           downTrackKP.push( data.kp * 1000 );
           downTrackWear.push( data.wear );
         }else{
-          upTrackMGT.push( data.accumulateWeight );
+          /* upTrackMGT.push( data.accumulateWeight );
           upTrackKP.push( data.kp * 1000 );
           upTrackWear.push( data.wear );
           downTrackMGT.push( data.accumulateWeight );
           downTrackKP.push( data.kp * 1000 );
-          downTrackWear.push( data.wear );
+          downTrackWear.push( data.wear ); */
         }
       }
     }
@@ -358,6 +362,9 @@ function WearMaintenance( props ) {
         index = findRange(railroadSection, data * 1000);
         dataExits_[index]++;
       }
+
+      setUpTrackMeasurePoint([...new Set(response.data.t2)]);
+      setDownTrackMeasurePoint([...new Set(response.data.t1)]);
       setDataExits(dataExits_);
     })
     .catch(error => console.error('Error fetching data:', error));
@@ -525,6 +532,8 @@ function WearMaintenance( props ) {
                     setSelectKP={setSelectKP}
                     path={selectedPath} 
                     instrumentationPoint={INSTRUMENTATIONPOINT}
+                    upTrackMeasurePoint = {upTrackMeasurePoint}
+                    downTrackMeasurePoint = {downTrackMeasurePoint}
                   ></PlaceInfo>
                 </div>
               </div>

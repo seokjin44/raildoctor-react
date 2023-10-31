@@ -12,6 +12,8 @@ class TrackSpeed extends React.Component {
 			id: Math.random().toString(36).substring(2, 11),
 			canvas: undefined,
 			ctx: undefined,
+			legend : [],
+			xaxis : [],
 
 			// user defined properties  
 			minX: 0,  
@@ -136,7 +138,7 @@ class TrackSpeed extends React.Component {
 		this.state.numYTicks = Math.round(this.state.rangeY / this.state.unitsPerTickY);
 
 		//x축의 시작점
-		this.state.x = this.getLongestValueWidth() + this.state.padding * 2; //x,y축(레이블)의 공간만큼 보정해주는 듯함.
+		this.state.x = this.getLongestValueWidth() ; //x,y축(레이블)의 공간만큼 보정해주는 듯함.
 		this.state.y = this.state.padding * 2; //x,y축(레이블)의 공간만큼 보정해주는 듯함.
 
 		//아마 HTML의 위치와 캔버스의 위치를 상대적으로 구한 값인듯. 
@@ -192,6 +194,8 @@ class TrackSpeed extends React.Component {
 	                                                                                                                                                                                                       
 	drawYAxis() {  
 		let context = this.state.ctx;  
+		let xaxis = [];
+		let textSize = 7;
 		context.save(); 
 		context.beginPath();  
 		context.moveTo(this.state.x, this.state.y);  
@@ -234,7 +238,7 @@ class TrackSpeed extends React.Component {
 		// draw values  
 		for (let n = 0; n < this.state.numYTicks; n++) {  
 			let value = Math.round(this.state.maxY - n * this.state.maxY / this.state.numYTicks);  
-			context.save();
+			/* context.save();
 			
 			context.font = "bold 12px NEO_R";  
 			context.fillStyle = "black";  
@@ -243,11 +247,16 @@ class TrackSpeed extends React.Component {
 
 			context.translate(this.state.x - this.state.padding, n * this.state.height / this.state.numYTicks + this.state.y);  
 			context.fillText(value, 0, 0);  
-			context.restore();  
+			context.restore();   */
+			xaxis.push({
+				value : value,
+				y : n * this.state.height / this.state.numYTicks + this.state.y - textSize,
+				type : "value"
+			});
 		}  
 		
 		// draw unit
-		context.save();
+		/* context.save();
 
 		context.font = "bold 12px NEO_R";  
 		context.fillStyle = "black";  
@@ -256,11 +265,18 @@ class TrackSpeed extends React.Component {
 
 		context.translate(this.state.x - this.state.padding, this.state.numYTicks * this.state.height / this.state.numYTicks + this.state.y);  
 		context.fillText("(km/h)", 15, 0);
-		context.restore();  
+		context.restore();   */
+		xaxis.push({
+			value : "(km/h)",
+			y : this.state.numYTicks * this.state.height / this.state.numYTicks + this.state.y - textSize,
+			type : "unit"
+		});
+
+		this.setState({xaxis : xaxis})
 	};
 	
 	drawLegend() {  
-		let context = this.state.ctx; 
+		/* let context = this.state.ctx; 
 		context.save();
 
 		context.font = "bold 12px NEO_R";  
@@ -279,7 +295,7 @@ class TrackSpeed extends React.Component {
 		context.setLineDash([0]);
 		context.lineWidth = 3; 
 		context.stroke();
-		context.closePath();	
+		context.closePath();
 		
 		//하본선
 		context.beginPath();
@@ -292,7 +308,18 @@ class TrackSpeed extends React.Component {
 		context.stroke();
 		context.closePath();	
 
-		context.restore();
+		context.restore(); */
+		let legend = [
+			{
+				name : `${this.props.data[0].trackName}`,
+				color : "red"
+			},
+			{
+				name : `${this.props.data[1].trackName}`,
+				color : "blue"
+			}
+		];
+		this.setState({legend:legend})
 	}
 	
 	drawLine() {  
@@ -511,7 +538,25 @@ class TrackSpeed extends React.Component {
 
 	render() {
 		return (
-			<div className="trackSpeedBox" id={"track-speed-container-" + this.state.id}></div>
+			<div className="speedBoxContainer">
+				<div className="legendBox">
+				{
+					this.state.legend.map( (legend, i) => {
+						return <div className="option" key={i}>
+							<div className="colorBar" style={{backgroundColor:legend.color}} ></div> : {legend.name}
+						</div>
+					})
+				}
+				</div>
+				<div className="xaxis" /* style={{height:`calc(100% - ${this.state.y}px)`, paddingTop:`${this.state.y}px`}} */>
+					{
+						this.state.xaxis.map( (axis, i) => {
+							return <div key={i} className={`line ${axis.type}`} style={{top:axis.y}}>{axis.value}</div>
+						})
+					}
+				</div>
+				<div className="trackSpeedBox" id={"track-speed-container-" + this.state.id}></div>
+			</div>
 		);
 	}
 }
