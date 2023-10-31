@@ -165,7 +165,7 @@ function TrackDeviation( props ) {
               <div className="line"></div>
               <div className="dataOption">
                 <div className="title">상하선 </div>
-                <div className="date">
+                <div className="track">
                 <Radio.Group style={RADIO_STYLE} value={selectTrack} defaultValue={selectTrack} 
                   onChange={(e)=>{setSelectTrack(e.target.value)}}
                 >
@@ -218,7 +218,7 @@ function TrackDeviation( props ) {
               </div>
               <div className="line"></div>
               <div className="dataOption">
-                <button onClick={()=>{
+                <button className="search" onClick={()=>{
                   let searchChartView_ = [];
                   let measureTs = new Date().toISOString();
                   try{

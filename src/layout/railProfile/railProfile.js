@@ -258,7 +258,7 @@ function RailProfile( props ) {
             <div className="componentBox" style={{overflow: "hidden"}}>
               <div className="dataOption">
                 <div className="title">상하선 </div>
-                <div className="date">
+                <div className="track">
                 <Radio.Group style={RADIO_STYLE} defaultValue={selectTrack} value={selectTrack} 
                   onChange={(e)=>{
                     setSelectTrack(e.target.value);

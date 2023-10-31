@@ -496,7 +496,7 @@ function TrackGeometryMeasurement( props ) {
               <div className="line"></div>
               <div className="dataOption">
                 <div className="title">데이터 </div>
-                <div className="date">
+                <div className="date" style={{textAlign : "left"}}>
                   <Radio.Group 
                     options={dataOption} 
                     onChange={onCheckboxChange}
@@ -505,7 +505,7 @@ function TrackGeometryMeasurement( props ) {
               </div>
               <div className="line"></div>
               <div className="dataOption">
-                <button onClick={()=>{
+                <button className="search" onClick={()=>{
                   console.log("조회");
                   /* let findDatas_ = findDatas; */
                   /* let selectPoints_ = [...selectPoints]; */
@@ -835,7 +835,7 @@ function TrackGeometryMeasurement( props ) {
           </div>
         </div>
       </div>
-      <div className="contentBox" style={{marginTop:"10px", height:"calc(100% - 510px)"}}>
+      <div className="contentBox" style={{marginTop:"10px", height:"calc(100% - 503px)"}}>
         <div className="containerTitle">Chart
           <div className="selectPoints">
             {

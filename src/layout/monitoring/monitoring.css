@@ -500,6 +500,7 @@
 
 .searchNavigate .dataOption .title{
     margin-right: 15px;
+    min-width: 50px;
 }
 
 .searchNavigate .line{

@@ -4,12 +4,13 @@ import RailStatus from "../../component/railStatus/railStatus";
 import { useEffect, useRef, useState } from "react";
 import { DatePicker, Input } from 'antd';
 import { Radio } from 'antd';
-import { RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_PATH, STRING_STATION, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
+import { KP_SEARCH_RANGE, KP_SEARCH_SINGLE, RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_PATH, STRING_STATION, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
 import { convertToCustomFormat, formatDateTime, getRailroadSection, getYear2Length, nonData, numberWithCommas } from "../../util";
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
+import classNames from "classnames";
 
 let pictureList = [];
 function CumulativeThroughput( props ) {
@@ -19,6 +20,7 @@ function CumulativeThroughput( props ) {
   const [zoomImgkpMarker, setZoomImgKPMarker] = useState(0);
 
   const [kp, setKP] = useState(0);
+  const [endkp, setendKp] = useState(0);
   const [inputKp, setInputKp] = useState(0);
   const [selectedPath, setSelectedPath] = useState([]);
   const containerRef = useRef(null);
@@ -28,6 +30,7 @@ function CumulativeThroughput( props ) {
   const [selectDate, setSelectDate] = useState(new Date());
   const [selectTrack, setSelectTrack] = useState(STRING_UP_TRACK);
   const [selectDir, setSelectDir] = useState(STRING_TRACK_DIR_LEFT);
+  const [selectSearch, setSelectSearch] = useState(KP_SEARCH_SINGLE);
   const [railmapOpen, setRailmapOpen] = useState(false);
 
   const [remainingCriteria, setRemainingCriteria] = useState(0);
@@ -36,7 +39,9 @@ function CumulativeThroughput( props ) {
   const [remainings, setRemainings] = useState([]);
   const [railroadSection, setRailroadSection] = useState([]);
   
-  const [trackGeo, setTrackGeo] = useState({});
+  const [remainingReturn, setRemainingReturn] = useState("");
+  const [trackGeo, setTrackGeo] = useState({shapeDisplay : "Shape"});
+  const [mapHide, setMapHide] = useState(false);
 
   const zoomImgAdjustPosition = () => {
     if (zoomimgRef.current) {
@@ -109,9 +114,9 @@ function CumulativeThroughput( props ) {
   }, []);
 
   useEffect(() => {
+    console.log("useEffect");
     let find = findPictureAndPosition( parseInt(kp) / 1000);
     setViewRailMap(find);
-    getAccRemainingData();
 
     let route = sessionStorage.getItem('route');
     axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
@@ -126,22 +131,39 @@ function CumulativeThroughput( props ) {
     .then(response => {
       console.log(response.data);
       setTrackGeo(response.data);
+      if( selectTrack === STRING_UP_TRACK ){
+        setTrackGeo(response.data.t2);
+      }else if( selectTrack === STRING_DOWN_TRACK ){
+        setTrackGeo(response.data.t1);
+      }
     })
     .catch(error => console.error('Error fetching data:', error));
-  }, [kp]);
+  }, [kp, selectTrack]);
 
   useEffect( () => {
     adjustPosition();
-  }, [viewRailMap] )
+  }, [viewRailMap, mapHide])
 
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
     setKP(select.beginKp);
     setInputKp(select.beginKp);
+    setendKp(select.endKp);
+    if( select.type === STRING_STATION ){
+      setSelectSearch(KP_SEARCH_SINGLE);
+      getAccRemainingData(select.beginKp);
+    }else{
+      setSelectSearch(KP_SEARCH_RANGE);
+      getAccRemainingsData(select.beginKp, select.endKp);
+    }
   }
 
-  const getAccRemainingData = ()=>{
+  const getAccRemainingData = (kp_)=>{
+    if( !kp_ || kp_ === "" || kp_ === null || kp_ === undefined){
+      alert("KP를 입력해주세요");
+      return;
+    }
     let track_ = "";
     if( selectTrack === STRING_UP_TRACK && selectDir === STRING_TRACK_DIR_LEFT ){
       track_ = STRING_UP_TRACK_LEFT;
@@ -152,15 +174,13 @@ function CumulativeThroughput( props ) {
     }else if( selectTrack === STRING_DOWN_TRACK && selectDir === STRING_TRACK_DIR_RIGHT ){
       track_ = STRING_DOWN_TRACK_RIGHT;
     }
-    console.log((kp / 1000));
+
     let route = sessionStorage.getItem('route');
     let param  = {
       railroad_name : route,
       measure_ts : selectDate.toISOString(),
       rail_track : track_,
-      kp : (kp / 1000)
-      /* begin_kp: (e.target.value / 1000),
-      end_kp : (e.target.value / 1000) + 0.99 */
+      kp : (kp_ / 1000)
     }
     console.log(param);
     axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remaining`,{
@@ -174,11 +194,17 @@ function CumulativeThroughput( props ) {
       setRemainingCriteria(response.data.criteria);
       setLeftRemaining(response.data.leftRemaining);
       setRightRemaining(response.data.rightRemaining);
+      setRemainingReturn(STRING_STATION);
     })
     .catch(error => console.error('Error fetching data:', error));
   }
 
-  const getAccRemainingsData = ()=>{
+  const getAccRemainingsData = (beginKp, endKp)=>{
+    if( !beginKp || beginKp === "" || beginKp === null || beginKp === undefined ||
+        !endKp || endKp === "" || endKp === null || endKp === undefined){
+      alert("KP를 입력해주세요");
+      return;
+    }
     let track_ = "";
     if( selectTrack === STRING_UP_TRACK && selectDir === STRING_TRACK_DIR_LEFT ){
       track_ = STRING_UP_TRACK_LEFT;
@@ -195,8 +221,8 @@ function CumulativeThroughput( props ) {
       railroad_name : route,
       measure_ts : selectDate.toISOString(),
       rail_track : track_,
-      begin_kp: (selectedPath.beginKp / 1000),
-      end_kp : (selectedPath.endKp / 1000)
+      begin_kp: (beginKp / 1000),
+      end_kp : (endKp / 1000)
     }
     console.log(param);
     axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remainings`,{
@@ -208,13 +234,10 @@ function CumulativeThroughput( props ) {
     .then(response => {
       console.log(response.data);
       setRemainings(response.data.remainings);
+      setRemainingReturn(STRING_PATH);
     })
     .catch(error => console.error('Error fetching data:', error));
   }
-
-  useEffect( ()=>{
-    getAccRemainingsData();
-  }, [selectedPath]);
 
   return (
     <div className="cumulativeThroughput" >
@@ -232,6 +255,10 @@ function CumulativeThroughput( props ) {
                   <DatePicker 
                     style={RANGEPICKERSTYLE}
                     onChange={(e)=>{
+                      if(e === null){
+                        setSelectDate(new Date());
+                        return;
+                      }
                       console.log(e.$d);
                       setSelectDate(e.$d);
                     }}
@@ -248,7 +275,7 @@ function CumulativeThroughput( props ) {
               <div className="line"></div>
               <div className="dataOption">
                 <div className="title">상하선 </div>
-                <div className="date">
+                <div className="track">
                   <Radio.Group style={RADIO_STYLE} defaultValue={selectTrack} value={selectTrack}
                     onChange={(e)=>{setSelectTrack(e.target.value)}}
                   >
@@ -260,7 +287,7 @@ function CumulativeThroughput( props ) {
               <div className="line"></div>
               <div className="dataOption">
                 <div className="title">좌우 </div>
-                <div className="date">
+                <div className="track">
                   <Radio.Group style={RADIO_STYLE} defaultValue={selectDir} value={selectDir} 
                     onChange={(e)=>{setSelectDir(e.target.value)}}
                   >
@@ -271,28 +298,105 @@ function CumulativeThroughput( props ) {
               </div>
               <div className="line"></div>
               <div className="dataOption">
-                <div className="title">KP </div>
-                <div className="date">
-                  <Input placeholder="KP" 
-                    value={inputKp}
-                    defaultValue={inputKp}
-                    style={RANGEPICKERSTYLE} 
-                    onKeyDown={(e)=>{ if(e.key==="Enter"){
-                      setKP(e.target.value);
-                    }}}
-                    onChange={(e)=>{
-                      const { value: inputValue } = e.target;
-                      const reg = /^-?\d*(\.\d*)?$/;
-                      if (reg.test(inputValue) || inputValue === '' || inputValue === '-') {
-                        setInputKp(e.target.value);
-                      }
-                    }}
-                  />
+                <div className="title">검색 </div>
+                <div className="track">
+                  <Radio.Group style={RADIO_STYLE} defaultValue={selectSearch} value={selectSearch} 
+                    onChange={(e)=>{setSelectSearch(e.target.value)}}
+                  >
+                    <Radio value={KP_SEARCH_SINGLE}>단일</Radio>
+                    <Radio value={KP_SEARCH_RANGE}>범위</Radio>
+                  </Radio.Group>
                 </div>
               </div>
-              <div className="dataOption" style={{marginLeft:"10px"}}>
-              {nonData(trackGeo.shapeDisplay)} /
-                R={nonData(trackGeo.direction)} {nonData(trackGeo.radius)} (C={nonData(trackGeo.cant)}, S={nonData(trackGeo.slack)})
+              <div className="line"></div>
+              <div className="dataOption" style={{ width: "330px", justifyContent: "left" }}>
+                {
+                  (selectSearch === KP_SEARCH_RANGE) ? 
+                  <>
+                    <div className="title">시작KP </div>
+                    <div className="">
+                      <Input placeholder="KP" 
+                        value={inputKp}
+                        defaultValue={inputKp}
+                        style={RANGEPICKERSTYLE} 
+                        /* onKeyDown={(e)=>{ if(e.key==="Enter"){
+                          setKP(e.target.value);
+                        }}} */
+                        onChange={(e)=>{
+                          const { value: inputValue } = e.target;
+                          const reg = /^-?\d*(\.\d*)?$/;
+                          if (reg.test(inputValue) || inputValue === '' || inputValue === '-') {
+                            setInputKp(e.target.value);
+                          }
+                        }}
+                      />
+                    </div>          
+                    <div className="line" style={{ marginLeft: "5px", marginRight: "5px" }}></div>      
+                    <div className="title">종점KP </div>
+                    <div className="">
+                      <Input placeholder="KP" 
+                        value={endkp}
+                        defaultValue={endkp}
+                        style={RANGEPICKERSTYLE} 
+                        /* onKeyDown={(e)=>{ if(e.key==="Enter"){
+                          setendKp(e.target.value);
+                        }}} */
+                        onChange={(e)=>{
+                          const { value: inputValue } = e.target;
+                          const reg = /^-?\d*(\.\d*)?$/;
+                          if (reg.test(inputValue) || inputValue === '' || inputValue === '-') {
+                            setendKp(e.target.value);
+                          }
+                        }}
+                      />
+                    </div>
+                  </>
+                  : 
+                  <>
+                    <div className="title">KP </div>
+                    <div className="">
+                      <Input placeholder="KP" 
+                        value={inputKp}
+                        defaultValue={inputKp}
+                        style={RANGEPICKERSTYLE} 
+                        /* onKeyDown={(e)=>{ if(e.key==="Enter"){
+                          setKP(e.target.value);
+                        }}} */
+                        onChange={(e)=>{
+                          const { value: inputValue } = e.target;
+                          const reg = /^-?\d*(\.\d*)?$/;
+                          if (reg.test(inputValue) || inputValue === '' || inputValue === '-') {
+                            setInputKp(e.target.value);
+                          }
+                        }}
+                      />
+                    </div>
+                  </>
+
+                }
+                
+              </div>
+              <div className="dataOption" style={{marginLeft:"10px",width:"190px"}}>
+               {nonData(trackGeo?.shapeDisplay)} <br/>
+                R={nonData(trackGeo?.direction)} {nonData(trackGeo?.radius)} (C={nonData(trackGeo?.cant)}, S={nonData(trackGeo?.slack)})
+              </div>
+              <div className="line"></div>
+              <div className="dataOption">
+                <button className="search" onClick={()=>{
+                  console.log("Search");
+                  setKP(inputKp);
+                  if( selectSearch === KP_SEARCH_SINGLE ){
+                    getAccRemainingData(inputKp);
+                  }else{
+                    if( inputKp > endkp ){
+                      alert("시작KP가 종점KP보다 큽니다.");
+                      return;
+                    }
+                    getAccRemainingsData(inputKp, endkp);
+                  }
+                }} >
+                  조회
+                </button>
               </div>
             </div>
       </div>
@@ -302,6 +406,10 @@ function CumulativeThroughput( props ) {
         <div className="containerTitle">
           <div>검토구간</div>
           <div className="flex">
+            <div className="modalButton" onClick={()=>{
+                      console.log("선로열람도 숨기기");
+                      setMapHide(!mapHide);
+            }} >선로열람도 {(mapHide)? "펼치기" : "숨기기"}</div>
             <div className="modalButton highlight" onClick={()=>{
                       console.log("선로열람도 상세보기");
                       setRailmapOpen(true);
@@ -309,7 +417,7 @@ function CumulativeThroughput( props ) {
           </div>
         </div>
         <div className="componentBox">
-          <div ref={containerRef} className="boxProto track" id="trackMapContainer">
+          <div ref={containerRef} className={classNames("boxProto track",{"hide" : mapHide})} id="trackMapContainer" >
           {/* {
             imgLoadArr.map( (img, i) => {
               return <img width={img.width * IMGSCALING} src={img.src}/>
@@ -329,7 +437,7 @@ function CumulativeThroughput( props ) {
           </div>
           <div className="dataContainer">
             {
-              ( selectedPath.type === STRING_STATION ) ? 
+              ( remainingReturn === STRING_STATION ) ? 
               <>
                 <div className="dataLine">
                   <div className="table">
@@ -415,7 +523,7 @@ function CumulativeThroughput( props ) {
                 </div>
               </>
               : 
-              ( selectedPath.type === STRING_PATH ) ?
+              ( remainingReturn === STRING_PATH ) ?
               <>
                 <div className="dataLine">
                   <div className="table">
@@ -442,7 +550,7 @@ function CumulativeThroughput( props ) {
                     <div className="tableBody">
                       {remainings.map( (remaining, i) => {
                         return <>
-                        <div key={i} className="tr">
+                        <div key={`left${i}`} className="tr">
                           <div className="td">좌</div>
                           {/* <div className="td">117</div>
                           <div className="td">669</div>
@@ -461,7 +569,7 @@ function CumulativeThroughput( props ) {
                           <div className="td">{formatDateTime(new Date(remaining.leftRemaining.secondMeasureTs))}</div> */}
                           <div className="td">{formatDateTime(new Date(remaining.leftRemaining.zeroMeasureTs))}</div>
                         </div>
-                        <div key={i} className="tr">
+                        <div key={`right${i}`} className="tr">
                           <div className="td">우</div>
                           {/* <div className="td">117</div>
                           <div className="td">669</div>

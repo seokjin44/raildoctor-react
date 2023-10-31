@@ -41,7 +41,7 @@ code {
 
 ::-webkit-scrollbar-track {
   background-color: #f1f1f12b;
-  border-top: 2px solid #d5d5d5;
+  /* border-top: 2px solid #d5d5d5; */
 }
 
 ::-webkit-scrollbar-thumb {
@@ -81,4 +81,32 @@ span{
 
 .emptyBox img{
   height: 150px;
+}
+
+.table.table2::-webkit-scrollbar-track,
+.table.table4::-webkit-scrollbar-track {
+  background-color: #f1f1f12b;
+  border-top: 1px solid #d5d5d5;
+}
+
+/* custome button */
+button.search{
+  width: 50px;
+  height: 35px;
+  border: 1px solid #cccccc;
+  background-color: #ffffff;
+  font-weight: bold;
+  color: black;
+  border-radius: 5px;
+  font-family: 'NEO_R';
+  cursor: pointer;
+}
+
+/* date Option */
+.dataOption .track{
+  min-width: 140px;
+}
+
+.dataOption .date{
+  min-width: 125px;
 }

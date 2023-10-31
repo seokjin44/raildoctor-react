@@ -95,8 +95,8 @@ class RailStatus extends React.Component {
             start_station_name: e.target.dataset.start_station_name,
             end_station_name: e.target.dataset.end_station_name,
             type : STRING_STATION,
-            beginKp: e.target.dataset.beginKp * 1000,
-            endKp: e.target.dataset.endKp * 1000,
+            beginKp: Math.floor(e.target.dataset.beginKp * 1000),
+            endKp: Math.floor(e.target.dataset.endKp * 1000),
           }
   
           this_.pathClick(path);
@@ -163,8 +163,8 @@ class RailStatus extends React.Component {
             start_station_name: e.target.dataset.start_station_name,
             end_station_name: e.target.dataset.end_station_name,
             type : STRING_PATH,
-            beginKp: e.target.dataset.beginKp * 1000,
-            endKp: e.target.dataset.endKp * 1000,
+            beginKp: Math.floor(e.target.dataset.beginKp * 1000),
+            endKp: Math.floor(e.target.dataset.endKp * 1000),
           }
   
           this_.pathClick(path);

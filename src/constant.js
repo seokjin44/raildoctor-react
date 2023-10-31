@@ -65,6 +65,9 @@ export const STRING_SELECT_WEAR_CORRELATION_RAILVAL = "railVal";
 export const STRING_VERTICAL_WEAR = "VERTICAL";
 export const STRING_CORNER_WEAR = "CORNER";
 
+export const KP_SEARCH_SINGLE = "SINGLE";
+export const KP_SEARCH_RANGE = "RANGE";
+
 export const STRING_WEAR_MODEL_KP = "KP"; //누적통과톤수만 고려한 KP 별 선형회귀 예측
 export const STRING_WEAR_MODEL_LOGI_LASSO = "LOGI_LASSO"; //레일특성변수사용, 로지스틱 LASSO
 export const STRING_WEAR_MODEL_LOGI_STEPWISE = "LOGI_STEPWISE"; //레일특성변수사용, 로지스틱 Stepwise

@@ -33,7 +33,7 @@ function DataExistence( props ) {
   const [pautImgIndex, setPautImgIndex] = useState(0);
 
   const [tabValue, setTabValue] = useState('1');
-  const [kptoPixel, setKPtoPixel] = useState(3000);
+  const [kptoPixel, setKPtoPixel] = useState(15000);
   const LINE_TITLE_WIDTH = 120;
   const kpto1Pixcel = 1;
   const [kpList, setKPList] = useState([]);

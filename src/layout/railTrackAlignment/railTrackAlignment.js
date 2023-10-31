@@ -156,7 +156,7 @@ function RailTrackAlignment( props ) {
             <div className="componentBox" style={{overflow: "hidden"}}>
               <div className="dataOption">
                 <div className="title">상하선 </div>
-                <div className="date">
+                <div className="track">
                 <Radio.Group style={RADIO_STYLE} defaultValue={selectTrack} value={selectTrack} 
                   onChange={(e)=>{setSelectTrack(e.target.value)}}
                 >
@@ -168,7 +168,7 @@ function RailTrackAlignment( props ) {
               <div className="line"></div>
               <div className="dataOption">
                 <div className="title">좌우 </div>
-                <div className="date">
+                <div className="track">
                 <Radio.Group style={RADIO_STYLE} defaultValue={selectDir} value={selectDir} 
                   onChange={(e)=>{setSelectDir(e.target.value)}}
                 >

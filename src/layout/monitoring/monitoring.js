@@ -2,11 +2,11 @@ import "./monitoring.css";
 import 'dayjs/locale/ko';
 import { useEffect, useRef, useState } from "react";
 import CalendarIcon from "../../assets/icon/299092_calendar_icon.png";
-import { DatePicker, Input } from 'antd';
+import { DatePicker, Input, Radio } from 'antd';
 import * as PDFJS from "pdfjs-dist/build/pdf";
 import * as pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 import RailStatus from "../../component/railStatus/railStatus";
-import { RANGEPICKERSTYLE, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL } from "../../constant";
+import { RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_UP_TRACK } from "../../constant";
 import classNames from "classnames";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import DataExistence from "../../component/dataExistence/dataExistence";
@@ -17,6 +17,7 @@ import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
 import { getInchonSpeedData, getRailroadSection, getSeoulSpeedData, nonData } from "../../util";
 import Papa from 'papaparse';
+import EmptyImg from "../../assets/icon/empty/empty5.png";
 
 window.PDFJS = PDFJS;
 const { RangePicker } = DatePicker;
@@ -36,6 +37,7 @@ function Monitoring( props ) {
   const [viewRailMap, setViewRailMap] = useState(null);
   const [kpMarker, setKPMarker] = useState(0);
   const [zoomImgkpMarker, setZoomImgKPMarker] = useState(0);
+  const [selectTrack, setSelectTrack] = useState(STRING_UP_TRACK);
   const inputRef = useRef(null);
 
   const [accumulateWeights, setAccumulateWeights] = useState([]);
@@ -48,6 +50,7 @@ function Monitoring( props ) {
   const [trackSpeedData, setTrackSpeedData] = useState([{trackName:"", data:[]},{trackName:"", data:[]}]);
   
   const [trackGeo, setTrackGeo] = useState({});
+  const [selectDates, setSelectDates] = useState(null);
   
   const pathClick = (select) => {
     console.log(select);
@@ -94,6 +97,28 @@ function Monitoring( props ) {
     }
   }
 
+  const getTrackGeo = ( kp_ ) => {
+    let route = sessionStorage.getItem('route');
+    axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroad : route,
+        kp :  parseInt(kp_) / 1000 
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      if( selectTrack === STRING_UP_TRACK ){
+        setTrackGeo(response.data.t2);
+      }else if( selectTrack === STRING_DOWN_TRACK ){
+        setTrackGeo(response.data.t1);
+      }
+    })
+    .catch(error => console.error('Error fetching data:', error));
+  }
+
   useEffect( ()=> {
     console.log("adjustPosition");
     adjustPosition();
@@ -102,22 +127,7 @@ function Monitoring( props ) {
   useEffect( ()=> {
     let find = findPictureAndPosition( parseInt(kp) / 1000 );
     setViewRailMap(find);
-
-    let route = sessionStorage.getItem('route');
-    axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
-      paramsSerializer: params => {
-        return qs.stringify(params, { format: 'RFC3986' })
-      },
-      params : {
-        railroad : route,
-        kp :  parseInt(kp) / 1000 
-      }
-    })
-    .then(response => {
-      console.log(response.data);
-      setTrackGeo(response.data);
-    })
-    .catch(error => console.error('Error fetching data:', error));
+    getTrackGeo(kp);
   },[kp])
 
   useEffect( ()=>{
@@ -146,6 +156,45 @@ function Monitoring( props ) {
     .catch(error => console.error('Error fetching data:', error));
   }, [] )
 
+  const getExistData = ( dates ) => {
+    let route = sessionStorage.getItem('route');
+    axios.get(`https://raildoctor.suredatalab.kr/api/statistics/data`,{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroad : route,
+        beginTs : dates[0].$d.toISOString(),
+        endTs : dates[1].$d.toISOString(),
+        /* beginKp : 0.23,
+        endKp : 16.84 */
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      setAccumulateWeights(response.data.accumulateWeights);
+      setRailbehaviors(response.data.railbehaviors);
+      setRailtwists(response.data.railtwists);
+      setRailwears(response.data.railwears);
+      setTemperatures(response.data.temperatures);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+
+    axios.get(`https://raildoctor.suredatalab.kr/api/pauts`,{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroad : route
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      setPaut(response.data.entities);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+  }
+
   return (
     <div className="monitoringContainer" >
         <div className="railStatusContainer">
@@ -164,47 +213,30 @@ function Monitoring( props ) {
                 <div className="title">탐색날짜 </div>
                 <div className="date">
                   <RangePicker 
+                    value={selectDates}
+                    defaultValue={selectDates}
                     style={RANGEPICKERSTYLE}
                     onChange={(e)=>{
-                        console.log(e);
-                        let route = sessionStorage.getItem('route');
-                        axios.get(`https://raildoctor.suredatalab.kr/api/statistics/data`,{
-                          paramsSerializer: params => {
-                            return qs.stringify(params, { format: 'RFC3986' })
-                          },
-                          params : {
-                            railroad : route,
-                            beginTs : e[0].$d.toISOString(),
-                            endTs : e[1].$d.toISOString(),
-                            /* beginKp : 0.23,
-                            endKp : 16.84 */
-                          }
-                        })
-                        .then(response => {
-                          console.log(response.data);
-                          setAccumulateWeights(response.data.accumulateWeights);
-                          setRailbehaviors(response.data.railbehaviors);
-                          setRailtwists(response.data.railtwists);
-                          setRailwears(response.data.railwears);
-                          setTemperatures(response.data.temperatures);
-                        })
-                        .catch(error => console.error('Error fetching data:', error));
-
-                        axios.get(`https://raildoctor.suredatalab.kr/api/pauts`,{
-                          paramsSerializer: params => {
-                            return qs.stringify(params, { format: 'RFC3986' })
-                          },
-                          params : {
-                            railroad : route
-                          }
-                        })
-                        .then(response => {
-                          console.log(response.data);
-                          setPaut(response.data.entities);
-                        })
-                        .catch(error => console.error('Error fetching data:', error));
+                      console.log(e);
+                      setSelectDates(e);
+                      if( e === null ){
+                        return;
+                      }
+                      getExistData(e);
                     }}
                   />
+                </div>
+              </div>
+              <div className="line"></div>
+              <div className="dataOption">
+                <div className="title">상하선 </div>
+                <div className="track">
+                  <Radio.Group style={RADIO_STYLE} defaultValue={selectTrack} value={selectTrack}
+                    onChange={(e)=>{setSelectTrack(e.target.value)}}
+                  >
+                    <Radio value={STRING_UP_TRACK}>상선</Radio>
+                    <Radio value={STRING_DOWN_TRACK}>하선</Radio>
+                  </Radio.Group>
                 </div>
               </div>
               <div className="line"></div>
@@ -232,8 +264,17 @@ function Monitoring( props ) {
                 </div>
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
-              {nonData(trackGeo.shapeDisplay)} /
-                R={nonData(trackGeo.direction)} {nonData(trackGeo.radius)} (C={nonData(trackGeo.cant)}, S={nonData(trackGeo.slack)})
+              {nonData(trackGeo?.shapeDisplay)} /
+                R={nonData(trackGeo?.direction)} {nonData(trackGeo?.radius)} (C={nonData(trackGeo?.cant)}, S={nonData(trackGeo?.slack)})
+              </div>
+              <div className="line"></div>
+              <div className="dataOption">
+                <button className="search" onClick={()=>{
+                  console.log("Search");
+                  setKP(inputKp);
+                }} >
+                  조회
+                </button>
               </div>
             </div>
           </div>
@@ -304,15 +345,34 @@ function Monitoring( props ) {
               </div> */}
             </div>
             <div className="componentBox separationBox">
-              <DataExistence 
-                kp={kp}
-                accumulateWeights={accumulateWeights}
-                railbehaviors={railbehaviors}
-                railtwists={railtwists}
-                railwears={railwears}
-                temperatures={temperatures}
-                paut={paut}
-              ></DataExistence>
+                {
+                  (accumulateWeights.length < 1 && railbehaviors.length < 1 && railtwists.length < 1 &&
+                    railwears.length < 1 && temperatures.length < 1 && paut.length < 1  
+                  ) ? 
+                  <div className="emptyBox" style={{ height: "340px",
+                    marginTop: "10px",
+                    marginBottom: "10px",
+                    width: "calc(100% - 22px)",
+                    marginLeft: "10px",
+                    marginRight: "10px"}}>
+                    <img src={EmptyImg} />
+                    <h1>데이터가 없습니다</h1>
+                    <div>
+                    출력할 데이터가 없습니다. <br/>
+                    상단에서 날짜를 지정해주세요.
+                    </div>
+                  </div>
+                  :
+                  <DataExistence 
+                  kp={kp}
+                  accumulateWeights={accumulateWeights}
+                  railbehaviors={railbehaviors}
+                  railtwists={railtwists}
+                  railwears={railwears}
+                  temperatures={temperatures}
+                  paut={paut}
+                ></DataExistence>
+                }
             </div>
           </div>
         </div>
