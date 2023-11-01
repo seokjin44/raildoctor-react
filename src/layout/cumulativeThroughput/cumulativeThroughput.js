@@ -4,20 +4,23 @@ import RailStatus from "../../component/railStatus/railStatus";
 import { useEffect, useRef, useState } from "react";
 import { DatePicker, Input } from 'antd';
 import { Radio } from 'antd';
-import { KP_SEARCH_RANGE, KP_SEARCH_SINGLE, RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_PATH, STRING_STATION, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
+import { KP_SEARCH_RANGE, KP_SEARCH_SINGLE, PICTURE_RENDERING_TEXT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_PATH, STRING_STATION, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
 import { convertToCustomFormat, formatDateTime, getRailroadSection, getYear2Length, nonData, numberWithCommas } from "../../util";
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
 import classNames from "classnames";
+import moment from 'moment';
+import LoadingImg from "../../assets/icon/loading/loading.png";
+import Draggable from 'react-draggable';
 
-let pictureList = [];
 function CumulativeThroughput( props ) {
 
   const zoomImgcontainerRef = useRef(null);
   const zoomimgRef = useRef(null);
   const [zoomImgkpMarker, setZoomImgKPMarker] = useState(0);
+  const [zoomImgkpMarkerHeight, setZoomImgkpMarkerHeight] = useState(0);
 
   const [kp, setKP] = useState(0);
   const [endkp, setendKp] = useState(0);
@@ -25,9 +28,9 @@ function CumulativeThroughput( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
   const containerRef = useRef(null);
   const imgRef = useRef(null);
-  const [kpMarker, setKPMarker] = useState(0);
+  const [kpMarker, setKPMarker] = useState({x : 0, y : 0});
   const [viewRailMap, setViewRailMap] = useState(null);
-  const [selectDate, setSelectDate] = useState(new Date());
+  const [selectDate, setSelectDate] = useState(moment());
   const [selectTrack, setSelectTrack] = useState(STRING_UP_TRACK);
   const [selectDir, setSelectDir] = useState(STRING_TRACK_DIR_LEFT);
   const [selectSearch, setSelectSearch] = useState(KP_SEARCH_SINGLE);
@@ -42,45 +45,10 @@ function CumulativeThroughput( props ) {
   const [remainingReturn, setRemainingReturn] = useState("");
   const [trackGeo, setTrackGeo] = useState({shapeDisplay : "Shape"});
   const [mapHide, setMapHide] = useState(false);
-
-  const zoomImgAdjustPosition = () => {
-    if (zoomimgRef.current) {
-        const scaleFactor = zoomimgRef.current.clientWidth / viewRailMap.originalWidth;
-        const adjustedPosition = viewRailMap.position * scaleFactor;
-        /* setKPMarker(adjustedPosition); */
-        /* zoomImgcontainerRef.current.scrollLeft = adjustedPosition - (zoomImgcontainerRef.current.offsetWidth / 2); */
-        let center = (zoomImgcontainerRef.current.offsetWidth / 2);
-        console.log(center);
-        setZoomImgKPMarker(adjustedPosition);
-        zoomImgcontainerRef.current.scrollLeft = adjustedPosition - center;
-    }
-  }
-  
-  const findPictureAndPosition = (km) => {
-    for (let pic of pictureList) {
-        if (pic.beginKp <= km && km <= pic.endKp) {
-            const position = ((km - pic.beginKp) / (pic.endKp - pic.beginKp)) * pic.width;
-            return { 
-              url: `https://raildoctor.suredatalab.kr${pic.fileName}`, 
-              originalWidth: pic.width, 
-              position: Math.round(position),
-              originalHeight: pic.height
-            };
-        }
-    }
-    return null;
-  }
-
-  const adjustPosition = () => {
-    if (imgRef.current) {
-        const scaleFactor = imgRef.current.clientWidth / viewRailMap.originalWidth;
-        const adjustedPosition = viewRailMap.position * scaleFactor;
-        console.log(adjustedPosition);
-        setKPMarker(adjustedPosition);
-        containerRef.current.scrollLeft = adjustedPosition - (containerRef.current.offsetWidth / 2);
-    }
-  }
-
+  const [pictureList, setpictureList ] = useState([]);
+  const [scales, setScales] = useState([]);
+  const [loading, setLoading] = useState(true);
+    
   useEffect(() => {
 /*     axios.get('https://devel.suredatalab.kr/api/accumulateweights/remaining',{
       params : {
@@ -106,17 +74,28 @@ function CumulativeThroughput( props ) {
       }
     })
     .then(response => {
+      let maxHeight = 0;
       console.log(response.data);
       /* "https://raildoctor.suredatalab.kr/resources/data/railroads/railroadmap/c1e7c0a1-e425-4793-9e91-933f003b1cb9.jpeg" */
-      pictureList = response.data.entities;
+      let pictureList_ = response.data.entities;
+      pictureList_.forEach( item => {if(maxHeight < item.height){maxHeight=item.height}});
+      setpictureList(pictureList_);
+      setZoomImgkpMarkerHeight(maxHeight);
     })
     .catch(error => console.error('Error fetching data:', error));
   }, []);
 
   useEffect(() => {
-    console.log("useEffect");
-    let find = findPictureAndPosition( parseInt(kp) / 1000);
-    setViewRailMap(find);
+/*     let find = findPictureAndPosition( parseInt(kp) / 1000);
+    setViewRailMap(find); */
+    try{
+      console.log(findPositionInPictureList(parseInt(kp)/1000, pictureList, scales));
+      let pos = findPositionInPictureList(parseInt(kp)/1000, pictureList, scales).position;
+      setKPMarker({x : findPositionInPictureList(parseInt(kp)/1000, pictureList, scales).position, y : 0});
+      containerRef.current.scrollLeft = pos - (containerRef.current.offsetWidth / 2);
+    }catch(e){
+
+    }
 
     let route = sessionStorage.getItem('route');
     axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
@@ -140,9 +119,104 @@ function CumulativeThroughput( props ) {
     .catch(error => console.error('Error fetching data:', error));
   }, [kp, selectTrack]);
 
+  const handleImageLoad = (index) => {
+    if (!containerRef.current) return;
+
+    const img = containerRef.current.querySelectorAll('img.map')[index];
+    const displayedHeight = img.offsetHeight;
+    const originalHeight = pictureList[index].height;
+    const newScale = displayedHeight / originalHeight;
+    console.log(index);
+    setScales(prevScales => {
+        const updatedScales = [...prevScales];
+        updatedScales[index] = newScale;
+        
+        // 모든 이미지가 로드되었는지 확인
+        if (updatedScales.every(scale => scale !== null)) {
+          setLoading(false); // 모든 이미지가 로드되었으면 로딩 상태를 false로 변경
+        }
+
+        return updatedScales;
+    });
+  };
+
+  const handleDrag = (e, data) => {
+    console.log(e, data);
+    console.log("handleDrag");
+    const newPosition = data.x; // X축 위치
+    const km = findKmFromPosition(newPosition, pictureList, scales);
+    setInputKp(Math.floor(km * 1000));
+    setKPMarker({x : data.x, y : 0});
+  };
+
+  const findKmFromPosition = (position, pictureList, scales) => {
+    let accumulatedWidth = 0;
+
+    for (let i = 0; i < pictureList.length; i++) {
+        const pic = pictureList[i];
+        const scale = scales[i];
+        const scaledWidth = pic.width * scale;
+
+        if (position <= accumulatedWidth + scaledWidth) { // 해당 이미지 범위 안에 위치하는 경우
+            const positionInCurrentPic = (position - accumulatedWidth) / scale;
+            const kmRatio = positionInCurrentPic / pic.width;
+            return pic.beginKp + kmRatio * (pic.endKp - pic.beginKp);
+        }
+        accumulatedWidth += scaledWidth;
+    }
+
+    return null; // 주어진 position 값이 유효하지 않은 경우
+  }
+
+  const findPositionInPictureList = (km, pictureList, scales) => {
+    let accumulatedWidth = 0;
+
+    for (let i = 0; i < pictureList.length; i++) {
+        const pic = pictureList[i];
+        const scale = scales[i];
+
+        if (pic.beginKp <= km && km <= pic.endKp) {
+            const positionInCurrentPic = ((km - pic.beginKp) / (pic.endKp - pic.beginKp)) * pic.width;
+            return {
+                url: pic.url,
+                originalWidth: pic.width,
+                position: Math.round(accumulatedWidth + (positionInCurrentPic * scale)),
+                originalHeight: pic.height
+            };
+        }
+        accumulatedWidth += pic.width * scale;
+    }
+
+    return null;
+  }
+
+  const zoomFindPositionInPictureList = (km, pictureList) => {
+    let accumulatedWidth = 0;
+    for (let pic of pictureList) {
+        if (pic.beginKp <= km && km <= pic.endKp) {
+            const positionInCurrentPic = ((km - pic.beginKp) / (pic.endKp - pic.beginKp)) * pic.width;
+            return {
+                url: pic.url,
+                originalWidth: pic.width,
+                position: Math.round(accumulatedWidth + (positionInCurrentPic)),
+                originalHeight: pic.height
+            };
+        }
+        accumulatedWidth += pic.width;
+    }
+    return null;
+  }
+
   useEffect( () => {
-    adjustPosition();
-  }, [viewRailMap, mapHide])
+    try{
+      console.log(findPositionInPictureList(parseInt(kp)/1000, pictureList, scales));
+      let pos = findPositionInPictureList(parseInt(kp)/1000, pictureList, scales).position;
+      setKPMarker({x : findPositionInPictureList(parseInt(kp)/1000, pictureList, scales).position, y : 0});
+      containerRef.current.scrollLeft = pos - (containerRef.current.offsetWidth / 2);
+    }catch(e){
+
+    }
+  }, [mapHide])
 
   const pathClick = (select) => {
     console.log(select);
@@ -253,10 +327,11 @@ function CumulativeThroughput( props ) {
                 <div className="title">조회일자 </div>
                 <div className="date">
                   <DatePicker 
+                    defaultValue={selectDate}
                     style={RANGEPICKERSTYLE}
                     onChange={(e)=>{
                       if(e === null){
-                        setSelectDate(new Date());
+                        setSelectDate(moment());
                         return;
                       }
                       console.log(e.$d);
@@ -417,23 +492,16 @@ function CumulativeThroughput( props ) {
           </div>
         </div>
         <div className="componentBox">
+          { (loading) ? <div className="loading"><img src={LoadingImg} alt="로딩" />{PICTURE_RENDERING_TEXT}</div> : null }
           <div ref={containerRef} className={classNames("boxProto track",{"hide" : mapHide})} id="trackMapContainer" >
-          {/* {
-            imgLoadArr.map( (img, i) => {
-              return <img width={img.width * IMGSCALING} src={img.src}/>
-            })
-          } */}
           {
-            (viewRailMap) ?
-              <img alt="선로열람도" ref={imgRef} src={viewRailMap.url} onLoad={()=>{
-                adjustPosition();
-                /* setKPMarker(viewRailMap.position); */
-                /* markerElement.style.left = `${result.position}px`;
-                container.scrollLeft = result.position - (container.offsetWidth / 2); */ // km 위치가 컨테이너의 중앙에 오도록 스크롤 조정
-              }} /> : null
+            pictureList.map( (pic, index) => {
+              return <img className="map" key={index} alt="선로열람도" src={`https://raildoctor.suredatalab.kr${pic.fileName}`} onLoad={() => handleImageLoad(index)} />
+            })
           }
-            <div className="guideLine" id="guideLine" style={{left:`${kpMarker}px`}}>
-            </div>
+          <Draggable axis="x" onDrag={handleDrag} position={kpMarker}>
+            <div className="guideLine" id="guideLine"></div>
+          </Draggable>
           </div>
           <div className="dataContainer">
             {
@@ -626,17 +694,17 @@ function CumulativeThroughput( props ) {
             <div className="zoomImgContainer" ref={zoomImgcontainerRef}>
               <div className="kpMarker" style={{
                 left:`${zoomImgkpMarker}px`,
-                height : `${viewRailMap?.originalHeight}px`
+                height : `${zoomImgkpMarkerHeight}px`
               }}></div>
-              {(viewRailMap) ? <img 
-                ref={zoomimgRef} 
-                alt="선로열람도" 
-                src={viewRailMap.url} 
-                onLoad={()=>{
-                  console.log("zoom img onload");
-                  zoomImgAdjustPosition();
-                }}  
-              /> : null}
+              {
+                pictureList.map( (pic, index) => {
+                  return <img className="map" key={index} alt="선로열람도" src={`https://raildoctor.suredatalab.kr${pic.fileName}`} onLoad={() => {
+                    let pos = zoomFindPositionInPictureList(parseInt(kp)/1000, pictureList).position;
+                    setZoomImgKPMarker(pos);
+                    zoomImgcontainerRef.current.scrollLeft = pos - (zoomImgcontainerRef.current.offsetWidth / 2);
+                  }} />
+                })
+              }
             </div>
           </Box>
         </Modal> 

@@ -11,13 +11,13 @@ import Papa from 'papaparse';
 import Box from '@mui/material/Box';
 import { Modal } from "@mui/material";
 import TextArea from "antd/es/input/TextArea";
-import { BOXSTYLE,  DUMMY_RANGE, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE } from "../../constant";
+import { BOXSTYLE,  CHART_RENDERING_TEXT,  DUMMY_RANGE, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE } from "../../constant";
 import { DatePicker, Input, Select } from "antd";
 import PlaceGauge from "../../component/PlaceGauge/PlaceGauge";
 import axios from 'axios';
 import qs from 'qs';
 import { findRange, getRailroadSection, intervalSample } from "../../util";
-
+import LoadingImg from "../../assets/icon/loading/loading.png";
 
 function RailRoughness( props ) {
   const [selectedPath, setSelectedPath] = useState({
@@ -33,6 +33,7 @@ function RailRoughness( props ) {
   const [roughnessChartData, setRoughnessChartData] = useState([]);
   const [selectedGauge, setSelectedGauge] = useState("");
   const [railroadSection, setRailroadSection] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const selectChange = (val) => {
     setSelectRange(val);
@@ -86,9 +87,13 @@ function RailRoughness( props ) {
   useEffect(() => {
     getRailroadSection(setRailroadSection);
   }, []);
+
+  useEffect(() => {
+    setLoading(false);
+  }, [roughnessChartData])
   
   return (
-    <div className="trackDeviation railTrackAlignment" >
+    <div className="railRoughness trackDeviation railTrackAlignment" >
       <div className="railStatusContainer">
         <RailStatus 
           railroadSection={railroadSection} 
@@ -176,6 +181,7 @@ function RailRoughness( props ) {
                   /* for( let rect of findRects  ){ */
                     axios.get("https://raildoctor.suredatalab.kr/"+findRects[0].dataFile, { responseType: 'text' })
                     .then(response => {
+                      setLoading(true);
                       const csvData = response.data;
                       let results = [];
                       Papa.parse(csvData, {
@@ -218,18 +224,8 @@ function RailRoughness( props ) {
             }} >유지보수지침</div>
         </div>
         <div className="componentBox chartBox flex">
-          {/* <div id="trackCanvas" className="trackBox">
-            <div className="curLine"></div>
-            <canvas id="trackDetailCanvas"
-                  ref={trackDetailCanvasRef}
-                  onMouseDown={(e)=>{trackDetailHandleMouseDown(e)}}
-                  onMouseUp={(e)=>{trackDetailHandleMouseUp()}}
-                  onMouseMove={(e)=>{trackDetailHandleMouseMove(e)}}
-                  //onWheel={trackDetailHandleWheel}
-              />
-          </div> */}
+        { (loading) ? <div className="loading"><img src={LoadingImg} alt="로딩" />{CHART_RENDERING_TEXT}</div> : null }
           <div className="chartBox">
-            {/* <div className="curLine"></div> */}
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 width={500}

@@ -6,7 +6,7 @@ import { DatePicker, Input, Radio } from 'antd';
 import * as PDFJS from "pdfjs-dist/build/pdf";
 import * as pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 import RailStatus from "../../component/railStatus/railStatus";
-import { RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_UP_TRACK } from "../../constant";
+import { CHART_RENDERING_TEXT, PICTURE_RENDERING_TEXT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_UP_TRACK } from "../../constant";
 import classNames from "classnames";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import DataExistence from "../../component/dataExistence/dataExistence";
@@ -18,25 +18,28 @@ import { Box } from "@mui/material";
 import { getInchonSpeedData, getRailroadSection, getSeoulSpeedData, nonData } from "../../util";
 import Papa from 'papaparse';
 import EmptyImg from "../../assets/icon/empty/empty5.png";
+import LoadingImg from "../../assets/icon/loading/loading.png";
+import Draggable from 'react-draggable';
 
 window.PDFJS = PDFJS;
 const { RangePicker } = DatePicker;
 
-let pictureList = [];
 function Monitoring( props ) {
   PDFJS.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-  /* const [routeHidden, setRouteHidden] = useState(true); */
   const containerRef = useRef(null);
   const zoomImgcontainerRef = useRef(null);
   const imgRef = useRef(null);
   const zoomimgRef = useRef(null);
+
   const [routeHidden, setRouteHidden] = useState(false);
   const [kp, setKP] = useState(0);
   const [inputKp, setInputKp] = useState(0);
   const [railmapOpen, setRailmapOpen] = useState(false);
   const [viewRailMap, setViewRailMap] = useState(null);
-  const [kpMarker, setKPMarker] = useState(0);
+  const [kpMarker, setKPMarker] = useState({x : 0, y : 0});
+  
   const [zoomImgkpMarker, setZoomImgKPMarker] = useState(0);
+  const [zoomImgkpMarkerHeight, setZoomImgkpMarkerHeight] = useState(0);
   const [selectTrack, setSelectTrack] = useState(STRING_UP_TRACK);
   const inputRef = useRef(null);
 
@@ -51,50 +54,44 @@ function Monitoring( props ) {
   
   const [trackGeo, setTrackGeo] = useState({});
   const [selectDates, setSelectDates] = useState(null);
-  
+  const [pictureList, setpictureList ] = useState([]);
+  const [scales, setScales] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const handleDrag = (e, data) => {
+    console.log(e, data);
+    console.log("handleDrag");
+    const newPosition = data.x; // X축 위치
+    const km = findKmFromPosition(newPosition, pictureList, scales);
+    setInputKp(Math.floor(km * 1000));
+    setKPMarker({x : data.x, y : 0});
+  };
+
+  const findKmFromPosition = (position, pictureList, scales) => {
+    let accumulatedWidth = 0;
+
+    for (let i = 0; i < pictureList.length; i++) {
+        const pic = pictureList[i];
+        const scale = scales[i];
+        const scaledWidth = pic.width * scale;
+
+        if (position <= accumulatedWidth + scaledWidth) { // 해당 이미지 범위 안에 위치하는 경우
+            const positionInCurrentPic = (position - accumulatedWidth) / scale;
+            const kmRatio = positionInCurrentPic / pic.width;
+            return pic.beginKp + kmRatio * (pic.endKp - pic.beginKp);
+        }
+        accumulatedWidth += scaledWidth;
+    }
+
+    return null; // 주어진 position 값이 유효하지 않은 경우
+  }
+
   const pathClick = (select) => {
     console.log(select);
     //getInstrumentationPoint(select);
     //setSelectedPath(select);
     setKP(select.beginKp);
     setInputKp(select.beginKp);
-  }
-
-  const findPictureAndPosition = (km) => {
-    for (let pic of pictureList) {
-        if (pic.beginKp <= km && km <= pic.endKp) {
-            const position = ((km - pic.beginKp) / (pic.endKp - pic.beginKp)) * pic.width;
-            return { 
-                url: `https://raildoctor.suredatalab.kr${pic.fileName}`, 
-                originalWidth: pic.width, 
-                position: Math.round(position),
-                originalHeight: pic.height
-            };
-        }
-    }
-    return null;
-  }
-
-  const adjustPosition = () => {
-    if (imgRef.current) {
-        const scaleFactor = imgRef.current.clientWidth / viewRailMap.originalWidth;
-        const adjustedPosition = viewRailMap.position * scaleFactor;
-        setKPMarker(adjustedPosition);
-        containerRef.current.scrollLeft = adjustedPosition - (containerRef.current.offsetWidth / 2);
-    }
-  }
-
-  const zoomImgAdjustPosition = () => {
-    if (zoomimgRef.current) {
-        const scaleFactor = zoomimgRef.current.clientWidth / viewRailMap.originalWidth;
-        const adjustedPosition = viewRailMap.position * scaleFactor;
-        /* setKPMarker(adjustedPosition); */
-        /* zoomImgcontainerRef.current.scrollLeft = adjustedPosition - (zoomImgcontainerRef.current.offsetWidth / 2); */
-        let center = (zoomImgcontainerRef.current.offsetWidth / 2);
-        console.log(center);
-        setZoomImgKPMarker(adjustedPosition);
-        zoomImgcontainerRef.current.scrollLeft = adjustedPosition - center;
-    }
   }
 
   const getTrackGeo = ( kp_ ) => {
@@ -120,15 +117,18 @@ function Monitoring( props ) {
   }
 
   useEffect( ()=> {
-    console.log("adjustPosition");
-    adjustPosition();
-  },[viewRailMap])
+    /* let find = findPictureAndPosition( parseInt(kp) / 1000 );
+    setViewRailMap(find); */
+    try{
+      console.log(findPositionInPictureList(parseInt(kp)/1000, pictureList, scales));
+      let pos = findPositionInPictureList(parseInt(kp)/1000, pictureList, scales).position;
+      setKPMarker({x : findPositionInPictureList(parseInt(kp)/1000, pictureList, scales).position, y : 0});
+      containerRef.current.scrollLeft = pos - (containerRef.current.offsetWidth / 2);
+    }catch(e){
 
-  useEffect( ()=> {
-    let find = findPictureAndPosition( parseInt(kp) / 1000 );
-    setViewRailMap(find);
+    }
     getTrackGeo(kp);
-  },[kp])
+  },[kp]);
 
   useEffect( ()=>{
     getRailroadSection(setRailroadSection);
@@ -149,9 +149,13 @@ function Monitoring( props ) {
       }
     })
     .then(response => {
+      let maxHeight = 0;
       console.log(response.data);
       /* "https://raildoctor.suredatalab.kr/resources/data/railroads/railroadmap/c1e7c0a1-e425-4793-9e91-933f003b1cb9.jpeg" */
-      pictureList = response.data.entities;
+      let pictureList_ = response.data.entities;
+      pictureList_.forEach( item => {if(maxHeight < item.height){maxHeight=item.height}});
+      setpictureList(pictureList_);
+      setZoomImgkpMarkerHeight(maxHeight);
     })
     .catch(error => console.error('Error fetching data:', error));
   }, [] )
@@ -195,6 +199,65 @@ function Monitoring( props ) {
     .catch(error => console.error('Error fetching data:', error));
   }
 
+  const handleImageLoad = (index) => {
+    if (!containerRef.current) return;
+
+    const img = containerRef.current.querySelectorAll('img.map')[index];
+    const displayedHeight = img.offsetHeight;
+    const originalHeight = pictureList[index].height;
+    const newScale = displayedHeight / originalHeight;
+    setScales(prevScales => {
+        const updatedScales = [...prevScales];
+        updatedScales[index] = newScale;
+        console.log(updatedScales);
+        // 모든 이미지가 로드되었는지 확인
+        if (updatedScales.every(scale => scale !== null && scale !== undefined)) {
+          setLoading(false); // 모든 이미지가 로드되었으면 로딩 상태를 false로 변경
+        }
+
+        return updatedScales;
+    });
+  };
+
+  const findPositionInPictureList = (km, pictureList, scales) => {
+    let accumulatedWidth = 0;
+
+    for (let i = 0; i < pictureList.length; i++) {
+        const pic = pictureList[i];
+        const scale = scales[i];
+
+        if (pic.beginKp <= km && km <= pic.endKp) {
+            const positionInCurrentPic = ((km - pic.beginKp) / (pic.endKp - pic.beginKp)) * pic.width;
+            return {
+                url: pic.url,
+                originalWidth: pic.width,
+                position: Math.round(accumulatedWidth + (positionInCurrentPic * scale)),
+                originalHeight: pic.height
+            };
+        }
+        accumulatedWidth += pic.width * scale;
+    }
+
+    return null;
+  }
+
+  const zoomFindPositionInPictureList = (km, pictureList) => {
+    let accumulatedWidth = 0;
+    for (let pic of pictureList) {
+        if (pic.beginKp <= km && km <= pic.endKp) {
+            const positionInCurrentPic = ((km - pic.beginKp) / (pic.endKp - pic.beginKp)) * pic.width;
+            return {
+                url: pic.url,
+                originalWidth: pic.width,
+                position: Math.round(accumulatedWidth + (positionInCurrentPic)),
+                originalHeight: pic.height
+            };
+        }
+        accumulatedWidth += pic.width;
+    }
+    return null;
+  }
+
   return (
     <div className="monitoringContainer" >
         <div className="railStatusContainer">
@@ -229,18 +292,6 @@ function Monitoring( props ) {
               </div>
               <div className="line"></div>
               <div className="dataOption">
-                <div className="title">상하선 </div>
-                <div className="track">
-                  <Radio.Group style={RADIO_STYLE} defaultValue={selectTrack} value={selectTrack}
-                    onChange={(e)=>{setSelectTrack(e.target.value)}}
-                  >
-                    <Radio value={STRING_UP_TRACK}>상선</Radio>
-                    <Radio value={STRING_DOWN_TRACK}>하선</Radio>
-                  </Radio.Group>
-                </div>
-              </div>
-              <div className="line"></div>
-              <div className="dataOption">
                 <div className="title">KP </div>
                 <div className="date">
                   <Input 
@@ -263,9 +314,16 @@ function Monitoring( props ) {
                   />
                 </div>
               </div>
+              <div className="line"></div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
-              {nonData(trackGeo?.shapeDisplay)} /
-                R={nonData(trackGeo?.direction)} {nonData(trackGeo?.radius)} (C={nonData(trackGeo?.cant)}, S={nonData(trackGeo?.slack)})
+                <div className="title border">상선 </div>
+                {nonData(trackGeo?.shapeDisplay)} /
+                  R={nonData(trackGeo?.direction)} {nonData(trackGeo?.radius)} (C={nonData(trackGeo?.cant)}, S={nonData(trackGeo?.slack)})
+              </div>
+              <div className="dataOption" style={{marginLeft:"10px"}}>
+                <div className="title border">하선 </div>
+                {nonData(trackGeo?.shapeDisplay)} /
+                  R={nonData(trackGeo?.direction)} {nonData(trackGeo?.radius)} (C={nonData(trackGeo?.cant)}, S={nonData(trackGeo?.slack)})
               </div>
               <div className="line"></div>
               <div className="dataOption">
@@ -296,29 +354,18 @@ function Monitoring( props ) {
                 }} >선로열람도 상세보기</div>
               </div>
             </div>
-            <div ref={containerRef} className={classNames("componentBox separationBox",{hidden : routeHidden} )} style={{overflow: "auto"}}  id="viewMapScroll">
+            <div ref={containerRef} className={classNames("componentBox separationBox",{hidden : routeHidden} )} style={{overflow: "auto"}}  id="viewMapScroll"
+            >
+              { (loading) ? <div className="loading"><img src={LoadingImg} alt="로딩" />{PICTURE_RENDERING_TEXT}</div> : null }
               <div className="boxProto track">
-                {/* <canvas id="trackDetailCanvas"
-                    ref={trackDetailCanvasRef}
-                    onMouseDown={(e)=>{trackDetailHandleMouseDown(e)}}
-                    onMouseUp={(e)=>{trackDetailHandleMouseUp()}}
-                    onMouseMove={(e)=>{trackDetailHandleMouseMove(e)}}
-                /> */}
-                {/* <TrackMap 
-                  open={railmapOpen} 
-                  popupClose={()=>{setRailmapOpen(false)}}
-                  kp={kp} 
-                /> */}
                 {
-                  (viewRailMap) ?
-                    <img alt="선로열람도" ref={imgRef} src={viewRailMap.url} onLoad={()=>{
-                      adjustPosition();
-                      /* setKPMarker(viewRailMap.position); */
-                      /* markerElement.style.left = `${result.position}px`;
-                      container.scrollLeft = result.position - (container.offsetWidth / 2); */ // km 위치가 컨테이너의 중앙에 오도록 스크롤 조정
-                    }} /> : null
+                  pictureList.map( (pic, index) => {
+                    return <img className="map" key={index} alt="선로열람도" src={`https://raildoctor.suredatalab.kr${pic.fileName}`} onLoad={() => handleImageLoad(index)} />
+                  })
                 }
-                <div className="kpMarker" style={{left:`${kpMarker}px`}}></div>
+                <Draggable axis="x" onDrag={handleDrag} position={kpMarker}>
+                  <div className="kpMarker" ></div>
+                </Draggable>
               </div>
             </div>
           </div>
@@ -402,17 +449,17 @@ function Monitoring( props ) {
           <div className="zoomImgContainer" ref={zoomImgcontainerRef}>
             <div className="kpMarker" style={{
               left:`${zoomImgkpMarker}px`,
-              height : `${viewRailMap?.originalHeight}px`
+              height : `${zoomImgkpMarkerHeight}px`
             }}></div>
-            {(viewRailMap) ? <img 
-              ref={zoomimgRef} 
-              alt="선로열람도" 
-              src={viewRailMap.url} 
-              onLoad={()=>{
-                console.log("zoom img onload");
-                zoomImgAdjustPosition();
-              }}  
-            /> : null}
+              {
+                pictureList.map( (pic, index) => {
+                  return <img className="map" key={index} alt="선로열람도" src={`https://raildoctor.suredatalab.kr${pic.fileName}`} onLoad={() => {
+                    let pos = zoomFindPositionInPictureList(parseInt(kp)/1000, pictureList).position;
+                    setZoomImgKPMarker(pos);
+                    zoomImgcontainerRef.current.scrollLeft = pos - (zoomImgcontainerRef.current.offsetWidth / 2);
+                  }} />
+                })
+              }
           </div>
         </Box>
       </Modal> 

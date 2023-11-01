@@ -212,7 +212,7 @@ function RailTrackAlignment( props ) {
               </div>
               <div className="line"></div>
               <div className="dataOption">
-                <button onClick={()=>{
+                <button className="search" onClick={()=>{
                   let track_ = "";
                   if( selectTrack === STRING_UP_TRACK && selectDir === STRING_TRACK_DIR_LEFT ){
                     track_ = STRING_UP_TRACK_LEFT;

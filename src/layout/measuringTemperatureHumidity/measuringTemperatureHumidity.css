@@ -14,6 +14,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 
 .trackDeviation .componentBox .position{
@@ -185,4 +186,26 @@
     height: 11px;
     margin-left: 5px;
     cursor: pointer;
+}
+
+.measuringTemperatureHumidity .componentBox.chartBox .loading{
+    position: absolute;
+    top: 0;
+    border: 0;
+    width: 100%;
+    height: 100%;
+    background: #00000094;
+    border-radius: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+    color: white;
+    opacity: 0;
+    animation: fadeIn 2s forwards;
+}
+
+.measuringTemperatureHumidity .componentBox.chartBox .loading img{
+    height: 40px;
+    margin-right: 25px;
 }

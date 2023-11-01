@@ -43,3 +43,30 @@
 .railTrackAlignment .optionBox.position .optionValue{
     height: 100%;
 }
+
+.railRoughness .componentBox.chartBox{
+    position: relative;
+}
+
+.railRoughness .componentBox.chartBox .loading{
+    position: absolute;
+    top: 10px;
+    border: 0;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    background: #00000094;
+    border-radius: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+    color: white;
+    z-index: 1;
+    opacity: 0;
+    animation: fadeIn 2s forwards;
+}
+
+.railRoughness .componentBox.chartBox .loading img{
+    height: 40px;
+    margin-right: 25px;
+}

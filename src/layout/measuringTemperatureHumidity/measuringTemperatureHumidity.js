@@ -4,12 +4,14 @@ import RailStatus from "../../component/railStatus/railStatus";
 import 'dayjs/locale/ko';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Checkbox, Input, Select, DatePicker } from "antd";
-import { CHART_FORMAT_RAW, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, colors } from "../../constant";
+import { CHART_FORMAT_RAW, CHART_RENDERING_TEXT, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, colors } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
 import { convertObjectToArray_, convertToCustomFormat, deleteNonObj, deleteObjData, findRange, getRailroadSection, nonData, tempDataName } from "../../util";
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
+import { isEmpty } from "lodash";
+import LoadingImg from "../../assets/icon/loading/loading.png";
 
 const { RangePicker } = DatePicker;
 const dataOption = [
@@ -35,6 +37,7 @@ function MeasuringTemperatureHumidity( props ) {
   const [railroadSection, setRailroadSection] = useState([]);
   
   const [trackGeo, setTrackGeo] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (value) => {
     console.log(`selected ${value}`);
@@ -42,6 +45,9 @@ function MeasuringTemperatureHumidity( props ) {
   };
 
   const setSearchRange = (date) => {
+    if( date === null ){
+      return;
+    }
     date[0].$d.setHours(0, 0, 0, 0);
     date[1].$d.setHours(23, 59, 59, 0);
     setSearchRangeDate(date);
@@ -100,6 +106,7 @@ function MeasuringTemperatureHumidity( props ) {
     })
     .then(response => {
       console.log(response.data);
+      setLoading(true);
       let sensorName = "";
       for( let sensor of sensorList ){
         if( sensor.deviceId === selectDeviceID ){
@@ -109,6 +116,11 @@ function MeasuringTemperatureHumidity( props ) {
       let tsAry = response.data.measureTs;
       for( let select of checkboxSelects ){
         let dataKey = `${selectDeviceID}_${select}`;
+
+        chartseries_ = chartseries_.filter(series => !(series.deviceID === selectDeviceID && series.item === tempDataName(select)));
+        deleteObjData(chartDataObj, selectDeviceID);
+        deleteNonObj(chartDataObj);
+
         if( select === STRING_RAIL_TEMPERATURE ){
           let dataAry = response.data.railTemperature;
           for( let i in dataAry ){
@@ -227,6 +239,10 @@ function MeasuringTemperatureHumidity( props ) {
     .catch(error => console.error('Error fetching data:', error));
   }, [railroadSection])
   
+  useEffect( ()=>{
+    setLoading(false);
+  }, [chartData] )
+
   return (
     <div className="trackDeviation measuringTemperatureHumidity" >
       <div className="scroll">
@@ -289,7 +305,7 @@ function MeasuringTemperatureHumidity( props ) {
               </div>
               <div className="line"></div>
               <div className="dataOption">
-                <button onClick={()=>{
+                <button className="search" onClick={()=>{
                   searchTempData();
                 }}>조회</button>
               </div>
@@ -309,6 +325,7 @@ function MeasuringTemperatureHumidity( props ) {
                         setChartseries(chartseries_);
                         deleteObjData(chartDataObj, point.deviceID);
                         deleteNonObj(chartDataObj);
+                        console.log("isEmpty(chartDataObj)",isEmpty(chartDataObj));
                       }}
                     />
                   </div>
@@ -317,6 +334,7 @@ function MeasuringTemperatureHumidity( props ) {
             </div>          
           </div>
           <div className="componentBox chartBox flex">
+            { (loading) ? <div className="loading"><img src={LoadingImg} alt="로딩" />{CHART_RENDERING_TEXT}</div> : null }
             {
               (chartData.length < 1) ? <div className="emptyBox">
                 <img src={EmptyImg} />

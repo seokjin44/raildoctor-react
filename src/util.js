@@ -4,10 +4,17 @@ import qs from 'qs';
 import Papa from 'papaparse';
 
 export const dateFormat = ( date ) => {
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하기 때문에 +1이 필요합니다.
-    const dd = String(date.getDate()).padStart(2, '0');
-    if( isNaN(yyyy) || isNaN(mm) || isNaN(dd) ){
+    let yyyy = '';
+    let mm = '';
+    let dd = '';
+    try{
+        yyyy = date.getFullYear();
+        mm = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하기 때문에 +1이 필요합니다.
+        dd = String(date.getDate()).padStart(2, '0');
+        if( isNaN(yyyy) || isNaN(mm) || isNaN(dd) ){
+            return '-';
+        }
+    }catch(e){
         return '-';
     }
     return `${yyyy}-${mm}-${dd}`;
@@ -734,5 +741,32 @@ export const deleteNonObj = (data) => {
         if (Object.keys(data[key]).length === 0 && data[key].constructor === Object) {
             delete data[key];
         }
+    }
+}
+
+export const isEmpty = (obj) => {
+    return Object.keys(obj).length === 0;
+}
+
+export const getYearStartEnd = (year) => {
+    const startDate = new Date(year, 0, 1);  // 0은 1월을 의미합니다. JavaScript의 월은 0부터 시작합니다.
+    const endDate = new Date(year, 11, 31);  // 11은 12월을 의미합니다.
+  
+    return {
+      start: startDate,
+      end: endDate
+    };
+}
+
+export const checkDateFormat = (str) => {
+    const yearMonthPattern = /^\d{4}-\d{2}$/;
+    const yearMonthDayPattern = /^\d{4}-\d{2}-\d{2}$/;
+
+    if (yearMonthPattern.test(str)) {
+        return 'yyyy-mm';
+    } else if (yearMonthDayPattern.test(str)) {
+        return 'yyyy-mm-dd';
+    } else {
+        return 'unknown format';
     }
 }

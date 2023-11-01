@@ -301,7 +301,7 @@ function RailProfile( props ) {
                 </div>
               </div> */}
               <div className="dataOption">
-                <button onClick={()=>{
+                <button className="search" onClick={()=>{
                   let route = sessionStorage.getItem('route');
                   axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles`,{
                     paramsSerializer: params => {

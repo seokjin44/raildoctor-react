@@ -15,7 +15,7 @@ import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, convertToNumber2, dateFormat, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, numberWithCommas, trackLeftRightToString, trackNumberToString, trackToString, wearModelTableBody, wearModelTableHeader1, wearModelTableHeader2 } from "../../util";
+import { convertToCustomFormat, convertToNumber2, dateFormat, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, mgtToM, numberWithCommas, trackLeftRightToString, trackNumberToString, trackToString, wearModelTableBody, wearModelTableHeader1, wearModelTableHeader2 } from "../../util";
 import lodash from "lodash";
 
 const { TextArea } = Input;
@@ -36,7 +36,7 @@ function WearMaintenance( props ) {
     startDate: new Date().getTime() - (31536000000 * 7),
     endDate: new Date().getTime(),
     startMGT: 0,
-    endMGT: 3000
+    endMGT: 1200
   });
   const [wear3dData, setWear3dData] = useState([]);
   const [viewWear3dData, setViewWear3dData] = useState([]);
@@ -58,6 +58,9 @@ function WearMaintenance( props ) {
   const [upTrackMeasurePoint, setUpTrackMeasurePoint] = useState([]);
   const [downTrackMeasurePoint, setDownTrackMeasurePoint] = useState([]);
   
+  const [dateSliderMinMax, setDateSliderMinMax] = useState({min : 32472144000000, max : 0});
+  const [mgtSliderMinMax, setMGTSliderMinMax] = useState({min : 50000000000, max : 0});
+
   const handleClose = () => {
     setOpen(false);
   }
@@ -67,8 +70,72 @@ function WearMaintenance( props ) {
 
   const pathClick = (select) => {
     console.log(select);
-    //getInstrumentationPoint(select);
     setSelectedPath(select);
+
+    let dateMinMax = {min : 32472144000000, max : 0};
+    let mgtMinMax = {min : 50000000000, max : 0};
+
+    let beginKp = select.beginKp / 1000;
+    let endKp = select.endKp / 1000;
+
+    let route = sessionStorage.getItem('route');
+    let param = {
+      begin_kp : [beginKp],
+      end_kp : [endKp],
+      rail_track : STRING_DOWN_TRACK,
+      railroad_name : route
+    }
+    console.log(param);
+    axios.get('https://raildoctor.suredatalab.kr/api/railwears/time_and_weight',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
+      },
+      params : param
+    })
+    .then(response => {
+      console.log(response.data);
+      let dateMin = new Date(response.data.minTs).getTime();
+      let dateMax = new Date(response.data.maxTs).getTime();
+      if( dateMinMax.min > dateMin ){ dateMinMax.min = dateMin; }
+      if( dateMinMax.max < dateMax ){ dateMinMax.max = dateMax; }
+
+      let mgtMin = response.data.minAccumulateWeight;
+      let mgtMax = response.data.maxAccumulateWeight;
+      if( mgtMinMax.min > mgtMin ){ mgtMinMax.min = mgtMin; }
+      if( mgtMinMax.max < mgtMax ){ mgtMinMax.max = mgtMax; }
+      setDateSliderMinMax(dateMinMax);
+      setMGTSliderMinMax(mgtMinMax);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+
+    param = {
+      begin_kp : [beginKp],
+      end_kp : [endKp],
+      rail_track : STRING_UP_TRACK,
+      railroad_name : route
+    }
+    console.log(param);
+    axios.get('https://raildoctor.suredatalab.kr/api/railwears/time_and_weight',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
+      },
+      params : param
+    })
+    .then(response => {
+      console.log(response.data);
+      let dateMin = new Date(response.data.minTs).getTime();
+      let dateMax = new Date(response.data.maxTs).getTime();
+      if( dateMinMax.min > dateMin ){ dateMinMax.min = dateMin; }
+      if( dateMinMax.max < dateMax ){ dateMinMax.max = dateMax; }
+
+      let mgtMin = response.data.minAccumulateWeight;
+      let mgtMax = response.data.maxAccumulateWeight;
+      if( mgtMinMax.min > mgtMin ){ mgtMinMax.min = mgtMin; }
+      if( mgtMinMax.max < mgtMax ){ mgtMinMax.max = mgtMax; }
+      setDateSliderMinMax(dateMinMax);
+      setMGTSliderMinMax(mgtMinMax);
+    })
+    .catch(error => console.error('Error fetching data:', error));
   }
   
   const timeFormatDate = (milliSeconds) => {
@@ -98,42 +165,6 @@ function WearMaintenance( props ) {
       
     });
   };
-
-  const getWearInfo = () => {
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
-    var urlencoded = new URLSearchParams();
-    urlencoded.append("railroad_id", "0");
-    urlencoded.append("location", document.getElementById("wearSearchPoint").value);
-    urlencoded.append("start_date", document.getElementById("startWearDate").innerText);
-    urlencoded.append("end_date", document.getElementById("endWearDate").innerText);
-    urlencoded.append("start_mgt", document.getElementById("startWearMGT").innerText);
-    urlencoded.append("end_mgt", document.getElementById("endWearMGT").innerText);
-
-    var requestOptions = {
-      method: 'POST',
-      //redirect: 'follow',
-      headers: myHeaders,
-      body: urlencoded
-    };
-
-    fetch("/RailDoctor/wearInfo/getWearInfo", requestOptions)
-      .then(response => {
-        return response.json(); //Promise 반환
-      }).then(result => {
-        console.log(result);
-        this.setState({
-          wearData: {
-            directWearInfo: result.direct_wear,
-            sideWearInfo: result.side_wear,
-          }
-        });
-        console.log(this.setState.wearData);
-      }).catch(error => {
-        console.log('error', error)
-      });
-  }
 
   const onClickWearSearch = () => {
     /* getWearInfo(); */
@@ -416,18 +447,18 @@ function WearMaintenance( props ) {
                       <div className="flex bothEnds valueBox">
                         <label className="textBold title">계측기간</label>
                         <div className="flex dataText">
-                          <div id="startWearDate">{timeFormatDate(wearSearchCondition.startDate)}</div>
+                          <div id="startWearDate">{timeFormatDate(dateSliderMinMax.min)}</div>
                           <div>~</div>
-                          <div id="endWearDate">{timeFormatDate(wearSearchCondition.endDate)}</div>
+                          <div id="endWearDate">{timeFormatDate(dateSliderMinMax.max)}</div>
                         </div>
                       </div>
                       <div className="flex" tyle={{height:'30px'}}>
                         <div className="sliderContainer">
                           <Slider 
                             range={{ draggableTrack: true }} 
-                            min={new Date().getTime() - (31536000000 * 7)} 
-                            max={new Date().getTime()} 
-                            defaultValue={[new Date().getTime() - (31536000000 * 7), new Date().getTime()]} tooltip={{ open: false, }} 
+                            min={dateSliderMinMax.min} 
+                            max={dateSliderMinMax.max} 
+                            defaultValue={[dateSliderMinMax.min, dateSliderMinMax.max]} tooltip={{ open: false, }} 
                             onChange={onChangeTimeSlider} step={86400000}/>
                         </div>
                       </div>
@@ -436,9 +467,9 @@ function WearMaintenance( props ) {
                       <div className="flex bothEnds valueBox">
                         <label className="textBold title">통과톤수</label>
                         <div className="flex dataText">
-                          <div id="startWearMGT">{wearSearchCondition.startMGT}</div>
+                          <div id="startWearMGT">{mgtToM(mgtSliderMinMax.min)}</div>
                           <div>~</div>
-                          <div id="endWearMGT">{wearSearchCondition.endMGT}</div>
+                          <div id="endWearMGT">{mgtToM(mgtSliderMinMax.max)}</div>
                           <div style={{marginLeft: "5px"}}>MGT</div>
                         </div>
                       </div>
@@ -446,9 +477,9 @@ function WearMaintenance( props ) {
                         <div className="sliderContainer">
                           <Slider 
                             range={{ draggableTrack: true }} 
-                            min={0} 
-                            max={3000} 
-                            defaultValue={[0, 3000]} 
+                            min={mgtSliderMinMax.min} 
+                            max={mgtSliderMinMax.max} 
+                            defaultValue={[mgtSliderMinMax.min, mgtSliderMinMax.max]} 
                             tooltip={{ open: false, }} 
                             onChange={onChangeMgtSlider} step={50}/>
                         </div>

@@ -10,10 +10,9 @@ import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import { Modal } from "@mui/material";
 import axios from 'axios';
 import qs from 'qs';
-import { dateFormat, getRailroadSection, transposeObjectToArray } from "../../util";
+import { dateFormat, getRailroadSection, isEmpty, transposeObjectToArray } from "../../util";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 
-let dataExitsDate = {};
 function TrackDeviation( props ) {
   const [selectedPath, setSelectedPath] = useState({
     start_station_name : "",
@@ -38,6 +37,8 @@ function TrackDeviation( props ) {
   const [railroadSection, setRailroadSection] = useState([]);
 
   const [viewMeasureDate, setViewMeasureDate] = useState(null);
+  const [dataExitsDate, setDataExitsDate] = useState({});
+  const [mode, setMode] = useState('month');
 
   const pathClick = (select) => {
     console.log(select);
@@ -57,28 +58,32 @@ function TrackDeviation( props ) {
     end = (end>0) ? end/1000 : end;
     console.log(start,end);
     let route = sessionStorage.getItem('route');
+    let param = {
+      begin_kp : [start],
+      end_kp : [end],
+      rail_track : selectTrack,
+      begin_measure_ts : new Date(range.start).toISOString(),
+      end_measure_ts : new Date(range.end).toISOString(),
+      railroad_name : route
+    }
+    console.log(param);
+    let dataExitsDate_ ={};
     axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/ts`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat' })
       },
-      params : {
-        begin_kp : [start],
-        end_kp : [end],
-        rail_track : selectTrack,
-        begin_measure_ts : new Date(range.start).toISOString(),
-        end_measure_ts : new Date(range.end).toISOString(),
-        railroad_name : route
-      }
+      params : param
     })
     .then(response => {
       console.log(response.data);
       for( let ts of response.data.listTs ){
-        if( !dataExitsDate[ dateFormat(new Date(ts)) ] ){
-          dataExitsDate[ dateFormat(new Date(ts)) ] = [];
-          dataExitsDate[ dateFormat(new Date(ts)) ].push(ts);
+        if( !dataExitsDate_[ dateFormat(new Date(ts)) ] ){
+          dataExitsDate_[ dateFormat(new Date(ts)) ] = [];
+          dataExitsDate_[ dateFormat(new Date(ts)) ].push(ts);
         }
-        console.log(dataExitsDate);
+        console.log(dataExitsDate_);
       }
+      setDataExitsDate(dataExitsDate_);
     })
     .catch(error => console.error('Error fetching data:', error));
   }
@@ -96,13 +101,26 @@ function TrackDeviation( props ) {
   }
 
   const handleCalendarChange = (date) => {
-    setSelectMeasureDate(dateFormat(date.$d));
     setViewMeasureDate(date);
+    if( date === null ){
+      return;
+    }
+    setMode('month');
+    setSelectMeasureDate(dateFormat(date.$d));
   };
 
   const selectChange = (val) => {
     setSelectRange(val);
   }
+
+  const handlePanelChange = (value, newMode) => {
+    if (mode === 'month') {
+      setMode('date');
+    } else {
+      setMode('month');
+    }
+  };
+
   
   const dataOption = [
     { label: '고저틀림', value: STRING_HEIGHT },
@@ -191,14 +209,15 @@ function TrackDeviation( props ) {
               <div className="dataOption">
                 <div className="title">측정일자 </div>
                 <div className="date">
-                  {/* <RangePicker 
-                    style={RANGEPICKERSTYLE}
-                  /> */}
+                { (isEmpty(dataExitsDate)) ? <div className="alertText" >검색된 날짜가 없습니다</div> : null }
                   <DatePicker 
+                    disabled={isEmpty(dataExitsDate)}
                     value={viewMeasureDate}
                     style={RANGEPICKERSTYLE} 
                     disabledDate={disabledDate}
                     onChange={handleCalendarChange}
+                    mode={mode} 
+                    onPanelChange={handlePanelChange}
                   />
                 </div>
               </div>
@@ -267,7 +286,7 @@ function TrackDeviation( props ) {
                       try{
                         dataAry = transposeObjectToArray(response.data);
                       }catch(e){
-                        alert("데이터가 없습니다.");
+                        /* alert("데이터가 없습니다."); */
                         return;
                       }
                       console.log(dataAry);

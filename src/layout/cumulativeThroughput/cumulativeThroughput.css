@@ -178,10 +178,10 @@
     height: calc(100%);
     position: absolute;
     background-color: #ff0000;
-    left: 295px;
+    left: 0px;
     top: 0px;
     border-radius: 5px;
-    /* cursor: e-resize; */
+    cursor: ew-resize;
 }
 
 .cumulativeThroughput .componentBox .guideLine .dataContainer{

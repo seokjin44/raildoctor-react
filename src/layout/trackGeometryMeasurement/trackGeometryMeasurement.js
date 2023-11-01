@@ -6,21 +6,23 @@ import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarC
   ScatterChart, Scatter, Label
 } from 'recharts';
 import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
-import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, EMPTY_MEASURE_OBJ, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE, STRING_ACC_KEY, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_LATERAL_LOAD_KEY, STRING_LONG_MEASURE, STRING_SHORT_MEASURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, colors } from "../../constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, EMPTY_MEASURE_OBJ, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE, STRING_ACC_KEY, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_LATERAL_LOAD_KEY, STRING_LONG_MEASURE, STRING_SHORT_MEASURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, TRACK_GEO_LOADING_TEXT, colors } from "../../constant";
 import PlacePosition from "../../component/PlacePosition/PlacePosition";
 import axios from 'axios';
 import qs from 'qs';
-import { convertObjectToArray, convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, findRange, formatTime, getFirstDateOfThreeMonthsAgo, getRailroadSection, numberToText, trackDataName, trackLeftRightToString, valueOneOrNone } from "../../util";
+import { checkDateFormat, convertObjectToArray, convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, findRange, formatTime, getFirstDateOfThreeMonthsAgo, getRailroadSection, getYearStartEnd, isEmpty, numberToText, trackDataName, trackLeftRightToString, valueOneOrNone } from "../../util";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
 import lodash from "lodash";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
+import LoadingImg from "../../assets/icon/loading/loading.png";
+import moment from "moment";
 
 dayjs.extend(customParseFormat);
 const { RangePicker } = DatePicker;
 
-let dataExitsDate = {};
+/* let dataExitsDate = {}; */
 let todayChartDataObj = {};
 let dailyChartDataObj = {};
 let monthlyChartDataObj = {};
@@ -65,8 +67,12 @@ function TrackGeometryMeasurement( props ) {
   const [todayChartseries, setTodayChartseries] = useState([]);
   const [dailyChartseries, setDailyChartseries] = useState([]);
   const [monthlyChartseries, setMonthlyChartseries] = useState([]);
-  const [timeOptions, setTimeOptions] = useState([]);
+
+  const [dataExitsDate, setDataExitsDate] = useState({});
+
   const [railroadSection, setRailroadSection] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState('month');
 
   const disabledDate = (current) => {
     return !dataExitsDate[dateFormat(current.$d)];
@@ -260,36 +266,13 @@ function TrackGeometryMeasurement( props ) {
   }
 
   const handlePanelChange = (value, mode) => {
-    console.log(value, mode); // value는 현재 선택된 날짜, mode는 현재 패널 모드
-    calendarDate = value.$d;
-    let begin = getFirstDateOfThreeMonthsAgo( calendarDate.getMonth(), calendarDate.getFullYear() );
-    /* let selectPoints_ = [...selectPoints]; */
-    /* for( let point of selectPoints_ ){ */
-    console.log(begin);
-    let point = pointsInfo[selectPoint];
-    axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/dates',{
-      params : {
-        sensorId : selectPoint,
-        beginTs : begin.toISOString()
-      },
-      paramsSerializer: params => {
-        return qs.stringify(params, { format: 'RFC3986' })
-      }
-    })
-    .then(response => {
-      console.log("summary! ::: ", response.data.summary);
-      dataExitsDate = {};
-      for( let summary of response.data.summary ){
-        summary['sensorId'] = point.sensorId;
-        summary['displayName'] = point.displayName;
-        if( !dataExitsDate[ dateFormat(new Date(summary.measureTs)) ] ){
-          dataExitsDate[ dateFormat(new Date(summary.measureTs)) ] = [];
-        }
-        dataExitsDate[ dateFormat(new Date(summary.measureTs)) ].push(formatTime(new Date(summary.measureTs)));
-      }
-    })
-    .catch(error => console.error('Error fetching data:', error));
-    /* } */
+    /* console.log(value, mode); */ // value는 현재 선택된 날짜, mode는 현재 패널 모드
+    /* calendarDate = value.$d; */
+    setViewMeasureDate(value);
+    console.log(value, mode);
+    if (mode === 'date') {
+      setMode('date');
+    }
   }
 
   const getColor = (index) => {
@@ -301,11 +284,18 @@ function TrackGeometryMeasurement( props ) {
     setFindDatas(e.target.value);
   }
 
-  const handleCalendarChange = (date) => {
+  const handleCalendarChange = (date, stringDate) => {
+    setViewMeasureDate(date);
+    if( date === null ){
+      return;
+    }
+    console.log("handleCalendarChange");
+    console.log(date, stringDate);
+    setMode('month');
     let yyyymmdd = dateFormat(date.$d);
     setSelectMeasureDate(yyyymmdd);
-    setViewMeasureDate(date);
-    let timeOptions_ = [];
+    
+    /* let timeOptions_ = [];
     for( let time of dataExitsDate[yyyymmdd] ){
       let option = {
         label : time,
@@ -318,7 +308,7 @@ function TrackGeometryMeasurement( props ) {
       if (a.value > b.value) return 1;
       return 0;
     });
-    setTimeOptions(timeOptions_);
+    setTimeOptions(timeOptions_); */
   };
 
   const dataOption = [
@@ -336,9 +326,9 @@ function TrackGeometryMeasurement( props ) {
   }, []);
 
   useEffect(() => {
+    console.log("selectPoint Change");
     setSelectMeasureDate(null);
     setViewMeasureDate(null);
-    setTimeOptions([]);
     /* setSelectMeasureTime(""); */
   }, [selectPoint]);
   
@@ -403,6 +393,36 @@ function TrackGeometryMeasurement( props ) {
     pathMeasurefind();
   }, [shortMeasureList, longMeasureList] )
 
+  const getMeasureDates = (sensorId) => {
+    setLoading(true);
+    let dates = getYearStartEnd( calendarDate.getFullYear() );
+    axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/dates',{
+      params : {
+        sensorId : sensorId,
+        beginTs : new Date("2000-01-01").toISOString(),
+        endTs : dates.end.toISOString()
+      },
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      }
+    })
+    .then(response => {
+      console.log("summary! ::: ", response.data.summary);
+      let dataExitsDate_ = {};
+      for( let summary of response.data.summary ){
+        summary['sensorId'] = pointsInfo[sensorId].sensorId;
+        summary['displayName'] = pointsInfo[sensorId].displayName;
+        if( !dataExitsDate_[ dateFormat(new Date(summary.measureTs)) ] ){
+          dataExitsDate_[ dateFormat(new Date(summary.measureTs)) ] = [];
+        }
+        dataExitsDate_[ dateFormat(new Date(summary.measureTs)) ].push(formatTime(new Date(summary.measureTs)));
+      }
+      setDataExitsDate(dataExitsDate_);
+      setLoading(false);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+  }
+
   return (
     <div className="trackDeviation trackGeometryMeasurement" >
       <div className="railStatusContainer">
@@ -413,6 +433,7 @@ function TrackGeometryMeasurement( props ) {
         ></RailStatus>
       </div>
       <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px", marginBottom:"10px"}}>
+            { (loading) ? <div className="loading"><img src={LoadingImg} alt="로딩" />{TRACK_GEO_LOADING_TEXT}</div> : null }
             <div className="containerTitle bothEnds">
               <div>검색</div>
             </div>
@@ -440,31 +461,8 @@ function TrackGeometryMeasurement( props ) {
                     }}
                     onChange={(e)=>{
                       console.log(e);
+                      getMeasureDates(e);
                       setSelectPoint(e);
-                      let begin = getFirstDateOfThreeMonthsAgo( calendarDate.getMonth(), calendarDate.getFullYear() );
-                      axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/dates',{
-                        params : {
-                          sensorId : e,
-                          beginTs : begin.toISOString()
-                        },
-                        paramsSerializer: params => {
-                          return qs.stringify(params, { format: 'RFC3986' })
-                        }
-                      })
-                      .then(response => {
-                        console.log("summary! ::: ", response.data.summary);
-                        dataExitsDate = {};
-                        for( let summary of response.data.summary ){
-                          summary['sensorId'] = pointsInfo[e].sensorId;
-                          summary['displayName'] = pointsInfo[e].displayName;
-                          if( !dataExitsDate[ dateFormat(new Date(summary.measureTs)) ] ){
-                            dataExitsDate[ dateFormat(new Date(summary.measureTs)) ] = [];
-                          }
-                          dataExitsDate[ dateFormat(new Date(summary.measureTs)) ].push(formatTime(new Date(summary.measureTs)));
-                        }
-                      })
-                      .catch(error => console.error('Error fetching data:', error));
-                      /* selectPointAdd(e); */
                     }}
                     value={selectPoint}
                     options={poinsts}
@@ -475,22 +473,21 @@ function TrackGeometryMeasurement( props ) {
               <div className="dataOption">
                 <div className="title">측정일자 </div>
                 <div className="date">
+                  { (isEmpty(dataExitsDate)) ? <div className="alertText" >검색된 날짜가 없습니다</div> : null }
                   <DatePicker 
                     value={viewMeasureDate}
+                    disabled={isEmpty(dataExitsDate)}
                     style={RANGEPICKERSTYLE} 
                     disabledDate={disabledDate}
                     onPanelChange={handlePanelChange} 
                     onChange={handleCalendarChange}
+                    /* picker={mode} */
+                    mode={mode}
+                    /* open={calendarOpen} */
+                    /* onClick={(e)=>{
+                      setCalendarOpen(true);
+                    }} */
                   />
-                  {/* <Select
-                    value={selectMeasureTime}
-                    defaultValue={selectMeasureTime}
-                    style={{width:'120px'}}
-                    options={timeOptions}
-                    onChange={(val)=>{
-                      setSelectMeasureTime(val);
-                    }}
-                  /> */}
                 </div>
               </div>
               <div className="line"></div>
@@ -505,7 +502,7 @@ function TrackGeometryMeasurement( props ) {
               </div>
               <div className="line"></div>
               <div className="dataOption">
-                <button className="search" onClick={()=>{
+                <button className="search" onClick={() => {
                   console.log("조회");
                   /* let findDatas_ = findDatas; */
                   /* let selectPoints_ = [...selectPoints]; */
@@ -516,6 +513,10 @@ function TrackGeometryMeasurement( props ) {
                   /* for( let summary of dataExitsDate[selectMeasureDate] ){ */
                     /* for( let item of findDatas_ ){ */
                       console.log(selectPoint);
+                      if( selectPoints.length > 1 ){
+                        alert("Point는 2개이상 추가할 수 없습니다.");
+                        return;
+                      }
                       if( !selectPoint || selectPoint === "" || selectPoint === undefined || selectPoint === null ){
                         alert("Point를 선택해주세요.");
                         return;
@@ -578,7 +579,8 @@ function TrackGeometryMeasurement( props ) {
                           data : convertObjectToArray(todayChartDataObj, CHART_FORMAT_TODAY),
                           item : findDatas,
                           colorCode : colorCode,
-                          point : point.kp
+                          kp : point.kp,
+                          trackSide : `(${trackLeftRightToString(point.railTrack)})`
                         });
                         dailyChartseries_.push({ 
                           sensorId : point.sensorId, 
@@ -586,7 +588,8 @@ function TrackGeometryMeasurement( props ) {
                           displayName : point.displayName,
                           item : findDatas,
                           colorCode : colorCode,
-                          point : point.kp
+                          kp : point.kp,
+                          trackSide : `(${trackLeftRightToString(point.railTrack)})`
                         });
                         monthlyChartseries_.push({ 
                           sensorId : point.sensorId, 
@@ -594,7 +597,8 @@ function TrackGeometryMeasurement( props ) {
                           displayName : point.displayName,
                           item : findDatas,
                           colorCode : colorCode,
-                          point : point.kp
+                          kp : point.kp,
+                          trackSide : `(${trackLeftRightToString(point.railTrack)})`
                         });
                         setTodayChartseries(todayChartseries_);
                         setDailyChartseries(dailyChartseries_);
@@ -609,9 +613,14 @@ function TrackGeometryMeasurement( props ) {
             </div>
       </div>
       <div className="contentBoxGroup" style={{width: "100%", height: "250px", marginTop:"10px"}}>
-        <div className="contentBox" style={{marginRight: "10px", width: "calc((((100% - 20px) - 800px) - 330px) - -93px)", height: "100%"}}>
+        <div className="contentBox" style={{position : "relative", marginRight: "10px", width: "calc((((100% - 20px) - 800px) - 330px) - -93px)", height: "100%"}}>
+          { (loading) ? <div className="loading"><img src={LoadingImg} alt="로딩" />{TRACK_GEO_LOADING_TEXT}</div> : null }
           <div className="containerTitle">
-            측정위치
+            측정위치 
+            <div className="legend">
+              <div className="option"><div className="circle yellow"></div>장기계측</div>
+              <div className="option"><div className="circle blue"></div>단기계측</div>
+            </div>
           </div>
           <div className="componentBox">
             <PlacePosition 
@@ -623,30 +632,7 @@ function TrackGeometryMeasurement( props ) {
               downRightTrackPoint={downRightTrackPoint}
               pointClick={(e)=>{
                 console.log(e);
-                let begin = getFirstDateOfThreeMonthsAgo( calendarDate.getMonth(), calendarDate.getFullYear() );
-                axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/dates',{
-                  params : {
-                    sensorId : e.sensorId,
-                    beginTs : begin.toISOString()
-                  },
-                  paramsSerializer: params => {
-                    return qs.stringify(params, { format: 'RFC3986' })
-                  }
-                })
-                .then(response => {
-                  console.log("summary! ::: ", response.data.summary);
-                  dataExitsDate = {};
-                  for( let summary of response.data.summary ){
-                    summary['sensorId'] = e.sensorId;
-                    summary['displayName'] = e.displayName;
-                    if( !dataExitsDate[ dateFormat(new Date(summary.measureTs)) ] ){
-                      dataExitsDate[ dateFormat(new Date(summary.measureTs)) ] = [];
-                    }
-                    dataExitsDate[ dateFormat(new Date(summary.measureTs)) ].push(formatTime(new Date(summary.measureTs)));
-                  }
-                })
-                .catch(error => console.error('Error fetching data:', error));
-                /* selectPointAdd(e); */
+                getMeasureDates(e.sensorId);
                 setSelectPoint(e.sensorId);
               }}
             ></PlacePosition>
@@ -841,7 +827,7 @@ function TrackGeometryMeasurement( props ) {
             {
               selectPoints.map( (point, i) => {
                 return <div key={i} className="point">
-                  {point.displayName}
+                  {`${convertToCustomFormat(point.kp*1000)}(${trackLeftRightToString(point.railTrack)})`}
                   <img src={CloseIcon} alt="제거" 
                     onClick={()=>{
                       let selectPoints_ = [...selectPoints];
@@ -910,7 +896,7 @@ function TrackGeometryMeasurement( props ) {
                   todayChartseries.map( (series, i) => {
                     console.log(series.datakey);
                     return <Scatter key={i}
-                      name={`${series.displayName}_${trackDataName(series.item)}`} 
+                      name={`${convertToCustomFormat(series.kp*1000)}${series.trackSide}_${trackDataName(series.item)}`} 
                       dataKey={series.datakey} fill={series.colorCode} />
                   })
                 }
@@ -943,7 +929,7 @@ function TrackGeometryMeasurement( props ) {
                     console.log(series);
                     return <Bar key={i}
                       dataKey={series.datakey} 
-                      name={`${series.displayName}_${trackDataName(series.item)}`}
+                      name={`${convertToCustomFormat(series.kp*1000)}${series.trackSide}_${trackDataName(series.item)}`}
                       fill={series.colorCode} />
                   })
                 }
@@ -974,7 +960,7 @@ function TrackGeometryMeasurement( props ) {
                   monthlyChartseries.map( (series, i) => {
                     return <Bar key={i} 
                       dataKey={series.datakey} 
-                      name={`${series.displayName}_${trackDataName(series.item)}`} 
+                      name={`${convertToCustomFormat(series.kp*1000)}${series.trackSide}_${trackDataName(series.item)}`} 
                       fill={series.colorCode} />
                   })
                 }

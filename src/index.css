@@ -110,3 +110,15 @@ button.search{
 .dataOption .date{
   min-width: 125px;
 }
+
+.dataOption .date .alertText{
+  position: absolute;
+  top: -15px;
+  color: #00000059;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}

@@ -79,6 +79,10 @@ export const STRING_WEAR_MODEL_XGB = "XGB"; //레일특성변수사용, 머신�
 export const STRING_WEAR_MODEL_LGBM = "LGBM"; //레일특성변수사용, 머신러닝 LightGBM
 export const STRING_WEAR_MODEL_CAT_BOOST = "CAT_BOOST";//레일특성변수사용, 머신러닝 CatBoost
 
+export const TRACK_GEO_LOADING_TEXT = "측정일자를 불러오는 중입니다...";
+export const CHART_RENDERING_TEXT = "차트를 그리는 중 입니다...";
+export const PICTURE_RENDERING_TEXT = "선로열람도를 그리는 중 입니다...";
+
 export const colors = [
   "#FF5733", "#33FF57", "#5733FF", "#FF33A6", 
   "#33FFC1", "#FFC133", "#3314FF", "#FF3370", 
