@@ -48,7 +48,14 @@ function CumulativeThroughput( props ) {
   const [pictureList, setpictureList ] = useState([]);
   const [scales, setScales] = useState([]);
   const [loading, setLoading] = useState(true);
-    
+  const [resizeOn, setResizeOn] = useState(0);
+  const resizeChange = () => {
+    console.log("resizeChange");
+    setResizeOn(prevScales=>{
+      return prevScales+1
+    });
+  }
+     
   useEffect(() => {
 /*     axios.get('https://devel.suredatalab.kr/api/accumulateweights/remaining',{
       params : {
@@ -63,6 +70,10 @@ function CumulativeThroughput( props ) {
     .then(response => console.log(response.data))
     .catch(error => console.error('Error fetching data:', error)); */
     /* readyImg(); */
+
+    // 이벤트 리스너 추가
+    window.addEventListener('resize', resizeChange);
+
     getRailroadSection(setRailroadSection);
     let route = sessionStorage.getItem('route');
     axios.get(`https://raildoctor.suredatalab.kr/api/railroads/railroadmap`,{
@@ -83,6 +94,9 @@ function CumulativeThroughput( props ) {
       setZoomImgkpMarkerHeight(maxHeight);
     })
     .catch(error => console.error('Error fetching data:', error));
+    
+      // 컴포넌트가 언마운트 될 때 이벤트 리스너 제거
+      return () => {window.removeEventListener('resize', resizeChange )};
   }, []);
 
   useEffect(() => {
@@ -316,7 +330,11 @@ function CumulativeThroughput( props ) {
   return (
     <div className="cumulativeThroughput" >
       <div className="railStatusContainer">
-        <RailStatus railroadSection={railroadSection} pathClick={pathClick}></RailStatus>
+        <RailStatus 
+          resizeOn={resizeOn}
+          railroadSection={railroadSection} 
+          pathClick={pathClick}
+        ></RailStatus>
       </div>
       <div className="contentBox searchNavigate" style={{marginLeft : 0, height: "95px", marginBottom:"10px"}}>
             <div className="containerTitle bothEnds">

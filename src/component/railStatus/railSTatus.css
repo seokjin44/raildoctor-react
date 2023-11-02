@@ -25,6 +25,11 @@
     height: 15px;
 }
 
+.railStatusBox .pointerList .obj{
+    top: 2px;
+    cursor: pointer;
+}
+
 .railStatusBox .pointer{
     height: 10px;
     background-color: white;
@@ -34,13 +39,23 @@
     cursor: pointer;
 }
 
+.railStatusBox .pointer.exist{
+    background-color: #a9ff00;
+}
+
 .railStatusBox .pointer.selectedPath{
     background-color: rgb(255, 217, 0);
 }
 
-.railStatusBox .path{
+.railStatusBox .pointerList div.path{
     position: absolute;
-    height: 10px;
+    height: 6px;
+    top: 5px;
+}
+
+.railStatusBox .path.exist{
+    background-color: #a9ff00;
+    border: 1px solid #000000;
 }
 
 .railStatusBox .path.exist div {

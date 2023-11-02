@@ -13,9 +13,10 @@ import { LineChart, Line, XAxis,
   YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer,
   ScatterChart, Scatter, Bar, BarChart } from 'recharts';
-import { convertObjectToArray, convertToCustomFormat, dateFormat, formatDateTime, numberWithCommas, tempDataName, trackDataName, trackToString, transposeObjectToArray } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, dateFormat, formatDateTime, formatTime, numberWithCommas, tempDataName, trackDataName, trackToString, trackToString2, transposeObjectToArray } from "../../util";
 import axios from 'axios';
 import qs from 'qs';
+import classNames from "classnames";
 
 let colorIndex = 1;
 function DataExistence( props ) {
@@ -79,6 +80,13 @@ function DataExistence( props ) {
   const [ tempSeries, setTempSeries] = useState([]);
   const [ tempChartData, setTempChartData] = useState([]);
 
+  //툴팁
+  const [accumulateWeightsTooltipIndex, setAccumulateWeightsTooltipIndex ] = useState(-1);
+  const [temperaturesTooltipIndex, setTemperaturesTooltipIndex ] = useState(-1);
+  const [pautTooltipIndex, setPautTooltipIndex ] = useState(-1);
+  const [railTwistTooltipIndex, setRailTwistTooltipIndex ] = useState(-1);
+  const [railwearsTooltipIndex, setRailwearsTooltipIndex ] = useState(-1);
+  
   const getColor = (index) => {
     return colors[index % 20];
   }
@@ -145,20 +153,23 @@ function DataExistence( props ) {
       <div className="scroll" id="dataExistenceContainer">
       <div className="dataList">
         <div className="line" style={{width:kptoPixel}} >
-          {/* <div className="dataName">KP</div> */}
           <div className="dataBar kp">
             {
-              kpList.map( kp => {
-                return <div className="kp" style={{left:kp}} >{convertToCustomFormat(kp)}</div>;
+              kpList.map( (kp, i) => {
+                return <div key={`kp${i}`} className="kp" style={{left:kp}} >{convertToCustomFormat(kp)}</div>;
               })
             }
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
-          {/* <div className="dataName">통과톤수</div> */}
-          <div className="dataBar">
+          <div className="dataBar accumulateWeights">
+            {/* 통과톤수 */}
             {props.accumulateWeights.map( (data, i) => {
-              return <div key={i} className="detailBtn" style={{left:`${(data.beginKp*1000)}px`}} onClick={()=>{
+              return <div key={`acc${i}`} className={classNames("detailBtn",{ onTooltip : accumulateWeightsTooltipIndex === i})} 
+              style={{left:`${(data.beginKp*1000)}px`, width : `${(data.endKp - data.beginKp)*1000}px` }} 
+              onMouseOver={()=>{setAccumulateWeightsTooltipIndex(i)}}
+              onMouseOut={()=>{setAccumulateWeightsTooltipIndex(-1)}}
+              onClick={()=>{
                 setRemainingData(data);
                 let route = sessionStorage.getItem('route');
                 axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remaining`,{
@@ -180,22 +191,35 @@ function DataExistence( props ) {
                   setAccOpen(true);
                 })
                 .catch(error => console.error('Error fetching data:', error));
-              }}>상세보기</div>
+              }}>
+                <div className="tooltip">
+                  <div className="tooltipLine">
+                    시작KP : {convertToCustomFormat(data.beginKp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    종점KP : {convertToCustomFormat(data.endKp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    TS : {formatDateTime(new Date(data.measureTs))}
+                  </div>
+                  <div className="tooltipLine">
+                    상하선 : {trackToString2(data.railTrack)}
+                  </div>                  
+                </div>
+              </div>
             })}
-            {/* <div className="detailBtn" style={{left:"0.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"9.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"12.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"81.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"78.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"65.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div> */}
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
           {/* <div className="dataName">마모 유지관리</div> */}
-          <div className="dataBar">
+          <div className="dataBar railwears">
             {props.railwears.map( (data, i) => {
               let route = sessionStorage.getItem('route');
-              return <div key={i} className="detailBtn" style={{left:`${(data.kp*1000)}px`}} onClick={()=>{
+              return <div key={`railwear${i}`} style={{left:`${(data.kp*1000)}px`}} 
+              className={classNames("detailBtn",{ onTooltip : railwearsTooltipIndex === i})}
+              onMouseOver={()=>{setRailwearsTooltipIndex(i)}}
+              onMouseOut={()=>{setRailwearsTooltipIndex(-1)}}
+              onClick={()=>{
                 setRailwearOpen(true)
                 setRailWearData(data);
                 /* 2D Data 상세조회 */
@@ -223,22 +247,36 @@ function DataExistence( props ) {
                   setVerticalWearGraphData(response.data.verticalWearGraph);
                 })
                 .catch(error => console.error('Error fetching data:', error));
-              }}>상세보기</div>
+              }}>
+                <div className="tooltip">
+                  <div className="tooltipLine">
+                    KP : {convertToCustomFormat(data.kp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    TS : {formatDateTime(new Date(data.measureTs))}
+                  </div>
+                  <div className="tooltipLine">
+                    누적통과톤수 : {numberWithCommas(data.accumulateWeight)}
+                  </div>
+                  <div className="tooltipLine">
+                    상하선 : {trackToString2(data.railTrack)}
+                  </div>
+                </div>
+
+              </div>
             })}
-            {/* <div className="detailBtn" style={{left:"3%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"35%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"12%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"28%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"59%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"91%"}} onClick={()=>{setOpen(true)}}>상세보기</div> */}
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
           {/* <div className="dataName">궤도틀림</div> */}
-          <div className="dataBar">
+          <div className="dataBar railtwists">
             {props.railtwists.map( (data, i) => {
               let route = sessionStorage.getItem('route');
-              return <div key={i} className="detailBtn" style={{left:`${(data.beginKp*1000)}px`}} onClick={()=>{
+              return <div key={`railtwists${i}`} style={{left:`${(data.beginKp*1000)}px`, width:`${(data.endKp - data.beginKp)*1000}px`}} 
+              className={classNames("detailBtn",{ onTooltip : railTwistTooltipIndex === i})}
+              onMouseOver={()=>{setRailTwistTooltipIndex(i)}}
+              onMouseOut={()=>{setRailTwistTooltipIndex(-1)}}
+              onClick={()=>{
                 setRailtwistData(data);
                 setRailtwistOpen(true);
                 let dataOption = [
@@ -278,21 +316,30 @@ function DataExistence( props ) {
                   })
                   .catch(error => console.error('Error fetching data:', error));
                 }
-              }}>상세보기</div>
+              }}>
+                <div className="tooltip">
+                  <div className="tooltipLine">
+                    시작KP : {convertToCustomFormat(data.beginKp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    종점KP : {convertToCustomFormat(data.endKp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    TS : {formatDateTime(new Date(data.measureTs))}
+                  </div>
+                  <div className="tooltipLine">
+                    상하선 : {trackToString2(data.railTrack)}
+                  </div>
+                </div>
+              </div>
             })}
-            {/* <div className="detailBtn" style={{left:"4.5%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"97%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"65%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"71%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"50%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"41%"}} onClick={()=>{setOpen(true)}}>상세보기</div> */}
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
           {/* <div className="dataName">궤도거동계측</div> */}
           <div className="dataBar">
             {props.railbehaviors.map( (railbehaviorsData, i) => {
-              return <div key={i} className="detailBtn" style={{left:`${(railbehaviorsData.kp*1000)}px`}} onClick={()=>{
+              return <div key={`railbehavior${i}`} className="detailBtn" style={{left:`${(railbehaviorsData.kp*1000)}px`}} onClick={()=>{
                 setRailbehaviorOpen(true);
                 setRailbehaviorData(railbehaviorsData);
                 axios.get(`https://raildoctor.suredatalab.kr/api/railbehaviors/measuresets/${railbehaviorsData.measureId}`,{
@@ -385,21 +432,28 @@ function DataExistence( props ) {
                   }
                 })
                 .catch(error => console.error('Error fetching data:', error));
-            }}>상세보기</div>
+            }}>
+                <div className="tooltip">
+                  <div className="tooltipLine">
+                    KP : {convertToCustomFormat(railbehaviorsData.kp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    TS : {formatDateTime(new Date(railbehaviorsData.measureTs))}
+                  </div>
+                </div>
+            </div>
             })}
-            {/* <div className="detailBtn" style={{left:"77%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"6%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"51%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"31%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"39%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"81"}} onClick={()=>{setOpen(true)}}>상세보기</div> */}
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
           {/* <div className="dataName">온/습도 측정</div> */}
           <div className="dataBar">
             {props.temperatures.map( (tempData, i) => {
-              return <div key={i} className="detailBtn" style={{left:`${(tempData.kp*1000)}px`}} onClick={()=>{
+              return <div key={`temp${i}`} style={{left:`${(tempData.kp*1000)}px`}} 
+              className={classNames("detailBtn",{ onTooltip : temperaturesTooltipIndex === i})} 
+              onMouseOver={()=>{setTemperaturesTooltipIndex(i)}}
+              onMouseOut={()=>{setTemperaturesTooltipIndex(-1)}}
+              onClick={()=>{
                 setTemperatureOpen(true);
                 setTempMeasureData(tempData);
                 let chartseries_ = [];
@@ -451,26 +505,43 @@ function DataExistence( props ) {
                   setTempSeries(chartseries_);
                 })
                 .catch(error => console.error('Error fetching data:', error));
-              }}>상세보기</div>
+              }}>
+                <div className="tooltip">
+                  <div className="tooltipLine">
+                    KP : {convertToCustomFormat(tempData.kp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    TS : {formatDateTime(new Date(tempData.measureTs))}
+                  </div>
+                </div>
+              </div>
             })}
-            {/* <div className="detailBtn" style={{left:"8%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"88%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"77%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"66%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"55%"}} onClick={()=>{setOpen(true)}}>상세보기</div>
-            <div className="detailBtn" style={{left:"44%"}} onClick={()=>{setOpen(true)}}>상세보기</div> */}
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
           {/* <div className="dataName">PAUT 탐상</div> */}
-          <div className="dataBar">
+          <div className="dataBar paut">
           {props.paut.map( (data, i) => {
-              let route = sessionStorage.getItem('route');
-              return <div key={i} className="detailBtn" style={{left:`${(data.kp*1000)}px`}} onClick={()=>{
+              return <div key={`paut${i}`} style={{left:`${(data.kp*1000)}px`}}               
+              className={classNames("detailBtn",{ onTooltip : pautTooltipIndex === i})} 
+              onMouseOver={()=>{setPautTooltipIndex(i)}}
+              onMouseOut={()=>{setPautTooltipIndex(-1)}}
+              
+              onClick={()=>{
                 setPautOpen(true);
                 setPautData(data);
                 setPautImgIndex(0);
-              }}>상세보기</div>
+              }}><div className="tooltip">
+                  <div className="tooltipLine">
+                    KP : {convertToCustomFormat(data.kp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    TS : {formatDateTime(new Date(data.measureTs))}
+                  </div>
+                  <div className="tooltipLine">
+                    상하선 : {trackToString2(data.railTrack)}
+                  </div>
+              </div></div>
             })}
           </div>
         </div>
@@ -655,7 +726,7 @@ function DataExistence( props ) {
                     {/* <Line dataKey="temp" stroke="#FF0000" dot={false} /> */}
                     {
                       tempSeries.map( (series, i) => {
-                        return <Line key={i} dataKey={series.dataKey} name={`${series.item}`} stroke={series.color} dot={false} />;
+                        return <Line key={`tempSeries${i}`} dataKey={series.dataKey} name={`${series.item}`} stroke={series.color} dot={false} />;
                       })
                     }
                   </LineChart>
@@ -1065,7 +1136,7 @@ function DataExistence( props ) {
                           {
                             wheelSeries.map( (series, i) => {
                               console.log(series.datakey);
-                              return <Scatter key={i}
+                              return <Scatter key={`wheelSeriesTime${i}`}
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 dataKey={series.datakey} fill={series.colorCode} />
                             })
@@ -1092,7 +1163,7 @@ function DataExistence( props ) {
                           {
                             wheelSeries.map( (series, i) => {
                               console.log(series);
-                              return <Bar key={i}
+                              return <Bar key={`wheelSeriesDay${i}`}
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`}
                                 fill={series.colorCode} />
@@ -1119,7 +1190,7 @@ function DataExistence( props ) {
                           <Legend />
                           {
                             wheelSeries.map( (series, i) => {
-                              return <Bar key={i} 
+                              return <Bar key={`wheelSeriesMonth${i}`} 
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 fill={series.colorCode} />
@@ -1165,7 +1236,7 @@ function DataExistence( props ) {
                           {
                             lateralSeries.map( (series, i) => {
                               console.log(series.datakey);
-                              return <Scatter key={i}
+                              return <Scatter key={`lateralSeriesTime${i}`}
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 dataKey={series.datakey} fill={series.colorCode} />
                             })
@@ -1192,7 +1263,7 @@ function DataExistence( props ) {
                           {
                             lateralSeries.map( (series, i) => {
                               console.log(series);
-                              return <Bar key={i}
+                              return <Bar key={`lateralSeriesDay${i}`}
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`}
                                 fill={series.colorCode} />
@@ -1219,7 +1290,7 @@ function DataExistence( props ) {
                           <Legend />
                           {
                             lateralSeries.map( (series, i) => {
-                              return <Bar key={i} 
+                              return <Bar key={`lateralSeriesMonth${i}`}
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 fill={series.colorCode} />
@@ -1265,7 +1336,7 @@ function DataExistence( props ) {
                           {
                             stressSeries.map( (series, i) => {
                               console.log(series.datakey);
-                              return <Scatter key={i}
+                              return <Scatter key={`stressSeriesTime${i}`}
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 dataKey={series.datakey} fill={series.colorCode} />
                             })
@@ -1292,7 +1363,7 @@ function DataExistence( props ) {
                           {
                             stressSeries.map( (series, i) => {
                               console.log(series);
-                              return <Bar key={i}
+                              return <Bar key={`stressSeriesDay${i}`}
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`}
                                 fill={series.colorCode} />
@@ -1319,7 +1390,7 @@ function DataExistence( props ) {
                           <Legend />
                           {
                             stressSeries.map( (series, i) => {
-                              return <Bar key={i} 
+                              return <Bar key={`stressSeriesMonth${i}`}
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 fill={series.colorCode} />
@@ -1365,7 +1436,7 @@ function DataExistence( props ) {
                           {
                             hdSeries.map( (series, i) => {
                               console.log(series.datakey);
-                              return <Scatter key={i}
+                              return <Scatter key={`hdSeriesTime${i}`}
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 dataKey={series.datakey} fill={series.colorCode} />
                             })
@@ -1392,7 +1463,7 @@ function DataExistence( props ) {
                           {
                             hdSeries.map( (series, i) => {
                               console.log(series);
-                              return <Bar key={i}
+                              return <Bar key={`hdSeriesDay${i}`}
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`}
                                 fill={series.colorCode} />
@@ -1419,7 +1490,7 @@ function DataExistence( props ) {
                           <Legend />
                           {
                             hdSeries.map( (series, i) => {
-                              return <Bar key={i} 
+                              return <Bar key={`hdSeriesMonth${i}`}
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 fill={series.colorCode} />
@@ -1465,7 +1536,7 @@ function DataExistence( props ) {
                           {
                             vdSeries.map( (series, i) => {
                               console.log(series.datakey);
-                              return <Scatter key={i}
+                              return <Scatter key={`vdSeriesTime${i}`}
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 dataKey={series.datakey} fill={series.colorCode} />
                             })
@@ -1492,7 +1563,7 @@ function DataExistence( props ) {
                           {
                             vdSeries.map( (series, i) => {
                               console.log(series);
-                              return <Bar key={i}
+                              return <Bar key={`vdSeriesDay${i}`}
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`}
                                 fill={series.colorCode} />
@@ -1519,7 +1590,7 @@ function DataExistence( props ) {
                           <Legend />
                           {
                             vdSeries.map( (series, i) => {
-                              return <Bar key={i} 
+                              return <Bar key={`vdSeriesMonth${i}`}
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 fill={series.colorCode} />
@@ -1565,7 +1636,7 @@ function DataExistence( props ) {
                           {
                             accSeries.map( (series, i) => {
                               console.log(series.datakey);
-                              return <Scatter key={i}
+                              return <Scatter key={`accSeriesTime${i}`}
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 dataKey={series.datakey} fill={series.colorCode} />
                             })
@@ -1592,7 +1663,7 @@ function DataExistence( props ) {
                           {
                             accSeries.map( (series, i) => {
                               console.log(series);
-                              return <Bar key={i}
+                              return <Bar key={`accSeriesDay${i}`}
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`}
                                 fill={series.colorCode} />
@@ -1619,7 +1690,7 @@ function DataExistence( props ) {
                           <Legend />
                           {
                             accSeries.map( (series, i) => {
-                              return <Bar key={i} 
+                              return <Bar key={`accSeriesMonth${i}`}
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 fill={series.colorCode} />
@@ -1665,7 +1736,7 @@ function DataExistence( props ) {
                           {
                             speedSeries.map( (series, i) => {
                               console.log(series.datakey);
-                              return <Scatter key={i}
+                              return <Scatter key={`speedSeriesTime${i}`}
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 dataKey={series.datakey} fill={series.colorCode} />
                             })
@@ -1692,7 +1763,7 @@ function DataExistence( props ) {
                           {
                             speedSeries.map( (series, i) => {
                               console.log(series);
-                              return <Bar key={i}
+                              return <Bar key={`speedSeriesDay${i}`}
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`}
                                 fill={series.colorCode} />
@@ -1719,7 +1790,7 @@ function DataExistence( props ) {
                           <Legend />
                           {
                             speedSeries.map( (series, i) => {
-                              return <Bar key={i} 
+                              return <Bar key={`speedSeriesMonth${i}`}
                                 dataKey={series.datakey} 
                                 name={`${series.displayName}_${trackDataName(series.item)}`} 
                                 fill={series.colorCode} />

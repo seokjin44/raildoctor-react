@@ -313,6 +313,23 @@ export const trackToString = ( track ) => {
     return "";
 }
 
+export const trackToString2 = ( track ) => {
+    if( track === STRING_UP_TRACK ){
+        return "상선";
+    }else if( track === STRING_UP_TRACK_LEFT ){
+        return "상선(좌)";
+    }else if(track === STRING_UP_TRACK_RIGHT ){
+        return "상선(좌)";
+    }else if( track === STRING_DOWN_TRACK ){
+        return "하선";
+    }else if( track === STRING_DOWN_TRACK_LEFT ){
+        return "하선(좌)";
+    }else if( track === STRING_DOWN_TRACK_RIGHT ){
+        return "하선(우)";
+    }
+    return "";
+}
+
 export const trackLeftRightToString = ( track ) => {
     if( track === STRING_UP_TRACK_LEFT ||
         track === STRING_DOWN_TRACK_LEFT ){

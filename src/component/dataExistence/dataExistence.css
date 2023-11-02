@@ -87,3 +87,76 @@
     top: 50%;
     background-image: url(../../assets/icon/dataexist/right.png);
 }
+
+.monitoringContainer .datafinder .dataList .line .dataBar .detailBtn{
+    width: 3px;
+    height: 16px;
+    font-size: 11px;
+    position: absolute;
+    padding: 2px;
+    border-radius: 5px;
+    background-color: #A9FF00;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 5px;
+    /* border: 1px solid #bdbdbd; */
+    color: white;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid #A9FF00;
+    transition: 0.2s;
+}
+
+.monitoringContainer .datafinder .dataList .line .dataBar .detailBtn:hover{
+    background-color: #00A2E8;
+    border: 1px solid #bdbdbd;
+}
+
+.monitoringContainer .datafinder .dataList .line .dataBar .detailBtn .tooltip{
+    background: white;
+    width: 155px;
+    height: 25px;
+    position: absolute;
+    top: -61px;
+    border-radius: 5px;
+    border: 1px solid #cccccc;
+    box-shadow: 3px 3px 7px #0000000d;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 10px 10px 10px;
+    display: none;
+    z-index: 1;
+}
+
+.monitoringContainer .datafinder .dataList .line .dataBar .detailBtn.onTooltip .tooltip{
+    display: flex;
+}
+
+.monitoringContainer .datafinder .dataList .line .dataBar .detailBtn .tooltip .tooltipLine{
+    color: black;
+    margin-top: 2.5px;
+    margin-bottom: 2.55px;
+}
+
+.monitoringContainer .datafinder .dataList .line .dataBar.railtwists .detailBtn .tooltip{
+    height: 51px;
+    top: -89px;
+}
+
+.monitoringContainer .datafinder .dataList .line .dataBar.railwears .detailBtn .tooltip{
+    height: 51px;
+    top: 30px;
+}
+
+.monitoringContainer .datafinder .dataList .line .dataBar.accumulateWeights .detailBtn .tooltip{
+    height: 51px;
+    top: 30px;
+    width: 155px;
+}
+
+.monitoringContainer .datafinder .dataList .line .dataBar.paut .detailBtn .tooltip{
+    height: 40px;
+    top: -75px;
+}

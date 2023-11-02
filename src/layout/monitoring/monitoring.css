@@ -400,24 +400,6 @@
     width: 120px;
 }
 
-.monitoringContainer .datafinder .dataList .line .dataBar .detailBtn{
-    width: 50px;
-    font-size: 11px;
-    height: 15px;
-    position: absolute;
-    padding: 2px;
-    border-radius: 5px;
-    background-color: #44546a;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    top: 5px;
-    border: 1px solid #bdbdbd;
-    color: white;
-    cursor: pointer;
-    user-select: none;
-}
-
 .popupTitle{
     height: 40px;
     display: flex;

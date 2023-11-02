@@ -8,10 +8,12 @@ class TrackSpeed extends React.Component {
 	KP1toPixel1Width = 0.125;
 	constructor( props ) {
 		super(props);
+		this.railContainer = React.createRef();
+		this.railCanvas = React.createRef();
 		this.state = {
 			id: Math.random().toString(36).substring(2, 11),
-			canvas: undefined,
-			ctx: undefined,
+			/* canvas: undefined, */
+			/* ctx: undefined, */
 			legend : [],
 			xaxis : [],
 
@@ -54,39 +56,12 @@ class TrackSpeed extends React.Component {
 	}
 
 	componentDidUpdate(prevProps, prevState){
-	  let canvas = this.state.canvas;
-	  let ctx = this.state.ctx;
+	  if( !this.railCanvas.current ){ return; }
+	  let canvas = this.railCanvas.current;
+	  let ctx = this.railCanvas.current.getContext("2d");
 	  if (prevProps.kp !== this.props.kp) {
-		console.log('kp has changed');
-		//pointX * this.state.scaleX + this.state.x
-
-		/* let cneterKP = ((this.state.x + this.state.width)/2) / this.KP1toPixel1Width; */
-		let cneterKP = ((this.state.x + this.state.width)/2) / this.KP1toPixel1Width;
-		let move = (this.props.kp - cneterKP) * this.state.scaleX + this.state.x;
-		/* let curKP = (( ((this.state.x + this.state.width)/2) + move) ); */
-		let curKP = (( ((this.state.x + this.state.width)/2) + move ) );
-		console.log(curKP);
-		console.log(curKP * ( 1 / this.KP1toPixel1Width ));
-
-		ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-		ctx.save(); // Save the current state of the context
-
-		if( cneterKP < this.props.kp ){	
-			ctx.translate( -move, 0); // Apply translation
-		}
-		ctx.beginPath();
-		ctx.strokeStyle = "red";
-		ctx.lineWidth = 1; 
-		ctx.moveTo( this.props.kp * this.state.scaleX + this.state.x, 0 );
-		ctx.lineTo( this.props.kp * this.state.scaleX + this.state.x, 125 );
-		ctx.stroke();
-
-		ctx.beginPath();  
-		ctx.textBaseline = "top";
-		ctx.textAlign = "center";
-		ctx.fillText( this.props.kp, this.props.kp * this.state.scaleX + this.state.x, 125);
-		ctx.closePath();
 		
+		this.kpChange(ctx, canvas);
 		this.drawYAxis();  
 		this.drawLegend();
 		this.drawLine();
@@ -100,22 +75,62 @@ class TrackSpeed extends React.Component {
 		this.drawLegend();
 		this.drawLine();
 	  }
+
+	  if (!isEqual(prevProps.resizeOn, this.props.resizeOn)) {
+		this.init();
+		this.kpChange(ctx, canvas);
+		this.drawYAxis();  
+		this.drawLegend();
+		this.drawLine();
+		ctx.restore(); // Restore the context to its saved state
+	  }
+	}
+
+	kpChange(ctx, canvas){
+		console.log('kp has changed');
+
+		let cneterKP = ((this.state.x + this.state.width)/2) / this.KP1toPixel1Width;
+		let move = (this.props.kp - cneterKP) * this.state.scaleX + this.state.x;
+		let curKP = (( ((this.state.x + this.state.width)/2) + move ) );
+		console.log(curKP);
+		console.log(curKP * ( 1 / this.KP1toPixel1Width ));
+
+		ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+		ctx.save(); // Save the current state of the context
+
+		if( cneterKP < this.props.kp ){	
+			ctx.translate( -move, 0); // Apply translation
+		}
+		ctx.beginPath();
+		ctx.strokeStyle = "red";
+		ctx.lineWidth = 1; 
+		ctx.setLineDash([0]);
+		ctx.moveTo( this.props.kp * this.state.scaleX + this.state.x, 0 );
+		ctx.lineTo( this.props.kp * this.state.scaleX + this.state.x, 125 );
+		ctx.stroke();
+
+		/* ctx.beginPath();  
+		ctx.textBaseline = "top";
+		ctx.textAlign = "center";
+		ctx.fillText( this.props.kp, this.props.kp * this.state.scaleX + this.state.x, 125);
+		ctx.closePath(); */
 	}
 
 	init() {
+		if( !this.railCanvas.current ){ return; }
+		if( !this.railContainer.current ){ return; }
 		/* this.setXY(); */
-		document.getElementById("track-speed-container-" + this.state.id).innerHTML = "";
-		let canvas = document.createElement("canvas");
-		canvas.style.width = "100%";
-		canvas.style.height = "100%";
-		canvas.id = "track-speed-canvas-" + this.state.id;
-		canvas.width = document.getElementById("track-speed-container-" + this.state.id).offsetWidth;
-		canvas.height = document.getElementById("track-speed-container-" + this.state.id).offsetHeight;
-		this.state.canvas = canvas;
+		/* document.getElementById("track-speed-container-" + this.state.id).innerHTML = ""; */
+		/* let canvas = document.createElement("canvas"); */
+		this.railCanvas.current.style.width = "100%";
+		this.railCanvas.current.style.height = "100%";
+		this.railCanvas.current.width = this.railContainer.current.offsetWidth;
+		this.railCanvas.current.height = this.railContainer.current.offsetHeight;
+/* 		this.state.canvas = canvas;
 		this.state.ctx = canvas.getContext("2d");
-		document.getElementById("track-speed-container-" + this.state.id).appendChild(canvas);
+		document.getElementById("track-speed-container-" + this.state.id).appendChild(canvas); */
 		
-		let rangeX = canvas.width / this.KP1toPixel1Width;
+		let rangeX = this.railCanvas.current.width / this.KP1toPixel1Width;
 		console.log("[TrackSpeed] rangeX :::: "+rangeX);
 
 		// user defined properties    
@@ -143,8 +158,8 @@ class TrackSpeed extends React.Component {
 
 		//아마 HTML의 위치와 캔버스의 위치를 상대적으로 구한 값인듯. 
 		//padding도 css에 있는 padding값을 의미하는 듯 함.
-		this.state.width = this.state.canvas.width - this.state.x - this.state.padding * 2;  
-		this.state.height = this.state.canvas.height - this.state.y - this.state.padding - this.state.fontHeight;  
+		this.state.width = this.railCanvas.current.width - this.state.x - this.state.padding * 2;  
+		this.state.height = this.railCanvas.current.height - this.state.y - this.state.padding - this.state.fontHeight;  
 
 		this.state.scaleX = this.state.width / this.state.rangeX;  
 		this.state.scaleY = this.state.height / this.state.rangeY;  
@@ -183,24 +198,27 @@ class TrackSpeed extends React.Component {
 	}
 
 	getLongestValueWidth() {
-		this.state.ctx.font = this.state.font;  
+		if( !this.railCanvas.current ){ return };
+		let ctx = this.railCanvas.current.getContext("2d");
+		ctx.font = this.state.font;  
 		let longestValueWidth = 0;  
 		for (let n = 0; n <= this.state.numYTicks; n++) {  
 			let value = this.state.maxY - (n * this.state.unitsPerTickY);  
-			longestValueWidth = Math.max(longestValueWidth, this.state.ctx.measureText(value).width);  
+			longestValueWidth = Math.max(longestValueWidth, ctx.measureText(value).width);  
 		}  
 		return longestValueWidth;  
 	};
 	                                                                                                                                                                                                       
 	drawYAxis() {  
-		let context = this.state.ctx;  
+		if( !this.railCanvas.current ){ return; }
+		let context = this.railCanvas.current.getContext("2d");  
 		let xaxis = [];
 		let textSize = 7;
 		context.save(); 
 		context.beginPath();  
 		context.moveTo(this.state.x, this.state.y);  
 		context.lineTo(this.state.x, this.state.y + this.state.height);  
-		context.strokeStyle = this.axisColor;  
+		context.strokeStyle = "black";  
 		context.lineWidth = 0.5; 
 		context.setLineDash([4]);
 		context.stroke();  
@@ -231,6 +249,7 @@ class TrackSpeed extends React.Component {
 			context.moveTo(this.state.x, n * this.state.height / this.state.numYTicks + this.state.y);  
 			context.lineTo(this.state.x + maxKP, n * this.state.height / this.state.numYTicks + this.state.y);
 			context.setLineDash([4]);
+			context.strokeStyle = "black";  
 			context.lineWidth = 0.5; 
 			context.stroke();  
 		}
@@ -323,7 +342,8 @@ class TrackSpeed extends React.Component {
 	}
 	
 	drawLine() {  
-		let context = this.state.ctx;  
+		if(!this.railCanvas.current){return}
+		let context = this.railCanvas.current.getContext("2d");  
 		context.save();  
 		console.log("drawLine");
 		let trackData = [...this.props.data];
@@ -555,7 +575,9 @@ class TrackSpeed extends React.Component {
 						})
 					}
 				</div>
-				<div className="trackSpeedBox" id={"track-speed-container-" + this.state.id}></div>
+				<div className="trackSpeedBox" ref={this.railContainer}>
+					<canvas ref={this.railCanvas} ></canvas>
+				</div>
 			</div>
 		);
 	}

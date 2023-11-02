@@ -107,11 +107,7 @@ function Monitoring( props ) {
     })
     .then(response => {
       console.log(response.data);
-      if( selectTrack === STRING_UP_TRACK ){
-        setTrackGeo(response.data.t2);
-      }else if( selectTrack === STRING_DOWN_TRACK ){
-        setTrackGeo(response.data.t1);
-      }
+      setTrackGeo(response.data);
     })
     .catch(error => console.error('Error fetching data:', error));
   }
@@ -181,20 +177,7 @@ function Monitoring( props ) {
       setRailtwists(response.data.railtwists);
       setRailwears(response.data.railwears);
       setTemperatures(response.data.temperatures);
-    })
-    .catch(error => console.error('Error fetching data:', error));
-
-    axios.get(`https://raildoctor.suredatalab.kr/api/pauts`,{
-      paramsSerializer: params => {
-        return qs.stringify(params, { format: 'RFC3986' })
-      },
-      params : {
-        railroad : route
-      }
-    })
-    .then(response => {
-      console.log(response.data);
-      setPaut(response.data.entities);
+      setPaut(response.data.pauts);
     })
     .catch(error => console.error('Error fetching data:', error));
   }
@@ -258,10 +241,26 @@ function Monitoring( props ) {
     return null;
   }
 
+  const [resizeOn, setResizeOn] = useState(0);
+  const resizeChange = () => {
+    console.log("resizeChange");
+    setResizeOn(prevScales=>{
+      return prevScales+1
+    });
+  }
+  useEffect(() => {
+    // 이벤트 리스너 추가
+    
+    window.addEventListener('resize', resizeChange);
+    // 컴포넌트가 언마운트 될 때 이벤트 리스너 제거
+    return () => {window.removeEventListener('resize', resizeChange )};
+  }, []); // 빈 의존성 배열을 전달하여 마운트 및 언마운트 시에만 실행되도록 함
+
   return (
     <div className="monitoringContainer" >
         <div className="railStatusContainer">
           <RailStatus 
+            resizeOn={resizeOn}
             railroadSection={railroadSection} 
             pathClick={pathClick}
           ></RailStatus>
@@ -292,6 +291,18 @@ function Monitoring( props ) {
               </div>
               <div className="line"></div>
               <div className="dataOption">
+                <div className="title">상하선 </div>
+                <div className="track">
+                  <Radio.Group style={RADIO_STYLE} defaultValue={selectTrack} value={selectTrack}
+                    onChange={(e)=>{setSelectTrack(e.target.value)}}
+                  >
+                    <Radio value={STRING_UP_TRACK}>상선</Radio>
+                    <Radio value={STRING_DOWN_TRACK}>하선</Radio>
+                  </Radio.Group>
+                </div>
+              </div>
+              <div className="line"></div>
+              <div className="dataOption">
                 <div className="title">KP </div>
                 <div className="date">
                   <Input 
@@ -317,13 +328,13 @@ function Monitoring( props ) {
               <div className="line"></div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
                 <div className="title border">상선 </div>
-                {nonData(trackGeo?.shapeDisplay)} /
-                  R={nonData(trackGeo?.direction)} {nonData(trackGeo?.radius)} (C={nonData(trackGeo?.cant)}, S={nonData(trackGeo?.slack)})
+                {nonData(trackGeo?.t2?.shapeDisplay)} /
+                  R={nonData(trackGeo?.t2?.direction)} {nonData(trackGeo?.t2?.radius)} (C={nonData(trackGeo?.t2?.cant)}, S={nonData(trackGeo?.t2?.slack)})
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
                 <div className="title border">하선 </div>
-                {nonData(trackGeo?.shapeDisplay)} /
-                  R={nonData(trackGeo?.direction)} {nonData(trackGeo?.radius)} (C={nonData(trackGeo?.cant)}, S={nonData(trackGeo?.slack)})
+                {nonData(trackGeo?.t1?.shapeDisplay)} /
+                  R={nonData(trackGeo?.t1?.direction)} {nonData(trackGeo?.t1?.radius)} (C={nonData(trackGeo?.t1?.cant)}, S={nonData(trackGeo?.t1?.slack)})
               </div>
               <div className="line"></div>
               <div className="dataOption">
@@ -376,7 +387,10 @@ function Monitoring( props ) {
             </div>
             <div className="componentBox separationBox">
               <div className="boxProto speed">
-                <TrackSpeed data={trackSpeedData} kp={kp} ></TrackSpeed>
+                <TrackSpeed 
+                  resizeOn={resizeOn}
+                  data={trackSpeedData} kp={kp} 
+                ></TrackSpeed>
               </div>
             </div>
           </div>

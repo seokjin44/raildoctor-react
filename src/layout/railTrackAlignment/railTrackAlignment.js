@@ -74,8 +74,20 @@ function RailTrackAlignment( props ) {
     setOpen(false);
   }
 
+  const [resizeOn, setResizeOn] = useState(0);
+  const resizeChange = () => {
+    console.log("resizeChange");
+    setResizeOn(prevScales=>{
+      return prevScales+1
+    });
+  }
+
   useEffect(() => {
+    // 이벤트 리스너 추가
+    window.addEventListener('resize', resizeChange);
     getRailroadSection(setRailroadSection);
+    // 컴포넌트가 언마운트 될 때 이벤트 리스너 제거
+    return () => {window.removeEventListener('resize', resizeChange )};
   }, []);
   
   useEffect( ()=> {
@@ -144,6 +156,7 @@ function RailTrackAlignment( props ) {
     <div className="trackDeviation railRoughness" >
       <div className="railStatusContainer">
         <RailStatus 
+          resizeOn={resizeOn}
           railroadSection={railroadSection} 
           pathClick={pathClick}
           dataExits={dataExits}

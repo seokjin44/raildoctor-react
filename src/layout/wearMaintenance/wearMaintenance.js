@@ -9,7 +9,7 @@ import 'dayjs/locale/ko';
 import { Select } from 'antd';
 import { Box, Modal } from "@mui/material";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
-import { BOXSTYLE, INSTRUMENTATIONPOINT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_CORNER_WEAR, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_UP_TRACK, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_KP, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, UP_TRACK } from "../../constant";
+import { BOXSTYLE, INSTRUMENTATIONPOINT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_CORNER_WEAR, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, STRING_UP_TRACK, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_KP, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, UP_TRACK } from "../../constant";
 import AlertIcon from "../../assets/icon/decision/3876149_alert_emergency_light_protection_security_icon.png";
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
@@ -258,25 +258,25 @@ function WearMaintenance( props ) {
 
   const makeWear3dData = (cornerWearGraph, verticalWearGraph, fliter, minmax) => {
     console.log("makeWear3dData");
-    let upTrackMGT = [];
-    let upTrackKP = [];
-    let upTrackWear = [];
+    let leftTrackMGT = [];
+    let leftTrackKP = [];
+    let leftTrackWear = [];
 
-    let downTrackMGT = [];
-    let downTrackKP = [];
-    let downTrackWear = [];
+    let rightTrackMGT = [];
+    let rightTrackKP = [];
+    let rightTrackWear = [];
 
     if( fliter.indexOf(STRING_CORNER_WEAR) > -1 ){
       for( let data of cornerWearGraph ){
-        if( data.railSide === STRING_UP_TRACK ){
-          upTrackMGT.push( data.accumulateWeight );
-          upTrackKP.push( data.kp * 1000 );
-          upTrackWear.push( data.wear );
+        if( data.railSide === STRING_TRACK_SIDE_LEFT ){
+          leftTrackMGT.push( data.accumulateWeight );
+          leftTrackKP.push( data.kp * 1000 );
+          leftTrackWear.push( data.wear );
         }
-        if( data.railSide === STRING_DOWN_TRACK ){
-          downTrackMGT.push( data.accumulateWeight );
-          downTrackKP.push( data.kp * 1000 );
-          downTrackWear.push( data.wear );
+        if( data.railSide === STRING_TRACK_SIDE_RIGHT ){
+          rightTrackMGT.push( data.accumulateWeight );
+          rightTrackKP.push( data.kp * 1000 );
+          rightTrackWear.push( data.wear );
         }else{
           /* upTrackMGT.push( data.accumulateWeight );
           upTrackKP.push( data.kp * 1000 );
@@ -290,15 +290,15 @@ function WearMaintenance( props ) {
 
     if( fliter.indexOf(STRING_VERTICAL_WEAR) > -1 ){
       for( let data of verticalWearGraph ){
-        if( data.railSide === STRING_UP_TRACK ){
-          upTrackMGT.push( data.accumulateWeight );
-          upTrackKP.push( data.kp * 1000 );
-          upTrackWear.push( data.wear );
+        if( data.railSide === STRING_TRACK_SIDE_LEFT ){
+          leftTrackMGT.push( data.accumulateWeight );
+          leftTrackKP.push( data.kp * 1000 );
+          leftTrackWear.push( data.wear );
         }
-        if( data.railSide === STRING_DOWN_TRACK ){
-          downTrackMGT.push( data.accumulateWeight );
-          downTrackKP.push( data.kp * 1000 );
-          downTrackWear.push( data.wear );
+        if( data.railSide === STRING_TRACK_SIDE_RIGHT ){
+          rightTrackMGT.push( data.accumulateWeight );
+          rightTrackKP.push( data.kp * 1000 );
+          rightTrackWear.push( data.wear );
         }else{
           /* upTrackMGT.push( data.accumulateWeight );
           upTrackKP.push( data.kp * 1000 );
@@ -312,24 +312,28 @@ function WearMaintenance( props ) {
 
     let data = [
       {
-        x: upTrackMGT, //통과톤수
-        y: upTrackKP, //kp
-        z: upTrackWear, //마모
+        x: leftTrackMGT, //통과톤수
+        y: leftTrackKP, //kp
+        z: leftTrackWear, //마모
         mode: 'markers',
+        /* mode: 'lines+markers', */
+        /* mode: 'lines', */
         type: 'scatter3d',
-        name: STRING_UP_TRACK,
+        name: "좌레일",
         marker: {
           size: 3,
           color: "red" //상선
         },
       },
       {
-        x: downTrackMGT,
-        y: downTrackKP,
-        z: downTrackWear,
+        x: rightTrackMGT,
+        y: rightTrackKP,
+        z: rightTrackWear,
         mode: 'markers',
+        /* mode: 'lines+markers', */
+        /* mode: 'lines', */
         type: 'scatter3d',
-        name: STRING_DOWN_TRACK,
+        name: "우레일",
         marker: {
           size: 3,
           color: "blue" //하선
@@ -349,7 +353,18 @@ function WearMaintenance( props ) {
     return data;
   }
 
+  const [resizeOn, setResizeOn] = useState(0);
+  const resizeChange = () => {
+    console.log("resizeChange");
+    setResizeOn(prevScales=>{
+      return prevScales+1
+    });
+  }
+
   useEffect(() => {
+    // 이벤트 리스너 추가
+    window.addEventListener('resize', resizeChange);
+
     getRailroadSection(setRailroadSection);
     let route = sessionStorage.getItem('route');
     if( route === STRING_ROUTE_INCHON ){
@@ -357,6 +372,9 @@ function WearMaintenance( props ) {
     }else if( route === STRING_ROUTE_SEOUL ){
       getSeoulSpeedData(setTrackSpeedData);
     }
+
+    // 컴포넌트가 언마운트 될 때 이벤트 리스너 제거
+    return () => {window.removeEventListener('resize', resizeChange )};
   }, []);
   
   useEffect( ()=> {
@@ -405,6 +423,7 @@ function WearMaintenance( props ) {
     <div className="wearMaintenance" >
       <div className="railStatusContainer">
         <RailStatus 
+          resizeOn={resizeOn}
           railroadSection={railroadSection} 
           pathClick={pathClick}
           dataExits={dataExits}
@@ -573,7 +592,7 @@ function WearMaintenance( props ) {
                   <div className="containerTitle bothEnds">
                     <div>마모정보</div>
                     <div className="flex">
-                      <ModalCustom buttonLabel="상선상세" title="상선 상세보기" 
+                      <ModalCustom buttonLabel="3D 상세보기" title="3D 상세보기" 
                         data={viewWear3dData}
                         dataSliderSort={(e)=>{
                           console.log("dataSliderSort");
@@ -592,7 +611,7 @@ function WearMaintenance( props ) {
                           wear3DMinMax = [];
                         }}
                       ></ModalCustom>
-                      <ModalCustom buttonLabel="하선상세" title="하선 상세보기" 
+                      {/* <ModalCustom buttonLabel="하선상세" title="하선 상세보기" 
                         data={viewWear3dData}
                         dataSliderSort={(e)=>{
                           console.log("dataSliderSort");
@@ -610,7 +629,7 @@ function WearMaintenance( props ) {
                           wearFilter = [STRING_VERTICAL_WEAR, STRING_CORNER_WEAR];
                           wear3DMinMax = [];
                         }}
-                      ></ModalCustom>
+                      ></ModalCustom> */}
                       <div className="modalButton highlight" onClick={()=>{
                         console.log("예측데이터 상세보기");
                         setOpen(true);

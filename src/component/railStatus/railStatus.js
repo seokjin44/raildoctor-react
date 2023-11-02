@@ -2,19 +2,21 @@ import React from "react";
 import "./railSTatus.css";
 import isEqual from 'lodash/isEqual';
 import { STRING_PATH, STRING_STATION } from "../../constant";
+import classNames from "classnames";
 
 class RailStatus extends React.Component {
 
   constructor(props) {
     super(props);
+    this.railContainer = React.createRef();
     this.state = {
       id: Math.random().toString(36).substring(2, 11),
       padding: 10,
-      pointerWidth: 10,
+      /* pointerWidth: 10, */
       selectedPath: undefined,
+      railObj : [],
     }
   }
-
   componentDidUpdate(prevProps, prevState) {
     if(this.props.railroadSection === undefined)  return;
     if(this.props.railroadSection.length === 0)  return;
@@ -27,7 +29,12 @@ class RailStatus extends React.Component {
 
     if (!isEqual(prevProps.dataExits, this.props.dataExits)) {
       console.log("props array has changed!");
-      this.dataExist();
+      console.log(this.props.dataExits);
+    }
+
+    if (!isEqual(prevProps.resizeOn, this.props.resizeOn)) {
+      console.log("props array has changed!");
+      this.init();
     }
 	}
 
@@ -41,20 +48,18 @@ class RailStatus extends React.Component {
   init() {
     console.log("!");
     if(this.props.railroadSection === undefined)  return;
-    document.getElementById("pointer-list-" + this.state.id).innerHTML = "";
-
-    let width = document.getElementById("pointer-list-" + this.state.id).offsetWidth - this.state.padding * 2;
-    /* let tick = width / (this.props.railroadSection.length + 2); */
+    let pointerWidth = 10;
+    let railObj_ = [];
+    let width = this.railContainer.current.offsetWidth - this.state.padding * 2;
     let stationList = [];
     let pathList = [];
-    for(let section of this.props.railroadSection){
+    for(let index in this.props.railroadSection ){
+      let section = this.props.railroadSection[index];
       if( section.type === STRING_STATION ){
-        stationList.push(section);
+        stationList.push({...section, ...{ index : index }});
       }
-    }
-    for(let section of this.props.railroadSection){
       if( section.type === STRING_PATH ){
-        pathList.push(section);
+        pathList.push({...section, ...{ index : index }});
       }
     }
 
@@ -63,128 +68,38 @@ class RailStatus extends React.Component {
         let section = stationList[i];
         let pointerDiv = document.createElement("div");
         pointerDiv.className = `pointer obj i${section.index}`;
-        pointerDiv.style.left = (tick * (i + 1)) + "px";
-        pointerDiv.style.top = "3px";
-        pointerDiv.style.zIndex = 10;
-        pointerDiv.style.width = this.state.pointerWidth + "px";
-  
-        pointerDiv.dataset.start_station_name = section.displayName;
-        pointerDiv.dataset.end_station_name = section.displayName;
-        pointerDiv.dataset.beginKp = section.beginKp;
-        pointerDiv.dataset.endKp = section.endKp;
-        let this_ = this;
-        pointerDiv.onclick = function (e) {
-          console.log(e);
-          let selectedPointer = document.getElementsByClassName("pointer selectedPath")[0];
-          if (e.target === selectedPointer) {
-            return;
-          } else if (selectedPointer !== undefined) {
-            selectedPointer.classList.remove("selectedPath");
-          }
 
-          let selectedPath = document.getElementsByClassName("path selectedPath")[0];
-          if (e.target === selectedPath) {
-            return;
-          } else if (selectedPath !== undefined) {
-            selectedPath.classList.remove("selectedPath");
-          }
-
-          e.target.classList.add("selectedPath");
-  
-          let path = {
-            start_station_name: e.target.dataset.start_station_name,
-            end_station_name: e.target.dataset.end_station_name,
-            type : STRING_STATION,
-            beginKp: Math.floor(e.target.dataset.beginKp * 1000),
-            endKp: Math.floor(e.target.dataset.endKp * 1000),
-          }
-  
-          this_.pathClick(path);
-        }
-
-        let pointerTextDiv = document.createElement("div");
-        pointerTextDiv.className = "pointerText";
-        pointerTextDiv.innerText = section.displayName;
-        
-        pointerDiv.appendChild(pointerTextDiv);
-        document.getElementById("pointer-list-" + this.state.id).appendChild(pointerDiv);
+        railObj_.push({
+          left : (tick * (i + 1)),
+          width : pointerWidth,
+          start_station_name : section.displayName,
+          end_station_name : section.displayName,
+          beginKp : section.beginKp * 1000,
+          endKp : section.endKp * 1000,
+          type : STRING_STATION,
+          index : section.index
+        })
     }
 
-    /* tick = width / (pathList.length + 2); */
     for (let i = 0; i < pathList.length; i++) {
       let section = pathList[i];
-        /* let section = this.props.railroadSection[i];
-        let pointerDiv = document.createElement("div");
-        pointerDiv.className = "pointer";
-        pointerDiv.style.left = (tick * (i + 1)) + "px";
-        pointerDiv.style.top = "3px";
-        pointerDiv.style.zIndex = 10;
-        pointerDiv.style.width = this.state.pointerWidth + "px";
-  
-        let pointerTextDiv = document.createElement("div");
-        pointerTextDiv.className = "pointerText";
-        pointerTextDiv.innerText = section.displayName;
-        pointerDiv.appendChild(pointerTextDiv);
-        document.getElementById("pointer-list-" + this.state.id).appendChild(pointerDiv); */
-
-      /* if(i < this.props.railroadSection.length - 1) { */
         let pathDiv = document.createElement("div");
         pathDiv.className = `path obj i${section.index}`;
-        pathDiv.style.left = (tick * (i + 1) + (this.state.pointerWidth / 2)) + "px";
-        pathDiv.style.width = tick + "px";
-        pathDiv.style.zIndex = 9;
-        pathDiv.style.top = "3px";
 
-        pathDiv.dataset.start_station_name = section.start_station_name;
-        pathDiv.dataset.end_station_name = section.end_station_name;
-  
-        pathDiv.dataset.beginKp = section.beginKp;
-        pathDiv.dataset.endKp = section.endKp;
-
-        let this_ = this;
-        pathDiv.onclick = function (e) {
-          let selectedPath = document.getElementsByClassName("path selectedPath")[0];
-          if (e.target === selectedPath) {
-            return;
-          } else if (selectedPath !== undefined) {
-            selectedPath.classList.remove("selectedPath");
-          }
-
-          let selectedPointer = document.getElementsByClassName("pointer selectedPath")[0];
-          if (e.target === selectedPointer) {
-            return;
-          } else if (selectedPointer !== undefined) {
-            selectedPointer.classList.remove("selectedPath");
-          }
-
-          e.target.classList.add("selectedPath");
-  
-          let path = {
-            start_station_name: e.target.dataset.start_station_name,
-            end_station_name: e.target.dataset.end_station_name,
-            type : STRING_PATH,
-            beginKp: Math.floor(e.target.dataset.beginKp * 1000),
-            endKp: Math.floor(e.target.dataset.endKp * 1000),
-          }
-  
-          this_.pathClick(path);
-        }
-        document.getElementById("pointer-list-" + this.state.id).appendChild(pathDiv);
-      /* } */      
+        railObj_.push({
+          left : (tick * (i + 1) + (pointerWidth / 2)),
+          width : tick,
+          start_station_name : section.start_station_name,
+          end_station_name : section.end_station_name,
+          beginKp : section.beginKp * 1000,
+          endKp : section.endKp * 1000,
+          type : STRING_PATH,
+          index : section.index
+        })
     }
-  }
 
-  dataExist() {
-    this.props.dataExits.forEach( (cnt, i) => {
-      if( cnt > 0 ){
-        let obj = document.querySelectorAll(`.pointerList .obj.i${i}`)[0];
-        console.log(obj.classList);
-        obj.classList.add("exist");
-        let cntDiv = document.createElement("div");
-        cntDiv.className = "cnt"
-        /* cntDiv.innerHTML = "(" + cnt + ")"; */
-        obj.appendChild(cntDiv);
-      }
+    this.setState({
+      railObj : railObj_
     })
   }
 
@@ -196,7 +111,34 @@ class RailStatus extends React.Component {
     return (
       <div className="railStatusBox">
         <div className="obj rail"></div>
-        <div className="obj pointerList" id={"pointer-list-" + this.state.id}>
+        <div className="obj pointerList" ref={this.railContainer} >
+          {
+            this.state.railObj.map( (obj, i) => {
+              let className = "";
+              let zIndex = 0;
+              let text = null;
+              let exist = false;
+              if( this.props.dataExits ){
+                exist = (this.props.dataExits[obj.index] > 0);
+              }
+              if( obj.type === STRING_PATH ){
+                 className="path"; zIndex = 9;
+              };
+              if( obj.type === STRING_STATION ){
+                 className="pointer"; zIndex = 10;
+                 text = <div className="pointerText">{obj.start_station_name}</div>;
+              };
+              return <div key={i} className={
+                  classNames(`obj ${className}`, 
+                    {selectedPath : this.state.selectedPath?.index === obj.index },
+                    {exist : exist }
+                  )
+                }
+                style={{ left : obj.left, width : `${obj.width}px`, zIndex : zIndex }}
+                onClick={(e)=>{this.pathClick(obj)}}
+              >{text}</div>
+            })
+          }
         </div>
       </div>
     );
