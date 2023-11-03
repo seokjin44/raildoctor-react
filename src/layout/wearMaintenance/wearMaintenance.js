@@ -36,7 +36,7 @@ function WearMaintenance( props ) {
     startDate: new Date().getTime() - (31536000000 * 7),
     endDate: new Date().getTime(),
     startMGT: 0,
-    endMGT: 1200
+    endMGT: 50000000000
   });
   const [wear3dData, setWear3dData] = useState([]);
   const [viewWear3dData, setViewWear3dData] = useState([]);
@@ -105,6 +105,13 @@ function WearMaintenance( props ) {
       if( mgtMinMax.max < mgtMax ){ mgtMinMax.max = mgtMax; }
       setDateSliderMinMax(dateMinMax);
       setMGTSliderMinMax(mgtMinMax);
+      
+      let wearSearchCondition_ = lodash.cloneDeep(wearSearchCondition);
+      if( wearSearchCondition_.startDate < dateMin ){ wearSearchCondition_.startDate = dateMin; }
+      if( wearSearchCondition_.endDate > dateMax ){ wearSearchCondition_.endDate = dateMax; }
+      if( wearSearchCondition_.startMGT < mgtMin ){ wearSearchCondition_.startMGT = mgtMin; }
+      if( wearSearchCondition_.endMGT > mgtMax ){ wearSearchCondition_.endMGT = mgtMax; }
+      setWearSearchCondition(wearSearchCondition_);
     })
     .catch(error => console.error('Error fetching data:', error));
 
@@ -134,6 +141,13 @@ function WearMaintenance( props ) {
       if( mgtMinMax.max < mgtMax ){ mgtMinMax.max = mgtMax; }
       setDateSliderMinMax(dateMinMax);
       setMGTSliderMinMax(mgtMinMax);
+            
+      let wearSearchCondition_ = lodash.cloneDeep(wearSearchCondition);
+      if( wearSearchCondition_.startDate < dateMin ){ wearSearchCondition_.startDate = dateMin; }
+      if( wearSearchCondition_.endDate > dateMax ){ wearSearchCondition_.endDate = dateMax; }
+      if( wearSearchCondition_.startMGT < mgtMin ){ wearSearchCondition_.startMGT = mgtMin; }
+      if( wearSearchCondition_.endMGT > mgtMax ){ wearSearchCondition_.endMGT = mgtMax; }
+      setWearSearchCondition(wearSearchCondition_);
     })
     .catch(error => console.error('Error fetching data:', error));
   }
@@ -240,8 +254,8 @@ function WearMaintenance( props ) {
       console.log(response.data);
       let cornerWearGraph = response.data.cornerWearGraph;
       let verticalWearGraph = response.data.verticalWearGraph;
-      setCornerWearGraphData(cornerWearGraph);
-      setVerticalWearGraphData(verticalWearGraph);
+/*       setCornerWearGraphData(cornerWearGraph);
+      setVerticalWearGraphData(verticalWearGraph); */
       let wear3DData = makeWear3dData(cornerWearGraph, verticalWearGraph, [STRING_VERTICAL_WEAR, STRING_CORNER_WEAR], []);
       setWear3dData(wear3DData);
       setViewWear3dData(wear3DData);
