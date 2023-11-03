@@ -8,7 +8,7 @@
 }
 
 .speedBoxContainer .legendBox{
-    width: 150px;
+    /* width: 150px; */
     height: 10px;
     position: absolute;
     left: 10px;

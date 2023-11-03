@@ -537,7 +537,7 @@ class TrackSpeed extends React.Component {
 		let hx = sizex / 2;
 		let hy = sizey / 2;
 		
-		let context = this.state.ctx;
+		let context = this.railCanvas.current.getContext("2d");
 		context.translate((p.x0), (p.y0));
 		context.rotate(radian);
 		context.translate(-hx,-hy);

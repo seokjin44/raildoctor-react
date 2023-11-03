@@ -562,8 +562,8 @@ export const getSeoulSpeedData = ( setTrackSpeedData ) => {
                                 let newRow = {
                                     x: row['KP'],
                                     y: row['speed'],
-                                    name: row['speed'] === '0' ? ' ' : ''
-                                    /* name: "_" */
+                                    /* name: row['speed'] === '0' ? ' ' : '' */
+                                    name: ""
                                 };
                                 return newRow;
                             }
