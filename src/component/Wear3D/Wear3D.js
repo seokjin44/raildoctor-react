@@ -120,10 +120,16 @@ class Wear3D extends React.Component {
                                 bordercolor: '#E2E2E2',
                                 borderwidth: 1,
                             },
+                            showlegend: false,
                             scene: {
                                 xaxis:{ title: 'MGT'},
                                 yaxis:{ title: 'KP'},
-                                zaxis:{ title: 'Wear'}
+                                zaxis:{ title: 'Wear'},
+                                camera: {
+                                    eye: {x: -1.25, y: -1.25, z: 1},
+                                    center: {x: 0, y: 0, z: 0},
+                                    up: {x: 0, y: 0, z: 1}
+                                },
                             }
                         }}
                         config={{
@@ -132,6 +138,10 @@ class Wear3D extends React.Component {
                         useResizeHandler={true}
                         style={{ width: "100%", height: "100%" }}
                     />
+                    <div className="legend">
+                        <div className="line"><div className="colorBar red"></div> 좌레일</div>
+                        <div className="line"><div className="colorBar blue"></div> 우레일</div>
+                    </div>
                 </div>
             </div>
         );

@@ -787,3 +787,10 @@ export const checkDateFormat = (str) => {
         return 'unknown format';
     }
 }
+export const convertQuarterFormat = (input) => {
+    // 정규식을 사용하여 문자열을 검색합니다.
+    const regex = /(\d{4})_(\d)/;
+    // 정규식에 맞는 부분을 치환합니다.
+    const replaced = input.replace(regex, (match, p1, p2) => `${p1}년 ${p2}분기`);
+    return replaced;
+  }

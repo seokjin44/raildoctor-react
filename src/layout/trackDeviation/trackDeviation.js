@@ -10,7 +10,7 @@ import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import { Modal } from "@mui/material";
 import axios from 'axios';
 import qs from 'qs';
-import { dateFormat, getRailroadSection, isEmpty, transposeObjectToArray } from "../../util";
+import { convertQuarterFormat, dateFormat, getRailroadSection, isEmpty, transposeObjectToArray } from "../../util";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 
 function TrackDeviation( props ) {
@@ -39,6 +39,11 @@ function TrackDeviation( props ) {
   const [viewMeasureDate, setViewMeasureDate] = useState(null);
   const [dataExitsDate, setDataExitsDate] = useState({});
   const [mode, setMode] = useState('month');
+
+  const [reportSelectRange, setReportSelectRange] = useState("");
+  const [reportSelectMeasureDate, setReportSelectMeasureDate] = useState(null);
+  const [reportSelectPath, setReportSelectPath] = useState("");
+  const [reportData, setReportData] = useState([]);
 
   const pathClick = (select) => {
     console.log(select);
@@ -302,6 +307,11 @@ function TrackDeviation( props ) {
                         /* alert("데이터가 없습니다."); */
                         return;
                       }
+
+                      setReportSelectRange(selectRange);
+                      setReportSelectMeasureDate(measureTs);
+                      setReportSelectPath(selectedPath);
+                      
                       console.log(dataAry);
                       if( option === STRING_HEIGHT ){
                         setHeightChartData(dataAry);
@@ -424,9 +434,9 @@ function TrackDeviation( props ) {
                 </div>
                 <div className="tableBody">
                   <div className="tr">
-                    <div className="td">2022 1분기</div>
-                    <div className="td">2022/03/12</div>
-                    <div className="td">간석오거리 - 인천시청</div>
+                    <div className="td">{convertQuarterFormat(reportSelectRange)}</div>
+                    <div className="td">{dateFormat(new Date(reportSelectMeasureDate))}</div>
+                    <div className="td">{reportSelectPath.start_station_name+" - "+reportSelectPath.end_station_name}</div>
                   </div>
                 </div>
               </div>

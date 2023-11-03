@@ -169,6 +169,21 @@ function WearMaintenance( props ) {
       alert("마모예측 상관성 및 예측모델을 선택해주세요.");
       return;
     }
+
+    if( wearSearchCondition.startDate < dateSliderMinMax.min || 
+        wearSearchCondition.endDate > dateSliderMinMax.max
+    ){
+      alert("선택한 계측기간의 최소값과 최대값이 맞지않습니다. 재조정 해주세요.");
+      return;
+    }
+
+    if( wearSearchCondition.startMGT < mgtSliderMinMax.min || 
+        wearSearchCondition.endMGT > mgtSliderMinMax.max
+    ){
+      alert("선택한 통과톤수의 최소값과 최대값이 맞지않습니다. 재조정 해주세요.");
+      return;
+    }
+
     let startKP = selectKP.beginKp / 1000;
     let endKP = selectKP.beginKp / 1000;
     console.log(startKP);
@@ -200,7 +215,8 @@ function WearMaintenance( props ) {
     })
     .catch(error => console.error('Error fetching data:', error));
 
-
+    startKP = selectedPath.beginKp / 1000;
+    endKP = selectedPath.endKp / 1000;
     param = {
       begin_kp : [startKP],
       end_kp : [endKP],
@@ -311,46 +327,62 @@ function WearMaintenance( props ) {
       }
     }
 
-    let data = [
-      {
-        x: leftTrackMGT, //통과톤수
-        y: leftTrackKP, //kp
-        z: leftTrackWear, //마모
-        /* mode: 'markers', */
-        /* mode: 'lines+markers', */
-        mode: 'lines',
+    let min = minmax[0];
+    let max = minmax[1];
+    
+    let uniqueLeftTrackKP = [...new Set(leftTrackKP)]; // type1Y에서 고유값 추출
+    let LeftTraces = uniqueLeftTrackKP.map(yValue => {
+      // 동일한 Y 값을 가진 데이터 포인트들로 구성된 배열 생성
+      let indices = leftTrackKP.map((val, idx) => val === yValue ? idx : -1).filter(idx => idx !== -1);
+      let xValues = indices.map(idx => leftTrackMGT[idx]);
+      let zValues = indices.map(idx => leftTrackWear[idx]);
+            
+      if( minmax && minmax.length === 2 ){
+        let [x, y, z] = filterArrays(min, max, xValues, indices, zValues);
+        xValues = x; indices = y; zValues = z;
+      }
+      // 고유 Y 값에 대한 trace 생성
+      return {
+        x: xValues,
+        y: indices.map(() => yValue), // 모든 포인트에 동일한 Y 값 할당
+        z: zValues,
+        mode: 'lines+markers',
         type: 'scatter3d',
-        name: "좌레일",
+        name: "좌레일 @ Y=" + yValue,
         marker: {
-          size: 3,
-          color: "red" //상선
+          size: 2,
+          color: "red"
         },
-      },
-      {
-        x: rightTrackMGT,
-        y: rightTrackKP,
-        z: rightTrackWear,
-        /* mode: 'markers', */
-        /* mode: 'lines+markers', */
-        mode: 'lines',
+      };
+    });
+
+    let uniqueRightTrackKP = [...new Set(rightTrackKP)]; // type1Y에서 고유값 추출
+    let rightTraces = uniqueRightTrackKP.map(yValue => {
+      // 동일한 Y 값을 가진 데이터 포인트들로 구성된 배열 생성
+      let indices = rightTrackKP.map((val, idx) => val === yValue ? idx : -1).filter(idx => idx !== -1);
+      let xValues = indices.map(idx => rightTrackMGT[idx]);
+      let zValues = indices.map(idx => rightTrackWear[idx]);
+      
+      if( minmax && minmax.length === 2 ){
+        let [x, y, z] = filterArrays(min, max, xValues, indices, zValues);
+        xValues = x; indices = y; zValues = z;
+      }
+      // 고유 Y 값에 대한 trace 생성
+      return {
+        x: xValues,
+        y: indices.map(() => yValue), // 모든 포인트에 동일한 Y 값 할당
+        z: zValues,
+        mode: 'lines+markers',
         type: 'scatter3d',
         name: "우레일",
         marker: {
-          size: 3,
-          color: "blue" //하선
-        }
-      }
-    ];
-
-    let min = minmax[0];
-    let max = minmax[1];
-    if( minmax && minmax.length === 2 ){
-      let [x1, y1, z1] = filterArrays(min, max, data[0].x, data[0].y, data[0].z);
-      let [x2, y2, z2] = filterArrays(min, max, data[1].x, data[1].y, data[1].z);
-      data[0].x = x1; data[0].y = y1; data[0].z = z1;
-      data[1].x = x2; data[1].y = y2; data[1].z = z2;
-    }
-
+          size: 2,
+          color: "blue"
+        },
+      };
+    });
+    
+    let data = [ ...LeftTraces, ...rightTraces ];
     return data;
   }
 
