@@ -146,30 +146,31 @@ function WearMaintenance( props ) {
 
   const onChangeTimeSlider = (newValue) => {
     console.log(timeFormatDate(newValue[0]) + "   ~   " + timeFormatDate(newValue[1]));
-    setWearSearchCondition({
-        startDate: newValue[0],
-        endDate: newValue[1],
-        startMGT: parseInt(document.getElementById("startWearMGT").innerText),
-        endMGT: parseInt(document.getElementById("endWearMGT").innerText)
-      });
-    
+    setWearSearchCondition( prevWearSearchCondition =>{
+      const wearSearchCondition_ = lodash.cloneDeep(prevWearSearchCondition);
+      wearSearchCondition_.startDate = newValue[0];
+      wearSearchCondition_.endDate = newValue[1];
+      return wearSearchCondition_;
+    });
   };
 
   const onChangeMgtSlider = (newValue) => {
     console.log(newValue);
-    setWearSearchCondition({
-        startDate: new Date(document.getElementById("startWearDate").innerText).getTime(),
-        endDate: new Date(document.getElementById("endWearDate").innerText).getTime(),
-        startMGT: newValue[0],
-        endMGT: newValue[1]
-      
+    setWearSearchCondition( prevWearSearchCondition =>{
+      const wearSearchCondition_ = lodash.cloneDeep(prevWearSearchCondition);
+      wearSearchCondition_.startMGT = newValue[0];
+      wearSearchCondition_.endMGT = newValue[1];
+      return wearSearchCondition_;
     });
   };
 
   const onClickWearSearch = () => {
-    /* getWearInfo(); */
+    if( !selectModel || selectModel === "" || selectModel === null || selectModel === undefined ){
+      alert("마모예측 상관성 및 예측모델을 선택해주세요.");
+      return;
+    }
     let startKP = selectKP.beginKp / 1000;
-    let endKP = selectKP.endKp / 1000;
+    let endKP = selectKP.beginKp / 1000;
     console.log(startKP);
     console.log(endKP);
     let route = sessionStorage.getItem('route');
@@ -178,8 +179,8 @@ function WearMaintenance( props ) {
       end_kp : [endKP],
       beginMeasureTs : new Date(wearSearchCondition.startDate).toISOString(),
       endMeasureTs : new Date(wearSearchCondition.endDate).toISOString(),
-      minAccumulateWeight : 1,
-      maxAccumulateWeight : 500000000,
+      minAccumulateWeight : wearSearchCondition.startMGT,
+      maxAccumulateWeight : wearSearchCondition.endMGT,
       railTrack : trackNumberToString(selectKP.trackType),
       railroadName : route,
       graphType : "TWO_DIMENTION",
@@ -205,8 +206,8 @@ function WearMaintenance( props ) {
       end_kp : [endKP],
       beginMeasureTs : new Date(wearSearchCondition.startDate).toISOString(),
       endMeasureTs : new Date(wearSearchCondition.endDate).toISOString(),
-      minAccumulateWeight : 1,
-      maxAccumulateWeight : 500000000,
+      minAccumulateWeight : wearSearchCondition.startMGT,
+      maxAccumulateWeight : wearSearchCondition.endMGT,
       railTrack : trackNumberToString(selectKP.trackType),
       railroadName : route,
       graphType : "THREE_DIMENTION",
@@ -315,9 +316,9 @@ function WearMaintenance( props ) {
         x: leftTrackMGT, //통과톤수
         y: leftTrackKP, //kp
         z: leftTrackWear, //마모
-        mode: 'markers',
+        /* mode: 'markers', */
         /* mode: 'lines+markers', */
-        /* mode: 'lines', */
+        mode: 'lines',
         type: 'scatter3d',
         name: "좌레일",
         marker: {
@@ -329,9 +330,9 @@ function WearMaintenance( props ) {
         x: rightTrackMGT,
         y: rightTrackKP,
         z: rightTrackWear,
-        mode: 'markers',
+        /* mode: 'markers', */
         /* mode: 'lines+markers', */
-        /* mode: 'lines', */
+        mode: 'lines',
         type: 'scatter3d',
         name: "우레일",
         marker: {
@@ -466,9 +467,9 @@ function WearMaintenance( props ) {
                       <div className="flex bothEnds valueBox">
                         <label className="textBold title">계측기간</label>
                         <div className="flex dataText">
-                          <div id="startWearDate">{timeFormatDate(dateSliderMinMax.min)}</div>
+                          <div id="startWearDate">{timeFormatDate(new Date(wearSearchCondition.startDate))}</div>
                           <div>~</div>
-                          <div id="endWearDate">{timeFormatDate(dateSliderMinMax.max)}</div>
+                          <div id="endWearDate">{timeFormatDate(new Date(wearSearchCondition.endDate))}</div>
                         </div>
                       </div>
                       <div className="flex" tyle={{height:'30px'}}>
@@ -486,9 +487,9 @@ function WearMaintenance( props ) {
                       <div className="flex bothEnds valueBox">
                         <label className="textBold title">통과톤수</label>
                         <div className="flex dataText">
-                          <div id="startWearMGT">{mgtToM(mgtSliderMinMax.min)}</div>
+                          <div id="startWearMGT">{mgtToM(wearSearchCondition.startMGT)}</div>
                           <div>~</div>
-                          <div id="endWearMGT">{mgtToM(mgtSliderMinMax.max)}</div>
+                          <div id="endWearMGT">{mgtToM(wearSearchCondition.endMGT)}</div>
                           <div style={{marginLeft: "5px"}}>MGT</div>
                         </div>
                       </div>
@@ -845,7 +846,7 @@ function WearMaintenance( props ) {
               <div className="closeBtn" onClick={()=>{setOpen2(false)}} ><img src={CloseIcon} /></div>
             </div>
             <div className="decisionPopupContent">
-              <div className="contentBox wearContainer" style={{marginLeft : 0, height:"575px"}}>
+              <div className="contentBox wearContainer" style={{marginLeft : 0, height:"515px"}}>
                   <div className="containerTitle bothEnds">
                     <div>마모정보</div>
                   </div>
@@ -871,7 +872,7 @@ function WearMaintenance( props ) {
                   </div>
               </div>
 
-              <div className="comment" style={{ marginTop: "50px"}} >
+              <div className="comment" style={{ marginTop: "20px"}} >
                 <div className="commentTitle">유지보수 지침</div>
                 <div className="commentInput">
                   <TextArea rows={3} />

@@ -210,7 +210,6 @@ class PlaceInfo extends React.Component {
 	} */
 
 	drawPlace() {
-		console.log("drawPlace");
 		pointList = [];
 		if(this.props.path === undefined)	return;
 		if(this.props.instrumentationPoint === undefined)	return;
@@ -325,7 +324,6 @@ class PlaceInfo extends React.Component {
 	}
 
 	drawPoint() {
-		console.log("drawPoint");
 		if(this.props.path === undefined)	return;
 		if(this.props.instrumentationPoint === undefined)	return;
 

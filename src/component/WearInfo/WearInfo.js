@@ -34,6 +34,7 @@ class WearInfo extends React.Component {
                     }
                 },
                 xaxis: {
+                    tickAmount: 20,
                     title: {
                       text: '통과톤수 (MGT)'
                     },

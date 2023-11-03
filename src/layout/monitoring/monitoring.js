@@ -91,7 +91,7 @@ function Monitoring( props ) {
     //getInstrumentationPoint(select);
     //setSelectedPath(select);
     setKP(select.beginKp);
-    setInputKp(select.beginKp);
+    setInputKp(Math.floor(select.beginKp));
   }
 
   const getTrackGeo = ( kp_ ) => {
@@ -177,7 +177,22 @@ function Monitoring( props ) {
       setRailtwists(response.data.railtwists);
       setRailwears(response.data.railwears);
       setTemperatures(response.data.temperatures);
-      setPaut(response.data.pauts);
+      /* setPaut(response.data.pauts); */
+    })
+    .catch(error => console.error('Error fetching data:', error));
+    axios.get(`https://raildoctor.suredatalab.kr/api/pauts`,{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroad : route,
+        beginTs : dates[0].$d.toISOString(),
+        endTs : dates[1].$d.toISOString(),
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      setPaut(response.data.entities);
     })
     .catch(error => console.error('Error fetching data:', error));
   }

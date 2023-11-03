@@ -236,8 +236,8 @@ function CumulativeThroughput( props ) {
     console.log(select);
     setSelectedPath(select);
     setKP(select.beginKp);
-    setInputKp(select.beginKp);
-    setendKp(select.endKp);
+    setInputKp(Math.floor(select.beginKp));
+    setendKp(Math.floor(select.endKp));
     if( select.type === STRING_STATION ){
       setSelectSearch(KP_SEARCH_SINGLE);
       getAccRemainingData(select.beginKp);

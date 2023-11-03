@@ -111,6 +111,7 @@
 .monitoringContainer .datafinder .dataList .line .dataBar .detailBtn:hover{
     background-color: #00A2E8;
     border: 1px solid #bdbdbd;
+    z-index: 1;
 }
 
 .monitoringContainer .datafinder .dataList .line .dataBar .detailBtn .tooltip{

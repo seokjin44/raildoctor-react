@@ -282,13 +282,9 @@ function RailTrackAlignment( props ) {
                     <div className="td no">{i+1}</div>
                     <div className="td regDate">{formatDateTime(new Date(report.measureTs))}</div>
                     <div className="td track">{report.railTrack}</div>
-                    {/* <div className="td rail">Right</div> */}
-                    {/* <div className="td station">15K242</div> */}
                     <div className="td weld">{report.welding}</div>
-                    {/* <div className="td weld">431,235,694</div> */}
                     <div className="td viewBtn">
                       <div className="viewBtn" onClick={()=>{
-                         /* setOpen(true)  */
                         axios.get('https://raildoctor.suredatalab.kr/api/railstraights/files',{
                           paramsSerializer: params => {
                             return qs.stringify(params, { format: 'RFC3986' })
@@ -300,20 +296,7 @@ function RailTrackAlignment( props ) {
                         })
                         .then(response => {
                           console.log(response.data);
-                          /* setOpen(true);
-                          let pdfData = []; */
                           for( let file of response.data.file ){
-                            /* let url = `https://raildoctor.suredatalab.kr/resources${pdfFile.filePath}`; */
-                            /* let url = `https://raildoctor.suredatalab.kr/resources/data/railstraights/bb6b47ac-d8ab-489b-8722-aefc76c06a14.pdf`;
-                            console.log(url);
-                            axios.get(url, {
-                              responseType: 'arraybuffer', // 중요: PDF 데이터를 ArrayBuffer로 가져옵니다.
-                            })
-                            .then( response => {
-                              pdfData.push( new Uint8Array(response.data) );
-                              setPDFDataList(pdfData);
-                            })
-                            .catch(error => console.error('Error fetching data:', error));          */                 
                             window.open(`https://raildoctor.suredatalab.kr/resources${file.filePath}`);
                           }
                         })
@@ -325,141 +308,10 @@ function RailTrackAlignment( props ) {
                   </div>
                   })
                 }
-                {/* <div className="tr">
-                  <div className="td no">1</div>
-                  <div className="td regDate">23/5/31 2:10</div>
-                  <div className="td track">Left</div>
-                  <div className="td rail">Right</div>
-                  <div className="td station">15K242</div>
-                  <div className="td weld">TMW</div>
-                  <div className="td weld">431,235,694</div>
-                  <div className="td viewBtn">
-                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
-                      <img src={ReportIcon} />
-                    </div>
-                  </div>
-                </div>
-                <div className="tr">
-                  <div className="td no">1</div>
-                  <div className="td regDate">23/5/31 4:20</div>
-                  <div className="td track">Left</div>
-                  <div className="td rail">Right</div>
-                  <div className="td station">15K242</div>
-                  <div className="td weld">TMW</div>
-                  <div className="td weld">431,235,694</div>
-                  <div className="td viewBtn">
-                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
-                      <img src={ReportIcon} />
-                    </div>
-                  </div>
-                </div>
-                <div className="tr">
-                  <div className="td no">2</div>
-                  <div className="td regDate">23/6/1 3:51</div>
-                  <div className="td track">Left</div>
-                  <div className="td rail">Right</div>
-                  <div className="td station">15K242</div>
-                  <div className="td weld">TMW</div>
-                  <div className="td weld">431,235,694</div>
-                  <div className="td viewBtn">
-                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
-                      <img src={ReportIcon} />
-                    </div>
-                  </div>
-                </div>
-                <div className="tr">
-                  <div className="td no">3</div>
-                  <div className="td regDate">23/6/12 1:15</div>
-                  <div className="td track">Left</div>
-                  <div className="td rail">Right</div>
-                  <div className="td station">15K242</div>
-                  <div className="td weld">TMW</div>
-                  <div className="td weld">431,235,694</div>
-                  <div className="td viewBtn">
-                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
-                      <img src={ReportIcon} />
-                    </div>
-                  </div>
-                </div>
-                <div className="tr">
-                  <div className="td no">4</div>
-                  <div className="td regDate">23/6/15 5:26</div>
-                  <div className="td track">Left</div>
-                  <div className="td rail">Right</div>
-                  <div className="td station">15K242</div>
-                  <div className="td weld">TMW</div>
-                  <div className="td weld">431,235,694</div>
-                  <div className="td viewBtn">
-                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
-                      <img src={ReportIcon} />
-                    </div>
-                  </div>
-                </div>
-                <div className="tr">
-                  <div className="td no">5</div>
-                  <div className="td regDate">23/6/17 5:17</div>
-                  <div className="td track">Left</div>
-                  <div className="td rail">Right</div>
-                  <div className="td station">15K242</div>
-                  <div className="td weld">TMW</div>
-                  <div className="td weld">431,235,694</div>
-                  <div className="td viewBtn">
-                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
-                      <img src={ReportIcon} />
-                    </div>
-                  </div>
-                </div>
-                <div className="tr">
-                  <div className="td no">6</div>
-                  <div className="td regDate">23/7/1 4:17</div>
-                  <div className="td track">Left</div>
-                  <div className="td rail">Right</div>
-                  <div className="td station">15K242</div>
-                  <div className="td weld">TMW</div>
-                  <div className="td weld">431,235,694</div>
-                  <div className="td viewBtn">
-                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
-                      <img src={ReportIcon} />
-                    </div>
-                  </div>
-                </div>
-                <div className="tr">
-                  <div className="td no">7</div>
-                  <div className="td regDate">23/7/10 4:28</div>
-                  <div className="td track">Left</div>
-                  <div className="td rail">Right</div>
-                  <div className="td station">15K242</div>
-                  <div className="td weld">TMW</div>
-                  <div className="td weld">431,235,694</div>
-                  <div className="td viewBtn">
-                    <div className="viewBtn" onClick={()=>{ setOpen(true) }}>
-                      <img src={ReportIcon} />
-                    </div>
-                  </div>
-                </div> */}
               </div>
             </div>
         </div>
       </div>
-
-      {/* <Modal
-        open={open}
-        onClose={(e)=>{console.log(e);handleClose()}}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={RAIL_ROUGHNESS_BOXSTYLE} >
-          {
-            (pdfDataList.length > 0) ?
-            <Document file={pdfDataList[0]}>
-              <Page pageNumber={1} />
-            </Document> : null
-          }
-          
-
-        </Box>
-      </Modal> */}
-
     </div>
   );
 }

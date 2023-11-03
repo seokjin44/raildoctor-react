@@ -528,6 +528,7 @@ function DataExistence( props ) {
               onMouseOut={()=>{setPautTooltipIndex(-1)}}
               
               onClick={()=>{
+                console.log(data);
                 setPautOpen(true);
                 setPautData(data);
                 setPautImgIndex(0);
@@ -691,7 +692,7 @@ function DataExistence( props ) {
         >
         <Box sx={BOXSTYLE} >
           <div className="popupTitle"><img src={PopupIcon} />온습도 상세요약</div>
-          <div className="tabPanel" style={{width:"763px", height:"336px"}}>
+          <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
             <div className="contentBox" style={{height: "100%"}}>
               <div className="containerTitle">Chart
                 <div className="dataOption" style={{right: "174px"}}>
@@ -746,7 +747,7 @@ function DataExistence( props ) {
         >
         <Box sx={BOXSTYLE} >
           <div className="popupTitle"><img src={PopupIcon} />PAUT 상세요약</div>
-          <div className="tabPanel" style={{width:"1450px", height:"1000px"}}>
+          <div className="tabPanel" style={{width:"945px", height:"700px"}}>
             <div className="contentBox paut" style={{height: "100px", marginBottom:"10px"}} >
               <div className="containerTitle">탐상 데이터</div>
               <div className="componentBox flex section ">
@@ -785,15 +786,15 @@ function DataExistence( props ) {
                 {
                   (pautData.images && pautData.images.length > 0) ? 
                   <>
-                    <div className="leftBtn" onClick={()=>{
+                    {(pautData.images.length > 1) ? <div className="leftBtn" onClick={()=>{
                       if(pautImgIndex>0){setPautImgIndex(pautImgIndex-1)}
-                    }}></div>
+                    }}></div> : null }
                     <img src={`https://raildoctor.suredatalab.kr${pautData.images[pautImgIndex].filePath}`}  />
-                    <div className="rightBtn" onClick={()=>{
+                    {(pautData.images.length > 1) ? <div className="rightBtn" onClick={()=>{
                       if(pautImgIndex<pautData.images.length-1){
                         setPautImgIndex(pautImgIndex+1)
                       }
-                    }}></div>
+                    }}></div> : null}
                   </>
                   : null
                 }
@@ -875,7 +876,7 @@ function DataExistence( props ) {
             </div>
             </TabPanel>
             <TabPanel value="2">
-            <div className="tabPanel" style={{width:"763px", height:"336px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
               <div className="contentBox" style={{width:"100%", height: "100%"}}>
                 <div className="containerTitle">
                   Chart
@@ -927,7 +928,7 @@ function DataExistence( props ) {
             </div>
             </TabPanel>
             <TabPanel value="3">
-            <div className="tabPanel" style={{width:"763px", height:"336px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
               <div className="contentBox" style={{width:"100%", height: "100%"}}>
                 <div className="containerTitle">
                   Chart
@@ -978,7 +979,7 @@ function DataExistence( props ) {
             </div>
             </TabPanel>
             <TabPanel value="4">
-            <div className="tabPanel" style={{width:"763px", height:"336px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
               <div className="contentBox" style={{width:"100%", height: "100%"}}>
                 <div className="containerTitle">
                   Chart
@@ -1029,7 +1030,7 @@ function DataExistence( props ) {
             </div>
             </TabPanel>
             <TabPanel value="5">
-            <div className="tabPanel" style={{width:"763px", height:"336px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
               <div className="contentBox" style={{width:"100%", height: "100%"}}>
                 <div className="containerTitle">
                   Chart
@@ -1104,7 +1105,7 @@ function DataExistence( props ) {
               </TabList>
             </Box>
             <TabPanel value="1">
-              <div className="tabPanel" style={{width:"1000px", height:"320px"}}>
+              <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
@@ -1204,7 +1205,7 @@ function DataExistence( props ) {
               </div>
             </TabPanel>
             <TabPanel value="2">
-            <div className="tabPanel" style={{width:"1000px", height:"320px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
@@ -1304,7 +1305,7 @@ function DataExistence( props ) {
               </div>
             </TabPanel>
             <TabPanel value="3">
-            <div className="tabPanel" style={{width:"1000px", height:"320px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
@@ -1404,7 +1405,7 @@ function DataExistence( props ) {
               </div>
             </TabPanel>
             <TabPanel value="4">
-            <div className="tabPanel" style={{width:"1000px", height:"320px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
@@ -1504,7 +1505,7 @@ function DataExistence( props ) {
               </div>
             </TabPanel>
             <TabPanel value="5">
-            <div className="tabPanel" style={{width:"1000px", height:"320px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
@@ -1604,7 +1605,7 @@ function DataExistence( props ) {
               </div>
             </TabPanel>
             <TabPanel value="6">
-            <div className="tabPanel" style={{width:"1000px", height:"320px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
@@ -1704,7 +1705,7 @@ function DataExistence( props ) {
               </div>
             </TabPanel>
             <TabPanel value="7">
-            <div className="tabPanel" style={{width:"1000px", height:"320px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
