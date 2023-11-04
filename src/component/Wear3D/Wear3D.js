@@ -141,6 +141,8 @@ class Wear3D extends React.Component {
                     <div className="legend">
                         <div className="line"><div className="colorBar red"></div> 좌레일</div>
                         <div className="line"><div className="colorBar blue"></div> 우레일</div>
+                        <div className="line"><div className="colorBar yellow"></div> 좌레일 예측</div>
+                        <div className="line"><div className="colorBar green"></div> 우레일 예측</div>
                     </div>
                 </div>
             </div>

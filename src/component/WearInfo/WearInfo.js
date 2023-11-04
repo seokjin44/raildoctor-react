@@ -3,6 +3,7 @@ import "./WearInfo.css";
 import Chart from "react-apexcharts";
 import { DOWN_TRACK, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, UP_TRACK } from '../../constant';
 import lodash from "lodash";
+import { zeroToNull } from '../../util';
 
 class WearInfo extends React.Component {
     constructor(props) {
@@ -216,11 +217,11 @@ class WearInfo extends React.Component {
 
             if( this.props.selectKP.trackType === UP_TRACK ){
                 if( data.railSide === STRING_TRACK_SIDE_LEFT ){
-                    series[1].data.push([data.accumulateWeight, data.wear]);
-                    series[5].data.push([data.accumulateWeight, data.prediction]);
+                    series[1].data.push([data.accumulateWeight, zeroToNull(data.wear)]);
+                    series[5].data.push([data.accumulateWeight, zeroToNull(data.prediction)]);
                 }else if( data.railSide === STRING_TRACK_SIDE_RIGHT ){
-                    series[3].data.push([data.accumulateWeight, data.wear]);
-                    series[7].data.push([data.accumulateWeight, data.prediction]);
+                    series[3].data.push([data.accumulateWeight, zeroToNull(data.wear)]);
+                    series[7].data.push([data.accumulateWeight, zeroToNull(data.prediction)]);
                 }else{
                     /* series[1].data.push([data.accumulateWeight, data.wear]);
                     series[5].data.push([data.accumulateWeight, data.prediction]);
@@ -229,11 +230,11 @@ class WearInfo extends React.Component {
                 }
             }else if( this.props.selectKP.trackType === DOWN_TRACK ){
                 if( data.railSide === STRING_TRACK_SIDE_LEFT ){
-                    series[0].data.push([data.accumulateWeight, data.wear]);
-                    series[4].data.push([data.accumulateWeight, data.prediction]);
+                    series[0].data.push([data.accumulateWeight, zeroToNull(data.wear)]);
+                    series[4].data.push([data.accumulateWeight, zeroToNull(data.prediction)]);
                 }else if( data.railSide === STRING_TRACK_SIDE_RIGHT ){
-                    series[2].data.push([data.accumulateWeight, data.wear]);
-                    series[6].data.push([data.accumulateWeight, data.prediction]);
+                    series[2].data.push([data.accumulateWeight, zeroToNull(data.wear)]);
+                    series[6].data.push([data.accumulateWeight, zeroToNull(data.prediction)]);
                 }else{
                     /* series[0].data.push([data.accumulateWeight, data.wear]);
                     series[4].data.push([data.accumulateWeight, data.prediction]);

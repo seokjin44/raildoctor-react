@@ -32,7 +32,7 @@
     left: 0;
     bottom: 0;
     width: 100px;
-    height: 55px;
+    height: 105px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -63,6 +63,14 @@
 
 .Wear3DChartContainer .legend .line .colorBar.blue{
     background-color: blue;
+}
+
+.Wear3DChartContainer .legend .line .colorBar.yellow{
+    background-color: yellow;
+}
+
+.Wear3DChartContainer .legend .line .colorBar.green{
+    background-color: green;
 }
 
 .checkboxContainer {

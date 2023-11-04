@@ -15,7 +15,7 @@ import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, convertToNumber2, dateFormat, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, mgtToM, numberWithCommas, trackLeftRightToString, trackNumberToString, trackToString, wearModelTableBody, wearModelTableHeader1, wearModelTableHeader2 } from "../../util";
+import { convertToCustomFormat, convertToNumber2, dateFormat, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, mgtToM, numberWithCommas, trackLeftRightToString, trackNumberToString, trackToString, wearModelTableBody, wearModelTableHeader1, wearModelTableHeader2, zeroToNull } from "../../util";
 import lodash, { isEmpty } from "lodash";
 
 const { TextArea } = Input;
@@ -322,22 +322,26 @@ function WearMaintenance( props ) {
     let leftTrackMGT = [];
     let leftTrackKP = [];
     let leftTrackWear = [];
+    let leftTrackPrediction = [];
 
     let rightTrackMGT = [];
     let rightTrackKP = [];
     let rightTrackWear = [];
+    let rightTrackPrediction = [];
 
     if( fliter.indexOf(STRING_CORNER_WEAR) > -1 ){
       for( let data of cornerWearGraph ){
         if( data.railSide === STRING_TRACK_SIDE_LEFT ){
           leftTrackMGT.push( data.accumulateWeight );
           leftTrackKP.push( data.kp * 1000 );
-          leftTrackWear.push( data.wear );
+          leftTrackWear.push( zeroToNull(data.wear) );
+          leftTrackPrediction.push( zeroToNull(data.prediction) );
         }
         if( data.railSide === STRING_TRACK_SIDE_RIGHT ){
           rightTrackMGT.push( data.accumulateWeight );
           rightTrackKP.push( data.kp * 1000 );
-          rightTrackWear.push( data.wear );
+          rightTrackWear.push( zeroToNull(data.wear) );
+          rightTrackPrediction.push( zeroToNull(data.prediction) );
         }else{
           /* upTrackMGT.push( data.accumulateWeight );
           upTrackKP.push( data.kp * 1000 );
@@ -354,12 +358,14 @@ function WearMaintenance( props ) {
         if( data.railSide === STRING_TRACK_SIDE_LEFT ){
           leftTrackMGT.push( data.accumulateWeight );
           leftTrackKP.push( data.kp * 1000 );
-          leftTrackWear.push( data.wear );
+          leftTrackWear.push( zeroToNull(data.wear) );
+          leftTrackPrediction.push( zeroToNull(data.prediction) );
         }
         if( data.railSide === STRING_TRACK_SIDE_RIGHT ){
           rightTrackMGT.push( data.accumulateWeight );
           rightTrackKP.push( data.kp * 1000 );
-          rightTrackWear.push( data.wear );
+          rightTrackWear.push( zeroToNull(data.wear) );
+          rightTrackPrediction.push( zeroToNull(data.prediction) );
         }else{
           /* upTrackMGT.push( data.accumulateWeight );
           upTrackKP.push( data.kp * 1000 );
@@ -400,6 +406,31 @@ function WearMaintenance( props ) {
       };
     });
 
+    let LeftPredictionTraces = uniqueLeftTrackKP.map(yValue => {
+      // 동일한 Y 값을 가진 데이터 포인트들로 구성된 배열 생성
+      let indices = leftTrackKP.map((val, idx) => val === yValue ? idx : -1).filter(idx => idx !== -1);
+      let xValues = indices.map(idx => leftTrackMGT[idx]);
+      let zValues = indices.map(idx => leftTrackPrediction[idx]);
+            
+      if( minmax && minmax.length === 2 ){
+        let [x, y, z] = filterArrays(min, max, xValues, indices, zValues);
+        xValues = x; indices = y; zValues = z;
+      }
+      // 고유 Y 값에 대한 trace 생성
+      return {
+        x: xValues,
+        y: indices.map(() => yValue), // 모든 포인트에 동일한 Y 값 할당
+        z: zValues,
+        mode: 'lines+markers',
+        type: 'scatter3d',
+        name: "좌레일예측 @ Y=" + yValue,
+        marker: {
+          size: 2,
+          color: "yellow"
+        },
+      };
+    });
+
     let uniqueRightTrackKP = [...new Set(rightTrackKP)]; // type1Y에서 고유값 추출
     let rightTraces = uniqueRightTrackKP.map(yValue => {
       // 동일한 Y 값을 가진 데이터 포인트들로 구성된 배열 생성
@@ -426,7 +457,32 @@ function WearMaintenance( props ) {
       };
     });
     
-    let data = [ ...LeftTraces, ...rightTraces ];
+    let rightPredictionTraces = uniqueRightTrackKP.map(yValue => {
+      // 동일한 Y 값을 가진 데이터 포인트들로 구성된 배열 생성
+      let indices = rightTrackKP.map((val, idx) => val === yValue ? idx : -1).filter(idx => idx !== -1);
+      let xValues = indices.map(idx => rightTrackMGT[idx]);
+      let zValues = indices.map(idx => rightTrackPrediction[idx]);
+            
+      if( minmax && minmax.length === 2 ){
+        let [x, y, z] = filterArrays(min, max, xValues, indices, zValues);
+        xValues = x; indices = y; zValues = z;
+      }
+      // 고유 Y 값에 대한 trace 생성
+      return {
+        x: xValues,
+        y: indices.map(() => yValue), // 모든 포인트에 동일한 Y 값 할당
+        z: zValues,
+        mode: 'lines+markers',
+        type: 'scatter3d',
+        name: "우레일예측 @ Y=" + yValue,
+        marker: {
+          size: 2,
+          color: "green"
+        },
+      };
+    });
+
+    let data = [ ...LeftTraces, ...rightTraces, ...LeftPredictionTraces, ...rightPredictionTraces ];
     return data;
   }
 

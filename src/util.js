@@ -839,3 +839,10 @@ export const measureTypeText = (val) => {
     }
     return '';
 }
+
+export const zeroToNull = (val) => {
+    if(val === 0){
+        return null;
+    }
+    return val
+}
