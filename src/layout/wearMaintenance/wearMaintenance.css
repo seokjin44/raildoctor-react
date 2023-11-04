@@ -653,14 +653,16 @@
     align-items: baseline;
     flex-direction: column;
     font-size: 13px;
+    width: 180px;
 }
 
 .searchContainer .componentBox .searchOption .linear .line{
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 1.5px;
-    margin-bottom: 1.5px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    width: 100%;
 }
 
 .searchContainer .componentBox .searchOption .linear .line .title{
@@ -671,4 +673,9 @@
     border: 1px solid #cccccc;
     border-radius: 5px;
     margin-right: 5px;
+}
+
+.searchContainer .componentBox .searchOption .linear .line .info{
+    width: calc(100% - 45px);
+    font-size: 10px;
 }

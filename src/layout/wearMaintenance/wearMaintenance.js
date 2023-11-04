@@ -724,13 +724,17 @@ function WearMaintenance( props ) {
                       <div className="flex linear ">
                         <div className="line">
                           <div className="title">상선 </div>
-                          {nonData(trackGeo?.t2?.shapeDisplay)} /
-                            R={nonData(trackGeo?.t2?.direction)} {nonData(trackGeo?.t2?.radius)} (C={nonData(trackGeo?.t2?.cant)}, S={nonData(trackGeo?.t2?.slack)})
+                          <div className="info">
+                            {nonData(trackGeo?.t2?.shapeDisplay)} / R={nonData(trackGeo?.t2?.direction)} <br/>
+                            {nonData(trackGeo?.t2?.radius)} (C={nonData(trackGeo?.t2?.cant)}, S={nonData(trackGeo?.t2?.slack)})
+                          </div>
                         </div>
                         <div className="line">
                           <div className="title">하선 </div>
-                          {nonData(trackGeo?.t1?.shapeDisplay)} /
-                            R={nonData(trackGeo?.t1?.direction)} {nonData(trackGeo?.t1?.radius)} (C={nonData(trackGeo?.t1?.cant)}, S={nonData(trackGeo?.t1?.slack)})
+                          <div className="info">
+                            {nonData(trackGeo?.t1?.shapeDisplay)} / R={nonData(trackGeo?.t1?.direction)} <br/> 
+                            {nonData(trackGeo?.t1?.radius)} (C={nonData(trackGeo?.t1?.cant)}, S={nonData(trackGeo?.t1?.slack)})
+                          </div>
                         </div>
                       </div>
                     </div>
