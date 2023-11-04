@@ -9,14 +9,14 @@ import 'dayjs/locale/ko';
 import { Select } from 'antd';
 import { Box, Modal } from "@mui/material";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
-import { BOXSTYLE, INSTRUMENTATIONPOINT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_CORNER_WEAR, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, STRING_UP_TRACK, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_KP, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, UP_TRACK } from "../../constant";
+import { BOXSTYLE, INSTRUMENTATIONPOINT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_CORNER_WEAR, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_KP, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, UP_TRACK } from "../../constant";
 import AlertIcon from "../../assets/icon/decision/3876149_alert_emergency_light_protection_security_icon.png";
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import axios from 'axios';
 import qs from 'qs';
 import { convertToCustomFormat, convertToNumber2, dateFormat, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, mgtToM, numberWithCommas, trackLeftRightToString, trackNumberToString, trackToString, wearModelTableBody, wearModelTableHeader1, wearModelTableHeader2 } from "../../util";
-import lodash from "lodash";
+import lodash, { isEmpty } from "lodash";
 
 const { TextArea } = Input;
 let wear3DMinMax = [];
@@ -60,7 +60,9 @@ function WearMaintenance( props ) {
   
   const [dateSliderMinMax, setDateSliderMinMax] = useState({min : 32472144000000, max : 0});
   const [mgtSliderMinMax, setMGTSliderMinMax] = useState({min : 50000000000, max : 0});
-
+  const [trackSpeedFindClosest, setTrackSpeedFindClosest] = useState([]);
+  const [leftRemaining, setLeftRemaining] = useState({});
+  const [rightRemaining, setRightRemaining] = useState({});
   const handleClose = () => {
     setOpen(false);
   }
@@ -177,6 +179,34 @@ function WearMaintenance( props ) {
       return wearSearchCondition_;
     });
   };
+
+  const getAccRemainingData = (kp_, railTrack)=>{
+    if( !kp_ || kp_ === "" || kp_ === null || kp_ === undefined){
+      alert("KP를 입력해주세요");
+      return;
+    }
+
+    let route = sessionStorage.getItem('route');
+    let param  = {
+      railroad_name : route,
+      measure_ts : new Date().toISOString(),
+      rail_track : railTrack,
+      kp : (convertToNumber2(kp_) / 1000)
+    }
+    console.log(param);
+    axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remaining`,{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : param
+    })
+    .then(response => {
+      console.log(response.data);
+      setLeftRemaining(response.data.leftRemaining);
+      setRightRemaining(response.data.rightRemaining);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+  }
 
   const onClickWearSearch = () => {
     if( !selectModel || selectModel === "" || selectModel === null || selectModel === undefined ){
@@ -479,26 +509,6 @@ function WearMaintenance( props ) {
       <div className="dataContainer">
         <div className="scrollContainer" style={{ width: "calc(100%)", height: "calc(100% - 0px)", overflow: "auto"}}>
           <div className="graphSection">
-            {/* <div className="leftContainer">
-              <div className="contentBox linearContainer mr10" style={{marginBottom:"10px", height:"calc(100% - 287px)"}}>
-                <div className="containerTitle tab">
-                  <div className="tab select">선형정보</div>
-                  <div className="tab">구배</div>
-                </div>
-                <div className="componentBox">
-                <div className="boxProto track" id="trackDetailContainer">
-                </div>
-                </div>
-              </div>
-              <div className="contentBox speedContainer" style={{height:"272px"}}>
-                <div className="containerTitle">통과속도 정보</div>
-                <div className="componentBox" style={{ marginRight: "10px", width: "calc(100% - 10px)", overflow: "hidden"}}>
-                  <div className="demoImgContainer">
-                    <TrackSpeed data={TRACKSPEEDDATA} kp={kp} ></TrackSpeed>
-                  </div>
-                </div>
-              </div>
-            </div> */}
             <div className="contentBox searchContainer mr10">
               <div className="containerTitle">조회 조건</div>
                 <div className="componentBox">
@@ -612,6 +622,23 @@ function WearMaintenance( props ) {
                           />
                       </div>
                     </div>
+                    <div className="searchOption selectBox">
+                      <div className="title flex textBold">최근누적통과톤수</div>
+                      <div className="flex acc">
+                        {( !isEmpty(leftRemaining) )?<div>좌레일 : {numberWithCommas(leftRemaining.accumulateweight)}</div> : null}
+                        {( !isEmpty(rightRemaining) )?<div>우레일 : {numberWithCommas(rightRemaining.accumulateweight)}</div> : null}
+                      </div>
+                    </div>
+                    <div className="searchOption selectBox">
+                      <div className="title flex textBold">속도정보</div>
+                      <div className="flex trackSpeedFindClosest">
+                      {
+                        trackSpeedFindClosest.map( closest => {
+                          return <div className="line"><div style={{backgroundColor : closest.color}} className="closestIcon"></div><div style={{marginLeft: "5px"}}>{closest.name}</div><div>: {`${parseFloat(closest.speed).toFixed(1)}km/h`}</div></div>;
+                        })
+                      }
+                      </div>
+                    </div>
                     <div className="flex flexCenter" style={{flexDirection: "row-reverse"}} >
                       <button className="searchButton" onClick={onClickWearSearch}>조회</button>
                     </div>
@@ -626,7 +653,10 @@ function WearMaintenance( props ) {
                 <div className="componentBox">
                   <PlaceInfo 
                     selectKP={selectKP}
-                    setSelectKP={setSelectKP}
+                    setSelectKP={(selectKP)=>{
+                      setSelectKP(selectKP);
+                      getAccRemainingData(selectKP.name, selectKP.trackType);
+                    }}
                     path={selectedPath} 
                     instrumentationPoint={INSTRUMENTATIONPOINT}
                     upTrackMeasurePoint = {upTrackMeasurePoint}
@@ -658,25 +688,6 @@ function WearMaintenance( props ) {
                           wear3DMinMax = [];
                         }}
                       ></ModalCustom>
-                      {/* <ModalCustom buttonLabel="하선상세" title="하선 상세보기" 
-                        data={viewWear3dData}
-                        dataSliderSort={(e)=>{
-                          console.log("dataSliderSort");
-                          let wear3DData = makeWear3dData(cornerWearGraphData, verticalWearGraphData, wearFilter, [e[0], e[1]]);
-                          wear3DMinMax = e;
-                          setViewWear3dData(wear3DData);
-                        }}
-                        changeCheckBox={(e)=>{
-                          let wear3DData = makeWear3dData(cornerWearGraphData, verticalWearGraphData, e, wear3DMinMax);
-                          wearFilter = e;
-                          setViewWear3dData(wear3DData);
-                        }}
-                        closeModal={()=>{
-                          setViewWear3dData(lodash.cloneDeep(wear3dData))
-                          wearFilter = [STRING_VERTICAL_WEAR, STRING_CORNER_WEAR];
-                          wear3DMinMax = [];
-                        }}
-                      ></ModalCustom> */}
                       <div className="modalButton highlight" onClick={()=>{
                         console.log("예측데이터 상세보기");
                         setOpen(true);
@@ -712,16 +723,6 @@ function WearMaintenance( props ) {
             </div>
           </div>
           <div className="leftContainer">
-              {/* <div className="contentBox linearContainer mr10" style={{marginBottom:"10px", height:"calc(100% - 287px)"}}>
-                <div className="containerTitle tab">
-                  <div className="tab select">선형정보</div>
-                  <div className="tab">구배</div>
-                </div>
-                <div className="componentBox">
-                <div className="boxProto track" id="trackDetailContainer">
-                </div>
-                </div>
-              </div> */}
               <div className="contentBox speedContainer" style={{height:"165px"}}>
                 <div className="containerTitle">통과속도 정보</div>
                 <div className="componentBox" style={{ marginRight: "10px", width: "calc(100% - 10px)", overflow: "hidden"}}>
@@ -729,6 +730,7 @@ function WearMaintenance( props ) {
                     <TrackSpeed 
                       data={trackSpeedData} 
                       kp={convertToNumber2(selectKP.name)} 
+                      findClosest={(e)=>{setTrackSpeedFindClosest(e)}}
                     ></TrackSpeed>
                   </div>
                 </div>

@@ -14,6 +14,9 @@ import classNames from "classnames";
 import moment from 'moment';
 import LoadingImg from "../../assets/icon/loading/loading.png";
 import Draggable from 'react-draggable';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
 
 function CumulativeThroughput( props ) {
 
@@ -345,7 +348,7 @@ function CumulativeThroughput( props ) {
                 <div className="title">조회일자 </div>
                 <div className="date">
                   <DatePicker 
-                    defaultValue={selectDate}
+                    defaultValue={dayjs()}
                     style={RANGEPICKERSTYLE}
                     onChange={(e)=>{
                       if(e === null){

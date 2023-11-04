@@ -16,7 +16,7 @@ import { DatePicker, Input, Select } from "antd";
 import PlaceGauge from "../../component/PlaceGauge/PlaceGauge";
 import axios from 'axios';
 import qs from 'qs';
-import { findRange, getRailroadSection, intervalSample } from "../../util";
+import { findRange, getRailroadSection, getStartEndDatesFromQuarter, intervalSample } from "../../util";
 import LoadingImg from "../../assets/icon/loading/loading.png";
 
 function RailRoughness( props ) {
@@ -37,7 +37,7 @@ function RailRoughness( props ) {
 
   const selectChange = (val) => {
     setSelectRange(val);
-    let range = DUMMY_RANGE[val];
+    let range = getStartEndDatesFromQuarter(val);
     if( railroadSection.length < 2 ){
       return;
     }
@@ -77,7 +77,9 @@ function RailRoughness( props ) {
 
   const pathClick = (select) => {
     console.log(select);
-    //getInstrumentationPoint(select);
+    if( !selectRange || selectRange === "" || selectRange === null || selectRange === undefined ){
+      alert("측정분기를 먼저 선택해주세요.");
+    }
     setSelectedPath(select);
   }
   const handleClose = () => {
@@ -157,7 +159,7 @@ function RailRoughness( props ) {
                     selectedPath.start_station_name+
                     " - "+
                     selectedPath.end_station_name}
-                    style={RANGEPICKERSTYLE}
+                    style={{...RANGEPICKERSTYLE, ...{minWidth : "250px"}}}
                     readOnly={true}
                   />
                 </div>
@@ -252,7 +254,7 @@ function RailRoughness( props ) {
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="KP(m)" />
+                <XAxis fontSize={12} dataKey="KP(m)" tickFormatter={(tick) => Math.floor(tick)}/>
                 <YAxis tickFormatter={(tick) => (tick / 1000).toFixed(2)} />
                 <Tooltip formatter={(value) => (value / 1000).toFixed(2)} />
                 <Legend />

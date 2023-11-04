@@ -5,12 +5,12 @@ import 'dayjs/locale/ko';
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import Box from '@mui/material/Box';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { BOXSTYLE, DUMMY_RANGE, RADIO_STYLE, RANGEPICKERSTYLE, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_DOWN_TRACK, STRING_HEIGHT, STRING_RAIL_DISTANCE, STRING_UP_TRACK } from "../../constant";
+import { BOXSTYLE, RADIO_STYLE, RANGEPICKERSTYLE, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_DOWN_TRACK, STRING_HEIGHT, STRING_RAIL_DISTANCE, STRING_UP_TRACK } from "../../constant";
 import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import { Modal } from "@mui/material";
 import axios from 'axios';
 import qs from 'qs';
-import { convertQuarterFormat, dateFormat, getRailroadSection, isEmpty, transposeObjectToArray } from "../../util";
+import { convertQuarterFormat, convertToCustomFormat, dateFormat, findRange, getQuarterFromDate, getRailroadSection, getStartEndDatesFromQuarter, isEmpty, transposeObjectToArray } from "../../util";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 
 function TrackDeviation( props ) {
@@ -43,20 +43,56 @@ function TrackDeviation( props ) {
   const [reportSelectRange, setReportSelectRange] = useState("");
   const [reportSelectMeasureDate, setReportSelectMeasureDate] = useState(null);
   const [reportSelectPath, setReportSelectPath] = useState("");
-  const [reportData, setReportData] = useState([]);
+  const [quarterOptions, setQuarterOptions] = useState([]);
+  const [chartKPMoveIndex, setChartKPMoveIndex] = useState(0);
 
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
     setViewMeasureDate(null);
     setSelectMeasureDate(null);
+    getMeasureQuarter(select.beginKp, select.endKp);
+  }
+
+  const getMeasureQuarter = (beginKp, endKp) => {
+    let start = beginKp;
+    let end = endKp;
+    start = (start>0) ? start/1000 : start;
+    end = (end>0) ? end/1000 : end;
+    console.log(start,end);
+    let route = sessionStorage.getItem('route');
+    let param = {
+      begin_kp : [start],
+      end_kp : [end],
+      railroad_name : route
+    }
+    console.log(param);
+    axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/ts`,{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat' })
+      },
+      params : param
+    })
+    .then(response => {
+      setSelectRange("");
+      console.log(response.data);
+      const quarters = new Map();
+      response.data.listTs.forEach(dateString => {
+        const { label, value } = getQuarterFromDate(dateString); // 각 날짜를 분기로 변환합니다.
+        quarters.set(label, value); // Map에 'y' 값을 key로, 'o' 값을 value로 저장합니다.
+      });
+      setQuarterOptions(Array.from(quarters.entries())
+      .sort()
+      .map(([label, value]) => ({ value, label })));
+    })
+    .catch(error => console.error('Error fetching data:', error));
   }
 
   const getMeasureDatas = () => {
     if( !selectRange || selectRange === "" || selectRange === null || selectRange === undefined ){
       return;
     }
-    let range = DUMMY_RANGE[selectRange];
+    let range = getStartEndDatesFromQuarter(selectRange);
     let start = selectedPath.beginKp;
     let end = selectedPath.endKp;
     start = (start>0) ? start/1000 : start;
@@ -126,6 +162,86 @@ function TrackDeviation( props ) {
     }
   };
 
+  const getChartData = ( alertBoolean, dataInit ) => {
+    let searchChartView_ = [];
+    let measureTs = new Date().toISOString();
+    try{
+      measureTs = dataExitsDate[selectMeasureDate][0];
+    }catch(e){
+      if(alertBoolean){alert("측정일자를 찾을 수 없습니다. 측정분기와 측정일자가 선택되어있는지 확인해주세요.")};
+      return;
+    }
+
+    if( !selectTrack || selectTrack === "" || selectTrack === null || selectTrack === undefined ){
+      return;
+    }
+    if( !selectedPath || selectedPath === "" || selectedPath === null || selectedPath === undefined ){
+      return;
+    }
+
+    let route = sessionStorage.getItem('route');
+    if( dataInit ){
+      setHeightChartData([]);
+      setDirectionChartData([]);
+      setCantChartData([]);
+      setRaildistanceChartData([]);
+      setDistortionChartData([]);
+    }
+    for( let option of selectCheckBox ){
+      let start = selectedPath.beginKp;
+      let end = selectedPath.endKp;
+      start = (start>0) ? start/1000 : start;
+      end = (end>0) ? end/1000 : end;
+
+      let add = (end-start) * chartKPMoveIndex;
+      let param = {
+        begin_kp : [start + add],
+        end_kp : [end + add],
+        measure_ts : measureTs,
+        rail_track : selectTrack,
+        data_type : option,
+        railroad_name : route,
+      };
+      console.log(param);
+      axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/graph_data`,{
+        paramsSerializer: params => {
+          return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
+        },
+        params : param
+      })
+      .then(response => {
+        console.log(response.data);
+        let dataAry = [];
+        try{
+          dataAry = transposeObjectToArray(response.data);
+        }catch(e){
+          /* alert("데이터가 없습니다."); */
+          return;
+        }
+
+        setReportSelectRange(selectRange);
+        setReportSelectMeasureDate(measureTs);
+        setReportSelectPath(selectedPath);
+        
+        console.log(dataAry);
+        if( option === STRING_HEIGHT ){
+          setHeightChartData(dataAry);
+        }else if( option === STRING_DIRECTION ){
+          setDirectionChartData(dataAry);
+        }else if( option === STRING_CANT ){
+          setCantChartData(dataAry);
+        }else if( option === STRING_RAIL_DISTANCE ){
+          setRaildistanceChartData(dataAry);
+        }else if( option === STRING_DISTORTION ){
+          setDistortionChartData(dataAry);
+        }
+        searchChartView_.push(option);
+        setSearchChartView(searchChartView_);
+      })
+      .catch(error => console.error('Error fetching data:', error));
+    }
+  }
+
   
   const dataOption = [
     { label: '고저틀림', value: STRING_HEIGHT },
@@ -151,6 +267,10 @@ function TrackDeviation( props ) {
     return () => {window.removeEventListener('resize', resizeChange )};
   }, []);
 
+  useEffect(() => {
+    getChartData(false, false);
+  }, [chartKPMoveIndex]);
+
   useEffect( () => {
     if( !selectRange || selectRange === "" || selectRange === null || selectRange === undefined ){
       return;
@@ -162,8 +282,59 @@ function TrackDeviation( props ) {
       return;
     }
     getMeasureDatas();
-  }, [selectedPath, selectTrack, selectRange])
+  }, [selectedPath, selectTrack, selectRange]);
+
+  useEffect( ()=> {
+    if( railroadSection.length < 2 ){
+      return;
+    }
+    let route = sessionStorage.getItem('route');
+    console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
+    axios.get('https://raildoctor.suredatalab.kr/api/railtwists/kp',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroadName : route,
+        begin : railroadSection[0].displayName,
+        end : railroadSection[railroadSection.length-1].displayName
+      }
+    })
+    .then(response => {
+      let dataArr = [];
+      railroadSection.forEach( data => {
+        dataArr.push(0);
+      });
+      let dataExits_ = [...dataArr];
+
+      console.log(response.data);
+      for( let data of response.data.t1 ){
+        let index = -1;
+        index = findRange(railroadSection, data * 1000);
+        dataExits_[index]++;        
+      }
+      for( let data of response.data.t2 ){
+        let index = -1;
+        index = findRange(railroadSection, data * 1000);
+        dataExits_[index]++;
+      }
+
+      /* setUpTrackMeasurePoint([...new Set(response.data.t2)]);
+      setDownTrackMeasurePoint([...new Set(response.data.t1)]); */
+      setDataExits(dataExits_);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+  }, [railroadSection])
   
+  const getKPRangeText = ()=>{
+    let start = selectedPath.beginKp;
+    let end = selectedPath.endKp;
+    start = (start>0) ? start/1000 : start;
+    end = (end>0) ? end/1000 : end;
+    let add = (end-start) * chartKPMoveIndex;
+    return `${convertToCustomFormat((start + add) * 1000)} ~ ${convertToCustomFormat(((end + add) * 1000))}`;
+  }
+
   return (
     <div className="trackDeviation" >
       <div className="railStatusContainer">
@@ -180,21 +351,26 @@ function TrackDeviation( props ) {
             </div>
             <div className="componentBox" style={{overflow: "hidden"}}>
               <div className="dataOption">
+                <div className="title">선택구간 </div>
+                <div className="date">
+                  <Input placeholder="KP" value={
+                    selectedPath.start_station_name+
+                    " - "+
+                    selectedPath.end_station_name}
+                    style={{...RANGEPICKERSTYLE, ...{minWidth : "250px"}}}
+                    readOnly={true}
+                  />
+                </div>
+              </div>
+              <div className="line"></div>
+              <div className="dataOption">
                 <div className="title">측정분기 </div>
                 <div className="date">
                   <Select
+                    value={selectRange}
                     style={{...{ width : 170 },...RANGEPICKERSTYLE}}
                     onChange={selectChange}
-                    options={[
-                      { value: '2022_1', label: '2022 1분기' },
-                      { value: '2022_2', label: '2022 2분기' },
-                      { value: '2022_3', label: '2022 3분기' },
-                      { value: '2022_4', label: '2022 4분기' },
-                      { value: '2023_1', label: '2023 1분기' },
-                      { value: '2023_2', label: '2023 2분기' },
-                      { value: '2023_3', label: '2023 3분기' },
-                      { value: '2023_4', label: '2023 4분기' },
-                    ]}
+                    options={quarterOptions}
                   />
                 </div>
               </div>
@@ -208,19 +384,6 @@ function TrackDeviation( props ) {
                   <Radio value={STRING_UP_TRACK} >상선</Radio>
                   <Radio value={STRING_DOWN_TRACK} >하선</Radio>
                 </Radio.Group>
-                </div>
-              </div>
-              <div className="line"></div>
-              <div className="dataOption">
-                <div className="title">선택구간 </div>
-                <div className="date">
-                  <Input placeholder="KP" value={
-                    selectedPath.start_station_name+
-                    " - "+
-                    selectedPath.end_station_name}
-                    style={RANGEPICKERSTYLE}
-                    readOnly={true}
-                  />
                 </div>
               </div>
               <div className="line"></div>
@@ -256,85 +419,21 @@ function TrackDeviation( props ) {
               <div className="line"></div>
               <div className="dataOption">
                 <button className="search" onClick={()=>{
-                  let searchChartView_ = [];
-                  let measureTs = new Date().toISOString();
-                  try{
-                    measureTs = dataExitsDate[selectMeasureDate][0];
-                  }catch(e){
-                    alert("측정일자를 찾을 수 없습니다. 측정분기와 측정일자가 선택되어있는지 확인해주세요.")
-                    return;
-                  }
-
-                  if( !selectTrack || selectTrack === "" || selectTrack === null || selectTrack === undefined ){
-                    return;
-                  }
-                  if( !selectedPath || selectedPath === "" || selectedPath === null || selectedPath === undefined ){
-                    return;
-                  }
-
-                  let route = sessionStorage.getItem('route');
-                  setHeightChartData([]);
-                  setDirectionChartData([]);
-                  setCantChartData([]);
-                  setRaildistanceChartData([]);
-                  setDistortionChartData([]);
-                  for( let option of selectCheckBox ){
-                    let start = selectedPath.beginKp;
-                    let end = selectedPath.endKp;
-                    start = (start>0) ? start/1000 : start;
-                    end = (end>0) ? end/1000 : end;
-                    let param = {
-                      begin_kp : [start],
-                      end_kp : [end],
-                      measure_ts : measureTs,
-                      rail_track : selectTrack,
-                      data_type : option,
-                      railroad_name : route,
-                    };
-                    console.log(param);
-                    axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/graph_data`,{
-                      paramsSerializer: params => {
-                        return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
-                      },
-                      params : param
-                    })
-                    .then(response => {
-                      console.log(response.data);
-                      let dataAry = [];
-                      try{
-                        dataAry = transposeObjectToArray(response.data);
-                      }catch(e){
-                        /* alert("데이터가 없습니다."); */
-                        return;
-                      }
-
-                      setReportSelectRange(selectRange);
-                      setReportSelectMeasureDate(measureTs);
-                      setReportSelectPath(selectedPath);
-                      
-                      console.log(dataAry);
-                      if( option === STRING_HEIGHT ){
-                        setHeightChartData(dataAry);
-                      }else if( option === STRING_DIRECTION ){
-                        setDirectionChartData(dataAry);
-                      }else if( option === STRING_CANT ){
-                        setCantChartData(dataAry);
-                      }else if( option === STRING_RAIL_DISTANCE ){
-                        setRaildistanceChartData(dataAry);
-                      }else if( option === STRING_DISTORTION ){
-                        setDistortionChartData(dataAry);
-                      }
-                      searchChartView_.push(option);
-                      setSearchChartView(searchChartView_);
-                    })
-                    .catch(error => console.error('Error fetching data:', error));
-                  }
+                  getChartData(true, true);
                 }}>조회</button>
               </div>
             </div>
       </div>
 
-      <div className="contentBox" style={{marginTop:"10px", height: "calc(100% - 250px)"}}>
+      <div className="contentBox" style={{marginTop:"10px", height: "calc(100% - 250px)", position:"relative"}}>
+        {
+            (heightChartData.length < 1 && directionChartData.length < 1 && cantChartData.length < 1 && raildistanceChartData.length < 1 && distortionChartData.length < 1 ) ? 
+            null : <>
+              <div className="searchKPRange">{getKPRangeText()}</div>
+              <div className="chartMoveBtn left" onClick={()=>{setChartKPMoveIndex( prev => prev-1 )}} >&lt; Left</div>
+              <div className="chartMoveBtn right" onClick={()=>{setChartKPMoveIndex( prev => prev+1 )}} >Right &gt;</div>
+            </>
+        }
         <div className="containerTitle">Chart
           <div className="flex">
             <div className="modalButton highlight orange" onClick={()=>{
@@ -353,21 +452,21 @@ function TrackDeviation( props ) {
                 측정분기 선택 - 상하선 선택 - 구간 선택 - 측정일자 선택 - 측정일자 선택 - 조회버튼 클릭
               </div>
             </div> : 
-              (searchChartView.map( (type, i) => {
+              searchChartView.map( (type, i) => {
                 let data = [];
                 let series = [];
                 if( type === STRING_HEIGHT ){
                   data = heightChartData;
                   series.push(<Line type="monotone" name="좌레일-고저틀림" dataKey="valueLeft" stroke="#4371C4" dot={false} />);
-                  series.push(<Line type="monotone" name="우레일-고저틀림" dataKey="valueRight" stroke="#4371C4" dot={false} />);
+                  series.push(<Line type="monotone" name="우레일-고저틀림" dataKey="valueRight" stroke="#A349A4" dot={false} />);
                 }else if( type === STRING_DIRECTION ){
                   data = directionChartData
                   series.push(<Line type="monotone" name="좌레일-방향틀림" dataKey="valueLeft" stroke="#4371C4" dot={false} />);
-                  series.push(<Line type="monotone" name="우레일-방향틀림" dataKey="valueRight" stroke="#4371C4" dot={false} />);
+                  series.push(<Line type="monotone" name="우레일-방향틀림" dataKey="valueRight" stroke="#A349A4" dot={false} />);
                 }else if( type === STRING_CANT ){
                   data = cantChartData
                   series.push(<Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} />);
-                  series.push(<Line type="monotone" name="캔트틀림" dataKey="cantTwist" stroke="#4371C4" dot={false} />);
+                  series.push(<Line type="monotone" name="캔트틀림" dataKey="cantTwist" stroke="#A349A4" dot={false} />);
                 }else if( type === STRING_RAIL_DISTANCE ){
                   data = raildistanceChartData
                   series.push(<Line type="monotone" name="궤간틀림" dataKey="value" stroke="#4371C4" dot={false} />);
@@ -398,16 +497,15 @@ function TrackDeviation( props ) {
                     return obj;
                   })}
     
-                  <Line type="monotone" name="목표기준" dataKey="maxTargetCriteria" stroke="#4BC784" dot={false} />
-                  <Line type="monotone" name="목표기준" dataKey="minTargetCriteria" stroke="#4BC784" dot={false} />
-                  <Line type="monotone" name="보수기준" dataKey="maxRepairCriteria" stroke="#FF0606" dot={false} />
-                  <Line type="monotone" name="보수기준" dataKey="minRepairCriteria" stroke="#FF0606" dot={false} />
-                  <Line type="monotone" name="주의기준" dataKey="maxCautionCriteria" stroke="#FFF200" dot={false} />
-                  <Line type="monotone" name="주의기준" dataKey="minCautionCriteria" stroke="#FFF200" dot={false} />
+                  <Line type="monotone" name="목표기준(상)" dataKey="maxTargetCriteria" stroke="#4BC784" dot={false} />
+                  <Line type="monotone" name="목표기준(하)" dataKey="minTargetCriteria" stroke="#4BC784" dot={false} />
+                  <Line type="monotone" name="보수기준(상)" dataKey="maxRepairCriteria" stroke="#FF0606" dot={false} />
+                  <Line type="monotone" name="보수기준(하)" dataKey="minRepairCriteria" stroke="#FF0606" dot={false} />
+                  <Line type="monotone" name="주의기준(상)" dataKey="maxCautionCriteria" stroke="#FFF200" dot={false} />
+                  <Line type="monotone" name="주의기준(하)" dataKey="minCautionCriteria" stroke="#FFF200" dot={false} />
                 </LineChart>
               </ResponsiveContainer>
-              }))
-            
+              })
         }
         </div>
       </div>

@@ -3,6 +3,7 @@ import "./PlacePosition.css";
 import classNames from "classnames";
 import { convertToCustomFormat } from "../../util";
 import { STRING_SHORT_MEASURE } from "../../constant";
+import { isEqual } from "lodash";
 
 let pointList = [];
 class PlacePosition extends React.Component {
@@ -60,6 +61,10 @@ class PlacePosition extends React.Component {
 			this.drawPoint();
 			this.drawPlace();
 		} else if(this.props.path.section_id !== prevProps.path.section_id) {
+			this.init();
+			this.drawPoint();
+			this.drawPlace();
+		} else if( !isEqual(prevProps.selectViewMeasure, this.props.selectViewMeasure) ) {
 			this.init();
 			this.drawPoint();
 			this.drawPlace();
@@ -261,6 +266,9 @@ class PlacePosition extends React.Component {
 
 		//상선 좌
 		for(let trackPoint of this.props.upLeftTrackPoint ) {
+			if( this.props.selectViewMeasure.indexOf(trackPoint.measureType) < 0 ){
+				continue;
+			}
 			let location = trackPoint.kp * 1000;
 			if( !(location >= trackBeginKP && location <= trackEndKP) ){
 				continue;
@@ -276,7 +284,7 @@ class PlacePosition extends React.Component {
 			context.beginPath();
 			
 			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
-			context.fillStyle = (trackPoint.measureType === STRING_SHORT_MEASURE) ? "yellow" : "blue";
+			context.fillStyle = (trackPoint.measureType === STRING_SHORT_MEASURE) ? "blue" : "yellow";
 			context.fill();
 			context.stroke();
 
@@ -298,6 +306,9 @@ class PlacePosition extends React.Component {
 
 		//상선 우
 		for(let trackPoint of this.props.upRightTrackPoint ) {
+			if( this.props.selectViewMeasure.indexOf(trackPoint.measureType) < 0 ){
+				continue;
+			}
 			let location = trackPoint.kp * 1000;
 			if( !(location >= trackBeginKP && location <= trackEndKP) ){
 				continue;
@@ -313,7 +324,7 @@ class PlacePosition extends React.Component {
 			context.beginPath();
 			
 			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
-			context.fillStyle = (trackPoint.measureType === STRING_SHORT_MEASURE) ? "yellow" : "blue";
+			context.fillStyle = (trackPoint.measureType === STRING_SHORT_MEASURE) ? "blue" : "yellow";
 			context.fill();
 			context.stroke();
 
@@ -335,6 +346,9 @@ class PlacePosition extends React.Component {
 
 		//하선 좌
 		for(let trackPoint of this.props.downLeftTrackPoint ) {
+			if( this.props.selectViewMeasure.indexOf(trackPoint.measureType) < 0 ){
+				continue;
+			}
 			let location = trackPoint.kp * 1000;
 			if( !(location >= trackBeginKP && location <= trackEndKP) ){
 				continue;
@@ -350,7 +364,7 @@ class PlacePosition extends React.Component {
 			context.beginPath();
 			
 			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
-			context.fillStyle = (trackPoint.measureType === STRING_SHORT_MEASURE) ? "yellow" : "blue";
+			context.fillStyle = (trackPoint.measureType === STRING_SHORT_MEASURE) ? "blue" : "yellow";
 			context.fill();
 			context.stroke();
 
@@ -372,6 +386,9 @@ class PlacePosition extends React.Component {
 
 		//하선 우
 		for(let trackPoint of this.props.downRightTrackPoint ) {
+			if( this.props.selectViewMeasure.indexOf(trackPoint.measureType) < 0 ){
+				continue;
+			}
 			let location = trackPoint.kp * 1000;
 			if( !(location >= trackBeginKP && location <= trackEndKP) ){
 				continue;
@@ -387,7 +404,7 @@ class PlacePosition extends React.Component {
 			context.beginPath();
 			
 			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
-			context.fillStyle = (trackPoint.measureType === STRING_SHORT_MEASURE) ? "yellow" : "blue";
+			context.fillStyle = (trackPoint.measureType === STRING_SHORT_MEASURE) ? "blue" : "yellow";
 			context.fill();
 			context.stroke();
 

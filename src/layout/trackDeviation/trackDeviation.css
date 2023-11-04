@@ -15,6 +15,7 @@
     align-items: center;
     flex-direction: column; */
     overflow: auto;
+    position: relative;
 }
 
 .trackDeviation .componentBox .position{
@@ -170,4 +171,41 @@
     padding-left: 15px;
     padding-right: 15px;
     padding-bottom: 15px;
+}
+
+.trackDeviation .chartMoveBtn{
+    position: absolute;
+    top: 50%;
+    font-size: 12px;
+    border-radius: 5px;
+    border: 1px solid #cccccc;
+    padding: 5px;
+    background: white;
+    z-index: 1;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.trackDeviation .chartMoveBtn:hover{
+    background-color: rgba(0, 81, 255, 0.664);
+    color: white;
+}
+
+.trackDeviation .chartMoveBtn.left{
+    left: 10px;
+}
+
+.trackDeviation .chartMoveBtn.right{
+    right: 10px;
+}
+
+.trackDeviation .searchKPRange{
+    position: absolute;
+    right: 34px;
+    top: 40px;
+    z-index: 1;
+    border: 1px solid #cccccc;
+    padding: 5px;
+    background: white;
+    border-radius: 5px;
 }

@@ -72,7 +72,16 @@
     padding: 5px;
     border-radius: 5px;
     box-shadow: 1px 1px 8px 1px #0000001c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    font-weight: bold;
+    margin-left: 5px;
+    margin-right: 5px;
+    cursor: pointer;
 }
+
 .table .tableBody .tr .td.viewBtn .viewBtn img{
     width: 100%;
 }

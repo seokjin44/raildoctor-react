@@ -10,7 +10,7 @@ import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, EMPTY_MEA
 import PlacePosition from "../../component/PlacePosition/PlacePosition";
 import axios from 'axios';
 import qs from 'qs';
-import { checkDateFormat, convertObjectToArray, convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, findRange, formatTime, getFirstDateOfThreeMonthsAgo, getRailroadSection, getYearStartEnd, isEmpty, numberToText, trackDataName, trackLeftRightToString, valueOneOrNone } from "../../util";
+import { checkDateFormat, convertObjectToArray, convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, findRange, formatTime, getFirstDateOfThreeMonthsAgo, getRailroadSection, getYearStartEnd, isEmpty, measureTypeText, numberToText, trackDataName, trackLeftRightToString, valueOneOrNone } from "../../util";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
@@ -73,6 +73,8 @@ function TrackGeometryMeasurement( props ) {
   const [railroadSection, setRailroadSection] = useState([]);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState('month');
+
+  const [selectViewMeasure, setSelectViewMeasure] = useState([STRING_SHORT_MEASURE, STRING_LONG_MEASURE]);
 
   const disabledDate = (current) => {
     return !dataExitsDate[dateFormat(current.$d)];
@@ -184,7 +186,7 @@ function TrackGeometryMeasurement( props ) {
         if( kp >= startKP && kp <= endKP ){
           //sensor select box
           poinsts_.push({
-            label : `${convertToCustomFormat(kp)}(${trackLeftRightToString(sensor.railTrack)})`,
+            label : `${convertToCustomFormat(kp)}(${trackLeftRightToString(sensor.railTrack)})-${measureTypeText(sensor.measureType)}`,
             value : sensor.sensorId
           });
           if( !tableViewShortMeasureObj[convertToCustomFormat(kp)] ){
@@ -219,7 +221,7 @@ function TrackGeometryMeasurement( props ) {
         let kp = sensor.kp * 1000;
         if( kp >= startKP && kp <= endKP ){
           poinsts_.push({
-            label : `${convertToCustomFormat(kp)}(${trackLeftRightToString(sensor.railTrack)})`,
+            label : `${convertToCustomFormat(kp)}(${trackLeftRightToString(sensor.railTrack)})-${measureTypeText(sensor.measureType)}`,
             value : sensor.sensorId
           });
           if( !tableViewLongMeasureObj[convertToCustomFormat(kp)] ){
@@ -458,7 +460,7 @@ function TrackGeometryMeasurement( props ) {
                     selectedPath.start_station_name+
                     " - "+
                     selectedPath.end_station_name}
-                    style={RANGEPICKERSTYLE}
+                    style={{...RANGEPICKERSTYLE, ...{minWidth : "250px"}}}
                     readOnly={true}
                   />
                 </div>
@@ -470,7 +472,7 @@ function TrackGeometryMeasurement( props ) {
                   <Select
                     defaultValue={selectPoint}
                     style={{
-                      width: 200,
+                      width: 170,
                     }}
                     onChange={(e)=>{
                       console.log(e);
@@ -593,7 +595,8 @@ function TrackGeometryMeasurement( props ) {
                           item : findDatas,
                           colorCode : colorCode,
                           kp : point.kp,
-                          trackSide : `(${trackLeftRightToString(point.railTrack)})`
+                          trackSide : `(${trackLeftRightToString(point.railTrack)})`,
+                          measureTypeText : measureTypeText(point.measureType)
                         });
                         dailyChartseries_.push({ 
                           sensorId : point.sensorId, 
@@ -602,7 +605,8 @@ function TrackGeometryMeasurement( props ) {
                           item : findDatas,
                           colorCode : colorCode,
                           kp : point.kp,
-                          trackSide : `(${trackLeftRightToString(point.railTrack)})`
+                          trackSide : `(${trackLeftRightToString(point.railTrack)})`,
+                          measureTypeText : measureTypeText(point.measureType)
                         });
                         monthlyChartseries_.push({ 
                           sensorId : point.sensorId, 
@@ -611,7 +615,8 @@ function TrackGeometryMeasurement( props ) {
                           item : findDatas,
                           colorCode : colorCode,
                           kp : point.kp,
-                          trackSide : `(${trackLeftRightToString(point.railTrack)})`
+                          trackSide : `(${trackLeftRightToString(point.railTrack)})`,
+                          measureTypeText : measureTypeText(point.measureType)
                         });
                         setTodayChartseries(todayChartseries_);
                         setDailyChartseries(dailyChartseries_);
@@ -630,10 +635,13 @@ function TrackGeometryMeasurement( props ) {
           { (loading) ? <div className="loading"><img src={LoadingImg} alt="로딩" />{TRACK_GEO_LOADING_TEXT}</div> : null }
           <div className="containerTitle">
             측정위치 
-            <div className="legend">
-              <div className="option"><div className="circle yellow"></div>장기계측</div>
-              <div className="option"><div className="circle blue"></div>단기계측</div>
-            </div>
+            <Checkbox.Group className="legend" value={selectViewMeasure} defaultValue={selectViewMeasure} onChange={(e)=>{
+              setSelectViewMeasure(e);
+            }} >
+              <Checkbox className="blue" value={STRING_SHORT_MEASURE}><div className="option">{/* <div className="circle blue "></div> */}단기계측</div></Checkbox>
+              <Checkbox className="yellow" value={STRING_LONG_MEASURE}><div className="option">{/* <div className="circle yellow "></div> */}장기계측</div></Checkbox>
+
+            </Checkbox.Group>
           </div>
           <div className="componentBox">
             <PlacePosition 
@@ -643,6 +651,7 @@ function TrackGeometryMeasurement( props ) {
               upRightTrackPoint={upRightTrackPoint}
               downLeftTrackPoint={downLeftTrackPoint}
               downRightTrackPoint={downRightTrackPoint}
+              selectViewMeasure={selectViewMeasure}
               pointClick={(e)=>{
                 console.log(e);
                 getMeasureDates(e.sensorId);
@@ -840,7 +849,7 @@ function TrackGeometryMeasurement( props ) {
             {
               selectPoints.map( (point, i) => {
                 return <div key={i} className="point">
-                  {`${convertToCustomFormat(point.kp*1000)}(${trackLeftRightToString(point.railTrack)})`}
+                  {`${convertToCustomFormat(point.kp*1000)}(${trackLeftRightToString(point.railTrack)})-${measureTypeText(point.measureType)}`}
                   <img src={CloseIcon} alt="제거" 
                     onClick={()=>{
                       let selectPoints_ = [...selectPoints];
@@ -909,7 +918,7 @@ function TrackGeometryMeasurement( props ) {
                   todayChartseries.map( (series, i) => {
                     console.log(series.datakey);
                     return <Scatter key={i}
-                      name={`${convertToCustomFormat(series.kp*1000)}${series.trackSide}_${trackDataName(series.item)}`} 
+                      name={`${convertToCustomFormat(series.kp*1000)}${series.trackSide}-${series.measureTypeText}_${trackDataName(series.item)}`} 
                       dataKey={series.datakey} fill={series.colorCode} />
                   })
                 }
@@ -942,7 +951,7 @@ function TrackGeometryMeasurement( props ) {
                     console.log(series);
                     return <Bar key={i}
                       dataKey={series.datakey} 
-                      name={`${convertToCustomFormat(series.kp*1000)}${series.trackSide}_${trackDataName(series.item)}`}
+                      name={`${convertToCustomFormat(series.kp*1000)}${series.trackSide}-${series.measureTypeText}_${trackDataName(series.item)}`}
                       fill={series.colorCode} />
                   })
                 }
@@ -973,7 +982,7 @@ function TrackGeometryMeasurement( props ) {
                   monthlyChartseries.map( (series, i) => {
                     return <Bar key={i} 
                       dataKey={series.datakey} 
-                      name={`${convertToCustomFormat(series.kp*1000)}${series.trackSide}_${trackDataName(series.item)}`} 
+                      name={`${convertToCustomFormat(series.kp*1000)}${series.trackSide}-${series.measureTypeText}_${trackDataName(series.item)}`} 
                       fill={series.colorCode} />
                   })
                 }

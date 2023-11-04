@@ -214,7 +214,7 @@ class WearInfo extends React.Component {
                 series[3].data.push([data.mgt, data.w_right]);
             } */
 
-            if( this.props.selectKP.trackType === DOWN_TRACK ){
+            if( this.props.selectKP.trackType === UP_TRACK ){
                 if( data.railSide === STRING_TRACK_SIDE_LEFT ){
                     series[1].data.push([data.accumulateWeight, data.wear]);
                     series[5].data.push([data.accumulateWeight, data.prediction]);
@@ -227,7 +227,7 @@ class WearInfo extends React.Component {
                     series[3].data.push([data.accumulateWeight, data.wear]);
                     series[7].data.push([data.accumulateWeight, data.prediction]); */
                 }
-            }else if( this.props.selectKP.trackType === UP_TRACK ){
+            }else if( this.props.selectKP.trackType === DOWN_TRACK ){
                 if( data.railSide === STRING_TRACK_SIDE_LEFT ){
                     series[0].data.push([data.accumulateWeight, data.wear]);
                     series[4].data.push([data.accumulateWeight, data.prediction]);

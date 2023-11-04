@@ -230,7 +230,7 @@
 
 .trackGeometryMeasurement .containerTitle .legend{
     position: absolute;
-    width: 165px;
+    width: 200px;
     height: 100%;
     right: 0;
     display: flex;
@@ -262,4 +262,18 @@
 
 .trackGeometryMeasurement .containerTitle .legend .option .circle.blue{
     background-color: #0000FF;
+}
+
+.trackGeometryMeasurement .containerTitle .blue .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #0000FF; /* 새 배경 색상 */
+    border-color: #0000FF; /* 새 테두리 색상 */
+}
+
+.trackGeometryMeasurement .containerTitle .yellow .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #FFFF00; /* 새 배경 색상 */
+    border-color: #FFFF00; /* 새 테두리 색상 */
+}
+
+.trackGeometryMeasurement .containerTitle .yellow .ant-checkbox-checked .ant-checkbox-inner::after {
+    border-color: black; /* 체크 표시의 색상을 바꿈 */
 }

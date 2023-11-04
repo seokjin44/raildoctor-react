@@ -1,4 +1,4 @@
-import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_LATERAL_LOAD_KEY, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STATION, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_LATERAL_LOAD_KEY, STRING_LONG_MEASURE, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_SHORT_MEASURE, STRING_SPEED_KEY, STRING_STATION, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
 import axios from 'axios';
 import qs from 'qs';
 import Papa from 'papaparse';
@@ -794,3 +794,48 @@ export const convertQuarterFormat = (input) => {
     const replaced = input.replace(regex, (match, p1, p2) => `${p1}년 ${p2}분기`);
     return replaced;
   }
+
+export const findClosestX = (arr, target) => {
+return arr.reduce((prev, curr) => {
+    return (Math.abs(curr.x - target) < Math.abs(prev.x - target) ? curr : prev);
+});
+}
+
+export const getQuarterFromDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = date.getMonth(); // 월은 0부터 시작하므로 1을 더해야 합니다.
+    const quarter = Math.floor((month / 3)) + 1; // 월을 3으로 나누고 내림하여 분기를 구합니다.
+    
+    return {
+        label: `${year}년 ${quarter}분기`,
+        value: `${year}_${quarter}`
+      };
+}
+
+export const getStartEndDatesFromQuarter = (yearQuarter) => {
+    const [year, quarter] = yearQuarter.split('_').map(Number); // 연도와 분기를 분리하고 숫자로 변환합니다.
+  
+    // 분기의 시작 월과 끝 월을 계산합니다.
+    const startMonth = (quarter - 1) * 3; // 분기 시작 월 (0, 3, 6, 9)
+    const endMonth = startMonth + 2; // 분기 끝 월 (2, 5, 8, 11)
+  
+    // Date 객체를 사용하여 날짜를 생성합니다.
+    const startDate = new Date(year, startMonth, 1); // 분기 시작 날짜
+    const endDate = new Date(year, endMonth + 1, 0); // 분기 끝 날짜
+  
+    // 날짜를 YYYY-MM-DD 형식의 문자열로 포맷합니다.
+    const startDateFormat = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')} 00:00:00`;
+    const endDateFormat = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')} 23:59:59`;
+  
+    return { start: startDateFormat, end: endDateFormat };
+}
+
+export const measureTypeText = (val) => {
+    if( val === STRING_SHORT_MEASURE ){
+       return "단기"
+    }else if( val === STRING_LONG_MEASURE ){
+        return "장기"
+    }
+    return '';
+}

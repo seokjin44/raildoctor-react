@@ -15,7 +15,7 @@ import axios from 'axios';
 import qs from 'qs';
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
-import { getInchonSpeedData, getRailroadSection, getSeoulSpeedData, nonData } from "../../util";
+import { convertToCustomFormat, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, nonData } from "../../util";
 import Papa from 'papaparse';
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 import LoadingImg from "../../assets/icon/loading/loading.png";
@@ -51,6 +51,7 @@ function Monitoring( props ) {
   const [railroadSection, setRailroadSection] = useState([]);
   const [paut, setPaut] = useState([]);
   const [trackSpeedData, setTrackSpeedData] = useState([{trackName:"", data:[]},{trackName:"", data:[]}]);
+  const [trackSpeedFindClosest, setTrackSpeedFindClosest] = useState([]);
   
   const [trackGeo, setTrackGeo] = useState({});
   const [selectDates, setSelectDates] = useState(null);
@@ -399,12 +400,21 @@ function Monitoring( props ) {
           <div className="contentBox" style={{marginLeft : 0, height: "190px"}}>
             <div className="containerTitle bothEnds">
               <div>속도정보</div>
+              <div className="selectKPInfo">
+                선택된 KP : {convertToCustomFormat(kp)}
+                {
+                  trackSpeedFindClosest.map( closest => {
+                    return <><div style={{backgroundColor : closest.color}} className="closestIcon"></div><div style={{marginLeft: "5px"}}>{closest.name}</div><div>: {`${closest.speed}km/h`}</div></>;
+                  })
+                }
+              </div>
             </div>
             <div className="componentBox separationBox">
               <div className="boxProto speed">
                 <TrackSpeed 
                   resizeOn={resizeOn}
                   data={trackSpeedData} kp={kp} 
+                  findClosest={(e)=>{setTrackSpeedFindClosest(e)}}
                 ></TrackSpeed>
               </div>
             </div>

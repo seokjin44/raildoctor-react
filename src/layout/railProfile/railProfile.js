@@ -1,5 +1,5 @@
 import "./railProfile.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import RailStatus from "../../component/railStatus/railStatus";
 import 'dayjs/locale/ko';
 import Slider from '@mui/material/Slider';
@@ -41,6 +41,8 @@ ChartJS.register(
 let dataExistKPs = {t1 : [], t2 : []};
 let profilesMap = new Map();
 function RailProfile( props ) {
+  const hiddenFileInput = useRef(null);
+  
   const [selectedPath, setSelectedPath] = useState([]);
   const [leftTrackProfile, setLeftTrackProfile] = useState(null);
   const [rightTrackProfile, setRightTrackProfile] = useState(null);
@@ -145,6 +147,7 @@ function RailProfile( props ) {
         console.log(response.data);
       })
       .catch(error => console.error('Error fetching data:', error));
+      console.log(profile);
       setLeftTrackProfile(profile);
     }
   }
@@ -383,39 +386,82 @@ function RailProfile( props ) {
         <div className="componentBox flex" style={{overflowY:'auto', overflowX:'hidden'}}>
           <div className="profile left">
             <div className="railTitle">좌</div>
-            {/* <div className="accData">
-              <div className="title">최근누적통과톤수</div>
-              <div className="value">{numberWithCommas(leftAcc)}</div>
-            </div> */}
-            <div className="profileSlider">
-              {(profileDetails.length > 0) ? <div className="imageViewButton" onClick={()=>{setLeftImgView(true)}} >이미지 보기</div> : null}
-              {(leftImgView) ? <div className="picture">
-                <div className="pictureData regDate">23.03.15</div>
-                <div className="pictureData newUpload">Upload</div>
-                <div className="pictureData closeImg">이미지 닫기</div>
-                <ImgSlider
-                  imgUrlList={[DemoImg1,DemoImg2]}
+            <div className="pictureContainer">
+              <div className="profileSlider">
+                {(leftImgView) ? <div className="picture">
+                  <div className="pictureData regDate">23.03.15</div>
+                  <div className="pictureData newUpload">Upload</div>
+                  <div className="pictureData closeImg">이미지 닫기</div>
+                  <ImgSlider
+                    imgUrlList={[DemoImg1,DemoImg2]}
+                  />
+                </div> : null}
+                {getProfileLeftImg(leftTrackProfile)}
+                <Slider
+                  value={selectLeftProfileDate}
+                  defaultValue={selectLeftProfileDate}
+                  track={false}
+                  aria-labelledby="track-false-slider"
+                  marks={marks}
+                  step={null}
+                  min={sliderMin.getTime()}
+                  max={sliderMax.getTime()}
+                  getAriaValueText={valueLabelFormat}
+                  valueLabelFormat={valueLabelFormat}
+                  valueLabelDisplay="on"
+                  onChange={(e)=>{
+                    upTrackHandleChange(e.target.value);
+                    downTrackHandleChange(e.target.value);
+                  }}
+                  size="medium"
                 />
-              </div> : null}
-              {getProfileLeftImg(leftTrackProfile)}
-              <Slider
-                value={selectLeftProfileDate}
-                defaultValue={selectLeftProfileDate}
-                track={false}
-                aria-labelledby="track-false-slider"
-                marks={marks}
-                step={null}
-                min={sliderMin.getTime()}
-                max={sliderMax.getTime()}
-                getAriaValueText={valueLabelFormat}
-                valueLabelFormat={valueLabelFormat}
-                valueLabelDisplay="on"
-                onChange={(e)=>{
-                  upTrackHandleChange(e.target.value);
-                  downTrackHandleChange(e.target.value);
-                }}
-                size="medium"
-              />
+              </div>
+              <div className="detailImgs">
+                <div className="title">업로드 이미지</div>
+                <div className="uploadBtn" onClick={()=>{ hiddenFileInput.current.click(); }}>Upload
+                  <input 
+                    ref={hiddenFileInput} 
+                    type="file" 
+                    style={{display:'none'}} 
+                    onChange={(e)=>{
+                      const file = e.target.files[0];
+                      const reader = new FileReader();
+                      reader.readAsDataURL(file);
+                      reader.onloadend = () => {
+                        const base64String = reader.result;
+                        // base64String은 'data:image/png;base64,iVBORw0KGgo...'와 같은 형태일 것입니다.
+                        // 서버에 전송하기 위해 필요한 부분만 추출합니다 (예: HTTP 헤더에 맞게 조정).
+                        const base64FormattedString = base64String.split(',')[1];
+                  
+                        // 이제 base64FormattedString을 서버에 업로드합니다.
+                        axios.post(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles/images`,{
+                          paramsSerializer: params => {
+                            return qs.stringify(params, { format: 'RFC3986' })
+                          },
+                          params : {
+                            mate : {
+                              profileId:leftTrackProfile.profileId,
+                              type:"PROFILE",
+                              railSide:"LEFT",
+                              fileName: file.name,
+                              comment:""
+                            },
+                            data : base64FormattedString
+                          }
+                        })
+                        .then(response => {
+                          console.log(response.data);
+                        })
+                        .catch(error => console.error('Error fetching data:', error));   
+                      };
+                      reader.onerror = () => {
+                        console.error('FileReader에 문제가 발생했습니다.');
+                      };
+                    }}
+                  />
+                </div>
+                {(profileDetails.length < 1) ? <div className="emptyText">업로드 된 이미지가 없습니다.</div> : null}
+              </div>
             </div>
             <div className="profileData">
               <div className="table" >
@@ -476,46 +522,87 @@ function RailProfile( props ) {
           </div>
           <div className="profile right">
             <div className="railTitle">우</div>
-            {/* <div className="accData">
-              <div className="title">최근누적통과톤수</div>
-              <div className="value">{numberWithCommas(rightAcc)}</div>
-            </div> */}
-            <div className="profileSlider">
-              {(profileDetails.length > 0) ? <div className="imageViewButton" onClick={()=>{setRightImgView(true)}} >이미지 보기</div> : null}
-              {(rightImgView) ? <div className="picture">
-                <div className="pictureData regDate">23.03.15</div>
-                <div className="pictureData newUpload">Upload</div>
-                <div className="pictureData closeImg">이미지 닫기</div>
-                <ImgSlider
-                  imgUrlList={[DemoImg1,DemoImg2]}
+            <div className="pictureContainer">
+              <div className="profileSlider">
+                {(rightImgView) ? <div className="picture">
+                  <div className="pictureData regDate">23.03.15</div>
+                  <div className="pictureData newUpload">Upload</div>
+                  <div className="pictureData closeImg">이미지 닫기</div>
+                  <ImgSlider
+                    imgUrlList={[DemoImg1,DemoImg2]}
+                  />
+                </div> : null}
+                {getProfileRightImg(rightTrackProfile)}
+                <Slider
+                  value={selectRightProfileDate}
+                  defaultValue={selectRightProfileDate}
+                  track={false}
+                  aria-labelledby="track-false-slider"
+                  marks={marks}
+                  step={null}
+                  min={sliderMin.getTime()}
+                  max={sliderMax.getTime()}
+                  getAriaValueText={valueLabelFormat}
+                  valueLabelFormat={valueLabelFormat}
+                  valueLabelDisplay="on"
+                  size="medium"
+                  onChange={(e)=>{
+                    upTrackHandleChange(e.target.value);
+                    downTrackHandleChange(e.target.value);
+                  }}
                 />
-              </div> : null}
-              {getProfileRightImg(rightTrackProfile)}
-              <Slider
-                value={selectRightProfileDate}
-                defaultValue={selectRightProfileDate}
-                track={false}
-                aria-labelledby="track-false-slider"
-                marks={marks}
-                step={null}
-                min={sliderMin.getTime()}
-                max={sliderMax.getTime()}
-                getAriaValueText={valueLabelFormat}
-                valueLabelFormat={valueLabelFormat}
-                valueLabelDisplay="on"
-                size="medium"
-                onChange={(e)=>{
-                  upTrackHandleChange(e.target.value);
-                  downTrackHandleChange(e.target.value);
-                }}
-              />
+              </div>
+              <div className="detailImgs">
+                <div className="title">업로드 이미지</div>
+                <div className="uploadBtn" onClick={()=>{ hiddenFileInput.current.click(); }}>Upload
+                  <input 
+                    ref={hiddenFileInput} 
+                    type="file" 
+                    style={{display:'none'}} 
+                    onChange={(e)=>{
+                      const file = e.target.files[0];
+                      const reader = new FileReader();
+                      reader.readAsDataURL(file);
+                      reader.onloadend = () => {
+                        const base64String = reader.result;
+                        // base64String은 'data:image/png;base64,iVBORw0KGgo...'와 같은 형태일 것입니다.
+                        // 서버에 전송하기 위해 필요한 부분만 추출합니다 (예: HTTP 헤더에 맞게 조정).
+                        const base64FormattedString = base64String.split(',')[1];
+                  
+                        // 이제 base64FormattedString을 서버에 업로드합니다.
+                        axios.post(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles/images`,{
+                          paramsSerializer: params => {
+                            return qs.stringify(params, { format: 'RFC3986' })
+                          },
+                          params : {
+                            mate : {
+                              profileId:rightTrackProfile.profileId,
+                              type:"PROFILE",
+                              railSide:"RIGHT",
+                              fileName: file.name,
+                              comment:""
+                            },
+                            data : base64FormattedString
+                          }
+                        })
+                        .then(response => {
+                          console.log(response.data);
+                        })
+                        .catch(error => console.error('Error fetching data:', error));   
+                      };
+                      reader.onerror = () => {
+                        console.error('FileReader에 문제가 발생했습니다.');
+                      };
+                    }}
+                  />
+                </div>
+                {(profileDetails.length < 1) ? 
+                  <div className="emptyText">업로드 된 이미지가 없습니다.</div> : 
+                  null
+                }
+              </div>
             </div>
             <div className="profileData">
-              {/* <div className="picture">
-                <div className="pictureData regDate">23.03.15</div>
-                <div className="pictureData newUpload">Upload</div>
-                <ImgSlider/>
-              </div> */}
               <div className="table" >
                 <div className="tableHeader">
                   <div className="tr">

@@ -1,8 +1,9 @@
 import React from "react";
 import "./TrackSpeed.css";
 import { IncheonKP, STRING_ROUTE_INCHON, seoulKP } from "../../constant";
-import { convertToCustomFormat } from "../../util";
+import { convertToCustomFormat, findClosestX } from "../../util";
 import isEqual from 'lodash/isEqual';
+import lodash from "lodash";
 
 class TrackSpeed extends React.Component {
 	KP1toPixel1Width = 0.125;
@@ -61,12 +62,36 @@ class TrackSpeed extends React.Component {
 	  let ctx = this.railCanvas.current.getContext("2d");
 	  if (prevProps.kp !== this.props.kp) {
 		
-		this.kpChange(ctx, canvas);
+		this.kpChange(ctx, canvas, this.props.kp);
 		this.drawYAxis();  
 		this.drawLegend();
 		this.drawLine();
 		ctx.restore(); // Restore the context to its saved state
-
+		let upTrackCloset = { kp : 0, speed : 0 };
+		let downTrackCloset = { kp : 0, speed : 0 };
+		let trackData = [...this.props.data];
+		for(let track of trackData) {
+			//상본선 1, 하본선 -1
+			let data = findClosestX(track.data, this.props.kp);
+			if(track.trackType === 1) {
+				upTrackCloset.kp = data.x;
+				upTrackCloset.speed = data.y;
+				/* this.kpChange(ctx, canvas, data.x); */
+			} else {
+				downTrackCloset.kp = data.x;
+				downTrackCloset.speed = data.y;
+				/* this.kpChange(ctx, canvas, data.x); */
+			}
+		}
+		let legend = lodash.cloneDeep(this.state.legend);
+		for( let obj of legend ){
+			if( obj.trackType === 1 ){
+				obj['speed'] = upTrackCloset.speed;
+			}else if( obj.trackType === -1 ){
+				obj['speed'] = downTrackCloset.speed;
+			}
+		}
+		this.props.findClosest(legend);
 	  }
 
 	  if (!isEqual(prevProps.data, this.props.data)) {
@@ -86,11 +111,11 @@ class TrackSpeed extends React.Component {
 	  }
 	}
 
-	kpChange(ctx, canvas){
+	kpChange(ctx, canvas, kp){
 		console.log('kp has changed');
 
 		let cneterKP = ((this.state.x + this.state.width)/2) / this.KP1toPixel1Width;
-		let move = (this.props.kp - cneterKP) * this.state.scaleX + this.state.x;
+		let move = (kp - cneterKP) * this.state.scaleX + this.state.x;
 		let curKP = (( ((this.state.x + this.state.width)/2) + move ) );
 		console.log(curKP);
 		console.log(curKP * ( 1 / this.KP1toPixel1Width ));
@@ -98,15 +123,15 @@ class TrackSpeed extends React.Component {
 		ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
 		ctx.save(); // Save the current state of the context
 
-		if( cneterKP < this.props.kp ){	
+		if( cneterKP < kp ){	
 			ctx.translate( -move, 0); // Apply translation
 		}
 		ctx.beginPath();
 		ctx.strokeStyle = "red";
 		ctx.lineWidth = 1; 
 		ctx.setLineDash([0]);
-		ctx.moveTo( this.props.kp * this.state.scaleX + this.state.x, 0 );
-		ctx.lineTo( this.props.kp * this.state.scaleX + this.state.x, 125 );
+		ctx.moveTo( kp * this.state.scaleX + this.state.x, 0 );
+		ctx.lineTo( kp * this.state.scaleX + this.state.x, 125 );
 		ctx.stroke();
 
 		/* ctx.beginPath();  
@@ -331,11 +356,13 @@ class TrackSpeed extends React.Component {
 		let legend = [
 			{
 				name : `${this.props.data[0].trackName}`,
-				color : "red"
+				color : "red",
+				trackType : this.props.data[0].trackType
 			},
 			{
 				name : `${this.props.data[1].trackName}`,
-				color : "blue"
+				color : "blue",
+				trackType : this.props.data[1].trackType
 			}
 		];
 		this.setState({legend:legend})
@@ -363,7 +390,8 @@ class TrackSpeed extends React.Component {
 			context.lineWidth = 1.5; 
 
 			let route = sessionStorage.getItem('route');
-			let minKP = (route === STRING_ROUTE_INCHON) ? IncheonKP.start : seoulKP.start;
+			/* let minKP = (route === STRING_ROUTE_INCHON) ? IncheonKP.start : seoulKP.start; */
+			let minKP = 0;
 
 			/* let kpPrint = 0; */
 			for (let n = 0; n < track.data.length; n++) {
@@ -401,8 +429,8 @@ class TrackSpeed extends React.Component {
 							p.push(p0); p.push(p1); p.push(p2); p.push(p3);
 		
 							let rateA = 0.5, rateB = 0.4;
-							if(track.trackType == -1)	{ rateA = 0.5; rateB = 0.4; }
-							else 				{ rateA = 0.4; rateB = 0.5; }
+							/* if(track.trackType == -1)	{ rateA = 0.5; rateB = 0.4; }
+							else 				{ rateA = 0.4; rateB = 0.5; } */
 							let _p = this.calcBezierAtT(p, rateA);
 							let __p = this.calcBezierAtT(p, rateB);
 							arrowCoordinates.push({x0: __p.x, y0: __p.y, x1: _p.x, y1: _p.y});
@@ -427,8 +455,8 @@ class TrackSpeed extends React.Component {
 							p.push(p0); p.push(p1); p.push(p2); p.push(p3);
 							
 							let rateA = 0.6, rateB = 0.5;
-							if(track.trackType == -1)	{ rateA = 0.6; rateB = 0.5; }
-							else 						{ rateA = 0.5; rateB = 0.6; }
+							/* if(track.trackType == -1)	{ rateA = 0.6; rateB = 0.5; }
+							else 						{ rateA = 0.5; rateB = 0.6; } */
 							
 							let _p = this.calcBezierAtT(p, rateA);
 							let __p = this.calcBezierAtT(p, rateB);

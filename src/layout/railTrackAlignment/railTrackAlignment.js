@@ -284,26 +284,53 @@ function RailTrackAlignment( props ) {
                     <div className="td track">{report.railTrack}</div>
                     <div className="td weld">{report.welding}</div>
                     <div className="td viewBtn">
-                      <div className="viewBtn" onClick={()=>{
-                        axios.get('https://raildoctor.suredatalab.kr/api/railstraights/files',{
-                          paramsSerializer: params => {
-                            return qs.stringify(params, { format: 'RFC3986' })
-                          },
-                          params : {
-                            measureId : report.measureId,
-                            fileType : 2
+                      {
+                        report.file.map( file => {
+                          if(file.originName.indexOf("QI") > -1){
+                            return <div className="viewBtn" onClick={()=>{
+                              axios.get('https://raildoctor.suredatalab.kr/api/railstraights/files',{
+                                paramsSerializer: params => {
+                                  return qs.stringify(params, { format: 'RFC3986' })
+                                },
+                                params : {
+                                  measureId : report.measureId,
+                                  fileType : 2
+                                }
+                              })
+                              .then(response => {
+                                console.log(response.data);
+                                for( let file_ of response.data.file ){
+                                  if( file_.originName.indexOf(file.originName) > -1 ){
+                                    window.open(`https://raildoctor.suredatalab.kr/resources${file_.filePath}`);
+                                  }
+                                }
+                              })
+                              .catch(error => console.error('Error fetching data:', error));
+                            }} >QI</div>
+                          }else{
+                            return <div className="viewBtn" onClick={()=>{
+                              axios.get('https://raildoctor.suredatalab.kr/api/railstraights/files',{
+                                paramsSerializer: params => {
+                                  return qs.stringify(params, { format: 'RFC3986' })
+                                },
+                                params : {
+                                  measureId : report.measureId,
+                                  fileType : 2
+                                }
+                              })
+                              .then(response => {
+                                console.log(response.data);
+                                for( let file_ of response.data.file ){
+                                  if( file_.originName.indexOf(file.originName) > -1 ){
+                                    window.open(`https://raildoctor.suredatalab.kr/resources${file_.filePath}`);
+                                  }
+                                }
+                              })
+                              .catch(error => console.error('Error fetching data:', error));
+                            }}>Abs.</div>
                           }
                         })
-                        .then(response => {
-                          console.log(response.data);
-                          for( let file of response.data.file ){
-                            window.open(`https://raildoctor.suredatalab.kr/resources${file.filePath}`);
-                          }
-                        })
-                        .catch(error => console.error('Error fetching data:', error));
-                        }}>
-                        <img src={ReportIcon} />
-                      </div>
+                      }
                     </div>
                   </div>
                   })
