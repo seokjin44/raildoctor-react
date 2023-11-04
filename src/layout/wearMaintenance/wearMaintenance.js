@@ -15,7 +15,7 @@ import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, convertToNumber2, dateFormat, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, mgtToM, numberWithCommas, trackLeftRightToString, trackNumberToString, trackToString, wearModelTableBody, wearModelTableHeader1, wearModelTableHeader2, zeroToNull } from "../../util";
+import { convertToCustomFormat, convertToNumber2, dateFormat, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, mgtToM, nonData, numberWithCommas, trackLeftRightToString, trackNumberToString, trackToString, wearModelTableBody, wearModelTableHeader1, wearModelTableHeader2, zeroToNull } from "../../util";
 import lodash, { isEmpty } from "lodash";
 
 const { TextArea } = Input;
@@ -63,6 +63,8 @@ function WearMaintenance( props ) {
   const [trackSpeedFindClosest, setTrackSpeedFindClosest] = useState([]);
   const [leftRemaining, setLeftRemaining] = useState({});
   const [rightRemaining, setRightRemaining] = useState({});
+  const [trackGeo, setTrackGeo] = useState({});
+
   const handleClose = () => {
     setOpen(false);
   }
@@ -150,6 +152,24 @@ function WearMaintenance( props ) {
       if( wearSearchCondition_.startMGT < mgtMin ){ wearSearchCondition_.startMGT = mgtMin; }
       if( wearSearchCondition_.endMGT > mgtMax ){ wearSearchCondition_.endMGT = mgtMax; }
       setWearSearchCondition(wearSearchCondition_);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+  }
+
+  const getTrackGeo = ( kp_ ) => {
+    let route = sessionStorage.getItem('route');
+    axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        railroad : route,
+        kp :  parseInt(kp_) / 1000 
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      setTrackGeo(response.data);
     })
     .catch(error => console.error('Error fetching data:', error));
   }
@@ -254,6 +274,10 @@ function WearMaintenance( props ) {
     })
     .then(response => {
       console.log(response.data);
+      if( response.data.cornerWearGraph.length < 1 &&
+          response.data.verticalWearGraph.length < 1 ){
+          alert("데이터가 없습니다.")
+      }
       setCornerWearGraphData(response.data.cornerWearGraph);
       setVerticalWearGraphData(response.data.verticalWearGraph);
     })
@@ -695,6 +719,21 @@ function WearMaintenance( props ) {
                       }
                       </div>
                     </div>
+                    <div className="searchOption selectBox">
+                      <div className="title flex textBold">선형정보</div>
+                      <div className="flex linear ">
+                        <div className="line">
+                          <div className="title">상선 </div>
+                          {nonData(trackGeo?.t2?.shapeDisplay)} /
+                            R={nonData(trackGeo?.t2?.direction)} {nonData(trackGeo?.t2?.radius)} (C={nonData(trackGeo?.t2?.cant)}, S={nonData(trackGeo?.t2?.slack)})
+                        </div>
+                        <div className="line">
+                          <div className="title">하선 </div>
+                          {nonData(trackGeo?.t1?.shapeDisplay)} /
+                            R={nonData(trackGeo?.t1?.direction)} {nonData(trackGeo?.t1?.radius)} (C={nonData(trackGeo?.t1?.cant)}, S={nonData(trackGeo?.t1?.slack)})
+                        </div>
+                      </div>
+                    </div>
                     <div className="flex flexCenter" style={{flexDirection: "row-reverse"}} >
                       <button className="searchButton" onClick={onClickWearSearch}>조회</button>
                     </div>
@@ -711,6 +750,7 @@ function WearMaintenance( props ) {
                     selectKP={selectKP}
                     setSelectKP={(selectKP)=>{
                       setSelectKP(selectKP);
+                      getTrackGeo(convertToNumber2(selectKP.name));
                       getAccRemainingData(selectKP.name, selectKP.trackType);
                     }}
                     path={selectedPath} 

@@ -106,6 +106,14 @@ function MeasuringTemperatureHumidity( props ) {
     })
     .then(response => {
       console.log(response.data);
+      if( response.data.humidity.length < 1 &&
+        response.data.kmaTemperature.length < 1 &&
+        response.data.measureTs.length < 1 &&
+        response.data.railTemperature.length < 1 &&
+        response.data.temperature.length < 1 ){
+          alert("데이터가 없습니다.");
+          return;
+      }
       setLoading(true);
       let sensorName = "";
       for( let sensor of sensorList ){

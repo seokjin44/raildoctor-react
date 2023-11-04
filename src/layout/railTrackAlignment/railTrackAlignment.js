@@ -226,6 +226,10 @@ function RailTrackAlignment( props ) {
               <div className="line"></div>
               <div className="dataOption">
                 <button className="search" onClick={()=>{
+                  if( !selectKP || selectKP === "" || selectKP === null || selectKP === undefined ){
+                    alert("KP를 선택해주세요.");
+                    return;
+                  }
                   let track_ = "";
                   if( selectTrack === STRING_UP_TRACK && selectDir === STRING_TRACK_DIR_LEFT ){
                     track_ = STRING_UP_TRACK_LEFT;
@@ -251,6 +255,10 @@ function RailTrackAlignment( props ) {
                   })
                   .then(response => {
                     console.log(response.data);
+                    if( response.data.entities.length < 1 ){
+                      alert("데이터가 없습니다.");
+                      return; 
+                    }
                     setReports(response.data.entities);
                   })
                   .catch(error => console.error('Error fetching data:', error));

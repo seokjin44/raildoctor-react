@@ -215,7 +215,7 @@ function TrackDeviation( props ) {
         try{
           dataAry = transposeObjectToArray(response.data);
         }catch(e){
-          /* alert("데이터가 없습니다."); */
+          alert("데이터가 없습니다.");
           return;
         }
 
