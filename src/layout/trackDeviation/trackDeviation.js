@@ -43,8 +43,11 @@ function TrackDeviation( props ) {
   const [reportSelectRange, setReportSelectRange] = useState("");
   const [reportSelectMeasureDate, setReportSelectMeasureDate] = useState(null);
   const [reportSelectPath, setReportSelectPath] = useState("");
+  const [reportSelectTrack, setReportSelectTrack] = useState("");
   const [quarterOptions, setQuarterOptions] = useState([]);
   const [chartKPMoveIndex, setChartKPMoveIndex] = useState(0);
+
+  const [reportData, setReportData] = useState({});
 
   const pathClick = (select) => {
     console.log(select);
@@ -222,6 +225,7 @@ function TrackDeviation( props ) {
         setReportSelectRange(selectRange);
         setReportSelectMeasureDate(measureTs);
         setReportSelectPath(selectedPath);
+        setReportSelectTrack(selectTrack);
         
         console.log(dataAry);
         if( option === STRING_HEIGHT ){
@@ -237,6 +241,19 @@ function TrackDeviation( props ) {
         }
         searchChartView_.push(option);
         setSearchChartView(searchChartView_);
+
+        axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/report`,{
+          paramsSerializer: params => {
+            return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
+          },
+          params : param
+        })
+        .then(response => {
+          console.log(response.data);
+          setReportData(response.data);
+        })
+        .catch(error => console.error('Error fetching data:', error));
+
       })
       .catch(error => console.error('Error fetching data:', error));
     }
@@ -544,7 +561,7 @@ function TrackDeviation( props ) {
                     <div className="td colspan2"><div className="colspan2">Rail</div></div>
                     <div className="td rowspan2"><div className="rowspan2">Position</div></div>
                     <div className="td rowspan2"></div>
-                    <div className="td colspan2"><div className="colspan2">Length</div></div>
+                    {/* <div className="td colspan2"><div className="colspan2">Length</div></div> */}
                     <div className="td rowspan2"><div className="rowspan2">Worst Defect</div></div>
                     <div className="td rowspan2"></div>
                     <div className="td colspan2"><div className="colspan2">Threshold Value</div></div>
@@ -557,7 +574,7 @@ function TrackDeviation( props ) {
                     <div className="td colspan2"></div>
                     <div className="td">Begin</div>
                     <div className="td">End</div>
-                    <div className="td colspan2"></div>
+                    {/* <div className="td colspan2"></div> */}
                     <div className="td">Postion</div>
                     <div className="td">Value</div>
                     <div className="td colspan2"></div>
@@ -568,7 +585,24 @@ function TrackDeviation( props ) {
                   </div>
                 </div>
                 <div className="tableBody">
-                  <div className="tr">
+                  {
+                    reportData?.entities?.map( entitie => {
+                      return <div className="tr">
+                        <div className="td">{reportSelectTrack}</div>
+                        <div className="td">{reportData.beginKp}</div>
+                        <div className="td">{reportData.endKp}</div>
+                        {/* <div className="td">1.25</div> */}
+                        <div className="td">{entitie.position}</div>
+                        <div className="td">{entitie.value}</div>
+                        <div className="td">{entitie.thresholdValue}</div>
+                        <div className="td">{entitie.excess}</div>
+                        <div className="td">{entitie.alarm}</div>
+                        <div className="td">{entitie.maxWear}</div>
+                        <div className="td">{entitie.minWear}</div>
+                      </div>
+                    })
+                  }
+                  {/* <div className="tr">
                     <div className="td">Long</div>
                     <div className="td">15785.25</div>
                     <div className="td">18784</div>
@@ -580,7 +614,7 @@ function TrackDeviation( props ) {
                     <div className="td">T1</div>
                     <div className="td">5.3</div>
                     <div className="td">5.26</div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

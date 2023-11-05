@@ -143,7 +143,12 @@ function RailTrackAlignment( props ) {
     })
     .then(response => {
       console.log(response.data);
-      setTrackGeo(response.data);
+      if( selectTrack === STRING_UP_TRACK ){
+        setTrackGeo(response.data.t2);
+      }else if( selectTrack === STRING_DOWN_TRACK ){
+        setTrackGeo(response.data.t1);
+      }
+      
     })
     .catch(error => console.error('Error fetching data:', error));    
   }, [selectKP])
@@ -209,8 +214,8 @@ function RailTrackAlignment( props ) {
                 </div>
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
-              {nonData(trackGeo.shapeDisplay)} /
-                R={nonData(trackGeo.direction)} {nonData(trackGeo.radius)} (C={nonData(trackGeo.cant)}, S={nonData(trackGeo.slack)})
+              {nonData(trackGeo?.shapeDisplay)} /
+                R={nonData(trackGeo?.direction)} {nonData(trackGeo?.radius)} (C={nonData(trackGeo?.cant)}, S={nonData(trackGeo?.slack)})
               </div>
               <div className="line"></div>
               <div className="dataOption">
