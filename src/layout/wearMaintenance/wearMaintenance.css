@@ -679,3 +679,23 @@
     width: calc(100% - 45px);
     font-size: 10px;
 }
+
+.wearMaintenance .containerTitle .selectKPInfo{
+    left: 80px;
+    position: absolute;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    background: white;
+    font-size: 13px;
+    padding: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wearMaintenance .containerTitle .selectKPInfo .closestIcon{
+    width: 14px;
+    height: 5px;
+    border-radius: 5px;
+    margin-left: 17px;
+}

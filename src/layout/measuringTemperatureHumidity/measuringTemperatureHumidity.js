@@ -281,7 +281,7 @@ function MeasuringTemperatureHumidity( props ) {
             <div className="componentBox" style={{overflow: "hidden"}}>
               <div className="dataOption">
                 <div className="title">센서목록 </div>
-                <div className="date">
+                <div>
                   {/* <Input placeholder="KP"
                     style={RANGEPICKERSTYLE}
                   /> */}
@@ -289,16 +289,22 @@ function MeasuringTemperatureHumidity( props ) {
                     value={selectDeviceID}
                     defaultValue={selectDeviceID}
                     style={{
-                      width: 200,
+                      width: 150,
                     }}
                     onChange={handleChange}
                     options={selectOptionSensors}
                   />
                 </div>
               </div>
-              <div className="dataOption" style={{marginLeft:"10px"}}>
-              {nonData(trackGeo.shapeDisplay)} /
-                R={nonData(trackGeo.direction)} {nonData(trackGeo.radius)} (C={nonData(trackGeo.cant)}, S={nonData(trackGeo.slack)})
+              <div className="dataOption linear" style={{marginLeft:"10px"}}>
+                <div className="title border">상선 </div>
+                {nonData(trackGeo?.t2?.shapeDisplay)} / R={nonData(trackGeo?.t2?.direction)} <br/>
+                {nonData(trackGeo?.t2?.radius)} (C={nonData(trackGeo?.t2?.cant)}, S={nonData(trackGeo?.t2?.slack)})
+              </div>
+              <div className="dataOption linear" style={{marginLeft:"10px"}}>
+                <div className="title border">하선 </div>
+                {nonData(trackGeo?.t1?.shapeDisplay)} / R={nonData(trackGeo?.t1?.direction)} <br/>
+                {nonData(trackGeo?.t1?.radius)} (C={nonData(trackGeo?.t1?.cant)}, S={nonData(trackGeo?.t1?.slack)})
               </div>
               <div className="line"></div>
               <div className="dataOption">
@@ -313,7 +319,7 @@ function MeasuringTemperatureHumidity( props ) {
               <div className="line"></div>
               <div className="dataOption">
                 <div className="title">데이터 </div>
-                <div className="date">
+                <div>
                   {/* <RangePicker 
                     style={RANGEPICKERSTYLE}
                   /> */}

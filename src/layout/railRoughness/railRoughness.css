@@ -70,3 +70,62 @@
     height: 40px;
     margin-right: 25px;
 }
+
+/*== decision ==*/
+.railRoughness .decisionPopupTitle{
+    color: #EB501F;
+    font-size: 25px;
+    font-weight: bold;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    border-bottom: 5px solid #9F9F9F;
+    padding-bottom: 10px;
+    padding-right: 80px;
+    margin-left: 15px;
+    margin-top: 15px;
+    width: 30%;
+}
+
+.railRoughness .decisionPopupContent{
+    width: 660px;
+}
+
+.railRoughness .decisionPopupContent .comment{
+    height: 150px;
+}
+
+.railRoughness .decisionPopupContent .header{
+    font-weight: bold;
+    font-size: 15px;
+    margin-bottom: 20px;
+}
+
+.railRoughness .decisionPopupContent .popupContent{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.railRoughness .decisionPopupContent .popupContent .contentSection{
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.railRoughness .decisionPopupContent .popupContent .contentSection .contentTitle{
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.railRoughness .decisionPopupContent .popupContent .contentSection .contentValue{
+    font-size: 13px;
+    height: 35px;
+    padding-left: 10px;
+}
+
+.railRoughness .decisionPopupContent .popupContent .leftContent{
+
+}
+
+.railRoughness .decisionPopupContent .popupContent .rightContent{
+}

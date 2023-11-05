@@ -19,6 +19,11 @@ import qs from 'qs';
 import { findRange, getRailroadSection, getStartEndDatesFromQuarter, intervalSample } from "../../util";
 import LoadingImg from "../../assets/icon/loading/loading.png";
 
+import DummyImg1 from "../../assets/reportDummy/1.png";
+import DummyImg2 from "../../assets/reportDummy/2.png";
+import DummyImg3 from "../../assets/reportDummy/3.png";
+import DummyImg4 from "../../assets/reportDummy/4.png";
+
 function RailRoughness( props ) {
   const [selectedPath, setSelectedPath] = useState({
     start_station_name : "",
@@ -272,57 +277,58 @@ function RailRoughness( props ) {
           onClose={(e)=>{handleClose()}}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
+          className="railRoughness"
         >
           <Box sx={BOXSTYLE} >
             <div className="decisionPopupTitle">
-              <img src={AlertIcon} />유지보수 지침등록 
+              <img src={AlertIcon} />유지보수 지침
               <div className="closeBtn" onClick={()=>{setOpen(false)}} ><img src={CloseIcon} /></div>
             </div>
             <div className="decisionPopupContent">
-              <div className="chartConatiner">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    width={500}
-                    height={300}
-                    data={roughnessChartData}
-                    margin={{
-                      top: 5,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                    
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="km" fontSize={12} />
-                    <YAxis  fontSize={12} />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="mm" stroke="#82ca9d" dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="comment" style={{ marginTop: "50px"}} >
-                <div className="commentTitle">유지보수 지침</div>
-                <div className="commentInput">
-                  <TextArea rows={6} />
+              <div className="header">레일표면상태 모니터링</div>
+              <div className="popupContent">
+                <div className="contentSection leftContent">
+                  <div className="contentTitle">15K300 (상선, 좌레일)</div>
+                  <div className="contentValue">
+                    레일두부표면 head check & scaling 발생. <br/>
+                    일부 파상마모 발생
+                  </div>
+                  <div className="pictureList">
+                    <img src={DummyImg1}/>
+                    <img src={DummyImg2}/>
+                  </div>
+                </div>
+                <div className="contentSection rightContent">
+                  <div className="contentTitle">14K900 (하선, 좌레일)</div>
+                  <div className="contentValue">
+                    가스압접 열영향부 위주로 squat(압좌)발생
+                  </div>
+                  <div className="pictureList">
+                    <img src={DummyImg3}/>
+                    <img src={DummyImg4}/>
+                  </div>
                 </div>
               </div>
-              <div className="comment" style={{ marginTop: "15px"}} >
+              <div className="comment" style={{ marginTop: "50px"}} >
+                <div className="commentTitle">유지보수 지침 또는 의사결정지원</div>
+                <div className="commentInput">
+                  <TextArea rows={5} value={`주기적인 모니터링 수행
+레일 연마 필요`} />
+                </div>
+              </div>
+              {/* <div className="comment" style={{ marginTop: "15px"}} >
                 <div className="commentTitle">유지보수 의사결정</div>
                 <div className="commentInput">
                   <TextArea rows={6} />
                 </div>
-              </div>
+              </div> */}
 
             </div>
-            <div className="decisionButtonContainer">
+            {/* <div className="decisionButtonContainer">
               <div className="button">유지보수 의사결정 등록</div>
-            </div>
+            </div> */}
           </Box>
         </Modal>
-
-
     </div>
   );
 }

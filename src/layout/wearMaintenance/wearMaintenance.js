@@ -709,7 +709,7 @@ function WearMaintenance( props ) {
                         {( !isEmpty(rightRemaining) )?<div>우레일 : {numberWithCommas(rightRemaining.accumulateweight)}</div> : null}
                       </div>
                     </div>
-                    <div className="searchOption selectBox">
+                    {/* <div className="searchOption selectBox">
                       <div className="title flex textBold">속도정보</div>
                       <div className="flex trackSpeedFindClosest">
                       {
@@ -718,7 +718,7 @@ function WearMaintenance( props ) {
                         })
                       }
                       </div>
-                    </div>
+                    </div> */}
                     <div className="searchOption selectBox">
                       <div className="title flex textBold">선형정보</div>
                       <div className="flex linear ">
@@ -824,7 +824,16 @@ function WearMaintenance( props ) {
           </div>
           <div className="leftContainer">
               <div className="contentBox speedContainer" style={{height:"165px"}}>
-                <div className="containerTitle">통과속도 정보</div>
+                <div className="containerTitle">속도 정보
+                <div className="selectKPInfo">
+                  선택된 KP : {selectKP.name}
+                  {
+                    trackSpeedFindClosest.map( closest => {
+                      return <><div style={{backgroundColor : closest.color}} className="closestIcon"></div><div style={{marginLeft: "5px"}}>{closest.name}</div><div>: {`${parseFloat(closest.speed).toFixed(1)}km/h`}</div></>;
+                    })
+                  }
+                </div>
+                </div>
                 <div className="componentBox" style={{ marginRight: "10px", width: "calc(100% - 10px)", overflow: "hidden"}}>
                   <div className="demoImgContainer">
                     <TrackSpeed 
@@ -990,7 +999,7 @@ function WearMaintenance( props ) {
         >
           <Box sx={BOXSTYLE} >
             <div className="decisionPopupTitle">
-              <img src={AlertIcon} />선로 마모 심각 
+              {/* <img src={AlertIcon} /> */}선로 마모 
               <div className="closeBtn" onClick={()=>{setOpen2(false)}} ><img src={CloseIcon} /></div>
             </div>
             <div className="decisionPopupContent">
@@ -1023,7 +1032,8 @@ function WearMaintenance( props ) {
               <div className="comment" style={{ marginTop: "20px"}} >
                 <div className="commentTitle">유지보수 지침</div>
                 <div className="commentInput">
-                  <TextArea rows={3} />
+                  <TextArea rows={3} value={`[60kg 레일] 직마모 13mm, 편마모 15mm 이상 발생시 레일 교환    [50kg 레일] 직마모 12mm, 편마모 13mm 이상 발생시 레일 교환
+[인천도시철도 공사] 누적통과톤수 기준 6억톤 기준 레일 교환`} />
                 </div>
               </div>
               <div className="comment" style={{ marginTop: "15px"}} >
