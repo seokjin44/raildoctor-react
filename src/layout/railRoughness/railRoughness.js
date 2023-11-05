@@ -11,7 +11,7 @@ import Papa from 'papaparse';
 import Box from '@mui/material/Box';
 import { Modal } from "@mui/material";
 import TextArea from "antd/es/input/TextArea";
-import { BOXSTYLE,  CHART_RENDERING_TEXT,  DUMMY_RANGE, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE } from "../../constant";
+import { BOXSTYLE,  CHART_RENDERING_TEXT,  DATA_LOADING_TEXT,  DUMMY_RANGE, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE } from "../../constant";
 import { DatePicker, Input, Select } from "antd";
 import PlaceGauge from "../../component/PlaceGauge/PlaceGauge";
 import axios from 'axios';
@@ -38,7 +38,8 @@ function RailRoughness( props ) {
   const [roughnessChartData, setRoughnessChartData] = useState([]);
   const [selectedGauge, setSelectedGauge] = useState("");
   const [railroadSection, setRailroadSection] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [dataloading, setDataloading] = useState(false);
 
   const selectChange = (val) => {
     setSelectRange(val);
@@ -199,8 +200,10 @@ function RailRoughness( props ) {
                   setSelectedGauge( findRects[0].roughnessId );
                   let roughnessChartData_ = [];
                   /* for( let rect of findRects  ){ */
+                  setDataloading(true);
                     axios.get("https://raildoctor.suredatalab.kr/"+findRects[0].dataFile, { responseType: 'text' })
                     .then(response => {
+                      setDataloading(false);
                       setLoading(true);
                       const csvData = response.data;
                       let results = [];
@@ -245,6 +248,7 @@ function RailRoughness( props ) {
         </div>
         <div className="componentBox chartBox flex">
         { (loading) ? <div className="loading"><img src={LoadingImg} alt="로딩" />{CHART_RENDERING_TEXT}</div> : null }
+        { (dataloading) ? <div className="loading"><img src={LoadingImg} alt="로딩" />{DATA_LOADING_TEXT}</div> : null }
           <div className="chartBox">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart

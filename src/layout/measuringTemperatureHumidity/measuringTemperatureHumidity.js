@@ -126,7 +126,7 @@ function MeasuringTemperatureHumidity( props ) {
         let dataKey = `${selectDeviceID}_${select}`;
 
         chartseries_ = chartseries_.filter(series => !(series.deviceID === selectDeviceID && series.item === tempDataName(select)));
-        deleteObjData(chartDataObj, selectDeviceID);
+        deleteObjData(chartDataObj, dataKey);
         deleteNonObj(chartDataObj);
 
         if( select === STRING_RAIL_TEMPERATURE ){
@@ -282,9 +282,6 @@ function MeasuringTemperatureHumidity( props ) {
               <div className="dataOption">
                 <div className="title">센서목록 </div>
                 <div>
-                  {/* <Input placeholder="KP"
-                    style={RANGEPICKERSTYLE}
-                  /> */}
                   <Select
                     value={selectDeviceID}
                     defaultValue={selectDeviceID}
@@ -350,7 +347,7 @@ function MeasuringTemperatureHumidity( props ) {
                         let chartseries_ = [...chartseries];
                         chartseries_ = chartseries_.filter(series => !(series.deviceID === point.deviceID && series.item === point.item));
                         setChartseries(chartseries_);
-                        deleteObjData(chartDataObj, point.deviceID);
+                        deleteObjData(chartDataObj, point.dataKey);
                         deleteNonObj(chartDataObj);
                         console.log("isEmpty(chartDataObj)",isEmpty(chartDataObj));
                       }}
@@ -392,7 +389,7 @@ function MeasuringTemperatureHumidity( props ) {
                     chartseries.map( (series, i) => {
                       return <Line key={i} 
                         dataKey={series.dataKey} name={`${series.sensorName}_${series.item}`} 
-                        stroke={series.color} dot={false} />;
+                        stroke={series.color} dot={{ strokeWidth: 1, r: 1 }}  />;
                     })
                   }
                 </LineChart>

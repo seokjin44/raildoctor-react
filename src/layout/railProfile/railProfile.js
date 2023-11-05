@@ -263,7 +263,7 @@ function RailProfile( props ) {
   }, [selectedPath, selectTrack])
 
   return (
-    <div className="trackDeviation railProfile" >
+    <div className="railProfile" >
       <div className="railStatusContainer">
         <RailStatus 
           resizeOn={resizeOn}
@@ -446,9 +446,9 @@ function RailProfile( props ) {
                           params : {
                             mate : {
                               profileId:leftTrackProfile.profileId,
-                              type:"PROFILE",
+                              type:"IMAGE",
                               railSide:"LEFT",
-                              fileName: file.name,
+                              fileName: [file.name],
                               comment:""
                             },
                             data : base64FormattedString
@@ -582,9 +582,9 @@ function RailProfile( props ) {
                           params : {
                             mate : {
                               profileId:rightTrackProfile.profileId,
-                              type:"PROFILE",
+                              type:"IMAGE",
                               railSide:"RIGHT",
-                              fileName: file.name,
+                              fileName: [file.name],
                               comment:""
                             },
                             data : base64FormattedString

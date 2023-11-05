@@ -171,7 +171,7 @@ export const convertObjectToArray = (obj, type) => {
             time: format(key),
             ...obj[key]
         };
-    });
+    }).sort((a, b) => new Date(a.time) - new Date(b.time));
 }
 
 export const convertObjectToArray_ = (obj, type, startDate, endDate) => {
