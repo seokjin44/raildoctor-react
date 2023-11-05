@@ -272,6 +272,8 @@ function TrackGeometryMeasurement( props ) {
     /* calendarDate = value.$d; */
     setViewMeasureDate(value);
     console.log(value, mode);
+    let yyyymmdd = dateFormat(value.$d);
+    setSelectMeasureDate(yyyymmdd);
     if (mode === 'date') {
       setMode('date');
     }
@@ -621,7 +623,7 @@ function TrackGeometryMeasurement( props ) {
                         setTodayChartseries(todayChartseries_);
                         setDailyChartseries(dailyChartseries_);
                         setMonthlyChartseries(monthlyChartseries_);
-                        selectPointAdd(pointsInfo[selectPoint]);
+                        selectPointAdd({...pointsInfo[selectPoint], ...{ measureDate : `${selectMeasureDate}` }});
                       })
                       .catch(error => console.error('Error fetching data:', error));
                     /* } */
@@ -849,7 +851,7 @@ function TrackGeometryMeasurement( props ) {
             {
               selectPoints.map( (point, i) => {
                 return <div key={i} className="point">
-                  {`${convertToCustomFormat(point.kp*1000)}(${trackLeftRightToString(point.railTrack)})-${measureTypeText(point.measureType)}`}
+                  {`${convertToCustomFormat(point.kp*1000)}(${trackLeftRightToString(point.railTrack)})-${measureTypeText(point.measureType)}-${point.measureDate}`}
                   <img src={CloseIcon} alt="제거" 
                     onClick={()=>{
                       let selectPoints_ = [...selectPoints];
