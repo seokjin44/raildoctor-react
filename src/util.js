@@ -37,7 +37,6 @@ export const formatDateTime = (date) => {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
-
 export const formatDate = (date) => {
     const day = String(date.getDate()).padStart(2, '0');
     return day;
@@ -157,6 +156,15 @@ export const convertObjectToArray = (obj, type) => {
         return formatDateTime(new Date(key));
       }
       return key;
+    }
+    
+    if( type === CHART_FORMAT_TODAY ){
+        return Object.keys(obj).map(key => {
+            return {
+                time: format(key),
+                ...obj[key]
+            };
+        }).sort((a, b) => a.time.localeCompare(b.time));
     }
     return Object.keys(obj).map(key => {
         return {
