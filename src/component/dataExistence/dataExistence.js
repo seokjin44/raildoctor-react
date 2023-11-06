@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./dataExistence.css"
 import { Box, Modal, Tab } from "@mui/material";
-import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, IncheonKP, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, colors } from "../../constant";
+import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRACK, IncheonKP, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK, colors } from "../../constant";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -52,6 +52,7 @@ function DataExistence( props ) {
 
   const [cornerWearGraphData, setCornerWearGraphData] = useState([]);
   const [verticalWearGraphData, setVerticalWearGraphData] = useState([]);
+  const [selectKP, setSelectKP] = useState({ trackType : "" });
 
   const [remainingData, setRemainingData] = useState({});
   const [remainingCriteria, setRemainingCriteria] = useState({});
@@ -228,13 +229,14 @@ function DataExistence( props ) {
                   end_kp : [data.kp],
                   beginMeasureTs : new Date(data.measureTs).toISOString(),
                   endMeasureTs : new Date(data.measureTs).toISOString(),
-                  minAccumulateWeight : data.accumulateWeights,
-                  maxAccumulateWeight : data.accumulateWeights,
+                  minAccumulateWeight : 1,
+                  maxAccumulateWeight : 600000000,
                   railTrack : data.railTrack,
                   railroadName : route,
                   graphType : "TWO_DIMENTION"
                 }
                 console.log(param);
+                setSelectKP({trackType : (data.railTrack===STRING_UP_TRACK) ? UP_TRACK : DOWN_TRACK });
                 axios.get('https://raildoctor.suredatalab.kr/api/railwears/graph_data',{
                   paramsSerializer: params => {
                     return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
@@ -655,7 +657,7 @@ function DataExistence( props ) {
         >
         <Box sx={BOXSTYLE} >
           <div className="popupTitle"><img src={PopupIcon} />마모유지관리 상세요약</div>
-          <div className="tabPanel"  style={{width: "915px", height: "565px" }}>
+          <div className="tabPanel"  style={{width: "915px", height: "565px", padding: "10px 10px 50px 10px" }}>
             <div className="contentBox" style={{marginLeft : 0, height:"100%"}}>
               <div className="containerTitle bothEnds">
                 <div>마모정보</div>
@@ -672,10 +674,10 @@ function DataExistence( props ) {
               </div>
               <div className="componentBox separationBox">
                 <div className="componentBox" id="directWearInfo">
-                  <WearInfo title="직마모" data={verticalWearGraphData} yTitle="직마모(mm)"></WearInfo>
+                  <WearInfo title="직마모" selectKP={selectKP} data={verticalWearGraphData} yTitle="직마모(mm)"></WearInfo>
                 </div>
                 <div className="componentBox" id="sideWearInfo">
-                  <WearInfo title="편마모" data={cornerWearGraphData} yTitle="편마모(mm)"></WearInfo>
+                  <WearInfo title="편마모" selectKP={selectKP} data={cornerWearGraphData} yTitle="편마모(mm)"></WearInfo>
                 </div>
               </div>
             </div>
