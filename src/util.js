@@ -145,30 +145,56 @@ export const trackNumberToString = ( number ) => {
 }
 
 export const convertObjectToArray = (obj, type) => {
-    let format = ( key ) => {
-      if( type === CHART_FORMAT_TODAY ){
+    let format = ( key, type_ ) => {
+      if( type_ === CHART_FORMAT_TODAY ){
         return formatTime(new Date(key));
-      }else if( type === CHART_FORMAT_DAILY ){
+      }else if( type_ === CHART_FORMAT_DAILY ){
         return formatDate(new Date(key));
-      }else if( type === CHART_FORMAT_MONTHLY ){
+      }else if( type_ === CHART_FORMAT_MONTHLY ){
         return formatYearMonth(new Date(key));
-      }else if( type === CHART_FORMAT_RAW ){
+      }else if( type_ === CHART_FORMAT_RAW ){
         return formatDateTime(new Date(key));
       }
       return key;
     }
+
+    const sortByTimeWithFourAMAsReference = (a, b) => {
+        // 시간을 'HH:mm:ss'에서 시간, 분, 초로 분리
+        const timeA = a.time.split(':');
+        const timeB = b.time.split(':');
+      
+        // '04:00' 기준으로 날짜 조정
+        const baseHour = 4;
+        const dateA = new Date();
+        const dateB = new Date();
+      
+        dateA.setHours(timeA[0], timeA[1], timeA[2]);
+        dateB.setHours(timeB[0], timeB[1], timeB[2]);
+      
+        // 만약 시간이 '04:00' 이전이라면, 날짜를 하루 늘림
+        if (timeA[0] < baseHour || (timeA[0] == baseHour && timeA[1] == '00' && timeA[2] == '00')) {
+          dateA.setDate(dateA.getDate() + 1);
+        }
+        if (timeB[0] < baseHour || (timeB[0] == baseHour && timeB[1] == '00' && timeB[2] == '00')) {
+          dateB.setDate(dateB.getDate() + 1);
+        }
+      
+        // '가상의' 날짜를 사용하여 비교
+        return dateA - dateB;
+    };
     
     if( type === CHART_FORMAT_TODAY ){
-        return Object.keys(obj).map(key => {
+        let sorting = Object.keys(obj).map(key => {
             return {
-                time: format(key),
+                time: format(key, CHART_FORMAT_TODAY),
                 ...obj[key]
             };
-        }).sort((a, b) => a.time.localeCompare(b.time));
+        }).sort(sortByTimeWithFourAMAsReference);
+        return sorting;
     }
     return Object.keys(obj).map(key => {
         return {
-            time: format(key),
+            time: format(key, type),
             ...obj[key]
         };
     }).sort((a, b) => new Date(a.time) - new Date(b.time));
