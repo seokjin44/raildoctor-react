@@ -10,7 +10,7 @@ import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import { Modal } from "@mui/material";
 import axios from 'axios';
 import qs from 'qs';
-import { convertQuarterFormat, convertToCustomFormat, dateFormat, findRange, getQuarterFromDate, getRailroadSection, getStartEndDatesFromQuarter, isEmpty, transposeObjectToArray } from "../../util";
+import { convertQuarterFormat, convertToCustomFormat, dateFormat, findRange, getQuarterFromDate, getRailroadSection, getStartEndDatesFromQuarter, isEmpty, trackToString, transposeObjectToArray } from "../../util";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 
 function TrackDeviation( props ) {
@@ -555,8 +555,8 @@ function TrackDeviation( props ) {
                   </div>
                 </div>
               </div>
-              <div className="table" style={{marginTop:"10px"}}>
-                <div className="tableHeader">
+              <div className="table trackDeviationReportTable" style={{marginTop:"10px", alignItems: "baseline"}}>
+                <div className="tableHeader" style={{width: "calc(100% - 20px)"}}>
                   <div className="tr">
                     <div className="td colspan2"><div className="colspan2">Rail</div></div>
                     <div className="td rowspan2"><div className="rowspan2">Position</div></div>
@@ -584,18 +584,18 @@ function TrackDeviation( props ) {
                     <div className="td">Min</div>
                   </div>
                 </div>
-                <div className="tableBody">
+                <div className="tableBody" style={{overflowY: "scroll", height: "500px", display: "block"}}>
                   {
-                    reportData?.entities?.map( entitie => {
+                    reportData?.entity?.map( entitie => {
                       return <div className="tr">
-                        <div className="td">{reportSelectTrack}</div>
+                        <div className="td">{trackToString(reportSelectTrack)}</div>
                         <div className="td">{reportData.beginKp}</div>
                         <div className="td">{reportData.endKp}</div>
                         {/* <div className="td">1.25</div> */}
                         <div className="td">{entitie.position}</div>
                         <div className="td">{entitie.value}</div>
                         <div className="td">{entitie.thresholdValue}</div>
-                        <div className="td">{entitie.excess}</div>
+                        <div className="td">{entitie.excess.toFixed(2)}</div>
                         <div className="td">{entitie.alarm}</div>
                         <div className="td">{entitie.maxWear}</div>
                         <div className="td">{entitie.minWear}</div>

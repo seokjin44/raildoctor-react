@@ -209,3 +209,7 @@
     background: white;
     border-radius: 5px;
 }
+
+div.trackDeviationReportTable div.tableBody div.tr{
+    height: 30px;
+}
