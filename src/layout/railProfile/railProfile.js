@@ -23,7 +23,7 @@ import faker from 'faker';
 import { RADIO_STYLE, STRING_DOWN_TRACK, STRING_UP_TRACK } from "../../constant";
 import { Input, DatePicker, Radio, Select } from "antd";
 import ImgSlider from "../../component/imgSlider/imgSlider";
-import { convertToCustomFormat, dateFormat, findRange, getRailroadSection, nonData, numberWithCommas } from "../../util";
+import { convertToCustomFormat, dateFormat, findJustSmallerKey, findRange, getRailroadSection, nonData, numberWithCommas } from "../../util";
 const { RangePicker } = DatePicker;
 
 ChartJS.register(
@@ -176,6 +176,8 @@ function RailProfile( props ) {
         날짜를 선택해주세요.
       </div>;
     }else if( profile.imageLeft ){
+      /* let get = findJustSmallerKey(profilesMap, new Date(profile.measureTs).getTime());
+      console.log(get); */
       return <img className="profileImg" src={`https://raildoctor.suredatalab.kr${profile.imageLeft.fileName}`} />;
     }
     return <div className="profileImg" >
