@@ -157,39 +157,15 @@ export const convertObjectToArray = (obj, type) => {
       }
       return key;
     }
-
-    const sortByTimeWithFourAMAsReference = (a, b) => {
-        // 시간을 'HH:mm:ss'에서 시간, 분, 초로 분리
-        const timeA = a.time.split(':');
-        const timeB = b.time.split(':');
-      
-        // '04:00' 기준으로 날짜 조정
-        const baseHour = 4;
-        const dateA = new Date();
-        const dateB = new Date();
-      
-        dateA.setHours(timeA[0], timeA[1], timeA[2]);
-        dateB.setHours(timeB[0], timeB[1], timeB[2]);
-      
-        // 만약 시간이 '04:00' 이전이라면, 날짜를 하루 늘림
-        if (timeA[0] < baseHour || (timeA[0] == baseHour && timeA[1] == '00' && timeA[2] == '00')) {
-          dateA.setDate(dateA.getDate() + 1);
-        }
-        if (timeB[0] < baseHour || (timeB[0] == baseHour && timeB[1] == '00' && timeB[2] == '00')) {
-          dateB.setDate(dateB.getDate() + 1);
-        }
-      
-        // '가상의' 날짜를 사용하여 비교
-        return dateA - dateB;
-    };
     
     if( type === CHART_FORMAT_TODAY ){
         let sorting = Object.keys(obj).map(key => {
             return {
+                datetime: format(key, CHART_FORMAT_RAW),
                 time: format(key, CHART_FORMAT_TODAY),
                 ...obj[key]
             };
-        }).sort(sortByTimeWithFourAMAsReference);
+        }).sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
         return sorting;
     }
     return Object.keys(obj).map(key => {
@@ -899,4 +875,40 @@ export const findJustSmallerKey = (myMap, targetKey) => {
     // 주어진 키가 가장 작은 키거나, 키가 없는 경우
     return undefined;
   }
+  
+  export const convertDates =(dataArray) => {
+    // 배열에서 가장 날짜가 이른 데이터 포인트를 기준 날짜로 설정합니다.
+    const baseDate = new Date(Math.min(...dataArray.map(item => new Date(item.ts))));
+    // '2000-01-01'을 새 기준 날짜로 설정합니다.
+    const newBaseDate = new Date('2000-01-01T00:00:00Z');
+  
+    // 기준 날짜의 자정을 기준으로 합니다.
+    const baseDateAtMidnight = new Date(baseDate);
+    baseDateAtMidnight.setUTCHours(0, 0, 0, 0);
+  
+    // 모든 날짜를 변환합니다.
+    return dataArray.map(item => {
+      const currentItemDate = new Date(item.ts);
+      // 기준 날짜의 자정과 현재 아이템 날짜의 자정 사이의 밀리초 차이를 계산합니다.
+      const diff = currentItemDate - baseDateAtMidnight;
+      // 차이를 일수로 변환합니다.
+      const diffDays = Math.floor(diff / (24 * 3600 * 1000));
+  
+      // 새 기준 날짜로부터의 일수 차이를 계산합니다.
+      const newDate = new Date(newBaseDate);
+      newDate.setUTCDate(newBaseDate.getUTCDate() + diffDays);
+  
+      // 현재 아이템의 시간을 유지합니다.
+      newDate.setUTCHours(currentItemDate.getUTCHours(), currentItemDate.getUTCMinutes(), currentItemDate.getUTCSeconds(), currentItemDate.getUTCMilliseconds());
+  
+      // 새로운 날짜와 기존 데이터를 결합하여 반환합니다.
+      return {
+        ...item,
+        ts: newDate.toISOString()
+      };
+    });
+  }
+  
+  
+  
   

@@ -10,7 +10,7 @@ import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, EMPTY_MEA
 import PlacePosition from "../../component/PlacePosition/PlacePosition";
 import axios from 'axios';
 import qs from 'qs';
-import { checkDateFormat, convertObjectToArray, convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, findRange, formatTime, getFirstDateOfThreeMonthsAgo, getRailroadSection, getYearStartEnd, isEmpty, measureTypeText, numberToText, trackDataName, trackLeftRightToString, valueOneOrNone } from "../../util";
+import { checkDateFormat, convertDates, convertObjectToArray, convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, findRange, formatTime, getFirstDateOfThreeMonthsAgo, getRailroadSection, getYearStartEnd, isEmpty, measureTypeText, numberToText, trackDataName, trackLeftRightToString, valueOneOrNone } from "../../util";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
@@ -566,8 +566,10 @@ function TrackGeometryMeasurement( props ) {
                       })
                       .then(response => {
                         console.log(response.data);
+
                         let chartData = (response.data.data) ? response.data.data : response.data.range;
                         let dataKey = `${point.sensorId}_${findDatas}`;
+                        chartData.today = convertDates(chartData.today, '2000-01-01T00:00:00Z');
                         for( let data of chartData.today ){
                           let addData = {};
                           addData[dataKey] = (data.data) ? data.data : data.maxValue;

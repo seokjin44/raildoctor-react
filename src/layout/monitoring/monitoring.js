@@ -178,10 +178,10 @@ function Monitoring( props ) {
       setRailtwists(response.data.railtwists);
       setRailwears(response.data.railwears);
       setTemperatures(response.data.temperatures);
-      /* setPaut(response.data.pauts); */
+      setPaut(response.data.pauts);
     })
     .catch(error => console.error('Error fetching data:', error));
-    axios.get(`https://raildoctor.suredatalab.kr/api/pauts`,{
+/*     axios.get(`https://raildoctor.suredatalab.kr/api/pauts`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -195,7 +195,7 @@ function Monitoring( props ) {
       console.log(response.data);
       setPaut(response.data.entities);
     })
-    .catch(error => console.error('Error fetching data:', error));
+    .catch(error => console.error('Error fetching data:', error)); */
   }
 
   const handleImageLoad = (index) => {

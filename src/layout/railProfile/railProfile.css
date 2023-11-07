@@ -305,8 +305,25 @@
     border-radius: 5px;
     position: relative;
     display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.contentBox .profile .pictureContainer .detailImgs .imageContainer{
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.contentBox .profile .pictureContainer .detailImgs img{
+    width: 85%;
+    height: 85%;
+    border-radius: 3px;
 }
 
 .contentBox .profile .pictureContainer .detailImgs .title{
@@ -317,6 +334,7 @@
     border: 1px solid #cccccc;
     border-radius: 5px;
     padding: 5px;
+    background-color: white;
 }
 
 .contentBox .profile .pictureContainer .detailImgs .uploadBtn{

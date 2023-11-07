@@ -178,7 +178,22 @@ function MeasuringTemperatureHumidity( props ) {
           });
         }
       }
-      setChartData(convertObjectToArray(chartDataObj, CHART_FORMAT_RAW, searchRangeDate[0].$d.toISOString(), searchRangeDate[1].$d.toISOString()));
+      let allData = convertObjectToArray(chartDataObj, CHART_FORMAT_RAW, searchRangeDate[0].$d.toISOString(), searchRangeDate[1].$d.toISOString())
+      const allKeys = Array.from(new Set(allData.flatMap(Object.keys))).filter(key => key !== 'time');
+      const lastKnownValues = allKeys.reduce((acc, key) => ({ ...acc, [key]: null }), {});
+      // 데이터를 순회하며 누락된 값들을 채웁니다.
+      const filledData = allData.map(item => {
+        // 각 키에 대해 마지막으로 알려진 값을 업데이트하거나 유지합니다.
+        allKeys.forEach(key => {
+          if (item[key] === undefined) {
+            item[key] = lastKnownValues[key]; // 누락된 값을 이전 값으로 채움
+          } else {
+            lastKnownValues[key] = item[key]; // 새 값을 마지막으로 알려진 값으로 업데이트
+          }
+        });
+        return item;
+      });
+      setChartData(filledData);
       console.log(convertObjectToArray(chartDataObj, CHART_FORMAT_RAW, searchRangeDate[0].$d.toISOString(), searchRangeDate[1].$d.toISOString()));
       setChartseries(chartseries_);
     })
@@ -389,7 +404,7 @@ function MeasuringTemperatureHumidity( props ) {
                     chartseries.map( (series, i) => {
                       return <Line key={i} 
                         dataKey={series.dataKey} name={`${series.sensorName}_${series.item}`} 
-                        stroke={series.color} dot={{ strokeWidth: 1, r: 1 }}  />;
+                        stroke={series.color} dot={false}  />;
                     })
                   }
                 </LineChart>

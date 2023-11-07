@@ -56,10 +56,8 @@ function RailProfile( props ) {
 /*   const [leftProfileImages, setLeftProfileImages] = useState([]); 
   const [rightProfileImages, setRightProfileImages] = useState([]); */
 
-  const [profileDetails, setProfileDetails] = useState([]);
-
-  const [leftImgView, setLeftImgView] = useState(false);
-  const [rightImgView, setRightImgView] = useState(false);
+  const [profileLeftDetails, setProfileLeftDetails] = useState([]);
+  const [profileRightDetails, setProfileRightDetails] = useState([]);
 
   const [sliderMin, setSliderMin] = useState(new Date()); 
   const [sliderMax, setSliderMax] = useState(new Date());
@@ -133,7 +131,7 @@ function RailProfile( props ) {
     return () => {window.removeEventListener('resize', resizeChange )};
   }, []);
 
-  const upTrackHandleChange = (val) => {
+  const leftTrackHandleChange = (val) => {
     setSelectLeftProfileDate(val);
     setSelectRightProfileDate(val);
     if( profilesMap.get(val) ){
@@ -145,6 +143,7 @@ function RailProfile( props ) {
       })
       .then(response => {
         console.log(response.data);
+        setProfileLeftDetails(response.data.pictures);
       })
       .catch(error => console.error('Error fetching data:', error));
       console.log(profile);
@@ -152,7 +151,7 @@ function RailProfile( props ) {
     }
   }
 
-  const downTrackHandleChange = (val) => {
+  const rightTrackHandleChange = (val) => {
     setSelectLeftProfileDate(val);
     setSelectRightProfileDate(val);
     if( profilesMap.get(val) ){
@@ -164,6 +163,7 @@ function RailProfile( props ) {
       })
       .then(response => {
         console.log(response.data);
+        setProfileRightDetails(response.data.pictures);
       })
       .catch(error => console.error('Error fetching data:', error));
       setRightTrackProfile(profile);
@@ -379,8 +379,8 @@ function RailProfile( props ) {
                     setSliderMax(sliderMax_);
                     setMarks(marks_);
                     setProfiles(profiles);
-                    upTrackHandleChange(marks_[marks_.length-1].value);
-                    downTrackHandleChange(marks_[marks_.length-1].value);
+                    leftTrackHandleChange(marks_[marks_.length-1].value);
+                    rightTrackHandleChange(marks_[marks_.length-1].value);
                   })
                   .catch(error => console.error('Error fetching data:', error));
                 }}>조회</button>
@@ -395,14 +395,14 @@ function RailProfile( props ) {
             <div className="railTitle">좌</div>
             <div className="pictureContainer">
               <div className="profileSlider">
-                {(leftImgView) ? <div className="picture">
+                {/* {(leftImgView) ? <div className="picture">
                   <div className="pictureData regDate">23.03.15</div>
                   <div className="pictureData newUpload">Upload</div>
                   <div className="pictureData closeImg">이미지 닫기</div>
                   <ImgSlider
                     imgUrlList={[DemoImg1,DemoImg2]}
                   />
-                </div> : null}
+                </div> : null} */}
                 {getProfileLeftImg(leftTrackProfile)}
                 <Slider
                   value={selectLeftProfileDate}
@@ -417,8 +417,8 @@ function RailProfile( props ) {
                   valueLabelFormat={valueLabelFormat}
                   valueLabelDisplay="on"
                   onChange={(e)=>{
-                    upTrackHandleChange(e.target.value);
-                    downTrackHandleChange(e.target.value);
+                    leftTrackHandleChange(e.target.value);
+                    rightTrackHandleChange(e.target.value);
                   }}
                   size="medium"
                 />
@@ -441,21 +441,21 @@ function RailProfile( props ) {
                         const base64FormattedString = base64String.split(',')[1];
                   
                         // 이제 base64FormattedString을 서버에 업로드합니다.
-                        axios.post(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles/images`,{
-                          paramsSerializer: params => {
+                        axios.post(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles/images`,
+/*                           paramsSerializer: params => {
                             return qs.stringify(params, { format: 'RFC3986' })
-                          },
-                          params : {
-                            mate : {
+                          }, */
+                          {
+                            meta : {
                               profileId:leftTrackProfile.profileId,
                               type:"IMAGE",
                               railSide:"LEFT",
-                              fileName: [file.name],
+                              fileName: file.name,
                               comment:""
                             },
                             data : base64FormattedString
                           }
-                        })
+                        )
                         .then(response => {
                           console.log(response.data);
                         })
@@ -467,7 +467,16 @@ function RailProfile( props ) {
                     }}
                   />
                 </div>
-                {(profileDetails.length < 1) ? <div className="emptyText">업로드 된 이미지가 없습니다.</div> : null}
+                <div className="imageContainer">
+                  {(profileLeftDetails.length < 1) ? <div className="emptyText">업로드 된 이미지가 없습니다.</div> : 
+                    <ImgSlider
+                      imgUrlList={profileLeftDetails}
+                    />
+                  }
+                  {/* <ImgSlider
+                    imgUrlList={[DemoImg1,DemoImg2]}
+                  /> */}
+                </div>
               </div>
             </div>
             <div className="profileData">
@@ -531,14 +540,14 @@ function RailProfile( props ) {
             <div className="railTitle">우</div>
             <div className="pictureContainer">
               <div className="profileSlider">
-                {(rightImgView) ? <div className="picture">
+                {/* {(rightImgView) ? <div className="picture">
                   <div className="pictureData regDate">23.03.15</div>
                   <div className="pictureData newUpload">Upload</div>
                   <div className="pictureData closeImg">이미지 닫기</div>
                   <ImgSlider
                     imgUrlList={[DemoImg1,DemoImg2]}
                   />
-                </div> : null}
+                </div> : null} */}
                 {getProfileRightImg(rightTrackProfile)}
                 <Slider
                   value={selectRightProfileDate}
@@ -554,8 +563,8 @@ function RailProfile( props ) {
                   valueLabelDisplay="on"
                   size="medium"
                   onChange={(e)=>{
-                    upTrackHandleChange(e.target.value);
-                    downTrackHandleChange(e.target.value);
+                    leftTrackHandleChange(e.target.value);
+                    rightTrackHandleChange(e.target.value);
                   }}
                 />
               </div>
@@ -577,21 +586,21 @@ function RailProfile( props ) {
                         const base64FormattedString = base64String.split(',')[1];
                   
                         // 이제 base64FormattedString을 서버에 업로드합니다.
-                        axios.post(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles/images`,{
-                          paramsSerializer: params => {
+                        axios.post(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles/images`,
+/*                           paramsSerializer: params => {
                             return qs.stringify(params, { format: 'RFC3986' })
-                          },
-                          params : {
-                            mate : {
+                          }, */
+                          {
+                            meta : {
                               profileId:rightTrackProfile.profileId,
                               type:"IMAGE",
                               railSide:"RIGHT",
-                              fileName: [file.name],
+                              fileName: file.name,
                               comment:""
                             },
                             data : base64FormattedString
                           }
-                        })
+                        )
                         .then(response => {
                           console.log(response.data);
                         })
@@ -603,9 +612,11 @@ function RailProfile( props ) {
                     }}
                   />
                 </div>
-                {(profileDetails.length < 1) ? 
+                {(profileRightDetails.length < 1) ? 
                   <div className="emptyText">업로드 된 이미지가 없습니다.</div> : 
-                  null
+                  <ImgSlider
+                    imgUrlList={profileRightDetails}
+                  />
                 }
               </div>
             </div>
