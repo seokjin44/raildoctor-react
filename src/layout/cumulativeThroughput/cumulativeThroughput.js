@@ -7,7 +7,7 @@ import { Radio } from 'antd';
 import { KP_SEARCH_RANGE, KP_SEARCH_SINGLE, PICTURE_RENDERING_TEXT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_PATH, STRING_STATION, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, formatDateTime, getRailroadSection, getYear2Length, nonData, numberWithCommas } from "../../util";
+import { convertToCustomFormat, dateFormat, formatDateTime, getRailroadSection, getYear2Length, nonData, numberWithCommas } from "../../util";
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
 import classNames from "classnames";
@@ -560,11 +560,11 @@ function CumulativeThroughput( props ) {
                         <div className="td">{numberWithCommas(rightRemaining.accumulateweight)}</div>
                         {/* <div className="td">41,915</div> */}
                         <div className="td">{numberWithCommas(rightRemaining.remainingWeight)}</div>
-                        <div className="td">{formatDateTime(new Date(rightRemaining.nextTimeToReplace))}</div>
+                        <div className="td">{dateFormat(new Date(rightRemaining.nextTimeToReplace))}</div>
 
                         {/* <div className="td">{formatDateTime(new Date(leftRemaining.firstMeasureTs))}</div>
                         <div className="td">{formatDateTime(new Date(leftRemaining.secondMeasureTs))}</div> */}
-                        <div className="td">{formatDateTime(new Date(leftRemaining.zeroMeasureTs))}</div>
+                        <div className="td">{dateFormat(new Date(leftRemaining.zeroMeasureTs))}</div>
                       </div>
                     </div>
                   </div>
@@ -601,11 +601,11 @@ function CumulativeThroughput( props ) {
                         <div className="td">{numberWithCommas(leftRemaining.accumulateweight)}</div>
                         {/* <div className="td">41,915</div> */}
                         <div className="td">{numberWithCommas(leftRemaining.remainingWeight)}</div>
-                        <div className="td">{formatDateTime(new Date(leftRemaining.nextTimeToReplace))}</div>
+                        <div className="td">{dateFormat(new Date(leftRemaining.nextTimeToReplace))}</div>
 
                         {/* <div className="td">{formatDateTime(new Date(leftRemaining.firstMeasureTs))}</div>
                         <div className="td">{formatDateTime(new Date(leftRemaining.secondMeasureTs))}</div> */}
-                        <div className="td">{formatDateTime(new Date(leftRemaining.zeroMeasureTs))}</div>
+                        <div className="td">{dateFormat(new Date(leftRemaining.zeroMeasureTs))}</div>
                       </div>
                     </div>
                   </div>
@@ -652,11 +652,11 @@ function CumulativeThroughput( props ) {
                           <div className="td">{numberWithCommas(remaining.leftRemaining.accumulateweight)}</div>
                           {/* <div className="td">41,915</div> */}
                           <div className="td">{numberWithCommas(remaining.leftRemaining.remainingWeight)}</div>
-                          <div className="td">{formatDateTime(new Date(remaining.leftRemaining.nextTimeToReplace))}</div>
+                          <div className="td">{dateFormat(new Date(remaining.leftRemaining.nextTimeToReplace))}</div>
 
                           {/* <div className="td">{formatDateTime(new Date(remaining.leftRemaining.firstMeasureTs))}</div>
                           <div className="td">{formatDateTime(new Date(remaining.leftRemaining.secondMeasureTs))}</div> */}
-                          <div className="td">{formatDateTime(new Date(remaining.leftRemaining.zeroMeasureTs))}</div>
+                          <div className="td">{dateFormat(new Date(remaining.leftRemaining.zeroMeasureTs))}</div>
                         </div>
                         <div key={`right${i}`} className="tr">
                           <div className="td">우</div>
@@ -671,11 +671,11 @@ function CumulativeThroughput( props ) {
                           <div className="td">{numberWithCommas(remaining.rightRemaining.accumulateweight)}</div>
                           {/* <div className="td">41,915</div> */}
                           <div className="td">{numberWithCommas(remaining.rightRemaining.remainingWeight)}</div>
-                          <div className="td">{formatDateTime(new Date(remaining.rightRemaining.nextTimeToReplace))}</div>
+                          <div className="td">{dateFormat(new Date(remaining.rightRemaining.nextTimeToReplace))}</div>
 
                           {/* <div className="td">{formatDateTime(new Date(remaining.rightRemaining.firstMeasureTs))}</div>
                           <div className="td">{formatDateTime(new Date(remaining.rightRemaining.secondMeasureTs))}</div> */}
-                          <div className="td">{formatDateTime(new Date(remaining.rightRemaining.zeroMeasureTs))}</div>
+                          <div className="td">{dateFormat(new Date(remaining.rightRemaining.zeroMeasureTs))}</div>
                         </div>
                       </>
                       })}
