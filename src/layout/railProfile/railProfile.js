@@ -612,12 +612,14 @@ function RailProfile( props ) {
                     }}
                   />
                 </div>
-                {(profileRightDetails.length < 1) ? 
-                  <div className="emptyText">업로드 된 이미지가 없습니다.</div> : 
-                  <ImgSlider
-                    imgUrlList={profileRightDetails}
-                  />
-                }
+                <div className="imageContainer">
+                  {(profileRightDetails.length < 1) ? 
+                    <div className="emptyText">업로드 된 이미지가 없습니다.</div> : 
+                    <ImgSlider
+                      imgUrlList={profileRightDetails}
+                    />
+                  }
+                </div>
               </div>
             </div>
             <div className="profileData">
