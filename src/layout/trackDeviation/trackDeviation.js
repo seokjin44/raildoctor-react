@@ -567,8 +567,8 @@ function TrackDeviation( props ) {
                     <div className="td colspan2"><div className="colspan2">Threshold Value</div></div>
                     <div className="td colspan2"><div className="colspan2">Excess</div></div>
                     <div className="td colspan2"><div className="colspan2">Alarm</div></div>
-                    <div className="td rowspan2"><div className="rowspan2">게이지 마모량</div></div>
-                    <div className="td rowspan2"></div>
+{/*                     <div className="td rowspan2"><div className="rowspan2">게이지 마모량</div></div>
+                    <div className="td rowspan2"></div> */}
                   </div>
                   <div className="tr">
                     <div className="td colspan2"></div>
@@ -580,8 +580,8 @@ function TrackDeviation( props ) {
                     <div className="td colspan2"></div>
                     <div className="td colspan2"></div>
                     <div className="td colspan2"></div>
-                    <div className="td">Max</div>
-                    <div className="td">Min</div>
+{/*                     <div className="td">Max</div>
+                    <div className="td">Min</div> */}
                   </div>
                 </div>
                 <div className="tableBody" style={{overflowY: "scroll", height: "500px", display: "block"}}>
@@ -597,8 +597,8 @@ function TrackDeviation( props ) {
                         <div className="td">{entitie.thresholdValue}</div>
                         <div className="td">{entitie.excess.toFixed(2)}</div>
                         <div className="td">{entitie.alarm}</div>
-                        <div className="td">{entitie.maxWear}</div>
-                        <div className="td">{entitie.minWear}</div>
+{/*                         <div className="td">{entitie.maxWear}</div>
+                        <div className="td">{entitie.minWear}</div> */}
                       </div>
                     })
                   }
