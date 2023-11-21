@@ -60,19 +60,6 @@ function CumulativeThroughput( props ) {
   }
      
   useEffect(() => {
-/*     axios.get('https://devel.suredatalab.kr/api/accumulateweights/remaining',{
-      params : {
-        operator : "인천",
-        lineNo : 1,
-        railTrack : "T1L",
-        kp : 500,
-        measureTs : "2023-01-25",
-        railroadName : "계양",
-      }
-    })
-    .then(response => console.log(response.data))
-    .catch(error => console.error('Error fetching data:', error)); */
-    /* readyImg(); */
 
     // 이벤트 리스너 추가
     window.addEventListener('resize', resizeChange);
