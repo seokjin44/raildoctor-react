@@ -911,7 +911,9 @@ function TrackGeometryMeasurement( props ) {
               >
                 <CartesianGrid />
                 <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '10px' }} />
-                <XAxis type="category" dataKey="time" name="time" fontSize={9} height={40} >
+                <XAxis type="category" dataKey="time" name="time" fontSize={9} height={40} tickFormatter={
+                  (val)=>{return val.slice(0, 5);}
+                }>
                   <Label value="Time" offset={0} position="insideBottom" />
                 </XAxis>
                 <YAxis type="number" name="data" fontSize={12} >
