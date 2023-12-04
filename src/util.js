@@ -144,6 +144,78 @@ export const trackNumberToString = ( number ) => {
     }
 }
 
+const defaultData = { data: 0 };
+
+
+const extractMonth = (isoString) => isoString.substring(0, 7); // YYYY-MM 형식
+const extractDay = (isoString) => isoString.split('T')[0].split('-')[2];
+
+// 일별 데이터를 그룹화하고 합치는 함수
+const createDailyArray = (obj) => {
+  const groupedData = {};
+
+  Object.keys(obj).forEach(key => {
+    const day = extractDay(key); // 일자만 추출
+    if (!groupedData[day]) {
+      groupedData[day] = { ...obj[key] }; // 새로운 일자면 데이터 초기화
+    } else {
+      // 이미 존재하는 일자면 데이터 합산 (단순 합산 예시)
+      Object.keys(obj[key]).forEach(dataKey => {
+        if (groupedData[day][dataKey]) {
+          groupedData[day][dataKey] += obj[key][dataKey];
+        } else {
+          groupedData[day][dataKey] = obj[key][dataKey];
+        }
+      });
+    }
+  });
+
+  // 그룹화된 데이터를 배열로 변환
+  return Object.keys(groupedData).map(day => {
+    return {
+      time: day, // 일자만 포함
+      ...groupedData[day]
+    };
+  }).sort((a, b) => a.time.localeCompare(b.time)); ;
+};
+
+
+// 월별 데이터 생성 함수 (여러 년도 데이터에서 동일 월 데이터 합산)
+const createMonthlyArray = (obj) => {
+    const dataByMonth = {};
+  
+    Object.keys(obj).forEach(key => {
+      const monthOnly = extractMonth(key).substring(5); // MM 형식 (년도 무시)
+  
+      if (!dataByMonth[monthOnly]) {
+        dataByMonth[monthOnly] = []; // 새로운 월이면 배열 초기화
+      }
+      dataByMonth[monthOnly].push(obj[key]);
+    });
+  
+    // 월별로 데이터 집계 (여기서는 단순 합산 예시)
+    const aggregatedData = Object.keys(dataByMonth).map(month => {
+      const aggregated = dataByMonth[month].reduce((acc, curr) => {
+        Object.keys(curr).forEach(key => {
+          if (acc[key]) {
+            acc[key] += curr[key];
+          } else {
+            acc[key] = curr[key];
+          }
+        });
+        return acc;
+      }, {});
+  
+      return {
+        time: month, // 월만 표시
+        ...aggregated
+      };
+    });
+  
+    return aggregatedData.sort((a, b) => a.time.localeCompare(b.time)); // 월별로 정렬
+  };
+  
+
 export const convertObjectToArray = (obj, type) => {
     let format = ( key, type_ ) => {
       if( type_ === CHART_FORMAT_TODAY ){
@@ -156,6 +228,12 @@ export const convertObjectToArray = (obj, type) => {
         return formatDateTime(new Date(key));
       }
       return key;
+    }
+
+    if (type === CHART_FORMAT_DAILY) {
+        return createDailyArray(obj, format);
+    } else if (type === CHART_FORMAT_MONTHLY) {
+        return createMonthlyArray(obj, format);
     }
     
     if( type === CHART_FORMAT_TODAY ){

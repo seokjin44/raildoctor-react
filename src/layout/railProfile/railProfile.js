@@ -370,7 +370,7 @@ function RailProfile( props ) {
                       if (a.value > b.value) return 1;
                       return 0;
                     });
-
+                    profiles.sort((a, b) => new Date(b.measureTs) - new Date(a.measureTs));
                     
                     console.log(dateCnt);
                     setSliderMin(sliderMin_);

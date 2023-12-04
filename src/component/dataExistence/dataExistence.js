@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./dataExistence.css"
 import { Box, Modal, Tab } from "@mui/material";
-import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRACK, IncheonKP, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK, colors } from "../../constant";
+import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, IncheonKP, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK, colors } from "../../constant";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -463,7 +463,13 @@ function DataExistence( props ) {
                 setTempMeasureData(tempData);
                 let chartseries_ = [];
                 let chartDataObj = {};
-                axios.get(`https://raildoctor.suredatalab.kr/api/temperatures/period/${tempData.measureId}?begin=${new Date(tempData.measureTs).toISOString()}&end=${new Date(tempData.measureTs).toISOString()}`,{
+
+                let begin = new Date(tempData.measureTs);
+                let end = new Date(tempData.measureTs);
+                begin.setDate(begin.getDate() - 3);
+                end.setDate(end.getDate() + 3);
+
+                axios.get(`https://raildoctor.suredatalab.kr/api/temperatures/period/${tempData.measureId}?begin=${begin.toISOString()}&end=${end.toISOString()}`,{
                   paramsSerializer: params => {
                     return qs.stringify(params, { format: 'RFC3986' })
                   }
@@ -506,7 +512,7 @@ function DataExistence( props ) {
                     chartseries_.push({
                       dataKey : dataKey, item : tempDataName(STRING_HUMIDITY), color :colorCode
                     });
-                  setTempChartData(convertObjectToArray(chartDataObj, CHART_FORMAT_DAILY));
+                  setTempChartData(convertObjectToArray(chartDataObj, CHART_FORMAT_RAW));
                   setTempSeries(chartseries_);
                 })
                 .catch(error => console.error('Error fetching data:', error));
