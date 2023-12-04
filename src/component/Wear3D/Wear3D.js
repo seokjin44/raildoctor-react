@@ -4,7 +4,7 @@ import "./Wear3D.css";
 import { Checkbox, Slider } from 'antd';
 import Plot from 'react-plotly.js'
 import { mgtToM, textToNumber } from "../../util";
-import { STRING_CORNER_WEAR, STRING_VERTICAL_WEAR } from "../../constant";
+import { STRING_CORNER_PREDIC_WEAR, STRING_CORNER_WEAR, STRING_VERTICAL_PREDIC_WEAR, STRING_VERTICAL_WEAR } from "../../constant";
 
 
 class Wear3D extends React.Component {
@@ -55,7 +55,9 @@ class Wear3D extends React.Component {
 
     checkboxOption = [
         { label: '직마모', value: STRING_VERTICAL_WEAR },
-        { label: '편마모', value: STRING_CORNER_WEAR }
+        { label: '편마모', value: STRING_CORNER_WEAR },
+        { label: '직마모 예측', value: STRING_VERTICAL_PREDIC_WEAR },
+        { label: '편마모 예측', value: STRING_CORNER_PREDIC_WEAR }
     ]
 
     render() {

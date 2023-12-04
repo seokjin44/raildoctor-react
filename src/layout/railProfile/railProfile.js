@@ -23,7 +23,7 @@ import faker from 'faker';
 import { RADIO_STYLE, STRING_DOWN_TRACK, STRING_UP_TRACK } from "../../constant";
 import { Input, DatePicker, Radio, Select } from "antd";
 import ImgSlider from "../../component/imgSlider/imgSlider";
-import { convertToCustomFormat, dateFormat, findJustSmallerKey, findRange, getRailroadSection, nonData, numberWithCommas } from "../../util";
+import { convertToCustomFormat, dateFormat, findJustSmallerKey, findRange, getRailroadSection, getTrackText, nonData, numberWithCommas } from "../../util";
 const { RangePicker } = DatePicker;
 
 ChartJS.register(
@@ -40,6 +40,7 @@ ChartJS.register(
 
 let dataExistKPs = {t1 : [], t2 : []};
 let profilesMap = new Map();
+let route = sessionStorage.getItem('route');
 function RailProfile( props ) {
   const hiddenFileInput = useRef(null);
   
@@ -203,7 +204,6 @@ function RailProfile( props ) {
       return;
     }
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
-    let route = sessionStorage.getItem('route');
     axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/locations`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
@@ -238,7 +238,6 @@ function RailProfile( props ) {
   }, [railroadSection]);
 
   useEffect( ()=>{
-    let route = sessionStorage.getItem('route');
     axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
@@ -280,15 +279,15 @@ function RailProfile( props ) {
             </div>
             <div className="componentBox" style={{overflow: "hidden"}}>
               <div className="dataOption">
-                <div className="title">상하선 </div>
+                <div className="title">{getTrackText("상하선", route)} </div>
                 <div className="track">
                 <Radio.Group style={RADIO_STYLE} defaultValue={selectTrack} value={selectTrack} 
                   onChange={(e)=>{
                     setSelectTrack(e.target.value);
                   }}
                 >
-                  <Radio value={STRING_UP_TRACK}>상선</Radio>
-                  <Radio value={STRING_DOWN_TRACK}>하선</Radio>
+                  <Radio value={STRING_UP_TRACK}>{getTrackText("상선", route)}</Radio>
+                  <Radio value={STRING_DOWN_TRACK}>{getTrackText("하선", route)}</Radio>
                 </Radio.Group>
                 </div>
               </div>
@@ -325,7 +324,6 @@ function RailProfile( props ) {
               </div> */}
               <div className="dataOption">
                 <button className="search" onClick={()=>{
-                  let route = sessionStorage.getItem('route');
                   axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles`,{
                     paramsSerializer: params => {
                       return qs.stringify(params, { format: 'RFC3986' })

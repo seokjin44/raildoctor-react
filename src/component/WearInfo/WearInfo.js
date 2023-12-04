@@ -3,8 +3,9 @@ import "./WearInfo.css";
 import Chart from "react-apexcharts";
 import { DOWN_TRACK, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, UP_TRACK } from '../../constant';
 import lodash from "lodash";
-import { zeroToNull } from '../../util';
+import { getTrackText, zeroToNull } from '../../util';
 
+let route = sessionStorage.getItem('route');
 class WearInfo extends React.Component {
     constructor(props) {
         super(props);
@@ -111,32 +112,32 @@ class WearInfo extends React.Component {
            
            series: [
             {
-                name: "하선 좌레일",
+                name: getTrackText("하선", route) + " 좌레일",
                 data: []
             }, {
-                name: "상선 좌레일",
+                name: getTrackText("상선", route) + " 좌레일",
                 data: []
             }, {
-                name: "하선 우레일",
+                name: getTrackText("하선", route) + " 우레일",
                 data: []
             }, {
-                name: "상선 우레일",
+                name: getTrackText("상선", route) + " 우레일",
                 data: []
             },
             {//4
-                name: "하선 좌레일 예측데이터",
+                name: getTrackText("하선", route) + " 좌레일 예측데이터",
                 data: []
             }, 
             {//5
-                name: "상선 좌레일 예측데이터",
+                name: getTrackText("상선", route) + " 좌레일 예측데이터",
                 data: []
             }, 
             {//6
-                name: "하선 우레일 예측데이터",
+                name: getTrackText("하선", route) + " 우레일 예측데이터",
                 data: []
             }, 
             {//7
-                name: "상선 우레일 예측데이터",
+                name: getTrackText("상선", route) + " 우레일 예측데이터",
                 data: []
             }
            ]
@@ -165,36 +166,36 @@ class WearInfo extends React.Component {
         console.log("initSeries");
         let series = [
             {//0
-                name: "하선 좌레일",
+                name: getTrackText("하선", route) + " 좌레일",
                 data: []
             }, 
             {//1
-                name: "상선 좌레일",
+                name: getTrackText("상선", route) + " 좌레일",
                 data: []
             }, 
             {//2
-                name: "하선 우레일",
+                name: getTrackText("하선", route) + " 우레일",
                 data: []
             }, 
             {//3
-                name: "상선 우레일",
+                name: getTrackText("상선", route) + " 우레일",
                 data: []
             },
 
             {//4
-                name: "하선 좌레일 예측데이터",
+                name: getTrackText("하선", route) + " 좌레일 예측데이터",
                 data: []
             }, 
             {//5
-                name: "상선 좌레일 예측데이터",
+                name: getTrackText("상선", route) + " 좌레일 예측데이터",
                 data: []
             }, 
             {//6
-                name: "하선 우레일 예측데이터",
+                name: getTrackText("하선", route) + " 우레일 예측데이터",
                 data: []
             }, 
             {//7
-                name: "상선 우레일 예측데이터",
+                name: getTrackText("상선", route) + " 우레일 예측데이터",
                 data: []
             }
         ];

@@ -15,15 +15,18 @@ import axios from 'axios';
 import qs from 'qs';
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
-import { convertToCustomFormat, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, nonData } from "../../util";
+import { convertToCustomFormat, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, getTrackText, nonData } from "../../util";
 import Papa from 'papaparse';
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 import LoadingImg from "../../assets/icon/loading/loading.png";
 import Draggable from 'react-draggable';
+import { monitoringInputKP, monitoringKP, monitoringSelectDates } from "../../atoms";
+import { useRecoilState } from 'recoil';
+import { isEmpty } from "lodash";
 
 window.PDFJS = PDFJS;
 const { RangePicker } = DatePicker;
-
+let route = sessionStorage.getItem('route');
 function Monitoring( props ) {
   PDFJS.GlobalWorkerOptions.workerSrc = pdfjsWorker;
   const containerRef = useRef(null);
@@ -32,8 +35,9 @@ function Monitoring( props ) {
   const zoomimgRef = useRef(null);
 
   const [routeHidden, setRouteHidden] = useState(false);
-  const [kp, setKP] = useState(0);
-  const [inputKp, setInputKp] = useState(0);
+  /* const [kp, setKP] = useState(0); */
+  const [kp, setKP] = useRecoilState(monitoringKP);
+  const [inputKp, setInputKp] = useRecoilState(monitoringInputKP);
   const [railmapOpen, setRailmapOpen] = useState(false);
   const [viewRailMap, setViewRailMap] = useState(null);
   const [kpMarker, setKPMarker] = useState({x : 0, y : 0});
@@ -54,7 +58,9 @@ function Monitoring( props ) {
   const [trackSpeedFindClosest, setTrackSpeedFindClosest] = useState([]);
   
   const [trackGeo, setTrackGeo] = useState({});
-  const [selectDates, setSelectDates] = useState(null);
+  /* const [selectDates, setSelectDates] = useState(null); */
+  const [selectDates, setSelectDates] = useRecoilState(monitoringSelectDates);
+
   const [pictureList, setpictureList ] = useState([]);
   const [scales, setScales] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -116,16 +122,19 @@ function Monitoring( props ) {
   useEffect( ()=> {
     /* let find = findPictureAndPosition( parseInt(kp) / 1000 );
     setViewRailMap(find); */
+    trackMapMove(scales);
+    getTrackGeo(kp);
+  },[kp]);
+
+  const trackMapMove = ( scales_ ) => {
     try{
-      console.log(findPositionInPictureList(parseInt(kp)/1000, pictureList, scales));
-      let pos = findPositionInPictureList(parseInt(kp)/1000, pictureList, scales).position;
-      setKPMarker({x : findPositionInPictureList(parseInt(kp)/1000, pictureList, scales).position, y : 0});
+      let pos = findPositionInPictureList(parseInt(kp)/1000, pictureList, scales_).position;
+      setKPMarker({x : findPositionInPictureList(parseInt(kp)/1000, pictureList, scales_).position, y : 0});
       containerRef.current.scrollLeft = pos - (containerRef.current.offsetWidth / 2);
     }catch(e){
 
     }
-    getTrackGeo(kp);
-  },[kp]);
+  }
 
   useEffect( ()=>{
     getRailroadSection(setRailroadSection);
@@ -208,10 +217,10 @@ function Monitoring( props ) {
     setScales(prevScales => {
         const updatedScales = [...prevScales];
         updatedScales[index] = newScale;
-        console.log(updatedScales);
         // 모든 이미지가 로드되었는지 확인
         if (updatedScales.every(scale => scale !== null && scale !== undefined)) {
           setLoading(false); // 모든 이미지가 로드되었으면 로딩 상태를 false로 변경
+          trackMapMove(updatedScales);
         }
 
         return updatedScales;
@@ -265,12 +274,12 @@ function Monitoring( props ) {
     });
   }
   useEffect(() => {
-    // 이벤트 리스너 추가
-    
+    if( selectDates && !isEmpty(selectDates) && selectDates !== null && selectDates !== undefined ){
+      getExistData(selectDates);
+    }
     window.addEventListener('resize', resizeChange);
-    // 컴포넌트가 언마운트 될 때 이벤트 리스너 제거
     return () => {window.removeEventListener('resize', resizeChange )};
-  }, []); // 빈 의존성 배열을 전달하여 마운트 및 언마운트 시에만 실행되도록 함
+  }, []);
 
   return (
     <div className="monitoringContainer" >
@@ -307,13 +316,13 @@ function Monitoring( props ) {
               </div>
               <div className="line"></div>
               <div className="dataOption">
-                <div className="title">상하선 </div>
+                <div className="title">{getTrackText("상하선", route)} </div>
                 <div className="track">
                   <Radio.Group style={RADIO_STYLE} defaultValue={selectTrack} value={selectTrack}
                     onChange={(e)=>{setSelectTrack(e.target.value)}}
                   >
-                    <Radio value={STRING_UP_TRACK}>상선</Radio>
-                    <Radio value={STRING_DOWN_TRACK}>하선</Radio>
+                    <Radio value={STRING_UP_TRACK}>{getTrackText("상선", route)}</Radio>
+                    <Radio value={STRING_DOWN_TRACK}>{getTrackText("하선", route)}</Radio>
                   </Radio.Group>
                 </div>
               </div>
@@ -343,12 +352,12 @@ function Monitoring( props ) {
               </div>
               <div className="line"></div>
               <div className="dataOption linear " style={{marginLeft:"10px"}}>
-                <div className="title border">상선 </div>
+                <div className="title border">{getTrackText("상선", route)} </div>
                 {nonData(trackGeo?.t2?.shapeDisplay)} / R={nonData(trackGeo?.t2?.direction)} <br/>
                 {nonData(trackGeo?.t2?.radius)} (C={nonData(trackGeo?.t2?.cant)}, S={nonData(trackGeo?.t2?.slack)})
               </div>
               <div className="dataOption linear " style={{marginLeft:"10px"}}>
-                <div className="title border">하선 </div>
+                <div className="title border">{getTrackText("하선", route)} </div>
                 {nonData(trackGeo?.t1?.shapeDisplay)} / R={nonData(trackGeo?.t1?.direction)} <br/>
                 {nonData(trackGeo?.t1?.radius)} (C={nonData(trackGeo?.t1?.cant)}, S={nonData(trackGeo?.t1?.slack)})
               </div>
@@ -404,7 +413,10 @@ function Monitoring( props ) {
                 선택된 KP : {convertToCustomFormat(kp)}
                 {
                   trackSpeedFindClosest.map( closest => {
-                    return <><div style={{backgroundColor : closest.color}} className="closestIcon"></div><div style={{marginLeft: "5px"}}>{closest.name}</div><div>: {`${closest.speed}km/h`}</div></>;
+                    return <>
+                      <div style={{backgroundColor : closest.color}} className="closestIcon"></div>
+                      <div style={{marginLeft: "5px"}}>{closest.name}</div>
+                      <div>: {`${parseFloat(closest.speed).toFixed(1)}km/h`}</div></>;
                   })
                 }
               </div>

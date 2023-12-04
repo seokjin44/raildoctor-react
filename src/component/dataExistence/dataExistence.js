@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./dataExistence.css"
 import { Box, Modal, Tab } from "@mui/material";
 import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, DOWN_TRACK, IncheonKP, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK, colors } from "../../constant";
@@ -13,12 +13,13 @@ import { LineChart, Line, XAxis,
   YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer,
   ScatterChart, Scatter, Bar, BarChart } from 'recharts';
-import { convertObjectToArray, convertToCustomFormat, dateFormat, formatDateTime, formatTime, numberWithCommas, tempDataName, trackDataName, trackToString, trackToString2, transposeObjectToArray } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, dateFormat, formatDateTime, formatTime, getTrackText, numberWithCommas, tempDataName, trackDataName, trackToString, trackToString2, transposeObjectToArray } from "../../util";
 import axios from 'axios';
 import qs from 'qs';
 import classNames from "classnames";
 
 let colorIndex = 1;
+let route = sessionStorage.getItem('route');
 function DataExistence( props ) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -96,6 +97,7 @@ function DataExistence( props ) {
   };
 
   useEffect(() => {
+    //Pixcel 계산
     console.log(document.getElementById("dataExistenceContainer").clientWidth);
     setKPtoPixel(IncheonKP.end * kpto1Pixcel);
     let kpList_ = [];
@@ -108,17 +110,21 @@ function DataExistence( props ) {
   }, []);
 
   useEffect(() => {
-    console.log(props.kp);
+    scrollMove(props.kp);
+  },[ props.kp ]);
+
+  const scrollMove = ( kp ) => {
+    console.log(kp);
     let left = (
-      props.kp > document.getElementById('dataExistenceContainer').clientWidth/2
-    ) ? parseFloat(props.kp) - document.getElementById('dataExistenceContainer').clientWidth/2 : 0;
+      kp > document.getElementById('dataExistenceContainer').clientWidth/2
+    ) ? parseFloat(kp) - document.getElementById('dataExistenceContainer').clientWidth/2 : 0;
     console.log(left);
     document.getElementById('dataExistenceContainer').scroll({
       top: 0,
       left: left,
-      behavior: "smooth",
+      behavior: "auto",
     });
-  },[ props.kp ]);
+  }
 
   return (
     <div className="boxProto datafinder">
@@ -172,7 +178,6 @@ function DataExistence( props ) {
               onMouseOut={()=>{setAccumulateWeightsTooltipIndex(-1)}}
               onClick={()=>{
                 setRemainingData(data);
-                let route = sessionStorage.getItem('route');
                 axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remaining`,{
                   paramsSerializer: params => {
                     return qs.stringify(params, { format: 'RFC3986' })
@@ -204,7 +209,7 @@ function DataExistence( props ) {
                     TS : {formatDateTime(new Date(data.measureTs))}
                   </div>
                   <div className="tooltipLine">
-                    상하선 : {trackToString2(data.railTrack)}
+                    {getTrackText("상하선", route)} : {trackToString2(data.railTrack, route)}
                   </div>                  
                 </div>
               </div>
@@ -215,7 +220,6 @@ function DataExistence( props ) {
           {/* <div className="dataName">마모 유지관리</div> */}
           <div className="dataBar railwears">
             {props.railwears.map( (data, i) => {
-              let route = sessionStorage.getItem('route');
               return <div key={`railwear${i}`} style={{left:`${(data.kp*1000)}px`}} 
               className={classNames("detailBtn",{ onTooltip : railwearsTooltipIndex === i})}
               onMouseOver={()=>{setRailwearsTooltipIndex(i)}}
@@ -261,7 +265,7 @@ function DataExistence( props ) {
                     누적통과톤수 : {numberWithCommas(data.accumulateWeight)}
                   </div>
                   <div className="tooltipLine">
-                    상하선 : {trackToString2(data.railTrack)}
+                    {getTrackText("상하선", route)} : {trackToString2(data.railTrack, route)}
                   </div>
                 </div>
 
@@ -273,7 +277,6 @@ function DataExistence( props ) {
           {/* <div className="dataName">궤도틀림</div> */}
           <div className="dataBar railtwists">
             {props.railtwists.map( (data, i) => {
-              let route = sessionStorage.getItem('route');
               return <div key={`railtwists${i}`} style={{left:`${(data.beginKp*1000)}px`, width:`${(data.endKp - data.beginKp)*1000}px`}} 
               className={classNames("detailBtn",{ onTooltip : railTwistTooltipIndex === i})}
               onMouseOver={()=>{setRailTwistTooltipIndex(i)}}
@@ -330,7 +333,7 @@ function DataExistence( props ) {
                     TS : {formatDateTime(new Date(data.measureTs))}
                   </div>
                   <div className="tooltipLine">
-                    상하선 : {trackToString2(data.railTrack)}
+                    {getTrackText("상하선", route)} : {trackToString2(data.railTrack, route)}
                   </div>
                 </div>
               </div>
@@ -542,7 +545,7 @@ function DataExistence( props ) {
                     TS : {formatDateTime(new Date(data.measureTs))}
                   </div>
                   <div className="tooltipLine">
-                    상하선 : {trackToString2(data.railTrack)}
+                    {getTrackText("상하선", route)} : {trackToString2(data.railTrack, route)}
                   </div>
               </div></div>
             })}
@@ -581,8 +584,8 @@ function DataExistence( props ) {
                     <div className="optionValue">{numberWithCommas(remainingCriteria)}</div>
                   </div>
                   <div className="curDate optionBox borderColorGreen">
-                    <div className="optionTitle">상하선</div>
-                    <div className="optionValue">{trackToString(remainingData.railTrack)}</div>
+                    <div className="optionTitle">{getTrackText("상하선", route)}</div>
+                    <div className="optionValue">{trackToString(remainingData.railTrack, route)}</div>
                   </div>
                   <div className="curDate optionBox borderColorGreen">
                     <div className="optionTitle">좌우</div>
@@ -618,8 +621,8 @@ function DataExistence( props ) {
                     <div className="optionValue">{numberWithCommas(remainingCriteria)}</div>
                   </div>
                   <div className="curDate optionBox borderColorGreen">
-                    <div className="optionTitle">상하선</div>
-                    <div className="optionValue">{trackToString(remainingData.railTrack)}</div>
+                    <div className="optionTitle">{getTrackText("상하선", route)}</div>
+                    <div className="optionValue">{trackToString(remainingData.railTrack, route)}</div>
                   </div>
                   <div className="curDate optionBox borderColorGreen">
                     <div className="optionTitle">좌우</div>

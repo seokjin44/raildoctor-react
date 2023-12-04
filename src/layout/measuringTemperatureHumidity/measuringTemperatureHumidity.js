@@ -7,7 +7,7 @@ import { Checkbox, Input, Select, DatePicker } from "antd";
 import { CHART_FORMAT_RAW, CHART_RENDERING_TEXT, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, colors } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertObjectToArray, convertObjectToArray_, convertToCustomFormat, deleteNonObj, deleteObjData, findRange, getRailroadSection, nonData, tempDataName } from "../../util";
+import { convertObjectToArray, convertObjectToArray_, convertToCustomFormat, deleteNonObj, deleteObjData, findRange, getRailroadSection, getTrackText, nonData, tempDataName } from "../../util";
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 import { isEmpty } from "lodash";
@@ -24,6 +24,7 @@ const dataOption = [
 let sensorList = [];
 let chartDataObj = {};
 let colorIndex = 1;
+let route = sessionStorage.getItem('route');
 function MeasuringTemperatureHumidity( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
   const [searchRangeDate, setSearchRangeDate] = useState([{$d : new Date(), $D : new Date()}]);
@@ -217,7 +218,6 @@ function MeasuringTemperatureHumidity( props ) {
   }, []);
 
   useEffect(()=>{
-    let route = sessionStorage.getItem('route');
     for( let sensor of sensorList ){
       if( sensor.deviceId === selectDeviceID ){
         axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
@@ -244,7 +244,6 @@ function MeasuringTemperatureHumidity( props ) {
       return;
     }
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
-    let route = sessionStorage.getItem('route');
     axios.get('https://raildoctor.suredatalab.kr/api/temperatures/locations',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
@@ -309,12 +308,12 @@ function MeasuringTemperatureHumidity( props ) {
                 </div>
               </div>
               <div className="dataOption linear" style={{marginLeft:"10px"}}>
-                <div className="title border">상선 </div>
+                <div className="title border">{getTrackText("상선", route)} </div>
                 {nonData(trackGeo?.t2?.shapeDisplay)} / R={nonData(trackGeo?.t2?.direction)} <br/>
                 {nonData(trackGeo?.t2?.radius)} (C={nonData(trackGeo?.t2?.cant)}, S={nonData(trackGeo?.t2?.slack)})
               </div>
               <div className="dataOption linear" style={{marginLeft:"10px"}}>
-                <div className="title border">하선 </div>
+                <div className="title border">{getTrackText("하선", route)} </div>
                 {nonData(trackGeo?.t1?.shapeDisplay)} / R={nonData(trackGeo?.t1?.direction)} <br/>
                 {nonData(trackGeo?.t1?.radius)} (C={nonData(trackGeo?.t1?.cant)}, S={nonData(trackGeo?.t1?.slack)})
               </div>

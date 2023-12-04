@@ -1,11 +1,12 @@
 import React from "react";
 import "./PlacePosition.css";
 import classNames from "classnames";
-import { convertToCustomFormat } from "../../util";
+import { convertToCustomFormat, getTrackText } from "../../util";
 import { STRING_SHORT_MEASURE } from "../../constant";
 import { isEqual } from "lodash";
 
 let pointList = [];
+let route = sessionStorage.getItem('route');
 class PlacePosition extends React.Component {
 	
 	constructor(props) {
@@ -135,7 +136,7 @@ class PlacePosition extends React.Component {
 		context.fillStyle = "black";
 		context.textAlign = "left";
 
-		context.fillText("상선", this.state.x - 60, this.state.canvas.height / 2 - this.state.padding - lineSpacing + this.state.fontHeight / 2 - 2.5);
+		context.fillText(getTrackText("상선", route), this.state.x - 60, this.state.canvas.height / 2 - this.state.padding - lineSpacing + this.state.fontHeight / 2 - 2.5);
 
 		//상선 좌
 		context.beginPath();
@@ -155,7 +156,7 @@ class PlacePosition extends React.Component {
 		context.lineWidth = 2;
 		context.stroke();
 
-		context.fillText("하선", this.state.x - 60, this.state.canvas.height / 2 + this.state.padding - (lineSpacing / 2) + this.state.fontHeight / 2 - 2.5);
+		context.fillText(getTrackText("하선", route), this.state.x - 60, this.state.canvas.height / 2 + this.state.padding - (lineSpacing / 2) + this.state.fontHeight / 2 - 2.5);
 
 		//하선 좌
 		context.beginPath();

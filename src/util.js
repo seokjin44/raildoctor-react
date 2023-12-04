@@ -1,4 +1,4 @@
-import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_LATERAL_LOAD_KEY, STRING_LONG_MEASURE, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_ROUTE_SEOUL, STRING_SHORT_MEASURE, STRING_SPEED_KEY, STRING_STATION, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, STRING_WHEEL_LOAD_KEY, UP_TRACK } from "./constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_LATERAL_LOAD_KEY, STRING_LONG_MEASURE, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_SHORT_MEASURE, STRING_SPEED_KEY, STRING_STATION, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, STRING_WHEEL_LOAD_KEY, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED, UP_TRACK } from "./constant";
 import axios from 'axios';
 import qs from 'qs';
 import Papa from 'papaparse';
@@ -310,32 +310,32 @@ export const getFirstDateOfThreeMonthsAgo = (month, year) => {
     return date;
 }
 
-export const trackToString = ( track ) => {
+export const trackToString = ( track, route ) => {
     if( track === STRING_UP_TRACK ||
      track === STRING_UP_TRACK_LEFT ||
      track === STRING_UP_TRACK_RIGHT ){
-        return "상선";
+        return getTrackText("상선", route);
     }else if( track === STRING_DOWN_TRACK ||
         track === STRING_DOWN_TRACK_LEFT ||
         track === STRING_DOWN_TRACK_RIGHT ){
-        return "하선";
+        return getTrackText("하선", route);
     }
     return "";
 }
 
-export const trackToString2 = ( track ) => {
+export const trackToString2 = ( track, route ) => {
     if( track === STRING_UP_TRACK ){
-        return "상선";
+        return getTrackText("상선", route);
     }else if( track === STRING_UP_TRACK_LEFT ){
-        return "상선(좌)";
+        return getTrackText("상선(좌)", route);
     }else if(track === STRING_UP_TRACK_RIGHT ){
-        return "상선(좌)";
+        return getTrackText("상선(좌)", route);
     }else if( track === STRING_DOWN_TRACK ){
-        return "하선";
+        return getTrackText("하선", route);
     }else if( track === STRING_DOWN_TRACK_LEFT ){
-        return "하선(좌)";
+        return getTrackText("하선(좌)", route);
     }else if( track === STRING_DOWN_TRACK_RIGHT ){
-        return "하선(우)";
+        return getTrackText("하선(우)", route);
     }
     return "";
 }
@@ -909,6 +909,65 @@ export const findJustSmallerKey = (myMap, targetKey) => {
     });
   }
   
-  
-  
-  
+export const flattenTreeData = (data, parentId = null) => {
+    let result = [];
+
+    data.forEach(item => {
+        let newItem = { ...item, ...{datumId: item.datumId, parentId: parentId} };
+        result.push(newItem);
+
+        if (item.convertedFiles && item.convertedFiles.length) {
+            item.convertedFiles.forEach(childItem => {
+                let childData = [{ datumId: childItem, convertedFiles: [], fileName : childItem.split('/').pop() }];
+                // 재귀 호출
+                result = result.concat(flattenTreeData(childData, item.datumId));
+            });
+        }
+    });
+
+    return result;
+}
+
+export const uploadStateBtn = ( val ) => {
+    if( val === UPLOAD_STATE_UPLOADED ){
+        return <div className="stateBtn complete">업로드 완료</div>
+    }else if( val === UPLOAD_STATE_CONVERTING ){
+        return <div className="stateBtn converting">변환 중</div>
+    }else if( val === UPLOAD_STATE_CONVERT_FAIL ){
+        return <div className="stateBtn convertFile">변환 실패</div>
+    }else if( val === UPLOAD_STATE_CONVERT_SUCCESS ){
+        return <div className="stateBtn convertSucess">변환 성공</div>;
+    }else if( val === UPLOAD_STATE_APPLYING ){
+        return <div className="stateBtn applying">시스템에 반영 중</div>;
+    }else if( val === UPLOAD_STATE_APPLY_FAIL ){
+        return <div className="stateBtn applyFail">반영 실패</div>;
+    }else if( val === UPLOAD_STATE_APPLY_SUCCESS ){
+        return <div className="stateBtn applySucess">반영 성공</div>;
+    }
+    return "";
+}
+
+export const curPagingCheck = (val, total) => {
+    if( val > total ){
+        return total;
+    }
+    return val
+}
+
+/* export const trackDeviationText = () => {
+    export const STRING_HEIGHT = "HEIGHT";
+    export const STRING_DIRECTION = "DIRECTION";
+    export const STRING_CANT = "CANT";
+    export const STRING_RAIL_DISTANCE = "RAIL_DISTANCE";
+    export const STRING_DISTORTION = "DISTORTION";
+} */
+
+export const getTrackText = (val, route) => {
+    let replaceText = val;
+    if( route === STRING_ROUTE_SEOUL ){
+        replaceText = replaceText.replace('상선', '내선');
+        replaceText = replaceText.replace('하선', '외선');
+        replaceText = replaceText.replace('상하선', '내외선');
+    }
+    return replaceText;
+}

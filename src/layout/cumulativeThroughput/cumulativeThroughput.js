@@ -7,7 +7,7 @@ import { Radio } from 'antd';
 import { KP_SEARCH_RANGE, KP_SEARCH_SINGLE, PICTURE_RENDERING_TEXT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_PATH, STRING_STATION, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, dateFormat, formatDateTime, getRailroadSection, getYear2Length, nonData, numberWithCommas } from "../../util";
+import { convertToCustomFormat, dateFormat, formatDateTime, getRailroadSection, getTrackText, getYear2Length, nonData, numberWithCommas } from "../../util";
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
 import classNames from "classnames";
@@ -18,6 +18,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 dayjs.extend(customParseFormat);
 
+let route = sessionStorage.getItem('route');
 function CumulativeThroughput( props ) {
 
   const zoomImgcontainerRef = useRef(null);
@@ -65,7 +66,6 @@ function CumulativeThroughput( props ) {
     window.addEventListener('resize', resizeChange);
 
     getRailroadSection(setRailroadSection);
-    let route = sessionStorage.getItem('route');
     axios.get(`https://raildoctor.suredatalab.kr/api/railroads/railroadmap`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
@@ -101,7 +101,6 @@ function CumulativeThroughput( props ) {
 
     }
 
-    let route = sessionStorage.getItem('route');
     axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
@@ -253,7 +252,6 @@ function CumulativeThroughput( props ) {
       track_ = STRING_DOWN_TRACK_RIGHT;
     }
 
-    let route = sessionStorage.getItem('route');
     let param  = {
       railroad_name : route,
       measure_ts : selectDate.toISOString(),
@@ -294,7 +292,6 @@ function CumulativeThroughput( props ) {
       track_ = STRING_DOWN_TRACK_RIGHT;
     }
     
-    let route = sessionStorage.getItem('route');
     let param  = {
       railroad_name : route,
       measure_ts : selectDate.toISOString(),
@@ -357,13 +354,13 @@ function CumulativeThroughput( props ) {
               </div> */}
               <div className="line"></div>
               <div className="dataOption">
-                <div className="title">상하선 </div>
+                <div className="title">{getTrackText("상하선", route)} </div>
                 <div className="track">
                   <Radio.Group style={RADIO_STYLE} defaultValue={selectTrack} value={selectTrack}
                     onChange={(e)=>{setSelectTrack(e.target.value)}}
                   >
-                    <Radio value={STRING_UP_TRACK}>상선</Radio>
-                    <Radio value={STRING_DOWN_TRACK}>하선</Radio>
+                    <Radio value={STRING_UP_TRACK}>{getTrackText("상선", route)}</Radio>
+                    <Radio value={STRING_DOWN_TRACK}>{getTrackText("하선", route)}</Radio>
                   </Radio.Group>
                 </div>
               </div>

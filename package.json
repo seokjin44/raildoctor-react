@@ -35,7 +35,9 @@
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.14.1",
     "react-scripts": "5.0.1",
+    "react-treelist": "^1.2.0",
     "recharts": "^2.7.2",
+    "recoil": "^0.7.7",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

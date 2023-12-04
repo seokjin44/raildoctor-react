@@ -9,10 +9,10 @@ import { DatePicker, Input, Radio, Select } from "antd";
 import { RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, findRange, formatDateTime, getRailroadSection, nonData } from "../../util";
+import { convertToCustomFormat, findRange, formatDateTime, getRailroadSection, getTrackText, nonData } from "../../util";
 
 const { RangePicker } = DatePicker;
-
+let route = sessionStorage.getItem('route');
 let dataExistKPs = {t1 : [], t2 : []};
 function RailTrackAlignment( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
@@ -95,7 +95,6 @@ function RailTrackAlignment( props ) {
       return;
     }
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
-    let route = sessionStorage.getItem('route');
     axios.get('https://raildoctor.suredatalab.kr/api/railstraights/locations',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
@@ -131,7 +130,6 @@ function RailTrackAlignment( props ) {
   }, [railroadSection])
 
   useEffect(()=>{
-    let route = sessionStorage.getItem('route');
     axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
@@ -173,13 +171,13 @@ function RailTrackAlignment( props ) {
             </div>
             <div className="componentBox" style={{overflow: "hidden"}}>
               <div className="dataOption">
-                <div className="title">상하선 </div>
+                <div className="title">{getTrackText("상하선", route)} </div>
                 <div className="track">
                 <Radio.Group style={RADIO_STYLE} defaultValue={selectTrack} value={selectTrack} 
                   onChange={(e)=>{setSelectTrack(e.target.value)}}
                 >
-                  <Radio value={STRING_UP_TRACK}>상선</Radio>
-                  <Radio value={STRING_DOWN_TRACK}>하선</Radio>
+                  <Radio value={STRING_UP_TRACK}>{getTrackText("상선", route)}</Radio>
+                  <Radio value={STRING_DOWN_TRACK}>{getTrackText("하선", route)}</Radio>
                 </Radio.Group>
                 </div>
               </div>

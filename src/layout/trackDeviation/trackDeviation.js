@@ -10,9 +10,10 @@ import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import { Modal } from "@mui/material";
 import axios from 'axios';
 import qs from 'qs';
-import { convertQuarterFormat, convertToCustomFormat, dateFormat, findRange, getQuarterFromDate, getRailroadSection, getStartEndDatesFromQuarter, isEmpty, trackToString, transposeObjectToArray } from "../../util";
+import { convertQuarterFormat, convertToCustomFormat, dateFormat, findRange, getQuarterFromDate, getRailroadSection, getStartEndDatesFromQuarter, getTrackText, isEmpty, trackToString, transposeObjectToArray } from "../../util";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 
+let route = sessionStorage.getItem('route');
 function TrackDeviation( props ) {
   const [selectedPath, setSelectedPath] = useState({
     start_station_name : "",
@@ -63,7 +64,6 @@ function TrackDeviation( props ) {
     start = (start>0) ? start/1000 : start;
     end = (end>0) ? end/1000 : end;
     console.log(start,end);
-    let route = sessionStorage.getItem('route');
     let param = {
       begin_kp : [start],
       end_kp : [end],
@@ -101,7 +101,6 @@ function TrackDeviation( props ) {
     start = (start>0) ? start/1000 : start;
     end = (end>0) ? end/1000 : end;
     console.log(start,end);
-    let route = sessionStorage.getItem('route');
     let param = {
       begin_kp : [start],
       end_kp : [end],
@@ -182,7 +181,6 @@ function TrackDeviation( props ) {
       return;
     }
 
-    let route = sessionStorage.getItem('route');
     if( dataInit ){
       setHeightChartData([]);
       setDirectionChartData([]);
@@ -305,7 +303,6 @@ function TrackDeviation( props ) {
     if( railroadSection.length < 2 ){
       return;
     }
-    let route = sessionStorage.getItem('route');
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
     axios.get('https://raildoctor.suredatalab.kr/api/railtwists/kp',{
       paramsSerializer: params => {
@@ -393,13 +390,13 @@ function TrackDeviation( props ) {
               </div>
               <div className="line"></div>
               <div className="dataOption">
-                <div className="title">상하선 </div>
+                <div className="title">{getTrackText("상하선", route)} </div>
                 <div className="track">
                 <Radio.Group style={RADIO_STYLE} value={selectTrack} defaultValue={selectTrack} 
                   onChange={(e)=>{setSelectTrack(e.target.value)}}
                 >
-                  <Radio value={STRING_UP_TRACK} >상선</Radio>
-                  <Radio value={STRING_DOWN_TRACK} >하선</Radio>
+                  <Radio value={STRING_UP_TRACK} >{getTrackText("상선", route)}</Radio>
+                  <Radio value={STRING_DOWN_TRACK} >{getTrackText("하선", route)}</Radio>
                 </Radio.Group>
                 </div>
               </div>
@@ -516,10 +513,10 @@ function TrackDeviation( props ) {
     
                   <Line type="monotone" name="목표기준(상)" dataKey="maxTargetCriteria" stroke="#4BC784" dot={false} />
                   <Line type="monotone" name="목표기준(하)" dataKey="minTargetCriteria" stroke="#4BC784" dot={false} />
-                  <Line type="monotone" name="보수기준(상)" dataKey="maxRepairCriteria" stroke="#FF0606" dot={false} />
-                  <Line type="monotone" name="보수기준(하)" dataKey="minRepairCriteria" stroke="#FF0606" dot={false} />
                   <Line type="monotone" name="주의기준(상)" dataKey="maxCautionCriteria" stroke="#FFF200" dot={false} />
                   <Line type="monotone" name="주의기준(하)" dataKey="minCautionCriteria" stroke="#FFF200" dot={false} />
+                  <Line type="monotone" name="보수기준(상)" dataKey="maxRepairCriteria" stroke="#FF0606" dot={false} />
+                  <Line type="monotone" name="보수기준(하)" dataKey="minRepairCriteria" stroke="#FF0606" dot={false} />
                 </LineChart>
               </ResponsiveContainer>
               })
@@ -559,36 +556,33 @@ function TrackDeviation( props ) {
                 <div className="tableHeader" style={{width: "calc(100% - 20px)"}}>
                   <div className="tr">
                     <div className="td colspan2"><div className="colspan2">Rail</div></div>
+                    <div className="td colspan2"><div className="colspan2">Type</div></div>
                     <div className="td rowspan2"><div className="rowspan2">Position</div></div>
                     <div className="td rowspan2"></div>
-                    {/* <div className="td colspan2"><div className="colspan2">Length</div></div> */}
                     <div className="td rowspan2"><div className="rowspan2">Worst Defect</div></div>
                     <div className="td rowspan2"></div>
                     <div className="td colspan2"><div className="colspan2">Threshold Value</div></div>
                     <div className="td colspan2"><div className="colspan2">Excess</div></div>
                     <div className="td colspan2"><div className="colspan2">Alarm</div></div>
-{/*                     <div className="td rowspan2"><div className="rowspan2">게이지 마모량</div></div>
-                    <div className="td rowspan2"></div> */}
                   </div>
                   <div className="tr">
                     <div className="td colspan2"></div>
+                    <div className="td colspan2"></div>
                     <div className="td">Begin</div>
                     <div className="td">End</div>
-                    {/* <div className="td colspan2"></div> */}
                     <div className="td">Postion</div>
                     <div className="td">Value</div>
                     <div className="td colspan2"></div>
                     <div className="td colspan2"></div>
                     <div className="td colspan2"></div>
-{/*                     <div className="td">Max</div>
-                    <div className="td">Min</div> */}
                   </div>
                 </div>
                 <div className="tableBody" style={{overflowY: "scroll", height: "500px", display: "block"}}>
                   {
                     reportData?.entity?.map( entitie => {
                       return <div className="tr">
-                        <div className="td">{trackToString(reportSelectTrack)}</div>
+                        <div className="td">{trackToString(reportSelectTrack, route)}</div>
+                        <div className="td">{entitie.dataType}</div>
                         <div className="td">{reportData.beginKp}</div>
                         <div className="td">{reportData.endKp}</div>
                         {/* <div className="td">1.25</div> */}

@@ -9,15 +9,16 @@ import 'dayjs/locale/ko';
 import { Select } from 'antd';
 import { Box, Modal } from "@mui/material";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
-import { BOXSTYLE, INSTRUMENTATIONPOINT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_CORNER_WEAR, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_KP, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, UP_TRACK } from "../../constant";
+import { BOXSTYLE, INSTRUMENTATIONPOINT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_CORNER_WEAR, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_KP, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, UP_TRACK, STRING_CORNER_PREDIC_WEAR, STRING_VERTICAL_PREDIC_WEAR } from "../../constant";
 import AlertIcon from "../../assets/icon/decision/3876149_alert_emergency_light_protection_security_icon.png";
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, convertToNumber2, dateFormat, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, mgtToM, nonData, numberWithCommas, trackLeftRightToString, trackNumberToString, trackToString, wearModelTableBody, wearModelTableHeader1, wearModelTableHeader2, zeroToNull } from "../../util";
+import { convertToCustomFormat, convertToNumber2, dateFormat, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, getTrackText, mgtToM, nonData, numberWithCommas, trackLeftRightToString, trackNumberToString, trackToString, wearModelTableBody, wearModelTableHeader1, wearModelTableHeader2, zeroToNull } from "../../util";
 import lodash, { isEmpty } from "lodash";
 
+let route = sessionStorage.getItem('route');
 const { TextArea } = Input;
 let wear3DMinMax = [];
 let wearFilter = [STRING_VERTICAL_WEAR, STRING_CORNER_WEAR];
@@ -46,6 +47,8 @@ function WearMaintenance( props ) {
   const [dataExits, setDataExits] = useState([]);
   const [cornerWearGraphData, setCornerWearGraphData] = useState([]);
   const [verticalWearGraphData, setVerticalWearGraphData] = useState([]);
+  const [cornerWear3DGraphData, setCornerWear3DGraphData] = useState([]);
+  const [verticalWear3DGraphData, setVerticalWear3DGraphData] = useState([]);
   const [selectModel, setSelectModel] = useState("");
   const [tableViewModel, setTableViewModel] = useState("");
   const [modelOptions, setModelOptions] = useState([{value:"",label:""}]);
@@ -82,7 +85,6 @@ function WearMaintenance( props ) {
     let beginKp = select.beginKp / 1000;
     let endKp = select.endKp / 1000;
 
-    let route = sessionStorage.getItem('route');
     let param = {
       begin_kp : [beginKp],
       end_kp : [endKp],
@@ -157,7 +159,6 @@ function WearMaintenance( props ) {
   }
 
   const getTrackGeo = ( kp_ ) => {
-    let route = sessionStorage.getItem('route');
     axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
@@ -206,7 +207,6 @@ function WearMaintenance( props ) {
       return;
     }
 
-    let route = sessionStorage.getItem('route');
     let param  = {
       railroad_name : route,
       measure_ts : new Date().toISOString(),
@@ -252,7 +252,6 @@ function WearMaintenance( props ) {
     let endKP = selectKP.beginKp / 1000;
     console.log(startKP);
     console.log(endKP);
-    let route = sessionStorage.getItem('route');
     let param = {
       begin_kp : [startKP],
       end_kp : [endKP],
@@ -308,8 +307,8 @@ function WearMaintenance( props ) {
       console.log(response.data);
       let cornerWearGraph = response.data.cornerWearGraph;
       let verticalWearGraph = response.data.verticalWearGraph;
-/*       setCornerWearGraphData(cornerWearGraph);
-      setVerticalWearGraphData(verticalWearGraph); */
+      setCornerWear3DGraphData(cornerWearGraph);
+      setVerticalWear3DGraphData(verticalWearGraph);
       let wear3DData = makeWear3dData(cornerWearGraph, verticalWearGraph, [STRING_VERTICAL_WEAR, STRING_CORNER_WEAR], []);
       setWear3dData(wear3DData);
       setViewWear3dData(wear3DData);
@@ -359,13 +358,21 @@ function WearMaintenance( props ) {
           leftTrackMGT.push( data.accumulateWeight );
           leftTrackKP.push( data.kp * 1000 );
           leftTrackWear.push( zeroToNull(data.wear) );
-          leftTrackPrediction.push( zeroToNull(data.prediction) );
+          if(fliter.indexOf(STRING_CORNER_PREDIC_WEAR) > -1){
+            leftTrackPrediction.push( zeroToNull(data.prediction) );
+          }else{
+            leftTrackPrediction.push( null );
+          };
         }
         if( data.railSide === STRING_TRACK_SIDE_RIGHT ){
           rightTrackMGT.push( data.accumulateWeight );
           rightTrackKP.push( data.kp * 1000 );
           rightTrackWear.push( zeroToNull(data.wear) );
-          rightTrackPrediction.push( zeroToNull(data.prediction) );
+          if(fliter.indexOf(STRING_CORNER_PREDIC_WEAR) > -1){
+            rightTrackPrediction.push( zeroToNull(data.prediction) );
+          }else{
+            rightTrackPrediction.push( null );
+          }
         }else{
           /* upTrackMGT.push( data.accumulateWeight );
           upTrackKP.push( data.kp * 1000 );
@@ -383,13 +390,21 @@ function WearMaintenance( props ) {
           leftTrackMGT.push( data.accumulateWeight );
           leftTrackKP.push( data.kp * 1000 );
           leftTrackWear.push( zeroToNull(data.wear) );
-          leftTrackPrediction.push( zeroToNull(data.prediction) );
+          if(fliter.indexOf(STRING_VERTICAL_PREDIC_WEAR) > -1){
+            leftTrackPrediction.push( zeroToNull(data.prediction) );
+          }else{
+            leftTrackPrediction.push( null );
+          }
         }
         if( data.railSide === STRING_TRACK_SIDE_RIGHT ){
           rightTrackMGT.push( data.accumulateWeight );
           rightTrackKP.push( data.kp * 1000 );
           rightTrackWear.push( zeroToNull(data.wear) );
-          rightTrackPrediction.push( zeroToNull(data.prediction) );
+          if(fliter.indexOf(STRING_VERTICAL_PREDIC_WEAR) > -1){
+            rightTrackPrediction.push( zeroToNull(data.prediction) );
+          }else{
+            rightTrackPrediction.push( null );
+          }
         }else{
           /* upTrackMGT.push( data.accumulateWeight );
           upTrackKP.push( data.kp * 1000 );
@@ -523,7 +538,6 @@ function WearMaintenance( props ) {
     window.addEventListener('resize', resizeChange);
 
     getRailroadSection(setRailroadSection);
-    let route = sessionStorage.getItem('route');
     if( route === STRING_ROUTE_INCHON ){
       getInchonSpeedData(setTrackSpeedData);
     }else if( route === STRING_ROUTE_SEOUL ){
@@ -538,7 +552,6 @@ function WearMaintenance( props ) {
     if( railroadSection.length < 2 ){
       return;
     }
-    let route = sessionStorage.getItem('route');
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
     axios.get('https://raildoctor.suredatalab.kr/api/railwears/kp',{
       paramsSerializer: params => {
@@ -723,14 +736,14 @@ function WearMaintenance( props ) {
                       <div className="title flex textBold">선형정보</div>
                       <div className="flex linear ">
                         <div className="line">
-                          <div className="title">상선 </div>
+                          <div className="title">{getTrackText("상선", route)} </div>
                           <div className="info">
                             {nonData(trackGeo?.t2?.shapeDisplay)} / R={nonData(trackGeo?.t2?.direction)} <br/>
                             {nonData(trackGeo?.t2?.radius)} (C={nonData(trackGeo?.t2?.cant)}, S={nonData(trackGeo?.t2?.slack)})
                           </div>
                         </div>
                         <div className="line">
-                          <div className="title">하선 </div>
+                          <div className="title">{getTrackText("하선", route)} </div>
                           <div className="info">
                             {nonData(trackGeo?.t1?.shapeDisplay)} / R={nonData(trackGeo?.t1?.direction)} <br/> 
                             {nonData(trackGeo?.t1?.radius)} (C={nonData(trackGeo?.t1?.cant)}, S={nonData(trackGeo?.t1?.slack)})
@@ -773,12 +786,12 @@ function WearMaintenance( props ) {
                         data={viewWear3dData}
                         dataSliderSort={(e)=>{
                           console.log("dataSliderSort");
-                          let wear3DData = makeWear3dData(cornerWearGraphData, verticalWearGraphData, wearFilter, [e[0], e[1]]);
+                          let wear3DData = makeWear3dData(cornerWear3DGraphData, verticalWear3DGraphData, wearFilter, [e[0], e[1]]);
                           wear3DMinMax = e;
                           setViewWear3dData(wear3DData);
                         }}
                         changeCheckBox={(e)=>{
-                          let wear3DData = makeWear3dData(cornerWearGraphData, verticalWearGraphData, e, wear3DMinMax);
+                          let wear3DData = makeWear3dData(cornerWear3DGraphData, verticalWear3DGraphData, e, wear3DMinMax);
                           wearFilter = e;
                           setViewWear3dData(wear3DData);
                         }}
@@ -829,7 +842,11 @@ function WearMaintenance( props ) {
                   선택된 KP : {selectKP.name}
                   {
                     trackSpeedFindClosest.map( closest => {
-                      return <><div style={{backgroundColor : closest.color}} className="closestIcon"></div><div style={{marginLeft: "5px"}}>{closest.name}</div><div>: {`${parseFloat(closest.speed).toFixed(1)}km/h`}</div></>;
+                      return <>
+                      <div style={{backgroundColor : closest.color}} className="closestIcon"></div>
+                      <div style={{marginLeft: "5px"}}>{closest.name}</div>
+                      <div>: {`${parseFloat(closest.speed).toFixed(1)}km/h`}</div>
+                    </>;
                     })
                   }
                 </div>
@@ -938,7 +955,7 @@ function WearMaintenance( props ) {
                       {
                         predictionDetails.map( (detail, i) => {
                           return <><div key={`ver${i}`} className="tr">
-                            <div className="td driving colspan2"><div className="colspan2">{trackToString(detail.railTrack)}</div></div>
+                            <div className="td driving colspan2"><div className="colspan2">{trackToString(detail.railTrack, route)}</div></div>
                             <div className="td kp colspan2"><div className="colspan2">{convertToCustomFormat(detail.kp*1000)}</div></div>
                             <div className="td rail colspan2"><div className="colspan2">{trackLeftRightToString(detail.railTrack)}</div></div>
                             <div className="td mamo">직마모</div>
