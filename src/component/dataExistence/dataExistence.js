@@ -541,8 +541,16 @@ function DataExistence( props ) {
               onClick={()=>{
                 console.log(data);
                 setPautOpen(true);
-                setPautData(data);
                 setPautImgIndex(0);
+                axios.get(`https://raildoctor.suredatalab.kr/api/pauts/${data.measureId}`,{
+                  paramsSerializer: params => {
+                    return qs.stringify(params, { format: 'RFC3986' })
+                  }
+                })
+                .then(response => {
+                  setPautData(response.data);
+                })
+                .catch(error => console.error('Error fetching data:', error));
               }}><div className="tooltip">
                   <div className="tooltipLine">
                     KP : {convertToCustomFormat(data.kp*1000)}
