@@ -20,6 +20,7 @@ import RailRoughness from "../railRoughness/railRoughness";
 import RailTrackAlignment from "../railTrackAlignment/railTrackAlignment";
 import DataUpload from "../dataUpload/dataUpload";
 import Sidemenu from "../../component2/sidemenu/sidemenu";
+import LWD from "../lwd/lwd";
 
 const ProtectedRoute = ({ user, children }) => {
   const isAuth = () => {
@@ -55,6 +56,7 @@ function Main2( props ) {
               {/* <Route path="/routeSelection" element={<ProtectedRoute>
                 <RouteSelection />
               </ProtectedRoute>} /> */}
+              <Route path="/login" element={<Login memberList={props.memberList} />} />
               <Route path="/monitoring" element={<ProtectedRoute><Monitoring/></ProtectedRoute>} />
               <Route path="/wearMaintenance" element={<ProtectedRoute><WearMaintenance/></ProtectedRoute>} />
               <Route path="/cumulativeThroughput" element={<ProtectedRoute><CumulativeThroughput/></ProtectedRoute>} />
@@ -65,9 +67,9 @@ function Main2( props ) {
               <Route path="/railProfile" element={<ProtectedRoute><RailProfile/></ProtectedRoute>} />
               <Route path="/railRoughness" element={<ProtectedRoute><RailRoughness/></ProtectedRoute>} />
               <Route path="/railTrackAlignment" element={<ProtectedRoute><RailTrackAlignment/></ProtectedRoute>} />
-              <Route path="/login" element={<Login memberList={props.memberList} />} />
 
               <Route path="/dataUpload" element={<ProtectedRoute><DataUpload/></ProtectedRoute>} />
+              <Route path="/lwd" element={<ProtectedRoute><LWD/></ProtectedRoute>} />
           </Routes> 
         </div>
       </div>

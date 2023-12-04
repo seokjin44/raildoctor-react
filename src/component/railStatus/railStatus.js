@@ -3,7 +3,9 @@ import "./railSTatus.css";
 import isEqual from 'lodash/isEqual';
 import { STRING_PATH, STRING_STATION } from "../../constant";
 import classNames from "classnames";
+import { getTrackColor } from "../../util";
 
+let route = sessionStorage.getItem('route');
 class RailStatus extends React.Component {
 
   constructor(props) {
@@ -110,7 +112,7 @@ class RailStatus extends React.Component {
   render() {
     return (
       <div className="railStatusBox">
-        <div className="obj rail"></div>
+        <div className={`obj rail`} style={{background : getTrackColor(route)}}></div>
         <div className="obj pointerList" ref={this.railContainer} >
           {
             this.state.railObj.map( (obj, i) => {
