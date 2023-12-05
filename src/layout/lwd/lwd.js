@@ -347,8 +347,8 @@ function LWD( props ) {
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis fontSize={12} dataKey="kp" />
-                <YAxis tickFormatter={(tick) => (tick / 1000).toFixed(2)} />
-                <Tooltip formatter={(value) => (value / 1000).toFixed(2)} />
+                <YAxis />
+                <Tooltip />
                 <Legend />
                 <Line dataKey="stiffness" stroke="#82ca9d" dot={false} />
                 {/* {
