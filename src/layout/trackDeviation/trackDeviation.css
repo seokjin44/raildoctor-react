@@ -218,7 +218,7 @@ div.trackDeviationReportTable div.tableBody div.tr{
     color: blue;
 }  
 .table .tableBody .tr .td.caution{
-    color: yellow;
+    color: #ffca00;
 }  
 .table .tableBody .tr .td.repair{
     color: red;
