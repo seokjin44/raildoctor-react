@@ -240,22 +240,36 @@ function TrackDeviation( props ) {
         }
         searchChartView_.push(option);
         setSearchChartView(searchChartView_);
-
-        axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/report`,{
-          paramsSerializer: params => {
-            return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
-          },
-          params : param
-        })
-        .then(response => {
-          console.log(response.data);
-          setReportData(response.data);
-        })
-        .catch(error => console.error('Error fetching data:', error));
-
       })
       .catch(error => console.error('Error fetching data:', error));
     }
+
+    let start = selectedPath.beginKp;
+    let end = selectedPath.endKp;
+    start = (start>0) ? start/1000 : start;
+    end = (end>0) ? end/1000 : end;
+    let add = (end-start) * chartKPMoveIndex;
+
+    let param = {
+      begin_kp : [start + add],
+      end_kp : [end + add],
+      measure_ts : measureTs,
+      rail_track : selectTrack,
+      data_type : [...selectCheckBox],
+      railroad_name : route,
+    };
+    console.log(param);
+    axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/report`,{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
+      },
+      params : param
+    })
+    .then(response => {
+      console.log(response.data);
+      setReportData(response.data);
+    })
+    .catch(error => console.error('Error fetching data:', error));
   }
 
   
