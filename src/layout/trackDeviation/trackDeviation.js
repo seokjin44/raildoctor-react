@@ -10,7 +10,7 @@ import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import { Modal } from "@mui/material";
 import axios from 'axios';
 import qs from 'qs';
-import { convertQuarterFormat, convertToCustomFormat, dateFormat, findRange, getQuarterFromDate, getRailroadSection, getStartEndDatesFromQuarter, getTrackText, isEmpty, trackToString, transposeObjectToArray } from "../../util";
+import { convertQuarterFormat, convertToCustomFormat, dateFormat, findRange, getQuarterFromDate, getRailroadSection, getStartEndDatesFromQuarter, getTrackDeviationAlarmClass, getTrackDeviationAlarmText, getTrackText, isEmpty, trackToString, trackToString2, transposeObjectToArray } from "../../util";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 
 let route = sessionStorage.getItem('route');
@@ -55,6 +55,7 @@ function TrackDeviation( props ) {
     setSelectedPath(select);
     setViewMeasureDate(null);
     setSelectMeasureDate(null);
+    setChartKPMoveIndex(0);
     getMeasureQuarter(select.beginKp, select.endKp);
   }
 
@@ -489,7 +490,7 @@ function TrackDeviation( props ) {
                   series.push(<Line type="monotone" name="비틀림" dataKey="value" stroke="#4371C4" dot={false} />);
                 }
 
-                return <ResponsiveContainer key={i} width="100%" height="100%">
+                return <ResponsiveContainer key={`lineChart${i}`} width="100%" height="100%">
                 <LineChart
                   width={500}
                   height={300}
@@ -581,7 +582,7 @@ function TrackDeviation( props ) {
                   {
                     reportData?.entity?.map( entitie => {
                       return <div className="tr">
-                        <div className="td">{trackToString(reportSelectTrack, route)}</div>
+                        <div className="td">{trackToString2(reportSelectTrack, route)}</div>
                         <div className="td">{entitie.dataType}</div>
                         <div className="td">{reportData.beginKp}</div>
                         <div className="td">{reportData.endKp}</div>
@@ -590,7 +591,9 @@ function TrackDeviation( props ) {
                         <div className="td">{entitie.value}</div>
                         <div className="td">{entitie.thresholdValue}</div>
                         <div className="td">{entitie.excess.toFixed(2)}</div>
-                        <div className="td">{entitie.alarm}</div>
+                        <div className={`td ${getTrackDeviationAlarmClass(entitie.thresholdType, entitie.thresholdValue ,entitie.value)}`}>
+                          {getTrackDeviationAlarmText(entitie.thresholdType, entitie.thresholdValue ,entitie.value)}
+                        </div>
 {/*                         <div className="td">{entitie.maxWear}</div>
                         <div className="td">{entitie.minWear}</div> */}
                       </div>

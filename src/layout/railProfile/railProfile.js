@@ -311,7 +311,7 @@ function RailProfile( props ) {
               </div>
               <div className="dataOption" style={{marginLeft:"10px"}}>
               {nonData(trackGeo?.shapeDisplay)} /
-                R={nonData(trackGeo?.direction)} {nonData(trackGeo?.radius)} (C={nonData(trackGeo?.cant)}, S={nonData(trackGeo?.slack)})
+                R={nonData(trackGeo?.direction)} {nonData(trackGeo?.radius)} (C={nonData(trackGeo?.cant)}, S={nonData(trackGeo?.slack)}) / {trackGeo?.railWeight}
               </div>
               <div className="line"></div>
               {/* <div className="dataOption">

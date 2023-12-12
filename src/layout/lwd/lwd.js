@@ -5,17 +5,19 @@ import 'dayjs/locale/ko';
 import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Brush, Line } from 'recharts';
 
 import Papa from 'papaparse';
-import { CHART_RENDERING_TEXT,  DATA_LOADING_TEXT, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE } from "../../constant";
+import { CHART_RENDERING_TEXT,  DATA_LOADING_TEXT, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE, colors } from "../../constant";
 import { DatePicker, Input } from "antd";
 import PlaceGauge from "../../component/PlaceGauge/PlaceGauge";
 import axios from 'axios';
-import { convertToCustomFormat, dateFormat, findRange, getRailroadSection, intervalSample, measureTypeText, trackDataName, trackLeftRightToString } from "../../util";
+import { convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, findRange, getRailroadSection, intervalSample, measureTypeText, trackDataName, trackLeftRightToString } from "../../util";
 import LoadingImg from "../../assets/icon/loading/loading.png";
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
 import { isEmpty } from "lodash";
 import qs from 'qs';
 
 let route = sessionStorage.getItem('route');
+let chartDataObj = {};
+let colorIndex = 1;
 function LWD( props ) {
   const [selectedPath, setSelectedPath] = useState({
     start_station_name : "",
@@ -23,11 +25,8 @@ function LWD( props ) {
     beginKp : 0,
     endKp : 0,
   });
-  const [open, setOpen] = useState(false);
   const [dataExits, setDataExits] = useState([]);
-  const [gaugeData, setGaugeData] = useState([]);
   const [lwdChartData, setLWDChartData] = useState([]);
-  const [selectedGauge, setSelectedGauge] = useState("");
   const [railroadSection, setRailroadSection] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dataloading, setDataloading] = useState(false);
@@ -38,11 +37,11 @@ function LWD( props ) {
   const [mode, setMode] = useState('month');
 
   const [chartseries, setChartseries] = useState([]);
-
-  const [avg, setAvg] = useState(0);
-  const [std, setSTD] = useState(0);
-  const [si, setSI] = useState(0);
   
+  const getColor = (index) => {
+    return colors[index % 20];
+  }
+
   const disabledDate = (current) => {
     return !dataExitsDate[dateFormat(current.$d)];
   };
@@ -156,7 +155,7 @@ function LWD( props ) {
   }, [railroadSection])
   
   return (
-    <div className="railRoughness trackDeviation railTrackAlignment" >
+    <div className="lwd trackDeviation" >
       <div className="railStatusContainer">
         <RailStatus 
           resizeOn={resizeOn}
@@ -228,13 +227,29 @@ function LWD( props ) {
                   })
                   .then(response => {
                     console.log(response);
-                    let combinedArray = response.data.kp.map((x, index) => {
-                      return { kp: x, stiffness: response.data.stiffness[index] };
+                    let colorCode = getColor(colorIndex++);
+                    let chartseries_ = [...chartseries];
+                    let seriesID = `${response.data.beginKp}_${response.data.endKp}_${measureTs}`;
+                    response.data.kp.forEach((kp, index) => {
+                      let addData = {};
+                      addData[seriesID] = response.data.stiffness[index];
+                      chartDataObj[kp] = {...chartDataObj[kp], ...addData};
                     });
-                    setLWDChartData(combinedArray);
-                    setAvg(response.data.average);
-                    setSTD(response.data.std);
-                    setSI(response.data.si);
+                    let transformedData = Object.keys(chartDataObj).map(key => {
+                      return { kp: key, ...chartDataObj[key] };
+                    });
+                    chartseries_.push({
+                      seriesID : seriesID,
+                      colorCode : colorCode,
+                      measureTs : measureTs,
+                      beginKp : response.data.beginKp,
+                      endKp : response.data.endKp,
+                      avg : response.data.average,
+                      std : response.data.std,
+                      si : response.data.si,
+                    });
+                    setChartseries(chartseries_);
+                    setLWDChartData(transformedData);
                   })
                   .catch(error => console.error('Error fetching data:', error));
                 }} >
@@ -250,31 +265,18 @@ function LWD( props ) {
             {
               chartseries.map( (point, i) => {
                 return <div key={i} className="point">
-                  {`${convertToCustomFormat(point.kp*1000)}(${trackLeftRightToString(point.railTrack)})-${measureTypeText(point.measureType)}-${point.measureDate}`}
+                  {`${dateFormat(new Date(point.measureTs))}[${convertToCustomFormat(point.beginKp*1000)}-${convertToCustomFormat(point.endKp*1000)}]`}
                   <img src={CloseIcon} alt="제거" 
                     onClick={()=>{
-                      /* let selectPoints_ = [...selectPoints];
-                      setSelectPoints(selectPoints_.filter(item => point.sensorId !== item.sensorId ));
-                      let todayChartseries_ = [...todayChartseries];
-                      let dailyChartseries_ = [...dailyChartseries];
-                      let monthlyChartseries_ = [...monthlyChartseries];
-                      todayChartseries_ = todayChartseries_.filter(item => point.sensorId !== item.sensorId );
-                      dailyChartseries_= dailyChartseries_.filter(item => point.sensorId !== item.sensorId );
-                      monthlyChartseries_= monthlyChartseries_.filter(item => point.sensorId !== item.sensorId );
-                      setTodayChartseries(todayChartseries_);
-                      setDailyChartseries(dailyChartseries_);
-                      setMonthlyChartseries(monthlyChartseries_);
-
-                      deleteObjData(todayChartDataObj, point.sensorId);
-                      deleteObjData(dailyChartDataObj, point.sensorId);
-                      deleteObjData(monthlyChartDataObj, point.sensorId);
-                      setToDayChartData(convertObjectToArray(todayChartDataObj, CHART_FORMAT_TODAY));
-                      setDailyChartData(convertObjectToArray(dailyChartDataObj, CHART_FORMAT_DAILY));
-                      setMonthlyChartData(convertObjectToArray(monthlyChartDataObj, CHART_FORMAT_MONTHLY));
-
-                      deleteNonObj(todayChartDataObj);
-                      deleteNonObj(dailyChartDataObj);
-                      deleteNonObj(monthlyChartDataObj); */
+                      let chartseries_ = [...chartseries];
+                      chartseries_ = chartseries_.filter(item => point.seriesID !== item.seriesID );
+                      setChartseries(chartseries_);
+                      deleteObjData(chartDataObj, point.seriesID);
+                      let transformedData = Object.keys(chartDataObj).map(key => {
+                        return { kp: key, ...chartDataObj[key] };
+                      });
+                      setLWDChartData(transformedData);
+                      deleteNonObj(chartDataObj);
                     }}
                   />
                 </div>
@@ -287,50 +289,24 @@ function LWD( props ) {
         { (dataloading) ? <div className="loading"><img src={LoadingImg} alt="로딩" />{DATA_LOADING_TEXT}</div> : null }
           <div className="addData">
             <div className="dataLines">
-                <div className="title">{`${selectMeasureDate}[${convertToCustomFormat(selectedPath.beginKp)}-${convertToCustomFormat(selectedPath.endKp)}]`}</div>
-                <div className="line">
-                  <div className="lineName">Average</div>
-                  <div className="lineVal">{avg}</div>
-                </div>
-                <div className="line">
-                  <div className="lineName">STD</div>
-                  <div className="lineVal">{std}</div>
-                </div>
-                <div className="line">
-                  <div className="lineName">SI</div>
-                  <div className="lineVal">{si}</div>
-                </div>
+                {
+                  chartseries.map( (series, i) => {
+                    return <><div className="title">{`${dateFormat(new Date(series.measureTs))}[${convertToCustomFormat(series.beginKp*1000)}-${convertToCustomFormat(series.endKp*1000)}]`}</div>
+                    <div className="line">
+                      <div className="lineName">Average</div>
+                      <div className="lineVal">{series.avg}</div>
+                    </div>
+                    <div className="line">
+                      <div className="lineName">STD</div>
+                      <div className="lineVal">{series.std}</div>
+                    </div>
+                    <div className="line">
+                      <div className="lineName">SI</div>
+                      <div className="lineVal">{series.si}</div>
+                    </div></>
+                  })
+                }
             </div>
-            {/* <div className="dataLines">
-                <div className="title">2023-01-01[15K000~16K000]</div>
-                <div className="line">
-                  <div className="lineName">Average</div>
-                  <div className="lineVal">104.97</div>
-                </div>
-                <div className="line">
-                  <div className="lineName">STD</div>
-                  <div className="lineVal">57.20</div>
-                </div>
-                <div className="line">
-                  <div className="lineName">SI</div>
-                  <div className="lineVal">47.77</div>
-                </div>
-            </div>
-            <div className="dataLines">
-                <div className="title">2023-01-01[15K000~16K000]</div>
-                <div className="line">
-                  <div className="lineName">Average</div>
-                  <div className="lineVal">104.97</div>
-                </div>
-                <div className="line">
-                  <div className="lineName">STD</div>
-                  <div className="lineVal">57.20</div>
-                </div>
-                <div className="line">
-                  <div className="lineName">SI</div>
-                  <div className="lineVal">47.77</div>
-                </div>
-            </div> */}
           </div>
           <div className="chartBox">
             <ResponsiveContainer width="100%" height="100%">
@@ -350,15 +326,16 @@ function LWD( props ) {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line dataKey="stiffness" stroke="#82ca9d" dot={false} />
-                {/* {
+                {
                   chartseries.map( (series, i) => {
                     console.log(series.datakey);
-                    return <Line key={i}
-                      name={`${convertToCustomFormat(series.kp*1000)}${series.trackSide}-${series.measureTypeText}_${trackDataName(series.item)}`} 
-                      dataKey={series.datakey} fill={series.colorCode} />
+                    return <Line key={`Chart${i}`}
+                      name={`${dateFormat(new Date(series.measureTs))}[${convertToCustomFormat(series.beginKp*1000)}-${convertToCustomFormat(series.endKp*1000)}]`} 
+                      dataKey={series.seriesID} 
+                      fill={series.colorCode}
+                      stroke={series.colorCode} />
                   })
-                } */}
+                }
                 {/* <Brush dataKey="KP(m)" height={30} stroke="#8884d8" /> */}
               </LineChart>
             </ResponsiveContainer>

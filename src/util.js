@@ -1,4 +1,4 @@
-import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_LATERAL_LOAD_KEY, STRING_LONG_MEASURE, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_ROUTE_GYEONGBU, STRING_ROUTE_INCHON, STRING_ROUTE_OSONG, STRING_ROUTE_SEOUL, STRING_SHORT_MEASURE, STRING_SPEED_KEY, STRING_STATION, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, STRING_WHEEL_LOAD_KEY, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED, UP_TRACK } from "./constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_LATERAL_LOAD_KEY, STRING_LONG_MEASURE, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_ROUTE_GYEONGBU, STRING_ROUTE_INCHON, STRING_ROUTE_OSONG, STRING_ROUTE_SEOUL, STRING_SHORT_MEASURE, STRING_SPEED_KEY, STRING_STATION, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, STRING_WHEEL_LOAD_KEY, TRACK_DEVIATION_CAUTION, TRACK_DEVIATION_REPAIR, TRACK_DEVIATION_TARGET, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED, UP_TRACK } from "./constant";
 import axios from 'axios';
 import qs from 'qs';
 import Papa from 'papaparse';
@@ -1073,4 +1073,82 @@ export const getTrackColor = (route) => {
         return 'linear-gradient(0deg, rgba(56,119,176,1) 0%, rgba(113,168,218,1) 35%, rgba(142,186,226,1) 100%)';
     }
     return '';
+}
+
+export const getTrackDeviationAlarmText = (thresholdType, thresholdValue, value) => {
+    if (thresholdValue > 0 && value > thresholdValue) {
+        if( thresholdType === TRACK_DEVIATION_TARGET ) { //목표
+            return "목표 초과";
+        }else if( thresholdType === TRACK_DEVIATION_CAUTION ) { //주의
+            return "주의 초과";
+        }else if( thresholdType === TRACK_DEVIATION_REPAIR ) { //보수
+            return "보수 초과";
+        }
+    } else if (thresholdValue < 0 && value < thresholdValue) {
+        if( thresholdType === TRACK_DEVIATION_TARGET ) { //목표
+            return "목표 초과";
+        }else if( thresholdType === TRACK_DEVIATION_CAUTION ) { //주의
+            return "주의 초과";
+        }else if( thresholdType === TRACK_DEVIATION_REPAIR ) { //보수
+            return "보수 초과";
+        }
+    }
+}
+
+export const getTrackDeviationAlarmClass = (thresholdType, thresholdValue, value) => {
+    if (thresholdValue > 0 && value > thresholdValue) {
+        if( thresholdType === TRACK_DEVIATION_TARGET ) { //목표
+            return "target";
+        }else if( thresholdType === TRACK_DEVIATION_CAUTION ) { //주의
+            return "caution";
+        }else if( thresholdType === TRACK_DEVIATION_REPAIR ) { //보수
+            return "repair";
+        }
+    } else if (thresholdValue < 0 && value < thresholdValue) {
+        if( thresholdType === TRACK_DEVIATION_TARGET ) { //목표
+            return "target";
+        }else if( thresholdType === TRACK_DEVIATION_CAUTION ) { //주의
+            return "caution";
+        }else if( thresholdType === TRACK_DEVIATION_REPAIR ) { //보수
+            return "repair";
+        }
+    }
+}
+
+export const transformData = (data) => {
+    const transformed = {};
+    const baseDate = new Date(Date.UTC(2000, 0, 1)); // 기준 날짜를 UTC 기준으로 설정
+    let additionalHours = 0;
+    const sortedData = Object.entries(data).sort(([dateTimeA], [dateTimeB]) => dateTimeA.localeCompare(dateTimeB));
+    sortedData.forEach(([dateTime, values]) => {
+        const [dateStr, timeStr] = dateTime.split('T');
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const [hours, minutes] = timeStr.split(':').map(Number);
+
+        // UTC 기준으로 날짜 객체 생성
+        const date = new Date(Date.UTC(year, month - 1, day, hours, minutes));
+        let time = date.getUTCHours() * 100 + date.getUTCMinutes();
+
+        // 다음 날짜로 넘어갈 때마다 24시간을 더함
+        if (date.getUTCDate() !== baseDate.getUTCDate()) {
+            baseDate.setUTCDate(date.getUTCDate());
+            baseDate.setUTCMonth(date.getUTCMonth());
+            baseDate.setUTCFullYear(date.getUTCFullYear());
+            additionalHours += 2400;
+        }
+        time += additionalHours;
+
+        // 동일한 시간대의 값들을 하나의 객체로 합침
+        if (!transformed[time]) {
+            transformed[time] = { ...values };
+        } else {
+            Object.keys(values).forEach(key => {
+                transformed[time][key] = (transformed[time][key] || 0) + values[key];
+            });
+        }
+    });
+
+    // 시간 순으로 정렬하여 배열로 변환
+    return Object.entries(transformed).map(([time, value]) => ({ time: parseInt(time), ...value }))
+        .sort((a, b) => a.time - b.time);
 }

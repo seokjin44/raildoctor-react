@@ -213,3 +213,13 @@
 div.trackDeviationReportTable div.tableBody div.tr{
     height: 30px;
 }
+
+.table .tableBody .tr .td.target{
+    color: blue;
+}  
+.table .tableBody .tr .td.caution{
+    color: yellow;
+}  
+.table .tableBody .tr .td.repair{
+    color: red;
+}

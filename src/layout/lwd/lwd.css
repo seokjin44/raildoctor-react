@@ -168,3 +168,30 @@
 .contentBox .componentBox.chartBox .addData .dataLines .line .lineVal{
     width: calc( 100% - 100px);
 }
+
+.lwd .selectPoints{
+    right: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+}
+
+.lwd .selectPoints .point{
+    font-size: 11px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    background: white;
+    padding: 4px;
+    padding-left: 9px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.lwd .selectPoints .point img{
+    width: 12px;
+    height: 11px;
+    margin-left: 5px;
+    cursor: pointer;
+}

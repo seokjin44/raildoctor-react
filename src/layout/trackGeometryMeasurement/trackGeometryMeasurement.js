@@ -10,7 +10,7 @@ import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, EMPTY_MEA
 import PlacePosition from "../../component/PlacePosition/PlacePosition";
 import axios from 'axios';
 import qs from 'qs';
-import { checkDateFormat, convertDates, convertObjectToArray, convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, findRange, formatTime, getFirstDateOfThreeMonthsAgo, getRailroadSection, getYearStartEnd, isEmpty, measureTypeText, numberToText, trackDataName, trackLeftRightToString, valueOneOrNone } from "../../util";
+import { checkDateFormat, convertDates, convertObjectToArray, convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, findRange, formatTime, getFirstDateOfThreeMonthsAgo, getRailroadSection, getYearStartEnd, isEmpty, measureTypeText, numberToText, trackDataName, trackLeftRightToString, transformData, valueOneOrNone } from "../../util";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
@@ -75,6 +75,24 @@ function TrackGeometryMeasurement( props ) {
   const [mode, setMode] = useState('month');
 
   const [selectViewMeasure, setSelectViewMeasure] = useState([STRING_SHORT_MEASURE, STRING_LONG_MEASURE]);
+
+  // 커스텀 눈금 라벨 포맷터 함수
+  const formatXAxis = (tickItem) => {
+    // 2400마다 증가하는 로직 적용
+    const adjustedHours = Math.floor(tickItem / 100) % 24; // 24시간 넘어가면 0으로 리셋
+    const minutes = tickItem % 100;
+    // 시간 형식으로 포맷팅
+    return `${adjustedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  };
+
+
+  // 라벨 포맷터 함수
+  const formatTooltipLabel = (label) => {
+    const adjustedHours = Math.floor(label / 100) % 24; // 24시간 넘어가면 0으로 리셋
+    const minutes = label % 100;
+    console.log(`${adjustedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`);
+    return `${adjustedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  };
 
   const disabledDate = (current) => {
     return !dataExitsDate[dateFormat(current.$d)];
@@ -585,10 +603,10 @@ function TrackGeometryMeasurement( props ) {
                           addData[dataKey] = (data.data) ? data.data : data.maxValue;
                           monthlyChartDataObj[data.ts] = {...monthlyChartDataObj[data.ts], ...addData};
                         }
-                        setToDayChartData(convertObjectToArray(todayChartDataObj, CHART_FORMAT_TODAY));
+                        setToDayChartData(transformData(todayChartDataObj));
                         setDailyChartData(convertObjectToArray(dailyChartDataObj, CHART_FORMAT_DAILY));
                         setMonthlyChartData(convertObjectToArray(monthlyChartDataObj, CHART_FORMAT_MONTHLY));
-                        console.log(convertObjectToArray(todayChartDataObj, CHART_FORMAT_TODAY));
+                        console.log(transformData(todayChartDataObj));
                         console.log(convertObjectToArray(dailyChartDataObj, CHART_FORMAT_DAILY));
                         console.log(convertObjectToArray(monthlyChartDataObj, CHART_FORMAT_MONTHLY));
                         
@@ -871,7 +889,7 @@ function TrackGeometryMeasurement( props ) {
                       deleteObjData(todayChartDataObj, point.sensorId);
                       deleteObjData(dailyChartDataObj, point.sensorId);
                       deleteObjData(monthlyChartDataObj, point.sensorId);
-                      setToDayChartData(convertObjectToArray(todayChartDataObj, CHART_FORMAT_TODAY));
+                      setToDayChartData(transformData(todayChartDataObj, CHART_FORMAT_TODAY));
                       setDailyChartData(convertObjectToArray(dailyChartDataObj, CHART_FORMAT_DAILY));
                       setMonthlyChartData(convertObjectToArray(monthlyChartDataObj, CHART_FORMAT_MONTHLY));
 
@@ -911,15 +929,22 @@ function TrackGeometryMeasurement( props ) {
               >
                 <CartesianGrid />
                 <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '10px' }} />
-                <XAxis type="category" dataKey="time" name="time" fontSize={9} height={40} tickFormatter={
-                  (val)=>{return val.slice(0, 5);}
-                }>
+                <XAxis 
+                    dataKey="time" 
+                    type="number" 
+                    domain={[400, 2800]}  // 04:00부터 다음 날 04:00까지의 범위
+                    tickFormatter={formatXAxis}
+                    tickCount={25}  // 1시간 간격으로 눈금 설정
+                    interval={2}  // 모든 눈금 표시
+                    fontSize={9} height={40}
+                >
                   <Label value="Time" offset={0} position="insideBottom" />
                 </XAxis>
                 <YAxis type="number" name="data" fontSize={12} >
                   <Label value="kN" angle={-90} position="insideLeft" />
                 </YAxis>
-                <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                <Tooltip cursor={{ strokeDasharray: '3 3' }} 
+                         formatter={formatTooltipLabel} />
                 {
                   todayChartseries.map( (series, i) => {
                     console.log(series.datakey);
