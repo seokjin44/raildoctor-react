@@ -1152,3 +1152,39 @@ export const transformData = (data) => {
     return Object.entries(transformed).map(([time, value]) => ({ time: parseInt(time), ...value }))
         .sort((a, b) => a.time - b.time);
 }
+
+export const convertToCSV = data => {
+    const headers = Object.keys(data[0]).join(',');
+    const rows = data.map(row =>
+      Object.values(row).join(',')
+    ).join('\n');
+  
+    return [headers].concat(rows).join('\n');
+};
+
+export const downloadCSV = (csvData, filename) => {
+    const blob = new Blob(["\uFEFF" + csvData], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+  
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+};
+
+export const transformDataKeys = (data, keyMapping) => {
+    return data.map(item => {
+      const newItem = {};
+      Object.keys(item).forEach(key => {
+        const newKey = keyMapping[key] || key; // 매핑된 키가 없으면 원래 키를 사용
+        newItem[newKey] = item[key];
+      });
+      return newItem;
+    });
+  };
+  
+  
+  
