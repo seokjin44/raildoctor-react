@@ -10,7 +10,7 @@ import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import { Modal } from "@mui/material";
 import axios from 'axios';
 import qs from 'qs';
-import { convertQuarterFormat, convertToCustomFormat, dateFormat, findRange, getQuarterFromDate, getRailroadSection, getStartEndDatesFromQuarter, getTrackDeviationAlarmClass, getTrackDeviationAlarmText, getTrackText, isEmpty, trackToString, trackToString2, transposeObjectToArray } from "../../util";
+import { convertQuarterFormat, convertToCSV, convertToCustomFormat, dateFormat, downloadCSV, findRange, getQuarterFromDate, getRailroadSection, getStartEndDatesFromQuarter, getTrackDeviationAlarmClass, getTrackDeviationAlarmText, getTrackText, isEmpty, trackToString, trackToString2, transposeObjectToArray } from "../../util";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 
 let route = sessionStorage.getItem('route');
@@ -551,6 +551,10 @@ function TrackDeviation( props ) {
               <div className="closeBtn" onClick={()=>{setOpen(false)}} ><img src={CloseIcon} /></div>
             </div>
             <div className="trackReportPopupContent">
+              <div className="reportDownloadBtn" onClick={()=>{
+                let csvData = convertToCSV(reportData?.entity);
+                downloadCSV(csvData, `${convertQuarterFormat(reportSelectRange)}_${dateFormat(new Date(reportSelectMeasureDate))}_${reportSelectPath.start_station_name+" - "+reportSelectPath.end_station_name}.csv`);
+              }}>CSV 다운로드</div>
               <div className="table" style={{marginTop:"10px", width:"400px"}}>
                 <div className="tableHeader">
                   <div className="tr">

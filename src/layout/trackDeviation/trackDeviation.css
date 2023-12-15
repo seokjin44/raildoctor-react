@@ -171,6 +171,7 @@
     padding-left: 15px;
     padding-right: 15px;
     padding-bottom: 15px;
+    position: relative;
 }
 
 .trackDeviation .chartMoveBtn{
@@ -222,4 +223,15 @@ div.trackDeviationReportTable div.tableBody div.tr{
 }  
 .table .tableBody .tr .td.repair{
     color: red;
+}
+
+.reportDownloadBtn{
+    position: absolute;
+    right: 12px;
+    top: 18px;
+    padding: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    background: #ffc84d;
+    cursor: pointer;
 }

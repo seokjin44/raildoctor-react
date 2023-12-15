@@ -209,3 +209,11 @@
     height: 40px;
     margin-right: 25px;
 }
+
+.measuringTemperatureHumidity .downloadCSV{
+    width: 100px; margin-left: 10px;
+}
+
+.measuringTemperatureHumidity .dataOption.linear{
+    min-width: 185px;
+}

@@ -7,7 +7,7 @@ import { Checkbox, Input, Select, DatePicker } from "antd";
 import { CHART_FORMAT_RAW, CHART_RENDERING_TEXT, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, colors } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertObjectToArray, convertObjectToArray_, convertToCustomFormat, deleteNonObj, deleteObjData, findRange, getRailroadSection, getTrackText, nonData, tempDataName } from "../../util";
+import { convertObjectToArray, convertObjectToArray_, convertToCSV, convertToCustomFormat, deleteNonObj, deleteObjData, downloadCSV, findRange, getRailroadSection, getTrackText, nonData, tempDataName, transformDataKeys } from "../../util";
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 import { isEmpty } from "lodash";
@@ -346,6 +346,17 @@ function MeasuringTemperatureHumidity( props ) {
                 <button className="search" onClick={()=>{
                   searchTempData();
                 }}>조회</button>
+                <button className="search downloadCSV" onClick={()=>{
+                  console.log(chartData);
+                  console.log(chartseries);
+                  let keyMapping = {};
+                  chartseries.forEach(( series )=>{
+                    keyMapping[series.dataKey] = `${series.sensorName}-${series.item}`;
+                  })
+                  let transData = transformDataKeys(chartData, keyMapping);
+                  let csvData = convertToCSV(transData);
+                  downloadCSV(csvData, "Temperature_Data.csv");
+                }}>CSV 다운로드</button>
               </div>
             </div>
       </div>
