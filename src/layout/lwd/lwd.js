@@ -104,6 +104,143 @@ function LWD( props ) {
     });
   }
 
+  const moveLeftData = () => {
+    let chartseries_ = [...chartseries];
+    /* for( let series of chartseries_ ){ */
+    for( let i = 0; i < chartseries_.length; i++ ){
+      let series = chartseries_[i];
+      axios.get('https://raildoctor.suredatalab.kr/api/lwds/adj',{
+        paramsSerializer: params => {
+          return qs.stringify(params, { format: 'RFC3986' })
+        },
+        params : {
+          railroad_name: route,
+          begin_kp: series.beginKp,
+          end_kp: series.endKp,
+          measure_ts: series.measureTs,
+          rail_track: "T1"
+        }
+      })
+      .then(response => {
+        console.log(response.data);
+        if(response.data.leftData){
+          deleteObjData(chartDataObj, series.seriesID);
+          let transformedData = Object.keys(chartDataObj).map(key => {
+            return { kp: key, ...chartDataObj[key] };
+          });
+          setLWDChartData(transformedData);
+          deleteNonObj(chartDataObj);
+          axios.get('https://raildoctor.suredatalab.kr/api/lwds',{
+            paramsSerializer: params => {
+              return qs.stringify(params, { format: 'RFC3986' })
+            },
+            params : {
+              railroad_name : route,
+              begin_kp : response.data.leftData.beginKp,
+              end_kp : response.data.leftData.endKp,
+              measure_ts : response.data.leftData.measureTs,
+              rail_track : "T1" // https://raildoctor.suredatalab.kr/api/lwds/ts 에는 rail_track이 없음
+            }
+          })
+          .then(response => {
+            console.log(response);
+            let seriesID = `${response.data.beginKp}_${response.data.endKp}_${response.data.measureTs}`;
+            response.data.kp.forEach((kp, index) => {
+              let addData = {};
+              addData[seriesID] = response.data.stiffness[index];
+              chartDataObj[kp] = {...chartDataObj[kp], ...addData};
+            });
+            let transformedData = Object.keys(chartDataObj).map(key => {
+              return { kp: key, ...chartDataObj[key] };
+            });
+            chartseries_[i] = {
+              seriesID : seriesID,
+              colorCode : series.colorCode,
+              measureTs : response.data.measureTs,
+              beginKp : response.data.beginKp,
+              endKp : response.data.endKp,
+              avg : response.data.average,
+              std : response.data.std,
+              si : response.data.si,
+            };
+            setChartseries(chartseries_);
+            setLWDChartData(transformedData);
+          })
+          .catch(error => console.error('Error fetching data:', error));
+        }
+      })
+      .catch(error => console.error('Error fetching data:', error));
+    }
+  }
+
+  const moveRightData = () => {
+    let chartseries_ = [...chartseries];
+    for( let i = 0; i < chartseries_.length; i++ ){
+      let series = chartseries_[i];
+      axios.get('https://raildoctor.suredatalab.kr/api/lwds/adj',{
+        paramsSerializer: params => {
+          return qs.stringify(params, { format: 'RFC3986' })
+        },
+        params : {
+          railroad_name: route,
+          begin_kp: series.beginKp,
+          end_kp: series.endKp,
+          measure_ts: series.measureTs,
+          rail_track: "T1"
+        }
+      })
+      .then(response => {
+        console.log(response.data);
+        if(response.data.rightData){
+          deleteObjData(chartDataObj, series.seriesID);
+          let transformedData = Object.keys(chartDataObj).map(key => {
+            return { kp: key, ...chartDataObj[key] };
+          });
+          setLWDChartData(transformedData);
+          deleteNonObj(chartDataObj);
+          axios.get('https://raildoctor.suredatalab.kr/api/lwds',{
+            paramsSerializer: params => {
+              return qs.stringify(params, { format: 'RFC3986' })
+            },
+            params : {
+              railroad_name : route,
+              begin_kp : response.data.rightData.beginKp,
+              end_kp : response.data.rightData.endKp,
+              measure_ts : response.data.rightData.measureTs,
+              rail_track : "T1" // https://raildoctor.suredatalab.kr/api/lwds/ts 에는 rail_track이 없음
+            }
+          })
+          .then(response => {
+            console.log(response);
+            let seriesID = `${response.data.beginKp}_${response.data.endKp}_${response.data.measureTs}`;
+            response.data.kp.forEach((kp, index) => {
+              let addData = {};
+              addData[seriesID] = response.data.stiffness[index];
+              chartDataObj[kp] = {...chartDataObj[kp], ...addData};
+            });
+            let transformedData = Object.keys(chartDataObj).map(key => {
+              return { kp: key, ...chartDataObj[key] };
+            });
+            chartseries_[i] = {
+              seriesID : seriesID,
+              colorCode : series.colorCode,
+              measureTs : response.data.measureTs,
+              beginKp : response.data.beginKp,
+              endKp : response.data.endKp,
+              avg : response.data.average,
+              std : response.data.std,
+              si : response.data.si,
+            };
+            setChartseries(chartseries_);
+            setLWDChartData(transformedData);
+          })
+          .catch(error => console.error('Error fetching data:', error));
+        }
+      })
+      .catch(error => console.error('Error fetching data:', error));
+    }
+  }
+
   useEffect(() => {
     // 이벤트 리스너 추가
     window.addEventListener('resize', resizeChange);
@@ -259,7 +396,7 @@ function LWD( props ) {
             </div>
       </div>
 
-      <div className="contentBox" style={{marginTop:"10px", height: "calc(100% - 240px)" }}>
+      <div className="contentBox" style={{marginTop:"10px", height: "calc(100% - 240px)", position: "relative" }}>
         <div className="containerTitle">Chart
           <div className="selectPoints">
             {
@@ -284,6 +421,8 @@ function LWD( props ) {
             }
           </div>
         </div>
+        <div className="chartMoveBtn left" onClick={()=>{moveLeftData()}} >&lt; Left</div>
+        <div className="chartMoveBtn right" onClick={()=>{moveRightData()}} >Right &gt;</div>
         <div className="componentBox chartBox flex">
         { (loading) ? <div className="loading"><img src={LoadingImg} alt="로딩" />{CHART_RENDERING_TEXT}</div> : null }
         { (dataloading) ? <div className="loading"><img src={LoadingImg} alt="로딩" />{DATA_LOADING_TEXT}</div> : null }
@@ -328,7 +467,6 @@ function LWD( props ) {
                 <Legend />
                 {
                   chartseries.map( (series, i) => {
-                    console.log(series.datakey);
                     return <Line key={`Chart${i}`}
                       name={`${dateFormat(new Date(series.measureTs))}[${convertToCustomFormat(series.beginKp*1000)}-${convertToCustomFormat(series.endKp*1000)}]`} 
                       dataKey={series.seriesID} 

@@ -90,7 +90,6 @@ function TrackGeometryMeasurement( props ) {
   const formatTooltipLabel = (label) => {
     const adjustedHours = Math.floor(label / 100) % 24; // 24시간 넘어가면 0으로 리셋
     const minutes = label % 100;
-    console.log(`${adjustedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`);
     return `${adjustedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   };
 

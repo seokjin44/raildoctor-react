@@ -966,30 +966,33 @@ export const findJustSmallerKey = (myMap, targetKey) => {
     return undefined;
   }
   
-  export const convertDates =(dataArray) => {
+export const convertDates = (dataArray) => {
     // 배열에서 가장 날짜가 이른 데이터 포인트를 기준 날짜로 설정합니다.
-    const baseDate = new Date(Math.min(...dataArray.map(item => new Date(item.ts))));
+    const baseDate = new Date(Math.min(...dataArray.map(item => new Date(item.ts).getTime() + (9 * 60 * 60 * 1000))));
     // '2000-01-01'을 새 기준 날짜로 설정합니다.
-    const newBaseDate = new Date('2000-01-01T00:00:00Z');
+    const newBaseDate = new Date('2000-01-01T00:00:00+09:00');
   
     // 기준 날짜의 자정을 기준으로 합니다.
     const baseDateAtMidnight = new Date(baseDate);
-    baseDateAtMidnight.setUTCHours(0, 0, 0, 0);
+    baseDateAtMidnight.setHours(0, 0, 0, 0);
   
     // 모든 날짜를 변환합니다.
     return dataArray.map(item => {
       const currentItemDate = new Date(item.ts);
+      // UTC 타임스탬프를 한국 시간대로 변환합니다.
+      const kstDate = new Date(currentItemDate.getTime() + (9 * 60 * 60 * 1000));
+  
       // 기준 날짜의 자정과 현재 아이템 날짜의 자정 사이의 밀리초 차이를 계산합니다.
-      const diff = currentItemDate - baseDateAtMidnight;
+      const diff = kstDate - baseDateAtMidnight;
       // 차이를 일수로 변환합니다.
       const diffDays = Math.floor(diff / (24 * 3600 * 1000));
   
       // 새 기준 날짜로부터의 일수 차이를 계산합니다.
       const newDate = new Date(newBaseDate);
-      newDate.setUTCDate(newBaseDate.getUTCDate() + diffDays);
+      newDate.setDate(newDate.getDate() + diffDays);
   
       // 현재 아이템의 시간을 유지합니다.
-      newDate.setUTCHours(currentItemDate.getUTCHours(), currentItemDate.getUTCMinutes(), currentItemDate.getUTCSeconds(), currentItemDate.getUTCMilliseconds());
+      newDate.setHours(kstDate.getHours(), kstDate.getMinutes(), kstDate.getSeconds(), kstDate.getMilliseconds());
   
       // 새로운 날짜와 기존 데이터를 결합하여 반환합니다.
       return {
@@ -998,6 +1001,7 @@ export const findJustSmallerKey = (myMap, targetKey) => {
       };
     });
   }
+  
   
 export const flattenTreeData = (data, parentId = null) => {
     let result = [];
