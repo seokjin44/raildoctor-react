@@ -552,8 +552,10 @@ function TrackDeviation( props ) {
             </div>
             <div className="trackReportPopupContent">
               <div className="reportDownloadBtn" onClick={()=>{
-                let csvData = convertToCSV(reportData?.entity);
-                downloadCSV(csvData, `${convertQuarterFormat(reportSelectRange)}_${dateFormat(new Date(reportSelectMeasureDate))}_${reportSelectPath.start_station_name+" - "+reportSelectPath.end_station_name}.csv`);
+                if(reportData?.entity){
+                  let csvData = convertToCSV(reportData?.entity);
+                  downloadCSV(csvData, `${convertQuarterFormat(reportSelectRange)}_${dateFormat(new Date(reportSelectMeasureDate))}_${reportSelectPath.start_station_name+" - "+reportSelectPath.end_station_name}.csv`);
+                }
               }}>CSV 다운로드</div>
               <div className="table" style={{marginTop:"10px", width:"400px"}}>
                 <div className="tableHeader">

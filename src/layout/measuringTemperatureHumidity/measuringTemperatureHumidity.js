@@ -354,8 +354,10 @@ function MeasuringTemperatureHumidity( props ) {
                     keyMapping[series.dataKey] = `${series.sensorName}-${series.item}`;
                   })
                   let transData = transformDataKeys(chartData, keyMapping);
-                  let csvData = convertToCSV(transData);
-                  downloadCSV(csvData, "Temperature_Data.csv");
+                  if( transData && transData.length > 0 ){
+                    let csvData = convertToCSV(transData);
+                    downloadCSV(csvData, "Temperature_Data.csv");
+                  }
                 }}>CSV 다운로드</button>
               </div>
             </div>

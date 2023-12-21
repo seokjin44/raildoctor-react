@@ -103,13 +103,15 @@
     justify-content: center;
     align-items: center;
     background-color: #44546a;
-    width: 120px;
+    width: 100px;
     height: 30px;
-    border-radius: 15px;
+    border-radius: 5px;
     position: absolute;
-    right: 15px;
-    top: 185px;
+    right: 20px;
+    top: 200px;
     color: white;
+    cursor: pointer;
+    font-size: 14px;
 }
 
 .dataUpload .uploadHistory .uploadBtn img{
@@ -122,13 +124,15 @@
     height: calc(100% - 40px);
     border-radius: 5px;
     border: 1px solid #cccccc;
-    padding: 10px 0px 10px 0px;
+    /* padding: 10px 0px 10px 0px; */
     margin: 10px;
 }
 
 .table3 .tableHeader{
     font-size: 18px;
     font-weight: bold;
+    background-color: #FAFAFA;
+    color: #A8A8A8;
 }
 
 .table3 .tableHeader .tr,
@@ -137,8 +141,17 @@
     display: flex;
     justify-content: left;
     align-items: center;
-    height: 32px;
+    height: 40.5px;
     border-bottom: 1px solid #cccccc73;
+}
+
+.table3 .tableHeader .tr .td,
+.table3 .tableBody .tr .td{
+    height: 100%;
+    border-right: 1px solid #E6E6E6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .table3 .tableHeader .tr .td.no,
@@ -146,19 +159,24 @@
     width: 5%;
 }
 
-.table3 .tableHeader .tr .td.upload,
-.table3 .tableBody .tr .td.upload{
+.table3 .tableHeader .tr .td.createdAt,
+.table3 .tableBody .tr .td.createdAt{
     width: 20%;
 }
 
-.table3 .tableHeader .tr .td.member,
-.table3 .tableBody .tr .td.member{
+.table3 .tableHeader .tr .td.fileSize,
+.table3 .tableBody .tr .td.fileSize{
     width: 20%;
 }
 
-.table3 .tableHeader .tr .td.file,
-.table3 .tableBody .tr .td.file{
-    width: 32%;
+.table3 .tableHeader .tr .td.filename,
+.table3 .tableBody .tr .td.filename{
+    width: 20%;
+}
+
+.table3 .tableHeader .tr .td.fileState,
+.table3 .tableBody .tr .td.fileState{
+    width: 13%;
 }
 
 .table3 .tableHeader .tr .td.download,
@@ -168,6 +186,14 @@
     justify-content: center;
     align-items: center;
 }
+
+.table3 .tableHeader .tr .td.btn,
+.table3 .tableBody .tr .td.btn{
+    width: calc(27% - 10px);
+    justify-content: flex-start;
+    padding-left: 10px;
+}
+
 
 .table3 .tableBody .tr{
     height: 50px;
@@ -214,4 +240,130 @@
     font-size: 25px;
     font-weight: bold;
     margin-top: 15px;
+}
+
+.treeListContainer{
+    height: calc(100% - 40px);
+    padding: 20px 20px 20px 20px;
+    width: calc(100% - 40px);
+    font-family: 'NEO_R' ;
+}
+
+.dataUpload .uploadHistory .pagination{
+    height: 30px;
+    position: absolute;
+    right: 155px;
+    top: 200px;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dataUpload .uploadHistory .pagination .optionTitle{
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.dataUpload .uploadHistory .pagination .curPaging{
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.dataUpload .uploadHistory .pagination .line{
+    height: 66%;
+    width: 1px;
+    border-right: 1px solid #cccccc;
+    margin-left: 15px;
+    margin-right: 15px;
+    border-radius: 5px;
+}
+
+/* css arrow */
+
+.wrap {
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    margin-left: 5px;
+    cursor: pointer;
+  }
+
+  .wrap .arrow {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
+    vertical-align: middle;
+  }
+
+  .wrap .arrow:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height:10px;
+    -webkit-transform: translate(-50%, -50%) rotate(45deg);
+    transform: translate(-50%, -50%) rotate(45deg);
+    margin-top: 2px;
+    border-top: 1px solid #333;
+    border-left: 1px solid #333;
+  }
+  .wrap .arrow.top:before {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }            
+  .wrap .arrow.down:before {
+    transform: translate(-50%, -50%) rotate(-135deg);
+  }
+  .wrap .arrow.left:before {
+    transform: translate(-50%, -50%) rotate(315deg);
+    top: 45%;
+    left: 57%;
+  }      
+  .wrap .arrow.right:before {
+    transform: translate(-50%, -50%) rotate(135deg);
+    top: 47%;
+    left: 44%;
+  }
+
+/*tgGrid*/
+.dataUpload .tgrid-column-header-text-wrapper{
+    padding: 0.5em 1em 0.5em 1em;
+    width: calc(100% - 2em);
+}
+
+.dataUpload span.i-collapse, 
+.dataUpload span.i-expand{
+    border-width: 10px 0 10px 10px;
+}
+
+.dataUpload span.i-expand{
+    transform: translateY(3px);
+}
+
+.dataUpload span.i-collapse{
+    transform: rotate(45deg) translateY(3px);
+}
+
+.tgrid-data-cell{
+    position: relative;
+}
+
+.tgrid-data-cell .state{
+    position: absolute;
+    left: 20px;
+    top: 5px;
+}
+
+.stateBtn{
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    padding: 5px;
+    width: 80px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.tgrid-data-cell .stateBtn.convertSucess{
 }

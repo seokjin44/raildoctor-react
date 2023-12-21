@@ -1022,21 +1022,21 @@ export const flattenTreeData = (data, parentId = null) => {
     return result;
 }
 
-export const uploadStateBtn = ( val ) => {
+export const uploadState = ( val ) => {
     if( val === UPLOAD_STATE_UPLOADED ){
-        return <div className="stateBtn complete">업로드 완료</div>
+        return "업로드 완료"
     }else if( val === UPLOAD_STATE_CONVERTING ){
-        return <div className="stateBtn converting">변환 중</div>
+        return "변환 중"
     }else if( val === UPLOAD_STATE_CONVERT_FAIL ){
-        return <div className="stateBtn convertFile">변환 실패</div>
+        return "변환 실패"
     }else if( val === UPLOAD_STATE_CONVERT_SUCCESS ){
-        return <div className="stateBtn convertSucess">변환 성공</div>;
+        return "변환 성공"
     }else if( val === UPLOAD_STATE_APPLYING ){
-        return <div className="stateBtn applying">시스템에 반영 중</div>;
+        return "시스템에 반영 중"
     }else if( val === UPLOAD_STATE_APPLY_FAIL ){
-        return <div className="stateBtn applyFail">반영 실패</div>;
+        return "반영 실패"
     }else if( val === UPLOAD_STATE_APPLY_SUCCESS ){
-        return <div className="stateBtn applySucess">반영 성공</div>;
+        return "반영 성공";
     }
     return "";
 }
@@ -1189,6 +1189,11 @@ export const transformDataKeys = (data, keyMapping) => {
       return newItem;
     });
   };
+
+  
+export const convertBytesToMB = (bytes) => {
+    return parseFloat((bytes / 1024 / 1024).toFixed(2));
+} 
   
   
   

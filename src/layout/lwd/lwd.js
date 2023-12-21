@@ -463,7 +463,10 @@ function LWD( props ) {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis fontSize={12} dataKey="kp" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip 
+                  labelFormatter={(value) => `KP : ${convertToCustomFormat(value*1000)}`}
+                  formatter={(value, name) => [`${value}`, name]}
+                />
                 <Legend />
                 {
                   chartseries.map( (series, i) => {
