@@ -7,7 +7,7 @@ import { Radio } from 'antd';
 import { KP_SEARCH_RANGE, KP_SEARCH_SINGLE, PICTURE_RENDERING_TEXT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_PATH, STRING_STATION, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, dateFormat, formatDateTime, getRailroadSection, getTrackText, getYear2Length, nonData, numberWithCommas } from "../../util";
+import { convertToCustomFormat, dateFormat, formatDateTime, getRailroadSection, getRoute, getTrackText, getYear2Length, nonData, numberWithCommas } from "../../util";
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
 import classNames from "classnames";
@@ -18,7 +18,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 dayjs.extend(customParseFormat);
 
-let route = sessionStorage.getItem('route');
+let route = getRoute();
 function CumulativeThroughput( props ) {
 
   const zoomImgcontainerRef = useRef(null);

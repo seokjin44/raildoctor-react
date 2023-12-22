@@ -7,7 +7,7 @@ import { Checkbox, Input, Select, DatePicker } from "antd";
 import { CHART_FORMAT_RAW, CHART_RENDERING_TEXT, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, colors } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertObjectToArray, convertObjectToArray_, convertToCSV, convertToCustomFormat, deleteNonObj, deleteObjData, downloadCSV, findRange, getRailroadSection, getTrackText, nonData, tempDataName, transformDataKeys } from "../../util";
+import { convertObjectToArray, convertObjectToArray_, convertToCSV, convertToCustomFormat, deleteNonObj, deleteObjData, downloadCSV, findRange, getRailroadSection, getRoute, getTrackText, nonData, tempDataName, transformDataKeys } from "../../util";
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 import { isEmpty } from "lodash";
@@ -24,7 +24,7 @@ const dataOption = [
 let sensorList = [];
 let chartDataObj = {};
 let colorIndex = 1;
-let route = sessionStorage.getItem('route');
+let route = getRoute();
 function MeasuringTemperatureHumidity( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
   const [searchRangeDate, setSearchRangeDate] = useState([{$d : new Date(), $D : new Date()}]);

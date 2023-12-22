@@ -10,10 +10,10 @@ import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import { Modal } from "@mui/material";
 import axios from 'axios';
 import qs from 'qs';
-import { convertQuarterFormat, convertToCSV, convertToCustomFormat, dateFormat, downloadCSV, findRange, getQuarterFromDate, getRailroadSection, getStartEndDatesFromQuarter, getTrackDeviationAlarmClass, getTrackDeviationAlarmText, getTrackText, isEmpty, trackToString, trackToString2, transposeObjectToArray } from "../../util";
+import { convertQuarterFormat, convertToCSV, convertToCustomFormat, dateFormat, downloadCSV, findRange, getQuarterFromDate, getRailroadSection, getRoute, getStartEndDatesFromQuarter, getTrackDeviationAlarmClass, getTrackDeviationAlarmText, getTrackText, isEmpty, trackToString, trackToString2, transposeObjectToArray } from "../../util";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 
-let route = sessionStorage.getItem('route');
+let route = getRoute();
 function TrackDeviation( props ) {
   const [selectedPath, setSelectedPath] = useState({
     start_station_name : "",
@@ -552,7 +552,7 @@ function TrackDeviation( props ) {
             </div>
             <div className="trackReportPopupContent">
               <div className="reportDownloadBtn" onClick={()=>{
-                if(reportData?.entity){
+                if(reportData?.entity && reportData?.entity.length > 0){
                   let csvData = convertToCSV(reportData?.entity);
                   downloadCSV(csvData, `${convertQuarterFormat(reportSelectRange)}_${dateFormat(new Date(reportSelectMeasureDate))}_${reportSelectPath.start_station_name+" - "+reportSelectPath.end_station_name}.csv`);
                 }

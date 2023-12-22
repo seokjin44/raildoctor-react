@@ -1,7 +1,7 @@
 import React from "react";
 import "./TrackSpeed.css";
 import { IncheonKP, STRING_ROUTE_INCHON, seoulKP } from "../../constant";
-import { convertToCustomFormat, findClosestX } from "../../util";
+import { convertToCustomFormat, findClosestX, getRoute } from "../../util";
 import isEqual from 'lodash/isEqual';
 import lodash from "lodash";
 
@@ -274,7 +274,7 @@ class TrackSpeed extends React.Component {
 		context.stroke();  
 		context.restore();  
 		
-		let route = sessionStorage.getItem('route');
+		let route = getRoute();
 		let minKP = (route === STRING_ROUTE_INCHON) ? IncheonKP.start : seoulKP.start;
 		let maxKP = (route === STRING_ROUTE_INCHON) ? IncheonKP.end : seoulKP.end;
 	
@@ -415,7 +415,7 @@ class TrackSpeed extends React.Component {
 			context.setLineDash([0]);
 			context.lineWidth = 1.5; 
 
-			let route = sessionStorage.getItem('route');
+			let route = getRoute();
 			/* let minKP = (route === STRING_ROUTE_INCHON) ? IncheonKP.start : seoulKP.start; */
 			let minKP = 0;
 

@@ -1,12 +1,12 @@
 import React from "react";
 import "./PlacePosition.css";
 import classNames from "classnames";
-import { convertToCustomFormat, getTrackText } from "../../util";
+import { convertToCustomFormat, getRoute, getTrackText } from "../../util";
 import { STRING_SHORT_MEASURE } from "../../constant";
 import { isEqual } from "lodash";
 
 let pointList = [];
-let route = sessionStorage.getItem('route');
+let route = getRoute();
 class PlacePosition extends React.Component {
 	
 	constructor(props) {

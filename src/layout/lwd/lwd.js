@@ -9,13 +9,13 @@ import { CHART_RENDERING_TEXT,  DATA_LOADING_TEXT, INSTRUMENTATIONPOINT, RANGEPI
 import { DatePicker, Input } from "antd";
 import PlaceGauge from "../../component/PlaceGauge/PlaceGauge";
 import axios from 'axios';
-import { convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, findRange, getRailroadSection, intervalSample, measureTypeText, trackDataName, trackLeftRightToString } from "../../util";
+import { convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, findRange, getRailroadSection, getRoute, intervalSample, measureTypeText, trackDataName, trackLeftRightToString } from "../../util";
 import LoadingImg from "../../assets/icon/loading/loading.png";
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
 import { isEmpty } from "lodash";
 import qs from 'qs';
 
-let route = sessionStorage.getItem('route');
+let route = getRoute();
 let chartDataObj = {};
 let colorIndex = 1;
 function LWD( props ) {

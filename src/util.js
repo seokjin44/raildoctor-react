@@ -492,7 +492,7 @@ export const numberToText = (value) => {
 };
 
 export const getRailroadSection = ( setRailroadSection ) =>{
-    let route = sessionStorage.getItem('route');
+    let route = getRoute();
     let param = {
         railroadName : route,
         structureType : STRING_STATION
@@ -1195,5 +1195,11 @@ export const convertBytesToMB = (bytes) => {
     return parseFloat((bytes / 1024 / 1024).toFixed(2));
 } 
   
-  
-  
+export const getRoute = () => {
+    let route = sessionStorage.getItem('route');
+    if( !route ){
+        return STRING_ROUTE_INCHON;
+    }else {
+        return route;
+    }
+}

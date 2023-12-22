@@ -3,9 +3,9 @@ import "./railSTatus.css";
 import isEqual from 'lodash/isEqual';
 import { STRING_PATH, STRING_STATION } from "../../constant";
 import classNames from "classnames";
-import { getTrackColor } from "../../util";
+import { getRoute, getTrackColor } from "../../util";
 
-let route = sessionStorage.getItem('route');
+let route = getRoute();
 class RailStatus extends React.Component {
 
   constructor(props) {

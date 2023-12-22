@@ -16,7 +16,7 @@ import { DatePicker, Input, Select } from "antd";
 import PlaceGauge from "../../component/PlaceGauge/PlaceGauge";
 import axios from 'axios';
 import qs from 'qs';
-import { findRange, getRailroadSection, getStartEndDatesFromQuarter, intervalSample } from "../../util";
+import { findRange, getRailroadSection, getRoute, getStartEndDatesFromQuarter, intervalSample } from "../../util";
 import LoadingImg from "../../assets/icon/loading/loading.png";
 
 import DummyImg1 from "../../assets/reportDummy/1.png";
@@ -48,7 +48,7 @@ function RailRoughness( props ) {
       return;
     }
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
-    let route = sessionStorage.getItem('route');
+    let route = getRoute();
     axios.get('https://raildoctor.suredatalab.kr/api/railroughnesses/locations',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })

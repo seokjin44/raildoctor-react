@@ -3,9 +3,9 @@ import "./WearInfo.css";
 import Chart from "react-apexcharts";
 import { DOWN_TRACK, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, UP_TRACK } from '../../constant';
 import lodash from "lodash";
-import { getTrackText, zeroToNull } from '../../util';
+import { getRoute, getTrackText, zeroToNull } from '../../util';
 
-let route = sessionStorage.getItem('route');
+let route = getRoute();
 class WearInfo extends React.Component {
     constructor(props) {
         super(props);

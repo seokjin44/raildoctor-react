@@ -13,13 +13,13 @@ import { LineChart, Line, XAxis,
   YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer,
   ScatterChart, Scatter, Bar, BarChart } from 'recharts';
-import { convertObjectToArray, convertToCustomFormat, dateFormat, formatDateTime, formatTime, getTrackText, numberWithCommas, tempDataName, trackDataName, trackToString, trackToString2, transposeObjectToArray } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, dateFormat, formatDateTime, formatTime, getRoute, getTrackText, numberWithCommas, tempDataName, trackDataName, trackToString, trackToString2, transposeObjectToArray } from "../../util";
 import axios from 'axios';
 import qs from 'qs';
 import classNames from "classnames";
 
 let colorIndex = 1;
-let route = sessionStorage.getItem('route');
+let route = getRoute();
 function DataExistence( props ) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);

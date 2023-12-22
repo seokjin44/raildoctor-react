@@ -2,10 +2,10 @@ import React from "react";
 import "./PlaceGauge.css";
 import classNames from "classnames";
 import { STRING_DOWN_TRACK_LEFT2, STRING_DOWN_TRACK_RIGHT2, STRING_UP_TRACK_LEFT2, STRING_UP_TRACK_RIGHT2 } from "../../constant";
-import { convertToCustomFormat, getTrackText } from "../../util";
+import { convertToCustomFormat, getRoute, getTrackText } from "../../util";
 
 let rectList = [];
-let route = sessionStorage.getItem('route');
+let route = getRoute();
 class PlaceGauge extends React.Component {
 	
 	constructor(props) {

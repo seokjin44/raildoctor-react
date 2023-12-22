@@ -23,7 +23,7 @@ import faker from 'faker';
 import { RADIO_STYLE, STRING_DOWN_TRACK, STRING_UP_TRACK } from "../../constant";
 import { Input, DatePicker, Radio, Select } from "antd";
 import ImgSlider from "../../component/imgSlider/imgSlider";
-import { convertToCustomFormat, dateFormat, findJustSmallerKey, findRange, getRailroadSection, getTrackText, nonData, numberWithCommas } from "../../util";
+import { convertToCustomFormat, dateFormat, findJustSmallerKey, findRange, getRailroadSection, getRoute, getTrackText, nonData, numberWithCommas } from "../../util";
 const { RangePicker } = DatePicker;
 
 ChartJS.register(
@@ -40,7 +40,7 @@ ChartJS.register(
 
 let dataExistKPs = {t1 : [], t2 : []};
 let profilesMap = new Map();
-let route = sessionStorage.getItem('route');
+let route = getRoute();
 function RailProfile( props ) {
   const hiddenFileInput = useRef(null);
   

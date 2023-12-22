@@ -10,7 +10,7 @@ import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, EMPTY_MEA
 import PlacePosition from "../../component/PlacePosition/PlacePosition";
 import axios from 'axios';
 import qs from 'qs';
-import { checkDateFormat, convertDates, convertObjectToArray, convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, findRange, formatTime, getFirstDateOfThreeMonthsAgo, getRailroadSection, getYearStartEnd, isEmpty, measureTypeText, numberToText, trackDataName, trackLeftRightToString, transformData, valueOneOrNone } from "../../util";
+import { checkDateFormat, convertDates, convertObjectToArray, convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, findRange, formatTime, getFirstDateOfThreeMonthsAgo, getRailroadSection, getRoute, getYearStartEnd, isEmpty, measureTypeText, numberToText, trackDataName, trackLeftRightToString, transformData, valueOneOrNone } from "../../util";
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
@@ -101,7 +101,7 @@ function TrackGeometryMeasurement( props ) {
     console.log("pathClick");
     console.log(select);
     setSelectedPath(select);
-    let route = sessionStorage.getItem('route');
+    let route = getRoute();
     let param = {
       params : {
         railroad : route,
@@ -366,7 +366,7 @@ function TrackGeometryMeasurement( props ) {
   }, [selectPoint]);
   
   useEffect( ()=> {
-    let route = sessionStorage.getItem('route');
+    let route = getRoute();
     let param = {
       params : {
         railroad : route,

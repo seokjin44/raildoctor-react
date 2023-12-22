@@ -15,7 +15,7 @@ import axios from 'axios';
 import qs from 'qs';
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
-import { convertToCustomFormat, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, getTrackText, nonData } from "../../util";
+import { convertToCustomFormat, getInchonSpeedData, getRailroadSection, getRoute, getSeoulSpeedData, getTrackText, nonData } from "../../util";
 import Papa from 'papaparse';
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 import LoadingImg from "../../assets/icon/loading/loading.png";
@@ -26,7 +26,7 @@ import { isEmpty } from "lodash";
 
 window.PDFJS = PDFJS;
 const { RangePicker } = DatePicker;
-let route = sessionStorage.getItem('route');
+let route = getRoute();
 function Monitoring( props ) {
   PDFJS.GlobalWorkerOptions.workerSrc = pdfjsWorker;
   const containerRef = useRef(null);
@@ -102,7 +102,7 @@ function Monitoring( props ) {
   }
 
   const getTrackGeo = ( kp_ ) => {
-    let route = sessionStorage.getItem('route');
+    let route = getRoute();
     axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
@@ -139,7 +139,7 @@ function Monitoring( props ) {
   useEffect( ()=>{
     getRailroadSection(setRailroadSection);
     console.log("monitoring init");
-    let route = sessionStorage.getItem('route');
+    let route = getRoute();
     if( route === STRING_ROUTE_INCHON ){
       getInchonSpeedData(setTrackSpeedData);
     }else if( route === STRING_ROUTE_SEOUL ){
@@ -167,7 +167,7 @@ function Monitoring( props ) {
   }, [] )
 
   const getExistData = ( dates ) => {
-    let route = sessionStorage.getItem('route');
+    let route = getRoute();
     axios.get(`https://raildoctor.suredatalab.kr/api/statistics/data`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })

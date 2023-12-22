@@ -10,6 +10,7 @@ import Arrow from "../../assets/icon/211689_right_arrow_icon.png";
 import classnames from "classnames";
 import { useLocation, useNavigate } from "react-router-dom";
 import { STRING_ROUTE_GYEONGBU, STRING_ROUTE_INCHON, STRING_ROUTE_OSONG, STRING_ROUTE_SEOUL } from "../../constant";
+import { getRoute } from "../../util";
 
 function Sidemenu( props ) {
   const location = useLocation();
@@ -23,7 +24,7 @@ function Sidemenu( props ) {
   }
   
   useEffect( ()=> {
-    let value = sessionStorage.getItem('route');
+    let value = getRoute();
     console.log(value);
     if( !value || value === null || value === undefined ){
       sessionStorage.setItem('route', STRING_ROUTE_INCHON);

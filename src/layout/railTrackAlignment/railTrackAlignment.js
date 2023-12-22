@@ -9,10 +9,10 @@ import { DatePicker, Input, Radio, Select } from "antd";
 import { RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, findRange, formatDateTime, getRailroadSection, getTrackText, nonData } from "../../util";
+import { convertToCustomFormat, findRange, formatDateTime, getRailroadSection, getRoute, getTrackText, nonData } from "../../util";
 
 const { RangePicker } = DatePicker;
-let route = sessionStorage.getItem('route');
+let route = getRoute();
 let dataExistKPs = {t1 : [], t2 : []};
 function RailTrackAlignment( props ) {
   const [selectedPath, setSelectedPath] = useState([]);
@@ -243,7 +243,7 @@ function RailTrackAlignment( props ) {
                   }else if( selectTrack === STRING_DOWN_TRACK && selectDir === STRING_TRACK_DIR_RIGHT ){
                     track_ = STRING_DOWN_TRACK_RIGHT;
                   }
-                  let route = sessionStorage.getItem('route');
+                  let route = getRoute();
                   axios.get('https://raildoctor.suredatalab.kr/api/railstraights/straights',{
                     paramsSerializer: params => {
                       return qs.stringify(params, { format: 'RFC3986' })

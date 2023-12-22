@@ -8,7 +8,7 @@ import TreeList from 'react-treelist';
 import 'react-treelist/build/css/index.css';
 import axios from 'axios';
 import qs from 'qs';
-import { convertBytesToMB, curPagingCheck, curPagingText, flattenTreeData, formatDateTime, uploadState, uploadStateBtn } from "../../util";
+import { convertBytesToMB, curPagingCheck, curPagingText, flattenTreeData, formatDateTime, getRoute, uploadState, uploadStateBtn } from "../../util";
 import { useRef } from "react";
 import { Input, Select } from "antd";
 import { UPLOAD_CATEGORY_ACCUMULATEWEIGHTS, UPLOAD_CATEGORY_RAILBEHAVIORS, UPLOAD_CATEGORY_RAILPROFILES, UPLOAD_CATEGORY_RAILROUGHNESS, UPLOAD_CATEGORY_RAILSTRAIGHTS, UPLOAD_CATEGORY_RAILTWISTS, UPLOAD_CATEGORY_RAILWEARS, UPLOAD_CATEGORY_TEMPERATURES, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED } from "../../constant";
@@ -170,7 +170,7 @@ function DataUpload( props ) {
                       reader.onloadend = () => {
                         const base64String = reader.result;
                         const base64FormattedString = base64String.split(',')[1];
-                        let route = sessionStorage.getItem('route');
+                        let route = getRoute();
                         axios.post(`https://raildoctor.suredatalab.kr/api/data`,
                           {
                             meta : {

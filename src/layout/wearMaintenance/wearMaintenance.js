@@ -15,10 +15,10 @@ import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, convertToNumber2, dateFormat, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getSeoulSpeedData, getTrackText, mgtToM, nonData, numberWithCommas, trackLeftRightToString, trackNumberToString, trackToString, wearModelTableBody, wearModelTableHeader1, wearModelTableHeader2, zeroToNull } from "../../util";
+import { convertToCustomFormat, convertToNumber2, dateFormat, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getRoute, getSeoulSpeedData, getTrackText, mgtToM, nonData, numberWithCommas, trackLeftRightToString, trackNumberToString, trackToString, wearModelTableBody, wearModelTableHeader1, wearModelTableHeader2, zeroToNull } from "../../util";
 import lodash, { isEmpty } from "lodash";
 
-let route = sessionStorage.getItem('route');
+let route = getRoute();
 const { TextArea } = Input;
 let wear3DMinMax = [];
 let wearFilter = [STRING_VERTICAL_WEAR, STRING_CORNER_WEAR];
