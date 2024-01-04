@@ -13,6 +13,7 @@ import { useRef } from "react";
 import { Input, Select } from "antd";
 import { UPLOAD_CATEGORY_ACCUMULATEWEIGHTS, UPLOAD_CATEGORY_RAILBEHAVIORS, UPLOAD_CATEGORY_RAILPROFILES, UPLOAD_CATEGORY_RAILROUGHNESS, UPLOAD_CATEGORY_RAILSTRAIGHTS, UPLOAD_CATEGORY_RAILTWISTS, UPLOAD_CATEGORY_RAILWEARS, UPLOAD_CATEGORY_TEMPERATURES, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED } from "../../constant";
 
+let interval = null;
 function DataUpload( props ) {
   const hiddenFileInput = useRef(null);
   const [ trList, setTrList ] = useState([]);
@@ -25,6 +26,10 @@ function DataUpload( props ) {
   const activeChange = ( category ) => {
     setActive(category);
     getList(category);
+    clearInterval(interval);
+    interval = setInterval(() => {
+      getList(category);
+    }, 5000);
   }
 
   const getList = (category) => {
@@ -81,7 +86,7 @@ function DataUpload( props ) {
   }
 
   useEffect( () => {
-    const interval = setInterval(() => {
+    interval = setInterval(() => {
       getList(active);
     }, 5000);
     return () => clearInterval(interval);
