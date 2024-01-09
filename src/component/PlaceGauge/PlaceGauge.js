@@ -458,7 +458,7 @@ class PlaceGauge extends React.Component {
 			<div className="placeGaugeTooltip" style={{
 					display : (this.state.tooltipOn) ? "flex" : "none",
 					left : this.state.tooltipLeft, 
-					top : this.state.tooltipTop + 70
+					top : this.state.tooltipTop + 10
 				}} >
 					{
 						this.state.findRects.map( (rect,i) => {

@@ -900,9 +900,12 @@ export const convertQuarterFormat = (input) => {
   }
 
 export const findClosestX = (arr, target) => {
-return arr.reduce((prev, curr) => {
-    return (Math.abs(curr.x - target) < Math.abs(prev.x - target) ? curr : prev);
-});
+    if( arr.length < 1 ){
+        return arr;
+    }
+    return arr.reduce((prev, curr) => {
+        return (Math.abs(curr.x - target) < Math.abs(prev.x - target) ? curr : prev);
+    });
 }
 
 export const getQuarterFromDate = (dateString) => {

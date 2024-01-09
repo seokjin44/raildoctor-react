@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./dataExistence.css"
 import { Box, Modal, Tab } from "@mui/material";
-import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, IncheonKP, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK, colors } from "../../constant";
+import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK, colors } from "../../constant";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -29,6 +29,8 @@ function DataExistence( props ) {
   const [railwearOpen, setRailwearOpen] = useState(false);
   const [temperatureOpen, setTemperatureOpen] = useState(false);
   const [pautOpen, setPautOpen] = useState(false);
+  const [railMinValue, setRailMinValue] = useState(99999);
+  const [railMaxValue, setRailMaxValue] = useState(0);
 
   //paut
   const [pautData, setPautData] = useState({});
@@ -99,15 +101,23 @@ function DataExistence( props ) {
   useEffect(() => {
     //Pixcel 계산
     console.log(document.getElementById("dataExistenceContainer").clientWidth);
-    setKPtoPixel(IncheonKP.end * kpto1Pixcel);
+  }, []);
+
+  useEffect(() => {
+    console.log(props.railroadSection);
     let kpList_ = [];
-    for( let i = IncheonKP.start; i < IncheonKP.end; i++ ){
+    let start = props.railroadSection[0].beginKp * 1000;
+    let end = props.railroadSection[props.railroadSection.length - 1].endKp * 1000;
+    for( let i = start; i < end; i++ ){
       if( i % 1000 === 0 ){
         kpList_.push(i);
       }
     }
+    setKPtoPixel(end * kpto1Pixcel);
     setKPList(kpList_);
-  }, []);
+    setRailMinValue(start);
+    setRailMaxValue(end);
+  },[ props.railroadSection ]);
 
   useEffect(() => {
     scrollMove(props.kp);
@@ -159,11 +169,11 @@ function DataExistence( props ) {
       </div>
       <div className="scroll" id="dataExistenceContainer">
       <div className="dataList">
-        <div className="line" style={{width:kptoPixel}} >
+        <div className="line" style={{width:railMaxValue - railMinValue}} >
           <div className="dataBar kp">
             {
               kpList.map( (kp, i) => {
-                return <div key={`kp${i}`} className="kp" style={{left:kp}} >{convertToCustomFormat(kp)}</div>;
+                return <div key={`kp${i}`} className="kp" style={{left:kp - railMinValue}} >{convertToCustomFormat(kp)}</div>;
               })
             }
           </div>
@@ -173,7 +183,7 @@ function DataExistence( props ) {
             {/* 통과톤수 */}
             {props.accumulateWeights.map( (data, i) => {
               return <div key={`acc${i}`} className={classNames("detailBtn",{ onTooltip : accumulateWeightsTooltipIndex === i})} 
-              style={{left:`${(data.beginKp*1000)}px`, width : `${(data.endKp - data.beginKp)*1000}px` }} 
+              style={{left:`${(data.beginKp*1000) - railMinValue}px`, width : `${(data.endKp - data.beginKp)*1000}px` }} 
               onMouseOver={()=>{setAccumulateWeightsTooltipIndex(i)}}
               onMouseOut={()=>{setAccumulateWeightsTooltipIndex(-1)}}
               onClick={()=>{
@@ -220,7 +230,7 @@ function DataExistence( props ) {
           {/* <div className="dataName">마모 유지관리</div> */}
           <div className="dataBar railwears">
             {props.railwears.map( (data, i) => {
-              return <div key={`railwear${i}`} style={{left:`${(data.kp*1000)}px`}} 
+              return <div key={`railwear${i}`} style={{left:`${(data.kp*1000) - railMinValue}px`}} 
               className={classNames("detailBtn",{ onTooltip : railwearsTooltipIndex === i})}
               onMouseOver={()=>{setRailwearsTooltipIndex(i)}}
               onMouseOut={()=>{setRailwearsTooltipIndex(-1)}}
@@ -277,7 +287,7 @@ function DataExistence( props ) {
           {/* <div className="dataName">궤도틀림</div> */}
           <div className="dataBar railtwists">
             {props.railtwists.map( (data, i) => {
-              return <div key={`railtwists${i}`} style={{left:`${(data.beginKp*1000)}px`, width:`${(data.endKp - data.beginKp)*1000}px`}} 
+              return <div key={`railtwists${i}`} style={{left:`${(data.beginKp*1000) - railMinValue}px`, width:`${(data.endKp - data.beginKp)*1000}px`}} 
               className={classNames("detailBtn",{ onTooltip : railTwistTooltipIndex === i})}
               onMouseOver={()=>{setRailTwistTooltipIndex(i)}}
               onMouseOut={()=>{setRailTwistTooltipIndex(-1)}}
@@ -344,7 +354,7 @@ function DataExistence( props ) {
           {/* <div className="dataName">궤도거동계측</div> */}
           <div className="dataBar">
             {props.railbehaviors.map( (railbehaviorsData, i) => {
-              return <div key={`railbehavior${i}`} className="detailBtn" style={{left:`${(railbehaviorsData.kp*1000)}px`}} onClick={()=>{
+              return <div key={`railbehavior${i}`} className="detailBtn" style={{left:`${(railbehaviorsData.kp*1000) - railMinValue}px`}} onClick={()=>{
                 setRailbehaviorOpen(true);
                 setRailbehaviorData(railbehaviorsData);
                 axios.get(`https://raildoctor.suredatalab.kr/api/railbehaviors/measuresets/${railbehaviorsData.measureId}`,{
@@ -454,7 +464,7 @@ function DataExistence( props ) {
           {/* <div className="dataName">온/습도 측정</div> */}
           <div className="dataBar">
             {props.temperatures.map( (tempData, i) => {
-              return <div key={`temp${i}`} style={{left:`${(tempData.kp*1000)}px`}} 
+              return <div key={`temp${i}`} style={{left:`${(tempData.kp*1000) - railMinValue}px`}} 
               className={classNames("detailBtn",{ onTooltip : temperaturesTooltipIndex === i})} 
               onMouseOver={()=>{setTemperaturesTooltipIndex(i)}}
               onMouseOut={()=>{setTemperaturesTooltipIndex(-1)}}
@@ -533,7 +543,7 @@ function DataExistence( props ) {
           {/* <div className="dataName">PAUT 탐상</div> */}
           <div className="dataBar paut">
           {props.paut.map( (data, i) => {
-              return <div key={`paut${i}`} style={{left:`${(data.kp*1000)}px`}}               
+              return <div key={`paut${i}`} style={{left:`${(data.kp*1000) - railMinValue}px`}}               
               className={classNames("detailBtn",{ onTooltip : pautTooltipIndex === i})} 
               onMouseOver={()=>{setPautTooltipIndex(i)}}
               onMouseOut={()=>{setPautTooltipIndex(-1)}}

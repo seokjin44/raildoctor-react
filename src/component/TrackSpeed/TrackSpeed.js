@@ -1,6 +1,6 @@
 import React from "react";
 import "./TrackSpeed.css";
-import { IncheonKP, STRING_ROUTE_INCHON, seoulKP } from "../../constant";
+import { STRING_ROUTE_INCHON } from "../../constant";
 import { convertToCustomFormat, findClosestX, getRoute } from "../../util";
 import isEqual from 'lodash/isEqual';
 import lodash from "lodash";
@@ -218,34 +218,6 @@ class TrackSpeed extends React.Component {
 		this.drawYAxis();  
 		this.drawLegend();
 	}
-	
-	setXY() {
-		let minX = undefined;
-		let maxX = undefined;
-		let minY = undefined;
-		let maxY = undefined;
-		for(let track of this.props.data) {
-			for(let data of track.data) {
-				if(minY == undefined || minY > data.y)	minY = data.y;
-				if(maxY == undefined || maxY < data.y)	maxY = data.y;
-				if(minX == undefined || minX > data.x)	minX = data.x;
-				if(maxX == undefined || maxX < data.x)	maxX = data.x;
-			}
-		}
-
-		if(minX != undefined && maxX != undefined && maxX == minX) {
-			maxX = maxX + this.state.unitsPerTickX;
-		} 
-
-		if(minY != undefined && maxY != undefined && maxY == minY) {
-			maxY = maxY + this.state.unitsPerTickY;
-		} 
-
-		this.state.maxX = Math.ceil(maxX / this.state.unitsPerTickX) * this.state.unitsPerTickX;
-		this.state.minX = Math.floor(minX / this.state.unitsPerTickX) * this.state.unitsPerTickX;
-		this.state.maxY = Math.ceil(maxY / this.state.unitsPerTickY) * this.state.unitsPerTickY;
-		this.state.minY = Math.floor(minY / this.state.unitsPerTickY) * this.state.unitsPerTickY;
-	}
 
 	getLongestValueWidth() {
 		if( !this.railCanvas.current ){ return };
@@ -274,9 +246,21 @@ class TrackSpeed extends React.Component {
 		context.stroke();  
 		context.restore();  
 		
-		let route = getRoute();
-		let minKP = (route === STRING_ROUTE_INCHON) ? IncheonKP.start : seoulKP.start;
-		let maxKP = (route === STRING_ROUTE_INCHON) ? IncheonKP.end : seoulKP.end;
+		let minKP = 99999999;
+		let maxKP = 0;
+		try{
+			for( let track of this.props.data ){
+				if( minKP > track.data[0].x ){
+					minKP = parseFloat(track.data[0].x);
+				}
+				if(maxKP < track.data[ track.data.length - 2 ].x) {
+					maxKP = parseFloat(track.data[ track.data.length - 2 ].x);
+				}
+			}
+		}catch(e){
+			console.log("트랙의 최소값과 최대값을 찾을 수 없음");
+			console.log(e);
+		}
 	
 		// draw tick marks  
 		for (let n = 0; n < this.state.numYTicks; n++) {  

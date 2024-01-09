@@ -273,6 +273,7 @@ function Monitoring( props ) {
       return prevScales+1
     });
   }
+
   useEffect(() => {
     if( selectDates && !isEmpty(selectDates) && selectDates !== null && selectDates !== undefined ){
       getExistData(selectDates);
@@ -416,7 +417,8 @@ function Monitoring( props ) {
                     return <>
                       <div style={{backgroundColor : closest.color}} className="closestIcon"></div>
                       <div style={{marginLeft: "5px"}}>{closest.name}</div>
-                      <div>: {`${parseFloat(closest.speed).toFixed(1)}km/h`}</div></>;
+                      <div>: {`${parseFloat(closest.speed).toFixed(1)}km/h`}</div>
+                    </>
                   })
                 }
               </div>
@@ -464,6 +466,7 @@ function Monitoring( props ) {
                   <DataExistence 
                   kp={kp}
                   accumulateWeights={accumulateWeights}
+                  railroadSection={railroadSection} 
                   railbehaviors={railbehaviors}
                   railtwists={railtwists}
                   railwears={railwears}

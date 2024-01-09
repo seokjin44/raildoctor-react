@@ -153,7 +153,7 @@ export const RAIL_ROUGHNESS_BOXSTYLE = {
   //p: 4,
 }
 
-export const IncheonKP = {
+/* export const IncheonKP = {
   start : 589,
   end : 30814
 }
@@ -161,7 +161,7 @@ export const IncheonKP = {
 export const seoulKP = {
   start : 0,
   end : 48961
-}
+} */
 
 export const EMPTY_MEASURE_OBJ = {
   left : {accMax : "",

@@ -13,6 +13,7 @@ import { useRef } from "react";
 import { Input, Select } from "antd";
 import { UPLOAD_CATEGORY_ACCUMULATEWEIGHTS, UPLOAD_CATEGORY_RAILBEHAVIORS, UPLOAD_CATEGORY_RAILPROFILES, UPLOAD_CATEGORY_RAILROUGHNESS, UPLOAD_CATEGORY_RAILSTRAIGHTS, UPLOAD_CATEGORY_RAILTWISTS, UPLOAD_CATEGORY_RAILWEARS, UPLOAD_CATEGORY_TEMPERATURES, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED } from "../../constant";
 
+let route = getRoute();
 let interval = null;
 function DataUpload( props ) {
   const hiddenFileInput = useRef(null);
@@ -21,11 +22,15 @@ function DataUpload( props ) {
   const [ totalCnt, setTotalCnt ] = useState(0);
   const [ showrows, setShowrows ] = useState(25);
   const [ curPage, setCurPage ] = useState(1);
-  const [ treeListKey, setTreeListKey ] = useState(0);
+  const [ dataCnt, setDataCnt ] = useState(0);
+  const [ dataSize, setDataSize ] = useState(0);
+  const [ weekDataCnt, setWeekDataCnt ] = useState(0);
+  const [ weekDataSize, setWeekDataSize ] = useState(0);
 
   const activeChange = ( category ) => {
     setActive(category);
     getList(category);
+    getDataStatistics(category);
     clearInterval(interval);
     interval = setInterval(() => {
       getList(category);
@@ -50,6 +55,44 @@ function DataUpload( props ) {
       /* console.log(flattenTreeData(response.data.entities)); */
       setTrList(response.data.entities);
       setTotalCnt(response.data.count);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+  }
+
+  
+  const getDataStatistics = (category) => {
+    axios.get('https://raildoctor.suredatalab.kr/api/data/statistics',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat' })
+      },
+      params : {
+        railroad  : route,
+        category : [category],
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      setDataCnt(response.data.dataCount);
+      setDataSize(response.data.dataSize);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+
+    let currentDate = new Date();
+    axios.get('https://raildoctor.suredatalab.kr/api/data/statistics',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat' })
+      },
+      params : {
+        railroad  : route,
+        category : [category],
+        beginTs : currentDate.toISOString(),
+        endTs : new Date(currentDate.setDate(currentDate.getDate() - 7)).toISOString()
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      setWeekDataCnt(response.data.dataCount);
+      setWeekDataSize(response.data.dataSize);
     })
     .catch(error => console.error('Error fetching data:', error));
   }
@@ -86,6 +129,8 @@ function DataUpload( props ) {
   }
 
   useEffect( () => {
+    getList(active);
+    getDataStatistics(active);
     interval = setInterval(() => {
       getList(active);
     }, 5000);
@@ -111,19 +156,19 @@ function DataUpload( props ) {
           <div className="info">
             <div className="infoBox">
               <div className="infoTitle">총 등록 데이터 수</div>
-              <div className="infoValue">6 건</div>
+              <div className="infoValue">{dataCnt} 건</div>
             </div>
             <div className="infoBox">
               <div className="infoTitle">총 등록 데이터 용량</div>
-              <div className="infoValue">523 MB</div>
+              <div className="infoValue">{convertBytesToMB(dataSize)} MB</div>
             </div>
             <div className="infoBox">
               <div className="infoTitle">최근 1주일 간 데이터 등록 건수</div>
-              <div className="infoValue">0 건</div>
+              <div className="infoValue">{weekDataCnt} 건</div>
             </div>
             <div className="infoBox">
               <div className="infoTitle">1주일간 데이터 등록 용량</div>
-              <div className="infoValue">0 MB</div>
+              <div className="infoValue">{convertBytesToMB(weekDataSize)} MB</div>
             </div>
           </div>
           <div className="pagination">
