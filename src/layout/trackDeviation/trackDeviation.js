@@ -600,8 +600,8 @@ function TrackDeviation( props ) {
                 </div>
                 <div className="tableBody" style={{overflowY: "scroll", height: "500px", display: "block"}}>
                   {
-                    reportData?.entity?.map( entitie => {
-                      return <div className="tr">
+                    reportData?.entity?.map( (entitie, i) => {
+                      return <div key={`report${i}`} className="tr">
                         <div className="td">{trackToString2(reportSelectTrack, route)}</div>
                         <div className="td">{entitie.dataType}</div>
                         <div className="td">{reportData.beginKp}</div>

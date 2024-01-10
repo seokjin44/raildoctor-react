@@ -433,9 +433,13 @@ function RailProfile( props ) {
                       const reader = new FileReader();
                       reader.readAsDataURL(file);
                       reader.onloadend = () => {
+                        if( !rightTrackProfile ){
+                          alert("데이터를 먼저 조회해주세요.");
+                          hiddenFileInput.current.value = "";
+                          return;
+                        }
                         const base64String = reader.result;
-                        // base64String은 'data:image/png;base64,iVBORw0KGgo...'와 같은 형태일 것입니다.
-                        // 서버에 전송하기 위해 필요한 부분만 추출합니다 (예: HTTP 헤더에 맞게 조정).
+                        // 서버에 전송하기 위해 필요한 부분 추출 (예: HTTP 헤더에 맞게 조정).
                         const base64FormattedString = base64String.split(',')[1];
                   
                         // 이제 base64FormattedString을 서버에 업로드합니다.
@@ -578,9 +582,13 @@ function RailProfile( props ) {
                       const reader = new FileReader();
                       reader.readAsDataURL(file);
                       reader.onloadend = () => {
+                        if( !rightTrackProfile ){
+                          alert("데이터를 먼저 조회해주세요.");
+                          hiddenFileInput.current.value = "";
+                          return;
+                        }
                         const base64String = reader.result;
-                        // base64String은 'data:image/png;base64,iVBORw0KGgo...'와 같은 형태일 것입니다.
-                        // 서버에 전송하기 위해 필요한 부분만 추출합니다 (예: HTTP 헤더에 맞게 조정).
+                        // 서버에 전송하기 위해 필요한 부분 추출 (예: HTTP 헤더에 맞게 조정).
                         const base64FormattedString = base64String.split(',')[1];
                   
                         // 이제 base64FormattedString을 서버에 업로드합니다.

@@ -1083,6 +1083,7 @@ export const getTrackColor = (route) => {
 }
 
 export const getTrackDeviationAlarmText = (thresholdType, thresholdValue, value) => {
+    /* console.log(thresholdType, thresholdValue, value);
     if (thresholdValue > 0 && value > thresholdValue) {
         if( thresholdType === TRACK_DEVIATION_TARGET ) { //목표
             return "목표 초과";
@@ -1091,7 +1092,7 @@ export const getTrackDeviationAlarmText = (thresholdType, thresholdValue, value)
         }else if( thresholdType === TRACK_DEVIATION_REPAIR ) { //보수
             return "보수 초과";
         }
-    } else if (thresholdValue < 0 && value < thresholdValue) {
+    } else if (thresholdValue < 0 && value < thresholdValue) { */
         if( thresholdType === TRACK_DEVIATION_TARGET ) { //목표
             return "목표 초과";
         }else if( thresholdType === TRACK_DEVIATION_CAUTION ) { //주의
@@ -1099,11 +1100,11 @@ export const getTrackDeviationAlarmText = (thresholdType, thresholdValue, value)
         }else if( thresholdType === TRACK_DEVIATION_REPAIR ) { //보수
             return "보수 초과";
         }
-    }
+    /* } */
 }
 
 export const getTrackDeviationAlarmClass = (thresholdType, thresholdValue, value) => {
-    if (thresholdValue > 0 && value > thresholdValue) {
+    /* if (thresholdValue > 0 && value > thresholdValue) {
         if( thresholdType === TRACK_DEVIATION_TARGET ) { //목표
             return "target";
         }else if( thresholdType === TRACK_DEVIATION_CAUTION ) { //주의
@@ -1111,7 +1112,7 @@ export const getTrackDeviationAlarmClass = (thresholdType, thresholdValue, value
         }else if( thresholdType === TRACK_DEVIATION_REPAIR ) { //보수
             return "repair";
         }
-    } else if (thresholdValue < 0 && value < thresholdValue) {
+    } else if (thresholdValue < 0 && value < thresholdValue) { */
         if( thresholdType === TRACK_DEVIATION_TARGET ) { //목표
             return "target";
         }else if( thresholdType === TRACK_DEVIATION_CAUTION ) { //주의
@@ -1119,7 +1120,7 @@ export const getTrackDeviationAlarmClass = (thresholdType, thresholdValue, value
         }else if( thresholdType === TRACK_DEVIATION_REPAIR ) { //보수
             return "repair";
         }
-    }
+    /* } */
 }
 
 export const transformData = (data) => {
