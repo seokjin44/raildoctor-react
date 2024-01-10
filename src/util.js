@@ -1207,3 +1207,8 @@ export const getRoute = () => {
         return route;
     }
 }
+
+export const getFileExtension = (filename) => {
+    // 마지막 점을 기준으로 문자열을 나누고 마지막 부분을 반환
+    return filename.split('.').pop();
+}

@@ -349,6 +349,7 @@
     color: white;
     font-weight: bold;
     cursor: pointer;
+    z-index: 1;
 }
 
 .profileData .table .tableBody .tr{

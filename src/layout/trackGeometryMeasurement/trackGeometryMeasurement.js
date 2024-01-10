@@ -686,7 +686,7 @@ function TrackGeometryMeasurement( props ) {
           <div className="componentBox">
             <div className="table table4" style={{ justifyContent: 'flex-start', alignItems: 'baseline', overflowX: 'scroll'}} >
               <div className="tableHeader" style={{ width: 'auto', height : "60px"}}>
-                <div className="tr">
+                <div className="tr" style={{height:"30px"}}>
                   <div className="td detail colspan2"><div className="colspan2">세부항목</div></div>
                   {
                     tableViewLongSensorList.map( key => {
@@ -699,7 +699,7 @@ function TrackGeometryMeasurement( props ) {
                     })
                   }
                 </div>
-                <div className="tr">
+                <div className="tr" style={{height:"30px"}}>
                   <div className="td detail"></div>
                   {
                     tableViewLongSensorList.map( key => {

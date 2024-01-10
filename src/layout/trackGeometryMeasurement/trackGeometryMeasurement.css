@@ -277,3 +277,7 @@
 .trackGeometryMeasurement .containerTitle .yellow .ant-checkbox-checked .ant-checkbox-inner::after {
     border-color: black; /* 체크 표시의 색상을 바꿈 */
 }
+
+.trackGeometryMeasurement .table .tableHeader .tr .td.rowspan2{
+    width: 51px;
+}

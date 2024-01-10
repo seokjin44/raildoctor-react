@@ -158,10 +158,8 @@ function TrackDeviation( props ) {
   }
 
   const handlePanelChange = (value, newMode) => {
-    if (mode === 'month') {
+    if (newMode === 'date') {
       setMode('date');
-    } else {
-      setMode('month');
     }
   };
 

@@ -28,6 +28,7 @@
     background-size: 100%;
     background-repeat: no-repeat;
     background-position: center;
+    z-index: 1;
   }
 
   .slider .sliderBtn.left{

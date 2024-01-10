@@ -414,11 +414,11 @@ function RailProfile( props ) {
                   getAriaValueText={valueLabelFormat}
                   valueLabelFormat={valueLabelFormat}
                   valueLabelDisplay="on"
+                  size="medium"
                   onChange={(e)=>{
                     leftTrackHandleChange(e.target.value);
                     rightTrackHandleChange(e.target.value);
                   }}
-                  size="medium"
                 />
               </div>
               <div className="detailImgs">
@@ -438,15 +438,22 @@ function RailProfile( props ) {
                           hiddenFileInput.current.value = "";
                           return;
                         }
-                        const base64String = reader.result;
-                        // 서버에 전송하기 위해 필요한 부분 추출 (예: HTTP 헤더에 맞게 조정).
-                        const base64FormattedString = base64String.split(',')[1];
-                  
+
+                        let base64String = "";
+                        let base64FormattedString = "";
+                        
+                        try{
+                          base64String = reader.result;
+                          // 서버에 전송하기 위해 필요한 부분 추출 (예: HTTP 헤더에 맞게 조정).
+                          base64FormattedString = base64String.split(',')[1];
+                        }catch(e){
+                          alert("데이터 업로드에 실패하였습니다. 다시 시도해주세요.")
+                          console.log(e);
+                          return;
+                        }
+
                         // 이제 base64FormattedString을 서버에 업로드합니다.
                         axios.post(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles/images`,
-/*                           paramsSerializer: params => {
-                            return qs.stringify(params, { format: 'RFC3986' })
-                          }, */
                           {
                             meta : {
                               profileId:leftTrackProfile.profileId,
@@ -483,7 +490,7 @@ function RailProfile( props ) {
             </div>
             <div className="profileData">
               <div className="table" >
-                <div className="tableHeader">
+                <div className="tableHeader" style={{ fontSize: "13px"}}>
                   <div className="tr">
                     <div className="td measurementDate colspan3"><div className="colspan3">측정일</div></div>
                     <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div>
@@ -506,7 +513,7 @@ function RailProfile( props ) {
                     <div className="td mamo">면적</div>
                     <div className="td mamo">마모율</div>
                   </div>
-                  <div className="tr" style={{ height: "45px"}}>
+                  <div className="tr" style={{ height: "37px"}}>
                     <div className="td measurementDate"></div>
                     <div className="td ton colspan3"></div>
                     <div className="td mamo">측마모(-90º)</div>
@@ -587,9 +594,19 @@ function RailProfile( props ) {
                           hiddenFileInput.current.value = "";
                           return;
                         }
-                        const base64String = reader.result;
-                        // 서버에 전송하기 위해 필요한 부분 추출 (예: HTTP 헤더에 맞게 조정).
-                        const base64FormattedString = base64String.split(',')[1];
+
+                        let base64String = "";
+                        let base64FormattedString = "";
+
+                        try{
+                          base64String = reader.result;
+                          // 서버에 전송하기 위해 필요한 부분 추출 (예: HTTP 헤더에 맞게 조정).
+                          base64FormattedString = base64String.split(',')[1];
+                        }catch(e){
+                          alert("데이터 업로드에 실패하였습니다. 다시 시도해주세요.")
+                          console.log(e);
+                          return;
+                        }
                   
                         // 이제 base64FormattedString을 서버에 업로드합니다.
                         axios.post(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles/images`,
@@ -630,7 +647,7 @@ function RailProfile( props ) {
             </div>
             <div className="profileData">
               <div className="table" >
-                <div className="tableHeader">
+                <div className="tableHeader" style={{ fontSize: "13px"}}>
                   <div className="tr">
                     <div className="td measurementDate colspan3"><div className="colspan3">측정일</div></div>
                     <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div>
@@ -653,7 +670,7 @@ function RailProfile( props ) {
                     <div className="td mamo">면적</div>
                     <div className="td mamo">마모율</div>
                   </div>
-                  <div className="tr" style={{ height: "45px"}}>
+                  <div className="tr" style={{ height: "37px"}}>
                     <div className="td measurementDate"></div>
                     <div className="td ton "></div>
                     <div className="td mamo">측마모(-90º)</div>
