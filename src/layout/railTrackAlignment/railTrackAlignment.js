@@ -9,7 +9,7 @@ import { DatePicker, Input, Radio, Select } from "antd";
 import { RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, findRange, formatDateTime, getRailroadSection, getRoute, getTrackText, nonData } from "../../util";
+import { convertToCustomFormat, findRange, formatDateTime, getQuarterStartAndEndDate, getRailroadSection, getRoute, getTrackText, nonData } from "../../util";
 
 const { RangePicker } = DatePicker;
 let route = getRoute();
@@ -23,7 +23,7 @@ function RailTrackAlignment( props ) {
   const [kpOptions, setKpOptions] = useState([]);
   const [selectKP, setSelectKP] = useState("");
   const [reports, setReports] = useState([]);
-  const [selectDateRange, setSelectDateRange] = useState([{$d:new Date()}, {$d:new Date()}]);
+  const [selectDateRange, setSelectDateRange] = useState({startDate:new Date(), endDate:new Date()});
   const [pdfDataList , setPDFDataList] = useState([]);
   const [railroadSection, setRailroadSection] = useState([]);
   
@@ -219,9 +219,13 @@ function RailTrackAlignment( props ) {
               <div className="dataOption">
                 <div className="title">측정일자 </div>
                 <div className="date">
-                  <RangePicker 
+                  <DatePicker 
+                    picker="quarter"
                     style={RANGEPICKERSTYLE}
-                    onChange={(date)=>{setSelectDateRange(date)}}
+                    onChange={(date)=>{
+                      let quarter = getQuarterStartAndEndDate( date.$d );
+                      setSelectDateRange(quarter)
+                    }}
                   />
                   {/* <DatePicker style={RANGEPICKERSTYLE} /> */}
                 </div>
@@ -252,13 +256,14 @@ function RailTrackAlignment( props ) {
                       railroad : route,
                       railTrack : track_,
                       kp : selectKP,
-                      beginTs : selectDateRange[0].$d.toISOString(),
-                      endTs : selectDateRange[1].$d.toISOString()
+                      beginTs : selectDateRange.startDate.toISOString(),
+                      endTs : selectDateRange.endDate.toISOString()
                     }
                   })
                   .then(response => {
                     console.log(response.data);
                     if( response.data.entities.length < 1 ){
+                      setReports([]);
                       alert("데이터가 없습니다.");
                       return; 
                     }

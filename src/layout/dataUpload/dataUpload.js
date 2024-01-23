@@ -10,13 +10,17 @@ import axios from 'axios';
 import qs from 'qs';
 import { convertBytesToMB, curPagingCheck, curPagingText, flattenTreeData, formatDateTime, getRoute, uploadState, uploadStateBtn } from "../../util";
 import { useRef } from "react";
-import { Input, Select } from "antd";
-import { UPLOAD_CATEGORY_ACCUMULATEWEIGHTS, UPLOAD_CATEGORY_RAILBEHAVIORS, UPLOAD_CATEGORY_RAILPROFILES, UPLOAD_CATEGORY_RAILROUGHNESS, UPLOAD_CATEGORY_RAILSTRAIGHTS, UPLOAD_CATEGORY_RAILTWISTS, UPLOAD_CATEGORY_RAILWEARS, UPLOAD_CATEGORY_TEMPERATURES, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED } from "../../constant";
-
+import { DatePicker, Input, Modal, Select } from "antd";
+import { BOXSTYLE, UPLOAD_CATEGORY_ACCUMULATEWEIGHTS, UPLOAD_CATEGORY_RAILBEHAVIORS, UPLOAD_CATEGORY_RAILPROFILES, UPLOAD_CATEGORY_RAILROUGHNESS, UPLOAD_CATEGORY_RAILSTRAIGHTS, UPLOAD_CATEGORY_RAILTWISTS, UPLOAD_CATEGORY_RAILWEARS, UPLOAD_CATEGORY_TEMPERATURES, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED } from "../../constant";
+import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
+const { RangePicker } = DatePicker;
 let route = getRoute();
 let interval = null;
+
 function DataUpload( props ) {
   const hiddenFileInput = useRef(null);
+  const [open, setOpen] = useState(false);
+
   const [ trList, setTrList ] = useState([]);
   const [ active, setActive ] = useState(UPLOAD_CATEGORY_ACCUMULATEWEIGHTS);
   const [ totalCnt, setTotalCnt ] = useState(0);
@@ -146,7 +150,7 @@ function DataUpload( props ) {
           <div className={ classNames("menu", { "active" : active === UPLOAD_CATEGORY_RAILWEARS })} onClick={()=>activeChange(UPLOAD_CATEGORY_RAILWEARS)} >마모유지관리</div>
           <div className={ classNames("menu", { "active" : active === UPLOAD_CATEGORY_RAILTWISTS })} onClick={()=>activeChange(UPLOAD_CATEGORY_RAILTWISTS)} >궤도틀림</div>
           <div className={ classNames("menu", { "active" : active === UPLOAD_CATEGORY_RAILBEHAVIORS })} onClick={()=>activeChange(UPLOAD_CATEGORY_RAILBEHAVIORS)} >궤도거동계측</div>
-          <div className={ classNames("menu", { "active" : active === UPLOAD_CATEGORY_TEMPERATURES })} onClick={()=>activeChange(UPLOAD_CATEGORY_TEMPERATURES)} >온습도</div>
+          {/* <div className={ classNames("menu", { "active" : active === UPLOAD_CATEGORY_TEMPERATURES })} onClick={()=>activeChange(UPLOAD_CATEGORY_TEMPERATURES)} >온습도</div> */}
           <div className={ classNames("menu", { "active" : active === UPLOAD_CATEGORY_RAILROUGHNESS })} onClick={()=>activeChange(UPLOAD_CATEGORY_RAILROUGHNESS)} >레일조도</div>
           <div className={ classNames("menu", { "active" : active === UPLOAD_CATEGORY_RAILSTRAIGHTS })} onClick={()=>activeChange(UPLOAD_CATEGORY_RAILSTRAIGHTS)} >레일직진도</div>
           <div className={ classNames("menu", { "active" : active === UPLOAD_CATEGORY_RAILPROFILES })} onClick={()=>activeChange(UPLOAD_CATEGORY_RAILPROFILES)} >레일프로파일</div>
@@ -206,7 +210,14 @@ function DataUpload( props ) {
               <i className="arrow right" role="img"></i>
             </div>
           </div>
-          
+          {
+            (active === UPLOAD_CATEGORY_RAILBEHAVIORS) ? 
+              <div className="uploadBtn" style={{top: '165px'}}
+                onClick={()=>setOpen(true)}
+              >측정세트 등록</div>
+            : null
+          }
+
           <div className="uploadBtn" onClick={()=>{ hiddenFileInput.current.click(); }} >
             <img src={UploadIcon}/>Upload
             <input 
@@ -277,6 +288,83 @@ function DataUpload( props ) {
             </div>
           </div>
         </div>
+
+        <Modal
+          /* title="Vertically centered modal dialog" */
+          centered
+          open={open}
+          onCancel={() => setOpen(false)}
+          width={1600}
+          className="dataUploadPopup"
+          footer={""}
+        >
+          <div className="popupTitle"><img src={PopupIcon} />측정세트 등록</div>
+          <div className="tabPanel" style={{width:"100%"}}>
+            <div className="inputLine">
+              <div className="inputTitle">노선</div>
+              <div className="inputValue"><Input placeholder="노선" /></div>
+            </div>
+            <div className="inputLine">
+              <div className="inputTitle">측정위치 명</div>
+              <div className="inputValue"><Input placeholder="측정위치" /></div>
+            </div>
+            <div className="inputLine">
+              <div className="inputTitle">계측구분</div>
+              <div className="inputValue"><Input placeholder="계측구분" /></div>
+            </div>
+            <div className="inputLine">
+              <div className="inputTitle">측정기간</div>
+              <div className="inputValue"><RangePicker onChange={(e)=>{console.log(e)}} /></div>
+            </div>
+            <div className="inputLine">
+              <div className="inputTitle">측정구간</div>
+              <div className="inputValue">
+                <div className="valueName">상선</div> <Input style={{width : "100px"}} placeholder="시작" /> <div className="range" >-</div> <Input style={{width : "100px"}} placeholder="종점" />
+                <div className="valueName">하선</div> <Input style={{width : "100px"}} placeholder="시작" /> <div className="range" >-</div> <Input style={{width : "100px"}} placeholder="종점" />
+              </div>
+            </div>
+            <div className="devisionLine"></div>
+            <div className="dataList">
+                <div className="customTable2">
+                  <div className="theader">
+                    <div className="tr">
+                      <div className="td">레일구분</div>
+                      <div className="td">위치</div>
+                      <div className="td">센서명</div>
+                      <div className="td">가속도(최대)</div>
+                      <div className="td">가속도(최소)</div>
+                      <div className="td">레일응력(최소)</div>
+                      <div className="td">레일응력(최대)</div>
+                      <div className="td">윤중(최대)</div>
+                      <div className="td">횡압</div>
+                      <div className="td">수직변위</div>
+                      <div className="td">수평변위</div>
+                      <div className="td">속도</div>
+                      <div className="td">Comment</div>
+                    </div>
+                  </div>
+                  <div className="tbody">
+                    <div className="tr">
+                      <div className="td"><Input /></div>
+                      <div className="td"><Input /></div>
+                      <div className="td"><Input /></div>
+                      <div className="td"><Input /></div>
+                      <div className="td"><Input /></div>
+                      <div className="td"><Input /></div>
+                      <div className="td"><Input /></div>
+                      <div className="td"><Input /></div>
+                      <div className="td"><Input /></div>
+                      <div className="td"><Input /></div>
+                      <div className="td"><Input /></div>
+                      <div className="td"><Input /></div>
+                      <div className="td"><Input /></div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </Modal>
+
       </div>
   );
 }

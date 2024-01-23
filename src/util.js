@@ -1212,3 +1212,34 @@ export const getFileExtension = (filename) => {
     // 마지막 점을 기준으로 문자열을 나누고 마지막 부분을 반환
     return filename.split('.').pop();
 }
+
+export const getQuarterStartAndEndDate = (date) => {
+    // 연도와 월을 추출합니다.
+    const year = date.getFullYear();
+    const month = date.getMonth();
+
+    let startMonth;
+    let endMonth;
+
+    // 해당 월을 기반으로 분기의 시작 월과 끝 월을 결정합니다.
+    if (month < 3) {
+        startMonth = 0; // 1월
+        endMonth = 2; // 3월
+    } else if (month < 6) {
+        startMonth = 3; // 4월
+        endMonth = 5; // 6월
+    } else if (month < 9) {
+        startMonth = 6; // 7월
+        endMonth = 8; // 9월
+    } else {
+        startMonth = 9; // 10월
+        endMonth = 11; // 12월
+    }
+
+    // 분기의 시작 날짜와 끝 날짜를 구합니다.
+    const startDate = new Date(year, startMonth, 1, 0, 0, 0);
+    const endDate = new Date(year, endMonth + 1, 0, 23, 59, 59);
+
+    console.log(`분기 시작 날짜: ${startDate}, 분기 끝 날짜: ${endDate}`);
+    return { startDate, endDate };
+}

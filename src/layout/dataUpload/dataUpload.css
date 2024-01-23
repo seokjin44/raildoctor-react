@@ -365,5 +365,63 @@
     cursor: pointer;
 }
 
-.tgrid-data-cell .stateBtn.convertSucess{
+.dataUploadPopup{
+    font-family: 'NEO_R';
+}
+
+.dataUploadPopup .tabPanel{
+    padding: 10px;
+}
+
+.dataUploadPopup .tabPanel .inputLine{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.dataUploadPopup .tabPanel .inputLine .inputTitle{
+    width: 150px;
+}
+
+.dataUploadPopup .tabPanel .inputLine .inputValue{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dataUploadPopup .tabPanel .inputLine .inputValue .valueName{
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    margin-right: 5px;
+    margin-left: 5px;
+    padding: 2px;
+}
+
+.dataUploadPopup .tabPanel .inputLine .inputValue .valueName:first-child{
+    margin-left: 0px;
+}
+
+.dataUploadPopup .tabPanel .inputLine .inputValue .range{
+    width: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dataUploadPopup .tabPanel .devisionLine{
+    width: 100%;
+    height: 1px;
+    background-color: #cccccc;
+}
+
+.dataUploadPopup .customTable2{
+    margin-top: 10px;
 }

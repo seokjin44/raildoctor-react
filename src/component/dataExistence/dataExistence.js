@@ -13,10 +13,11 @@ import { LineChart, Line, XAxis,
   YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer,
   ScatterChart, Scatter, Bar, BarChart } from 'recharts';
-import { convertObjectToArray, convertToCustomFormat, dateFormat, formatDateTime, formatTime, getRoute, getTrackText, numberWithCommas, tempDataName, trackDataName, trackToString, trackToString2, transposeObjectToArray } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, dateFormat, formatDateTime, formatTime, getRoute, getTrackText, intervalSample, numberWithCommas, tempDataName, trackDataName, trackToString, trackToString2, transposeObjectToArray } from "../../util";
 import axios from 'axios';
 import qs from 'qs';
 import classNames from "classnames";
+import Papa from 'papaparse';
 
 let colorIndex = 1;
 let route = getRoute();
@@ -29,6 +30,7 @@ function DataExistence( props ) {
   const [railwearOpen, setRailwearOpen] = useState(false);
   const [temperatureOpen, setTemperatureOpen] = useState(false);
   const [pautOpen, setPautOpen] = useState(false);
+  const [roughnessOpen, setRoughnessOpen] = useState(false);
   const [railMinValue, setRailMinValue] = useState(99999);
   const [railMaxValue, setRailMaxValue] = useState(0);
 
@@ -90,7 +92,12 @@ function DataExistence( props ) {
   const [pautTooltipIndex, setPautTooltipIndex ] = useState(-1);
   const [railTwistTooltipIndex, setRailTwistTooltipIndex ] = useState(-1);
   const [railwearsTooltipIndex, setRailwearsTooltipIndex ] = useState(-1);
-  
+  const [railstraightsIndex, setRailstraightsIndex ] = useState(-1);
+
+  //레일조도
+  const [roughnessChartData, setRoughnessChartData] = useState([]);
+  const [roughnessData, setRoughnessData] = useState({});
+
   const getColor = (index) => {
     return colors[index % 20];
   }
@@ -165,6 +172,12 @@ function DataExistence( props ) {
         </div>
         <div className="line"  >
           <div className="dataName">LWD</div>
+        </div>
+        <div className="line"  >
+          <div className="dataName">레일직진도</div>
+        </div>
+        <div className="line"  >
+          <div className="dataName">레일조도</div>
         </div>
       </div>
       <div className="scroll" id="dataExistenceContainer">
@@ -585,6 +598,110 @@ function DataExistence( props ) {
           <div className="dataBar">
           </div>
         </div>
+        <div className="line" style={{width:kptoPixel}} >
+          {/* <div className="dataName">LWD</div> */}
+          <div className="dataBar railstraights">
+            {props.railstraights.map( (straightsData, i) => {
+              return <div key={`temp${i}`} style={{left:`${(straightsData.kp*1000) - railMinValue}px`}} 
+              className={classNames("detailBtn",{ onTooltip : railstraightsIndex === i})} 
+              onMouseOver={()=>{setRailstraightsIndex(i)}}
+              onMouseOut={()=>{setRailstraightsIndex(-1)}}
+              onClick={()=>{
+                console.log(straightsData);
+                axios.get('https://raildoctor.suredatalab.kr/api/railstraights/files',{
+                  paramsSerializer: params => {
+                    return qs.stringify(params, { format: 'RFC3986' })
+                  },
+                  params : {
+                    measureId : straightsData.measureId,
+                    fileType : 2
+                  }
+                })
+                .then(response => {
+                  console.log(response.data);
+                  for( let file_ of response.data.file ){
+                    /* if( file_.originName.indexOf(file.originName) > -1 ){ */
+                      window.open(`https://raildoctor.suredatalab.kr/resources${file_.filePath}`);
+                    /* } */
+                  }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+              }}>
+                <div className="tooltip">
+                  <div className="tooltipLine">
+                    KP : {convertToCustomFormat(straightsData.kp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    TS : {formatDateTime(new Date(straightsData.measureTs))}
+                  </div>
+                  <div className="tooltipLine">
+                    {getTrackText("상하선", route)} : {trackToString2(straightsData.railTrack, route)}
+                  </div>
+                </div>
+              </div>
+            })}
+          </div>
+        </div>
+        <div className="line" style={{width:kptoPixel}} >
+          {/* <div className="dataName">LWD</div> */}
+          <div className="dataBar railRoughnesses">
+            {props.railroughnesses.map( (roughnessesData, i) => {
+              return <div key={`temp${i}`} style={{left:`${(roughnessesData.beginKp*1000) - railMinValue}px`, width:`${(roughnessesData.endKp - roughnessesData.beginKp)*1000}px`}}
+              className={classNames("detailBtn",{ onTooltip : temperaturesTooltipIndex === i})} 
+              onMouseOver={()=>{setTemperaturesTooltipIndex(i)}}
+              onMouseOut={()=>{setTemperaturesTooltipIndex(-1)}}
+              onClick={()=>{
+                console.log(roughnessesData);
+                setRoughnessData(roughnessesData);
+                axios.get("https://raildoctor.suredatalab.kr/resources/data/railroughness/"+roughnessesData.fileName, { responseType: 'text' })
+                    .then(response => {
+                      let roughnessChartData_ = [];
+                      const csvData = response.data;
+                      let results = [];
+                      Papa.parse(csvData, {
+                        header: true,  // 첫 번째 행을 헤더로 사용
+                        step: (result) => {
+                          /* results.push(result.data); */
+                            // 각 데이터 항목을 반복하며 숫자 값에 대한 소수점을 제한
+                            let roundedData = {};
+                            for (const key in result.data) {
+                              let value = result.data[key];
+                              if (key === 'Roughness(mm)') {  // 값이 숫자인 경우
+                                let round = value * 1000;
+                                roundedData[key] = round;  // 소수점 두 자리까지만 반올림
+                              } else {
+                                roundedData[key] = value;
+                              }
+                            }
+                            results.push(roundedData);
+                        }
+                      });
+                      console.log(results);
+                      results = intervalSample(results, 100);
+                      roughnessChartData_.push(...results);
+                      setRoughnessChartData(roughnessChartData_);
+                      setRoughnessOpen(true);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));  // responseType을 'text'로 설정
+              }}>
+                <div className="tooltip">
+                  <div className="tooltipLine">
+                    시작KP : {convertToCustomFormat(roughnessesData.beginKp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    종점KP : {convertToCustomFormat(roughnessesData.endKp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    TS : {formatDateTime(new Date(roughnessesData.measureTs))}
+                  </div>
+                  <div className="tooltipLine">
+                    {getTrackText("상하선", route)} : {trackToString2(roughnessesData.railTrack, route)}
+                  </div>
+                </div>
+              </div>
+            })}
+          </div>
+        </div>
       </div>
       </div>
       <Modal
@@ -827,6 +944,63 @@ function DataExistence( props ) {
                   </>
                   : null
                 }
+              </div>
+            </div>
+            {/* <div className="directBtn" onClick={()=>{navigate("/MeasuringTemperatureHumidity");}}>데이터 상세보기<img src={ArrowIcon} /></div> */}
+          </div>
+        </Box>
+      </Modal>
+
+      <Modal
+          open={roughnessOpen}
+          onClose={(e)=>{setRoughnessOpen(false)}}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+        <Box sx={BOXSTYLE} >
+          <div className="popupTitle"><img src={PopupIcon} />레일조도 상세요약</div>
+          <div className="tabPanel" style={{width:"945px", height:"600px", paddingBottom : 0}}>
+            <div className="contentBox" style={{height: "calc(100%)"}}>
+              <div className="containerTitle">그래프
+                <div className="dataOptionBox">
+                  <div className="dataOption" style={{right: "250px"}}>
+                    <div className="value">
+                        위치 : {convertToCustomFormat(roughnessData.beginKp*1000)} - {convertToCustomFormat(roughnessData.endKp*1000)}
+                    </div>
+                  </div>
+                  <div className="dataOption">
+                    <div className="value">
+                      측정기간 : {formatDateTime(new Date(roughnessData.measureTs))}
+                    </div>
+                  </div>
+                  <div className="dataOption">
+                    <div className="value">
+                      {getTrackText("상하선", route)} : {trackToString2(roughnessData.railTrack, route)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="componentBox chartBox flex paut">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    width={500}
+                    height={300}
+                    data={roughnessChartData}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis fontSize={12} dataKey="KP(m)" tickFormatter={(tick) => Math.floor(tick)}/>
+                    <YAxis tickFormatter={(tick) => (tick / 1000).toFixed(2)} />
+                    <Tooltip formatter={(value) => (value / 1000).toFixed(2)} />
+                    <Legend />
+                    <Line dataKey="Roughness(mm)" stroke="#82ca9d" dot={false} />
+                  </LineChart>
+              </ResponsiveContainer>
               </div>
             </div>
             {/* <div className="directBtn" onClick={()=>{navigate("/MeasuringTemperatureHumidity");}}>데이터 상세보기<img src={ArrowIcon} /></div> */}

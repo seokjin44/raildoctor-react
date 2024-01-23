@@ -161,3 +161,24 @@
     height: 40px;
     top: -75px;
 }
+
+.monitoringContainer .datafinder .dataList .line .dataBar.railstraights .detailBtn .tooltip{
+    height: 40px;
+    top: -75px;
+}
+
+.monitoringContainer .datafinder .dataList .line .dataBar.railRoughnesses .detailBtn .tooltip{
+    height: 51px;
+    top: -89px;
+}
+
+.tabPanel .dataOptionBox{
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    height: 100%;
+}
+
+.tabPanel .dataOptionBox .dataOption{
+    position: static;
+}

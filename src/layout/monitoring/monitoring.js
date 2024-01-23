@@ -15,7 +15,7 @@ import axios from 'axios';
 import qs from 'qs';
 import Modal from '@mui/material/Modal';
 import { Box } from "@mui/material";
-import { convertToCustomFormat, getInchonSpeedData, getRailroadSection, getRoute, getSeoulSpeedData, getTrackText, nonData } from "../../util";
+import { convertToCustomFormat, getInchonSpeedData, getQuarterStartAndEndDate, getRailroadSection, getRoute, getSeoulSpeedData, getTrackText, nonData } from "../../util";
 import Papa from 'papaparse';
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 import LoadingImg from "../../assets/icon/loading/loading.png";
@@ -52,6 +52,9 @@ function Monitoring( props ) {
   const [railtwists, setRailtwists] = useState([]);
   const [railwears, setRailwears] = useState([]);
   const [temperatures, setTemperatures] = useState([]);
+  const [railstraights, setRailstraights] = useState([]);
+  const [railroughnesses, setRailroughnesses] = useState([]);
+
   const [railroadSection, setRailroadSection] = useState([]);
   const [paut, setPaut] = useState([]);
   const [trackSpeedData, setTrackSpeedData] = useState([{trackName:"", data:[]},{trackName:"", data:[]}]);
@@ -166,16 +169,17 @@ function Monitoring( props ) {
     .catch(error => console.error('Error fetching data:', error));
   }, [] )
 
-  const getExistData = ( dates ) => {
+  const getExistData = ( date ) => {
     let route = getRoute();
+    let quarter = getQuarterStartAndEndDate( date.$d );
     axios.get(`https://raildoctor.suredatalab.kr/api/statistics/data`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
       params : {
         railroad : route,
-        beginTs : dates[0].$d.toISOString(),
-        endTs : dates[1].$d.toISOString(),
+        beginTs : quarter.startDate.toISOString(),
+        endTs : quarter.endDate.toISOString(),
         /* beginKp : 0.23,
         endKp : 16.84 */
       }
@@ -188,6 +192,8 @@ function Monitoring( props ) {
       setRailwears(response.data.railwears);
       setTemperatures(response.data.temperatures);
       setPaut(response.data.pauts);
+      setRailstraights(response.data.railstraights);
+      setRailroughnesses(response.data.railroughnesses);
     })
     .catch(error => console.error('Error fetching data:', error));
 /*     axios.get(`https://raildoctor.suredatalab.kr/api/pauts`,{
@@ -252,19 +258,24 @@ function Monitoring( props ) {
   const zoomFindPositionInPictureList = (km, pictureList) => {
     let accumulatedWidth = 0;
     for (let pic of pictureList) {
+        // 이미지 너비에 devicePixelRatio를 곱하여 조정
+        let adjustedWidth = pic.width * window.devicePixelRatio;
+
         if (pic.beginKp <= km && km <= pic.endKp) {
-            const positionInCurrentPic = ((km - pic.beginKp) / (pic.endKp - pic.beginKp)) * pic.width;
+            // 조정된 너비를 사용하여 위치 계산
+            const positionInCurrentPic = ((km - pic.beginKp) / (pic.endKp - pic.beginKp)) * adjustedWidth;
             return {
                 url: pic.url,
                 originalWidth: pic.width,
-                position: Math.round(accumulatedWidth + (positionInCurrentPic)),
+                position: Math.round(accumulatedWidth + positionInCurrentPic),
                 originalHeight: pic.height
             };
         }
-        accumulatedWidth += pic.width;
+        // 조정된 너비로 accumulatedWidth 업데이트
+        accumulatedWidth += adjustedWidth;
     }
     return null;
-  }
+  };
 
   const [resizeOn, setResizeOn] = useState(0);
   const resizeChange = () => {
@@ -300,10 +311,11 @@ function Monitoring( props ) {
               <div className="dataOption">
                 <div className="title">탐색날짜 </div>
                 <div className="date">
-                  <RangePicker 
+                  <DatePicker  
                     value={selectDates}
                     defaultValue={selectDates}
                     style={RANGEPICKERSTYLE}
+                    picker="quarter"
                     onChange={(e)=>{
                       console.log(e);
                       setSelectDates(e);
@@ -447,7 +459,8 @@ function Monitoring( props ) {
             <div className="componentBox separationBox">
                 {
                   (accumulateWeights.length < 1 && railbehaviors.length < 1 && railtwists.length < 1 &&
-                    railwears.length < 1 && temperatures.length < 1 && paut.length < 1  
+                    railwears.length < 1 && temperatures.length < 1 && paut.length < 1 && railstraights.length < 1 &&  
+                    railroughnesses.length < 1
                   ) ? 
                   <div className="emptyBox" style={{ height: "340px",
                     marginTop: "10px",
@@ -471,6 +484,8 @@ function Monitoring( props ) {
                   railtwists={railtwists}
                   railwears={railwears}
                   temperatures={temperatures}
+                  railstraights={railstraights}
+                  railroughnesses={railroughnesses}
                   paut={paut}
                 ></DataExistence>
                 }

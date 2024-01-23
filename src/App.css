@@ -1,6 +1,7 @@
 @import "./css/input.css";
 @import "./css/direct.css";
 @import "./css/prototype.css";
+@import "./css/table.css";
 
 .App {
   text-align: center;

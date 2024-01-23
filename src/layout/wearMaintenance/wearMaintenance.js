@@ -206,10 +206,11 @@ function WearMaintenance( props ) {
       alert("KP를 입력해주세요");
       return;
     }
+    console.log(new Date(wearSearchCondition.endDate).toISOString());
 
     let param  = {
       railroad_name : route,
-      measure_ts : new Date().toISOString(),
+      measure_ts : new Date(wearSearchCondition.endDate).toISOString(),
       rail_track : railTrack,
       kp : (convertToNumber2(kp_) / 1000)
     }
@@ -589,6 +590,13 @@ function WearMaintenance( props ) {
     .catch(error => console.error('Error fetching data:', error));
   }, [railroadSection])
 
+  useEffect( ()=> {
+    if( !selectKP.name || selectKP.name === "" || selectKP.name === null || selectKP.name === undefined){
+      return;
+    }
+    getAccRemainingData(selectKP.name, selectKP.trackType);
+  }, [wearSearchCondition] )
+  
   return (
     <div className="wearMaintenance" >
       <div className="railStatusContainer">
@@ -716,7 +724,7 @@ function WearMaintenance( props ) {
                       </div>
                     </div>
                     <div className="searchOption selectBox">
-                      <div className="title flex textBold">최근누적통과톤수</div>
+                      <div className="title flex textBold">계측기간 내 <br/> 누적통과톤수</div>
                       <div className="flex acc">
                         {( !isEmpty(leftRemaining) )?<div>좌레일 : {numberWithCommas(leftRemaining.accumulateweight)}</div> : null}
                         {( !isEmpty(rightRemaining) )?<div>우레일 : {numberWithCommas(rightRemaining.accumulateweight)}</div> : null}

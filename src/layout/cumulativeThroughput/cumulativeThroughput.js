@@ -196,19 +196,24 @@ function CumulativeThroughput( props ) {
   const zoomFindPositionInPictureList = (km, pictureList) => {
     let accumulatedWidth = 0;
     for (let pic of pictureList) {
+        // 이미지 너비에 devicePixelRatio를 곱하여 조정
+        let adjustedWidth = pic.width * window.devicePixelRatio;
+
         if (pic.beginKp <= km && km <= pic.endKp) {
-            const positionInCurrentPic = ((km - pic.beginKp) / (pic.endKp - pic.beginKp)) * pic.width;
+            // 조정된 너비를 사용하여 위치 계산
+            const positionInCurrentPic = ((km - pic.beginKp) / (pic.endKp - pic.beginKp)) * adjustedWidth;
             return {
                 url: pic.url,
                 originalWidth: pic.width,
-                position: Math.round(accumulatedWidth + (positionInCurrentPic)),
+                position: Math.round(accumulatedWidth + positionInCurrentPic),
                 originalHeight: pic.height
             };
         }
-        accumulatedWidth += pic.width;
+        // 조정된 너비로 accumulatedWidth 업데이트
+        accumulatedWidth += adjustedWidth;
     }
     return null;
-  }
+  };
 
   useEffect( () => {
     try{
