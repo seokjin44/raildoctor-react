@@ -172,6 +172,11 @@
     top: -89px;
 }
 
+.monitoringContainer .datafinder .dataList .line .dataBar.railbehaviors .detailBtn .tooltip{
+    height: 51px;
+    top: -89px;
+}
+
 .tabPanel .dataOptionBox{
     display: flex;
     justify-content: end;

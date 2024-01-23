@@ -93,6 +93,8 @@ function DataExistence( props ) {
   const [railTwistTooltipIndex, setRailTwistTooltipIndex ] = useState(-1);
   const [railwearsTooltipIndex, setRailwearsTooltipIndex ] = useState(-1);
   const [railstraightsIndex, setRailstraightsIndex ] = useState(-1);
+  const [railbehaviorsIndex, setRailbehaviorsIndex ] = useState(-1);
+  
 
   //레일조도
   const [roughnessChartData, setRoughnessChartData] = useState([]);
@@ -365,9 +367,13 @@ function DataExistence( props ) {
         </div>
         <div className="line" style={{width:kptoPixel}} >
           {/* <div className="dataName">궤도거동계측</div> */}
-          <div className="dataBar">
+          <div className="dataBar railbehaviors">
             {props.railbehaviors.map( (railbehaviorsData, i) => {
-              return <div key={`railbehavior${i}`} className="detailBtn" style={{left:`${(railbehaviorsData.kp*1000) - railMinValue}px`}} onClick={()=>{
+              return <div key={`railbehavior${i}`} style={{left:`${(railbehaviorsData.beginKp*1000) - railMinValue}px`, width:`${(railbehaviorsData.endKp - railbehaviorsData.beginKp)*1000}px`}} 
+              className={classNames("detailBtn",{ onTooltip : railbehaviorsIndex === i})} 
+              onMouseOver={()=>{setRailbehaviorsIndex(i)}}
+              onMouseOut={()=>{setRailbehaviorsIndex(-1)}}
+              onClick={()=>{
                 setRailbehaviorOpen(true);
                 setRailbehaviorData(railbehaviorsData);
                 axios.get(`https://raildoctor.suredatalab.kr/api/railbehaviors/measuresets/${railbehaviorsData.measureId}`,{
@@ -463,10 +469,16 @@ function DataExistence( props ) {
             }}>
                 <div className="tooltip">
                   <div className="tooltipLine">
-                    KP : {convertToCustomFormat(railbehaviorsData.kp*1000)}
+                    시작KP : {convertToCustomFormat(railbehaviorsData.beginKp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    종점KP : {convertToCustomFormat(railbehaviorsData.endKp*1000)}
                   </div>
                   <div className="tooltipLine">
                     TS : {formatDateTime(new Date(railbehaviorsData.measureTs))}
+                  </div>
+                  <div className="tooltipLine">
+                    {getTrackText("상하선", route)} : {trackToString2(railbehaviorsData.railTrack, route)}
                   </div>
                 </div>
             </div>
