@@ -167,19 +167,19 @@ function DataExistence( props ) {
           <div className="dataName">온/습도 측정</div>
         </div>
         <div className="line"  >
-          <div className="dataName">PAUT 탐상</div>
-        </div>
-        <div className="line"  >
-          <div className="dataName">DRL</div>
-        </div>
-        <div className="line"  >
-          <div className="dataName">LWD</div>
-        </div>
-        <div className="line"  >
           <div className="dataName">레일직진도</div>
         </div>
         <div className="line"  >
           <div className="dataName">레일조도</div>
+        </div>
+        {/* <div className="line"  >
+          <div className="dataName">DRL</div>
+        </div> */}
+        <div className="line"  >
+          <div className="dataName">LWD</div>
+        </div>
+        <div className="line"  >
+          <div className="dataName">PAUT 탐상</div>
         </div>
       </div>
       <div className="scroll" id="dataExistenceContainer">
@@ -565,53 +565,7 @@ function DataExistence( props ) {
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
-          {/* <div className="dataName">PAUT 탐상</div> */}
-          <div className="dataBar paut">
-          {props.paut.map( (data, i) => {
-              return <div key={`paut${i}`} style={{left:`${(data.kp*1000) - railMinValue}px`}}               
-              className={classNames("detailBtn",{ onTooltip : pautTooltipIndex === i})} 
-              onMouseOver={()=>{setPautTooltipIndex(i)}}
-              onMouseOut={()=>{setPautTooltipIndex(-1)}}
-              
-              onClick={()=>{
-                console.log(data);
-                setPautOpen(true);
-                setPautImgIndex(0);
-                axios.get(`https://raildoctor.suredatalab.kr/api/pauts/${data.measureId}`,{
-                  paramsSerializer: params => {
-                    return qs.stringify(params, { format: 'RFC3986' })
-                  }
-                })
-                .then(response => {
-                  setPautData(response.data);
-                })
-                .catch(error => console.error('Error fetching data:', error));
-              }}><div className="tooltip">
-                  <div className="tooltipLine">
-                    KP : {convertToCustomFormat(data.kp*1000)}
-                  </div>
-                  <div className="tooltipLine">
-                    TS : {formatDateTime(new Date(data.measureTs))}
-                  </div>
-                  <div className="tooltipLine">
-                    {getTrackText("상하선", route)} : {trackToString2(data.railTrack, route)}
-                  </div>
-              </div></div>
-            })}
-          </div>
-        </div>
-        <div className="line" style={{width:kptoPixel}} >
-          {/* <div className="dataName">DRL</div> */}
-          <div className="dataBar">
-          </div>
-        </div>
-        <div className="line" style={{width:kptoPixel}} >
-          {/* <div className="dataName">LWD</div> */}
-          <div className="dataBar">
-          </div>
-        </div>
-        <div className="line" style={{width:kptoPixel}} >
-          {/* <div className="dataName">LWD</div> */}
+          {/* <div className="dataName">레일직진도</div> */}
           <div className="dataBar railstraights">
             {props.railstraights.map( (straightsData, i) => {
               return <div key={`temp${i}`} style={{left:`${(straightsData.kp*1000) - railMinValue}px`}} 
@@ -655,7 +609,7 @@ function DataExistence( props ) {
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
-          {/* <div className="dataName">LWD</div> */}
+          {/* <div className="dataName">레일조도</div> */}
           <div className="dataBar railRoughnesses">
             {props.railroughnesses.map( (roughnessesData, i) => {
               return <div key={`temp${i}`} style={{left:`${(roughnessesData.beginKp*1000) - railMinValue}px`, width:`${(roughnessesData.endKp - roughnessesData.beginKp)*1000}px`}}
@@ -711,6 +665,47 @@ function DataExistence( props ) {
                   </div>
                 </div>
               </div>
+            })}
+          </div>
+        </div>
+        <div className="line" style={{width:kptoPixel}} >
+          {/* <div className="dataName">LWD</div> */}
+          <div className="dataBar">
+          </div>
+        </div>
+        <div className="line" style={{width:kptoPixel}} >
+          {/* <div className="dataName">PAUT 탐상</div> */}
+          <div className="dataBar paut">
+          {props.paut.map( (data, i) => {
+              return <div key={`paut${i}`} style={{left:`${(data.kp*1000) - railMinValue}px`}}               
+              className={classNames("detailBtn",{ onTooltip : pautTooltipIndex === i})} 
+              onMouseOver={()=>{setPautTooltipIndex(i)}}
+              onMouseOut={()=>{setPautTooltipIndex(-1)}}
+              
+              onClick={()=>{
+                console.log(data);
+                setPautOpen(true);
+                setPautImgIndex(0);
+                axios.get(`https://raildoctor.suredatalab.kr/api/pauts/${data.measureId}`,{
+                  paramsSerializer: params => {
+                    return qs.stringify(params, { format: 'RFC3986' })
+                  }
+                })
+                .then(response => {
+                  setPautData(response.data);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+              }}><div className="tooltip">
+                  <div className="tooltipLine">
+                    KP : {convertToCustomFormat(data.kp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    TS : {formatDateTime(new Date(data.measureTs))}
+                  </div>
+                  <div className="tooltipLine">
+                    {getTrackText("상하선", route)} : {trackToString2(data.railTrack, route)}
+                  </div>
+              </div></div>
             })}
           </div>
         </div>
