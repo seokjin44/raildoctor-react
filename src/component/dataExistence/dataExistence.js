@@ -20,7 +20,9 @@ import classNames from "classnames";
 import Papa from 'papaparse';
 
 let colorIndex = 1;
+let railMinValue = 99999;
 let route = getRoute();
+let setTimeoutID = -1;
 function DataExistence( props ) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -31,8 +33,10 @@ function DataExistence( props ) {
   const [temperatureOpen, setTemperatureOpen] = useState(false);
   const [pautOpen, setPautOpen] = useState(false);
   const [roughnessOpen, setRoughnessOpen] = useState(false);
-  const [railMinValue, setRailMinValue] = useState(99999);
+  /* const [railMinValue, setRailMinValue] = useState(99999); */
   const [railMaxValue, setRailMaxValue] = useState(0);
+
+  const scrollContainerRef = useRef(null);
 
   //paut
   const [pautData, setPautData] = useState({});
@@ -107,9 +111,30 @@ function DataExistence( props ) {
     setTabValue(newValue);
   };
 
+  const handleScroll = () => {
+    if( setTimeoutID > 0 ){
+      return;
+    }
+    const scrollContainer = scrollContainerRef.current;
+    const scrollLeft = scrollContainer.scrollLeft;
+    const containerWidth = scrollContainer.clientWidth;
+    const centerPixel = scrollLeft + containerWidth / 2;
+    const newCenterMeter = centerPixel * kpto1Pixcel + railMinValue;
+    props.setKP(newCenterMeter);
+  };
+
   useEffect(() => {
     //Pixcel 계산
     console.log(document.getElementById("dataExistenceContainer").clientWidth);
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll);
+
+      // 컴포넌트 언마운트 시 리스너 제거
+      return () => {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      };
+    }
   }, []);
 
   useEffect(() => {
@@ -124,20 +149,26 @@ function DataExistence( props ) {
     }
     setKPtoPixel(end * kpto1Pixcel);
     setKPList(kpList_);
-    setRailMinValue(start);
+    railMinValue = start;
     setRailMaxValue(end);
   },[ props.railroadSection ]);
 
   useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    scrollContainer.removeEventListener('scroll', handleScroll);
     scrollMove(props.kp);
+    clearTimeout(setTimeoutID);
+    setTimeoutID = setTimeout( ()=>{
+      scrollContainer.addEventListener('scroll', handleScroll);
+      setTimeoutID = -1;
+    }, 200 )
+    console.log(setTimeoutID);
   },[ props.kp ]);
 
   const scrollMove = ( kp ) => {
-    console.log(kp);
     let left = (
       kp > document.getElementById('dataExistenceContainer').clientWidth/2
     ) ? parseFloat(kp) - document.getElementById('dataExistenceContainer').clientWidth/2 : 0;
-    console.log(left);
     document.getElementById('dataExistenceContainer').scroll({
       top: 0,
       left: left,
@@ -182,7 +213,7 @@ function DataExistence( props ) {
           <div className="dataName">PAUT 탐상</div>
         </div>
       </div>
-      <div className="scroll" id="dataExistenceContainer">
+      <div ref={scrollContainerRef} className="scroll" id="dataExistenceContainer">
       <div className="dataList">
         <div className="line" style={{width:railMaxValue - railMinValue}} >
           <div className="dataBar kp">

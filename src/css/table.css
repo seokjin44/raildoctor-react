@@ -26,6 +26,7 @@
     width: calc(100% - 20px);
     padding-left: 10px;
     padding-right: 10px;
+    flex-direction: column;
 }
 
 .customTable2 .theader .tr,
@@ -39,11 +40,16 @@
 .customTable2 .theader .tr .td,
 .customTable2 .tbody .tr .td{
     width: 100%;
-}
-
-.customTable2 .theader .tr .td,
-.customTable2 .tbody .tr .td{
     padding-left: 10px;
     padding-right: 10px;
 }
 
+.customTable2 .tbody .tr {
+    margin-bottom: 5px;
+}
+
+.customTable2 .tbody.scroll{
+    height: 300px;
+    overflow: auto;
+    justify-content: flex-start;
+}

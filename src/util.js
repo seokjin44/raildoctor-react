@@ -407,7 +407,7 @@ export const trackToString2 = ( track, route ) => {
     }else if( track === STRING_UP_TRACK_LEFT ){
         return getTrackText("상선(좌)", route);
     }else if(track === STRING_UP_TRACK_RIGHT ){
-        return getTrackText("상선(좌)", route);
+        return getTrackText("상선(우)", route);
     }else if( track === STRING_DOWN_TRACK ){
         return getTrackText("하선", route);
     }else if( track === STRING_DOWN_TRACK_LEFT ){

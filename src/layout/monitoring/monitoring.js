@@ -1,6 +1,6 @@
 import "./monitoring.css";
 import 'dayjs/locale/ko';
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CalendarIcon from "../../assets/icon/299092_calendar_icon.png";
 import { DatePicker, Input, Radio } from 'antd';
 import * as PDFJS from "pdfjs-dist/build/pdf";
@@ -22,7 +22,7 @@ import LoadingImg from "../../assets/icon/loading/loading.png";
 import Draggable from 'react-draggable';
 import { monitoringInputKP, monitoringKP, monitoringSelectDates } from "../../atoms";
 import { useRecoilState } from 'recoil';
-import { isEmpty } from "lodash";
+import { isEmpty, throttle, debounce } from "lodash";
 
 window.PDFJS = PDFJS;
 const { RangePicker } = DatePicker;
@@ -68,14 +68,13 @@ function Monitoring( props ) {
   const [scales, setScales] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const handleDrag = (e, data) => {
-    console.log(e, data);
-    console.log("handleDrag");
+  const handleDrag = useCallback(throttle((e, data) => {
+    console.log("handleDrag!!!!!!!");
     const newPosition = data.x; // X축 위치
     const km = findKmFromPosition(newPosition, pictureList, scales);
     setInputKp(Math.floor(km * 1000));
     setKPMarker({x : data.x, y : 0});
-  };
+  }, 100), [pictureList, scales]);
 
   const findKmFromPosition = (position, pictureList, scales) => {
     let accumulatedWidth = 0;
@@ -412,7 +411,10 @@ function Monitoring( props ) {
                     return <img className="map" key={index} alt="선로열람도" src={`https://raildoctor.suredatalab.kr${pic.fileName}`} onLoad={() => handleImageLoad(index)} />
                   })
                 }
-                <Draggable axis="x" onDrag={handleDrag} position={kpMarker}>
+                <Draggable axis="x" 
+                  onDrag={handleDrag} 
+                  onStop={()=>{setKP(inputKp)}}
+                  position={kpMarker}>
                   <div className="kpMarker" ></div>
                 </Draggable>
               </div>
@@ -477,16 +479,20 @@ function Monitoring( props ) {
                   </div>
                   :
                   <DataExistence 
-                  kp={kp}
-                  accumulateWeights={accumulateWeights}
-                  railroadSection={railroadSection} 
-                  railbehaviors={railbehaviors}
-                  railtwists={railtwists}
-                  railwears={railwears}
-                  temperatures={temperatures}
-                  railstraights={railstraights}
-                  railroughnesses={railroughnesses}
-                  paut={paut}
+                    kp={kp}
+                    setKP={(kp)=>{
+                      setInputKp(kp);
+                      setKP(kp);
+                    }}
+                    accumulateWeights={accumulateWeights}
+                    railroadSection={railroadSection} 
+                    railbehaviors={railbehaviors}
+                    railtwists={railtwists}
+                    railwears={railwears}
+                    temperatures={temperatures}
+                    railstraights={railstraights}
+                    railroughnesses={railroughnesses}
+                    paut={paut}
                 ></DataExistence>
                 }
             </div>

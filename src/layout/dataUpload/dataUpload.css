@@ -425,3 +425,53 @@
 .dataUploadPopup .customTable2{
     margin-top: 10px;
 }
+
+.customTable2 .theader .tr .td.displayName,
+.customTable2 .tbody .tr .td.displayName{
+    width: 10%;
+}
+.customTable2 .theader .tr .td.kp,
+.customTable2 .tbody .tr .td.kp{
+    width: 10%; /* *4 */
+}
+
+.customTable2 .theader .tr .td.measureType,
+.customTable2 .tbody .tr .td.measureType{
+    width: 5%;
+}
+
+.customTable2 .theader .tr .td.date,
+.customTable2 .tbody .tr .td.date{
+    width: 15%; /* *2 */
+}
+
+.customTable2 .theader .tr .td.button,
+.customTable2 .tbody .tr .td.button{
+    width: 15%;
+}
+
+/* sensor */
+.customTable2 .theader .tr .td.track,
+.customTable2 .tbody .tr .td.track{
+    width: 8%;
+}
+
+.customTable2 .theader .tr .td.kp,
+.customTable2 .tbody .tr .td.kp{
+    width: 8%;
+}
+
+.customTable2 .theader .tr .td.sensorName,
+.customTable2 .tbody .tr .td.sensorName{
+    width: 8%;
+}
+
+.customTable2 .theader .tr .td.number,
+.customTable2 .tbody .tr .td.number{
+    width: 8%;
+}
+
+.customTable2 .theader .tr .td.del,
+.customTable2 .tbody .tr .td.del{
+    width: 2%;
+}
