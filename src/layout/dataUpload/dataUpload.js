@@ -8,7 +8,7 @@ import TreeList from 'react-treelist';
 import 'react-treelist/build/css/index.css';
 import axios from 'axios';
 import qs from 'qs';
-import { convertBytesToMB, curPagingCheck, curPagingText, flattenTreeData, formatDateTime, getRoute, measureTypeText, trackToString, trackToString2, uploadState, uploadStateBtn } from "../../util";
+import { convertBytesToMB, convertToCustomFormat, curPagingCheck, curPagingText, flattenTreeData, formatDateTime, getRoute, measureTypeText, trackToString, trackToString2, uploadState, uploadStateBtn } from "../../util";
 import { useRef } from "react";
 import { Button, DatePicker, Input, Modal, Select } from "antd";
 import { BOXSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_LONG_MEASURE, STRING_ROUTE_GYEONGBU, STRING_ROUTE_INCHON, STRING_ROUTE_OSONG, STRING_ROUTE_SEOUL, STRING_SHORT_MEASURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, UPLOAD_CATEGORY_ACCUMULATEWEIGHTS, UPLOAD_CATEGORY_RAILBEHAVIORS, UPLOAD_CATEGORY_RAILPROFILES, UPLOAD_CATEGORY_RAILROUGHNESS, UPLOAD_CATEGORY_RAILSTRAIGHTS, UPLOAD_CATEGORY_RAILTWISTS, UPLOAD_CATEGORY_RAILWEARS, UPLOAD_CATEGORY_TEMPERATURES, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED } from "../../constant";
@@ -67,6 +67,10 @@ function DataUpload( props ) {
   }
 
   const getRailbehaviorsMeasureList = () => {
+    if( !railbehaviorsDateRange ){
+      alert("측정기간을 입력해주세요.");
+      return;
+    }
     let param = {
       /* asc : ["DISPLAY_NAME", "MEASURE_TYPE", "BEGIN_TS", "END_TS"] */
       desc : ["BEGIN_TS"],
@@ -181,10 +185,6 @@ function DataUpload( props ) {
         return "";
     }
   }
-
-  const saveMeasureset = () => {
-
-  } 
 
   useEffect( () => {
     getList(active);
@@ -471,10 +471,10 @@ function DataUpload( props ) {
                     {railbehaviorsMeasureList.entities.map( (data, i) => {
                       return <div key={`measureList${i}`} className="tr">
                         <div className="td displayName">{data.displayName}</div>
-                        <div className="td kp">{data.t2Begin}</div>
-                        <div className="td kp">{data.t2End}</div>
-                        <div className="td kp">{data.t1Begin}</div>
-                        <div className="td kp">{data.t1End}</div>
+                        <div className="td kp">{convertToCustomFormat(data.t2Begin*1000)}</div>
+                        <div className="td kp">{convertToCustomFormat(data.t2End*1000)}</div>
+                        <div className="td kp">{convertToCustomFormat(data.t1Begin*1000)}</div>
+                        <div className="td kp">{convertToCustomFormat(data.t1End*1000)}</div>
                         <div className="td measureType">{data.measureType}</div>
                         <div className="td date">{formatDateTime(new Date(data.beginTs))}</div>
                         <div className="td date">{formatDateTime(new Date(data.endTs))}</div>
@@ -610,8 +610,17 @@ function DataUpload( props ) {
                     )
                     .then(response => {
                       console.log(response.data);
+                      alert("등록되었습니다.");
+                      setAddOpen(false);
                     })
-                    .catch(error => console.error('Error fetching data:', error));   
+                    .catch(error => {
+                      if (error.response && error.response.status === 409) {
+                        alert("측정지점이름이 중복되었습니다. 변경 후 다시 시도해주세요.")
+                        console.error('Conflict error (409):', error.response.data);
+                      } else {
+                        console.error('Error fetching data:', error);
+                      }
+                    });   
                   }} style={{marginLeft : "10px"}} type="primary" icon={<AppstoreAddOutlined />}>
                   측정세트등록
                 </Button>
@@ -843,8 +852,10 @@ function DataUpload( props ) {
             <div className="inputLine">
               <div className="inputTitle">측정구간</div>
               <div className="inputValue">
-                <div className="valueName">{trackToString(STRING_UP_TRACK, railbehaviorsRoute)}</div> {railbehaviorsViewData.t2Begin} ~ {railbehaviorsViewData.t2End}
-                <div className="valueName">{trackToString(STRING_DOWN_TRACK, railbehaviorsRoute)}</div> {railbehaviorsViewData.t1Begin} ~ {railbehaviorsViewData.t1Begin}
+                <div className="valueName">{trackToString(STRING_UP_TRACK, railbehaviorsRoute)}</div> 
+                {convertToCustomFormat(railbehaviorsViewData.t2Begin*1000)} ~ {convertToCustomFormat(railbehaviorsViewData.t2End*1000)}
+                <div className="valueName">{trackToString(STRING_DOWN_TRACK, railbehaviorsRoute)}</div> 
+                {convertToCustomFormat(railbehaviorsViewData.t1Begin*1000)} ~ {convertToCustomFormat(railbehaviorsViewData.t1Begin*1000)}
               </div>
             </div>
             <div className="devisionLine"></div>
