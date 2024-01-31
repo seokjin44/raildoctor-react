@@ -287,6 +287,27 @@ function TrackDeviation( props ) {
     });
   }
 
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active) {
+      console.log(active, payload, label);
+      return (
+        <div className="customTooltip">
+          <p>{`${label}`}</p>
+          <p style={{color : payload[0].color}}>{`${payload[0].name} : ${payload[0].value}`}</p>
+          <p style={{color : '#A349A4'}}>{`캔트틀림 : ${payload[0].payload.cantTwist}`}</p>
+          <p style={{color : payload[1].color}}>{`${payload[1].name} : ${payload[1].value}`}</p>
+          <p style={{color : payload[2].color}}>{`${payload[2].name} : ${payload[2].value}`}</p>
+          <p style={{color : payload[3].color}}>{`${payload[3].name} : ${payload[3].value}`}</p>
+          <p style={{color : payload[4].color}}>{`${payload[4].name} : ${payload[4].value}`}</p>
+          <p style={{color : payload[5].color}}>{`${payload[5].name} : ${payload[5].value}`}</p>
+          <p style={{color : payload[6].color}}>{`${payload[6].name} : ${payload[6].value}`}</p>
+        </div>
+      );
+    }
+  
+    return null;
+  };
+
   useEffect(() => {
     // 이벤트 리스너 추가
     window.addEventListener('resize', resizeChange);
@@ -493,7 +514,7 @@ function TrackDeviation( props ) {
                 }else if( type === STRING_CANT ){
                   data = cantChartData
                   series.push(<Line type="monotone" name="캔트" dataKey="cant" stroke="#4371C4" dot={false} />);
-                  series.push(<Line type="monotone" name="캔트틀림" dataKey="cantTwist" stroke="#A349A4" dot={false} />);
+                  /* series.push(<Line type="monotone" name="캔트틀림" dataKey="cantTwist" stroke="#A349A4" dot={false} />); */
                 }else if( type === STRING_RAIL_DISTANCE ){
                   data = raildistanceChartData
                   series.push(<Line type="monotone" name="궤간틀림" dataKey="value" stroke="#4371C4" dot={false} />);
@@ -517,7 +538,7 @@ function TrackDeviation( props ) {
                   <CartesianGrid />
                   <XAxis dataKey="kp" interval={150} tickFormatter={(value) => value.toFixed(2)} />
                   <YAxis />
-                  <Tooltip />
+                  <Tooltip  content={type === STRING_CANT ? <CustomTooltip /> : undefined}  />
                   <Legend />
 
                   {series.map( obj => {

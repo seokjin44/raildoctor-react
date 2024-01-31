@@ -236,3 +236,13 @@ div.trackDeviationReportTable div.tableBody div.tr{
     cursor: pointer;
     user-select: none;
 }
+
+.customTooltip{
+    border: 1px solid #cccccc;
+    background-color: white;
+    padding: 5px 10px 10px 10px;
+}
+
+.customTooltip p {
+    line-height: 0.6; /* 줄 간격을 글꼴 크기의 1.5배로 설정 */
+  }
