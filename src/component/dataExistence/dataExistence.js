@@ -162,17 +162,10 @@ function DataExistence( props ) {
   },[ props.railroadSection ]);
 
   useEffect(() => {
-/*     const scrollContainer = scrollContainerRef.current;
-    scrollContainer.removeEventListener('scroll', handleScroll); */
+    console.log(props.kp);
     if( props.kp.changeEvent !== MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL ){
-      scrollMove(props.kp);
+      scrollMove(props.kp.kp);
     }
-/*     clearTimeout(setTimeoutID);
-    setTimeoutID = setTimeout( ()=>{
-      scrollContainer.addEventListener('scroll', handleScroll);
-      setTimeoutID = -1;
-    }, 200 )
-    console.log(setTimeoutID); */
   },[ props.kp ]);
 
   const scrollMove = ( kp ) => {

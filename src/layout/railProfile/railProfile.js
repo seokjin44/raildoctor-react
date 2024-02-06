@@ -182,7 +182,7 @@ function RailProfile( props ) {
       return <img className="profileImg" src={`https://raildoctor.suredatalab.kr${profile.imageLeft.fileName}`} />;
     }
     return <div className="profileImg" >
-      이미지가 준비되지않은 범위입니다.
+      이미지가 없습니다.
     </div>;
   } 
 
@@ -195,7 +195,7 @@ function RailProfile( props ) {
       return <img className="profileImg" src={`https://raildoctor.suredatalab.kr${profile.imageRight.fileName}`} />;
     }
     return <div className="profileImg" >
-      이미지가 준비되지않은 범위입니다.
+      이미지가 없습니다.
     </div>;
   }
 
@@ -346,7 +346,7 @@ function RailProfile( props ) {
                     let dateCnt = {};
                     let profiles = [];
                     for( let profile of response.data.profiles ){
-                      if( !profile.imageLeft && !profile.imageRight ){ continue; }
+                      /* if( !profile.imageLeft && !profile.imageRight ){ continue; } */
                       profilesMap.set(new Date(profile.measureTs).getTime(), profile);
                       let profileId = profile.profileId;
                       let measureDate = new Date(profile.measureTs);
