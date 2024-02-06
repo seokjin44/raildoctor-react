@@ -10,16 +10,20 @@ import axios from 'axios';
 import qs from 'qs';
 import { checkUniqueness, convertBytesToMB, convertToCustomFormat, curPagingCheck, curPagingText, dataUploadTitle, flattenTreeData, formatDateTime, getRoute, measureTypeText, trackToString, trackToString2, uploadState, uploadStateBtn } from "../../util";
 import { useRef } from "react";
-import { Button, DatePicker, Input, Modal, Select } from "antd";
+import { Button, Checkbox, DatePicker, Input, Modal, Pagination, Select } from "antd";
 import { BOXSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_LONG_MEASURE, STRING_ROUTE_GYEONGBU, STRING_ROUTE_INCHON, STRING_ROUTE_OSONG, STRING_ROUTE_SEOUL, STRING_SHORT_MEASURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, UPLOAD_CATEGORY_ACCUMULATEWEIGHTS, UPLOAD_CATEGORY_RAILBEHAVIORS, UPLOAD_CATEGORY_RAILPROFILES, UPLOAD_CATEGORY_RAILROUGHNESS, UPLOAD_CATEGORY_RAILSTRAIGHTS, UPLOAD_CATEGORY_RAILTWISTS, UPLOAD_CATEGORY_RAILWEARS, UPLOAD_CATEGORY_TEMPERATURES, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED } from "../../constant";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
 import Search from "antd/es/input/Search";
-import { SearchOutlined, DeleteOutlined, AppstoreAddOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { SearchOutlined, DeleteOutlined, AppstoreAddOutlined, PlusCircleOutlined, DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { saveAs } from 'file-saver';
 
 const { RangePicker } = DatePicker;
 let route = getRoute();
 let interval = null;
+const options = [
+  { label: '장기계측', value: STRING_LONG_MEASURE },
+  { label: '단기계측', value: STRING_SHORT_MEASURE },
+];
 
 function DataUpload( props ) {
   const hiddenFileInput = useRef(null);
@@ -30,7 +34,7 @@ function DataUpload( props ) {
   const [ trList, setTrList ] = useState([]);
   const [ active, setActive ] = useState(UPLOAD_CATEGORY_ACCUMULATEWEIGHTS);
   const [ totalCnt, setTotalCnt ] = useState(0);
-  const [ showrows, setShowrows ] = useState(25);
+  const [ showrows, setShowrows ] = useState(10);
   const [ curPage, setCurPage ] = useState(1);
   const [ dataCnt, setDataCnt ] = useState(0);
   const [ dataSize, setDataSize ] = useState(0);
@@ -40,7 +44,7 @@ function DataUpload( props ) {
   const [ railbehaviorsMeasureList, setRailbehaviorsMeasureList ] = useState({entities : [], count : 1});
   const [ railbehaviorsRoute, setRailbehaviorsRoute ] = useState(route);
   const [ railbehaviorsDisplayName, setRailbehaviorsDisplayName ] = useState("");
-  const [ railbehaviorsMeasureType, setRailbehaviorsMeasureType ] = useState(STRING_SHORT_MEASURE);
+  const [ railbehaviorsMeasureType, setRailbehaviorsMeasureType ] = useState([STRING_SHORT_MEASURE, STRING_LONG_MEASURE]);
   const [ railbehaviorsDateRange, setRailbehaviorsDateRange ] = useState(null);
   const [ railbehaviorsBeginKp, setRailbehaviorsBeginKp ] = useState("");
   const [ railbehaviorsEndKp, setRailbehaviorsEndKp ] = useState("");
@@ -58,30 +62,39 @@ function DataUpload( props ) {
 
   const activeChange = ( category ) => {
     setActive(category);
-    getList(category);
-    getDataStatistics(category);
     clearInterval(interval);
-    interval = setInterval(() => {
+    if( category === UPLOAD_CATEGORY_RAILBEHAVIORS ){
+      getRailbehaviorsMeasureList();
+    }else{
       getList(category);
-    }, 5000);
+      getDataStatistics(category);
+      interval = setInterval(() => {
+        getList(category);
+      }, 5000);
+    }
   }
 
   const getRailbehaviorsMeasureList = () => {
-    if( !railbehaviorsDateRange ){
-      alert("측정기간을 입력해주세요.");
-      return;
-    }
     let param = {
       /* asc : ["DISPLAY_NAME", "MEASURE_TYPE", "BEGIN_TS", "END_TS"] */
       desc : ["BEGIN_TS"],
       railroad : railbehaviorsRoute,
       displayName : railbehaviorsDisplayName,
-      measureType : [railbehaviorsMeasureType],
-      beginKp : railbehaviorsBeginKp / 1000,
-      endKp : railbehaviorsEndKp / 1000,
-      beginTs : railbehaviorsDateRange[0].$d.toISOString(),
-      endTs : railbehaviorsDateRange[1].$d.toISOString()
+      measureType : [railbehaviorsMeasureType]
     }
+    if( railbehaviorsDateRange ){
+      param.beginTs = railbehaviorsDateRange[0].$d.toISOString();
+      param.endTs = railbehaviorsDateRange[1].$d.toISOString();
+    }
+
+    if( railbehaviorsBeginKp ){
+      param.beginKp = railbehaviorsBeginKp / 1000;
+    }
+    if( railbehaviorsEndKp ){
+      param.endKp = railbehaviorsEndKp / 1000;
+    }
+
+
     console.log(param);
     axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/measuresets',{
       paramsSerializer: params => {
@@ -92,6 +105,7 @@ function DataUpload( props ) {
     .then(response => {
       console.log(response.data);
       setRailbehaviorsMeasureList(response.data);
+      setTotalCnt(response.data.count);
     })
     .catch(error => console.error('Error fetching data:', error));
   }
@@ -186,6 +200,16 @@ function DataUpload( props ) {
     }
   }
 
+  const onChange = (checkedValues) => {
+    console.log('checked = ', checkedValues);
+    setRailbehaviorsMeasureType(checkedValues);
+  };
+
+  const onShowSizeChange = (current, pageSize) => {
+    console.log(current, pageSize);
+    setShowrows(pageSize);
+  };
+
   useEffect( () => {
     getList(active);
     getDataStatistics(active);
@@ -211,63 +235,41 @@ function DataUpload( props ) {
         </div>
         <div className="uploadHistory">
           <div className="title">{
-            dataUploadTitle(active)
+              dataUploadTitle(active)
           }</div>
-          <div className="info">
-            <div className="infoBox">
-              <div className="infoTitle">총 등록 데이터 수</div>
-              <div className="infoValue">{dataCnt} 건</div>
+          { (active !== UPLOAD_CATEGORY_RAILBEHAVIORS) ? <>
+
+            <div className="info">
+              <div className="infoBox">
+                <div className="infoTitle">총 등록 데이터 수</div>
+                <div className="infoValue">{dataCnt} 건</div>
+              </div>
+              <div className="infoBox">
+                <div className="infoTitle">총 등록 데이터 용량</div>
+                <div className="infoValue">{convertBytesToMB(dataSize)} MB</div>
+              </div>
+              <div className="infoBox">
+                <div className="infoTitle">최근 1주일 간 데이터 등록 건수</div>
+                <div className="infoValue">{weekDataCnt} 건</div>
+              </div>
+              <div className="infoBox">
+                <div className="infoTitle">1주일간 데이터 등록 용량</div>
+                <div className="infoValue">{convertBytesToMB(weekDataSize)} MB</div>
+              </div>
             </div>
-            <div className="infoBox">
-              <div className="infoTitle">총 등록 데이터 용량</div>
-              <div className="infoValue">{convertBytesToMB(dataSize)} MB</div>
-            </div>
-            <div className="infoBox">
-              <div className="infoTitle">최근 1주일 간 데이터 등록 건수</div>
-              <div className="infoValue">{weekDataCnt} 건</div>
-            </div>
-            <div className="infoBox">
-              <div className="infoTitle">1주일간 데이터 등록 용량</div>
-              <div className="infoValue">{convertBytesToMB(weekDataSize)} MB</div>
-            </div>
-          </div>
-          { (active !== UPLOAD_CATEGORY_RAILBEHAVIORS) ? <div className="pagination">
-            {/* <div className="optionTitle">Go to</div>
-            <Input style={{width:100}} placeholder="Page" />
-            <div className="line"></div> */}
-            <div className="optionTitle">Show rows</div>
-            <Select
-              value={showrows}
-              className="listCnt"
-              defaultValue={showrows}
-              onChange={(e)=>setShowrows(e)}
-              options={[
-                { value: 25, label: '25' },
-                { value: 50, label: '50' },
-                { value: 75, label: '75' },
-                { value: 100, label: '100'},
-              ]}
-            />
-            <div className="line"></div>
-            <div className="curPaging"> {curPagingCheck(curPage*showrows, totalCnt)} of {totalCnt} </div>
-            <div className="wrap" onClick={()=>{
-              if(curPage > 1){
-                setCurPage(curPage-1);
-              }
-            }}>
-              <i className="arrow left" role="img"></i>
-            </div>
-            <div className="wrap" onClick={()=>{
-              let maxPage = Math.ceil(totalCnt / showrows);
-              if( curPage < maxPage){
-                setCurPage(curPage+1);
-              }
-            }}>
-              <i className="arrow right" role="img"></i>
-            </div>
-          </div> : null }
+            <div className="pagination">
+              <Pagination
+                onShowSizeChange={onShowSizeChange}
+                onChange={(e)=>{console.log(e); setCurPage(e)}}
+                total={totalCnt}
+                showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+                pageSize={showrows}
+                current={curPage}
+              />
+            </div> </> : null }
           {
-            (active !== UPLOAD_CATEGORY_RAILBEHAVIORS) ? <div className="uploadBtn" style={{ width: "120px",top: '165px'}}
+            (active !== UPLOAD_CATEGORY_RAILBEHAVIORS) ? 
+              <Button type="primary" icon={<DownloadOutlined />} style={{width:"160px", top:"165px", right: "20px", position: "absolute"}}
                 onClick={()=>{
                   axios.get(`https://raildoctor.suredatalab.kr/api/data/${active}`)
                   .then(response => {
@@ -282,89 +284,48 @@ function DataUpload( props ) {
                     .catch(e => console.error(e));
                   })
                   .catch(error => console.error('Error fetching data:', error));   
-                }}> 
-              포맷파일 다운로드
-            </div> : null
+                }}
+              >
+                포맷파일 다운로드
+              </Button>
+              : null
           }
-          {/* {
-            (active === UPLOAD_CATEGORY_RAILBEHAVIORS) ? 
-              <div className="uploadBtn" style={{top: '130px'}}
-                onClick={()=>setOpen(true)}
-              >측정세트등록</div>
-            : null
-          } */}
 
           {
-            (active !== UPLOAD_CATEGORY_RAILBEHAVIORS) ? <div className="uploadBtn" onClick={()=>{ hiddenFileInput.current.click(); }} >
-            <img src={UploadIcon}/>Upload
-            <input 
-                    ref={hiddenFileInput} 
-                    type="file" 
-                    style={{display:'none'}} 
-                    onChange={(e)=>{
-                      const file = e.target.files[0];
-                      const reader = new FileReader();
-                      reader.readAsDataURL(file);
-                      reader.onloadend = () => {
-                        const base64String = reader.result;
-                        const base64FormattedString = base64String.split(',')[1];
-                        let route = getRoute();
-                        axios.post(`https://raildoctor.suredatalab.kr/api/data`,
-                          {
-                            meta : {
-                              railroadId:"",
-                              category: active,
-                              dataType:"DATA",
-                              fileName: file.name,
-                              params: {},
-                              state: "UPLOADED"
-                            },
-                            data : base64FormattedString,
-                            railroadName : route
-                          }
-                        )
-                        .then(response => {
-                          console.log(response.data);
-                          getList(active);
-                        })
-                        .catch(error => console.error('Error fetching data:', error));   
-                      };
-                      reader.onerror = () => {
-                        console.error('FileReader에 문제가 발생했습니다.');
-                      };
-                    }}
-                  />
-            </div> : null
+            (active !== UPLOAD_CATEGORY_RAILBEHAVIORS) ? 
+              <Button type="primary" icon={<UploadOutlined />} style={{width:"100px", top:"200px", right: "20px", position: "absolute"}}
+                onClick={()=>{hiddenFileInput.current.click();}}
+              >
+                Upload
+              </Button> : null
           }
+          
           <div className="treeListContainer">
             {
-              (active !== UPLOAD_CATEGORY_RAILBEHAVIORS) ? <div className="table3">
-                <div className="tableHeader" >
-                    <div className="tr">
-                      <div className="td createdAt">업로드 날짜</div>
-                      <div className="td fileSize">파일크기</div>
-                      <div className="td filename">파일명</div>
-                      <div className="td fileState">상태</div>
-                      <div className="td btn"></div>
+              (active !== UPLOAD_CATEGORY_RAILBEHAVIORS) ? 
+              <div className="customTable2" style={{fontSize : "14px"}}>
+                <div className="theader">
+                  <div className="tr">
+                    <div className="td createdAt">업로드 날짜</div>
+                    <div className="td fileSize">파일크기</div>
+                    <div className="td filename">파일명</div>
+                    <div className="td fileState">상태</div>
+                    <div className="td btn"></div>
+                  </div>
+                </div>
+                <div className="tbody scroll" style={{overflow: "auto", height: "calc( 100% - 35px)"}}>
+                  {trList.map( (tr, i) => {
+                    return <div key={`dataupload${i}`} className="tr">
+                      <div className="td createdAt">{formatDateTime(new Date(tr.createdAt))}</div>
+                      <div className="td fileSize">{`${convertBytesToMB(tr.fileSize)}MB`}</div>
+                      <div className="td filename">{tr.fileName}</div>
+                      <div className="td fileState">{uploadState(tr.state)}</div>
+                      <div className="td btn">{statusBtn(tr)}</div>
                     </div>
+                  } )}
                 </div>
-                <div className="tableBody" style={{overflow: "auto", height: "calc( 100% - 35px)"}}>
-                    {
-                      trList.map( (tr, i) => {
-                        return <div className="tr" key={i}>
-                        <div className="td createdAt">{formatDateTime(new Date(tr.createdAt))}</div>
-                        <div className="td fileSize">{`${convertBytesToMB(tr.fileSize)}MB`}</div>
-                        <div className="td filename">{tr.fileName}</div>
-                        <div className="td fileState">{uploadState(tr.state)}</div>
-                        <div className="td btn">
-                          {statusBtn(tr)}
-                        </div>
-                      </div>
+              </div>
 
-                      })
-                    }
-                </div>
-              </div> 
               : 
               <>
                 <div className="inputSearch">
@@ -395,7 +356,7 @@ function DataUpload( props ) {
                   <div className="inputLine">
                     <div className="inputTitle">계측구분</div>
                     <div className="inputValue">
-                      <Select
+                      {/* <Select
                         className="no-border-radius"
                         defaultValue={railbehaviorsMeasureType}
                         style={{ width: 140 }}
@@ -404,11 +365,15 @@ function DataUpload( props ) {
                           { value: STRING_SHORT_MEASURE, label: "단기계측" },
                           { value: STRING_LONG_MEASURE, label: "장기계측" },
                         ]}
-                      />
+                      /> */}
+                      <div className="checkboxContainer">
+                        <Checkbox.Group options={options} value={railbehaviorsMeasureType}
+                          onChange={onChange} />
+                      </div>
                     </div>
                   </div>
-                </div>  
-                <div className="inputSearch"> 
+                {/* </div>  
+                <div className="inputSearch">  */}
                   <div className="inputLine">
                     <div className="inputTitle">측정기간</div>
                     <div className="inputValue">
@@ -462,8 +427,18 @@ function DataUpload( props ) {
                     </div>
                   </div>
                 </div>
-                <div className="devisionLine"></div>
+                {/* <div className="devisionLine"></div> */}
                 <div className="dataList">
+                    <div className="pagination">
+                      <Pagination
+                        onShowSizeChange={onShowSizeChange}
+                        onChange={(e)=>{console.log(e); setCurPage(e)}}
+                        total={totalCnt}
+                        showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+                        pageSize={showrows}
+                        current={curPage}
+                      />
+                    </div>
                     <div className="customTable2" style={{fontSize : "14px"}}>
                       <div className="theader">
                         <div className="tr">
@@ -946,14 +921,20 @@ function DataUpload( props ) {
                             }}
                           placeholder="속도" />
                         </div>
-                        <div className="td del">
+                        <div className="td del" style={{position:"relative"}}>
                           <Button danger 
                             onClick={()=>{
                               const newList = [...addRailbehaviorsSensorList];
                               newList.splice(i, 1);
                               setAddRailbehaviorsSensorList(newList);
                             }}
-                          icon={<DeleteOutlined />}></Button>
+                          icon={<DeleteOutlined />} ></Button>
+                          <div style={{position: "absolute",
+                                        right: 0,
+                                        background: "white",
+                                        width: "3px",
+                                        height: "100%",
+                                        top: 0}}></div>
                         </div>
                       </div>
                     } )}
@@ -1068,7 +1049,43 @@ function DataUpload( props ) {
             </div>
           </div>
         </Modal>
-
+        <input 
+          ref={hiddenFileInput} 
+          type="file" 
+          style={{display:'none'}} 
+          onChange={(e)=>{
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = () => {
+              const base64String = reader.result;
+              const base64FormattedString = base64String.split(',')[1];
+              let route = getRoute();
+              axios.post(`https://raildoctor.suredatalab.kr/api/data`,
+                {
+                  meta : {
+                    railroadId:"",
+                    category: active,
+                    dataType:"DATA",
+                    fileName: file.name,
+                    params: {},
+                    state: "UPLOADED"
+                  },
+                  data : base64FormattedString,
+                  railroadName : route
+                }
+              )
+              .then(response => {
+                console.log(response.data);
+                getList(active);
+              })
+              .catch(error => console.error('Error fetching data:', error));   
+            };
+            reader.onerror = () => {
+              console.error('FileReader에 문제가 발생했습니다.');
+            };
+          }}
+        />
       </div>
   );
 }

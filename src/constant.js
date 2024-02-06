@@ -85,6 +85,7 @@ export const TRACK_GEO_LOADING_TEXT = "측정일자를 불러오는 중입니다
 export const CHART_RENDERING_TEXT = "차트를 그리는 중 입니다...";
 export const DATA_LOADING_TEXT = "데이터를 불러오는 중 입니다...";
 export const PICTURE_RENDERING_TEXT = "선로열람도를 그리는 중 입니다...";
+export const MEASURE_DATA_LOADING_TEXT = "측정데이터를 불러오는 중 입니다...";
 
 export const UPLOAD_STATE_UPLOADED = "UPLOADED";
 export const UPLOAD_STATE_CONVERTING = "CONVERTING";

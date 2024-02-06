@@ -243,7 +243,13 @@ class PlaceInfo extends React.Component {
 			}
 
 			let y = this.state.canvas.height / 2 - this.state.padding + this.state.topPadding;
-
+			let fontColor = "rgba(0, 0, 0, 0.25)";
+			let strokeColor = "black"
+			if( viewUpPointcount > 30 ){
+				fontColor = "#00000000";
+				strokeColor = "#00000000";
+			}
+			context.strokeStyle = strokeColor;
 			context.beginPath();
 			
 			context.arc(point.x * this.state.scaleX + this.state.x, y, this.state.pointRadius, 0, 2 * Math.PI, false);
@@ -254,10 +260,7 @@ class PlaceInfo extends React.Component {
 			context.fill();
 			context.stroke();
 
-			let fontColor = "rgba(0, 0, 0, 0.25)";
-			if( viewUpPointcount > 30 ){
-					fontColor = "#00000000";
-			}
+
 			if( this.state.hoverPoint?.name === point.name &&
 				this.state.hoverPoint?.trackType === UP_TRACK ){
 				fontColor = "black";
@@ -303,6 +306,11 @@ class PlaceInfo extends React.Component {
 			}
 
 			let y = this.state.canvas.height / 2 + this.state.padding - this.state.bottomPadding;
+			let fontColor = "rgba(0, 0, 0, 0.25)";
+			if( viewDownPointcount > 30 ){
+					fontColor = "#00000000";
+
+			}
 
 			context.beginPath();
 			
@@ -314,10 +322,7 @@ class PlaceInfo extends React.Component {
 			context.fill();
 			context.stroke();
 
-			let fontColor = "rgba(0, 0, 0, 0.25)";
-			if( viewDownPointcount > 30 ){
-					fontColor = "#00000000";
-			}
+			
 
 			if( this.state.hoverPoint?.name === point.name &&
 				this.state.hoverPoint?.trackType === DOWN_TRACK ){

@@ -3,13 +3,13 @@
     height: calc(100% - 20px);
     display: flex;
     justify-content: left;
-    align-items: center;
+    align-items: flex-start;
     padding: 10px;
 }
 
 .dataUpload .uploadMenu{
     width: 300px;
-    height: 100%;
+    height: calc(100% - 10px);
     box-shadow: 1px 1px 8px #00000021;
     background-color: white;
     border-radius: 5px;
@@ -76,26 +76,30 @@
 .dataUpload .uploadHistory{
     width: calc(100% - 300px);
     margin-left: 10px;
-    height: calc(100% - 225px);
+    margin-top: 10px;
+    height: calc(100% - 30px);
     box-shadow: 1px 1px 8px #00000021;
     background-color: white;
     border-radius: 5px;
     position: relative;
-    padding-top: 215px;
+    /* padding-top: 215px; */
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    padding-top: 20px;
 }
 
 .dataUpload .uploadHistory .title{
     display: flex;
     justify-content: left;
     align-items: center;
-    position: absolute;
-    left: 20px;
-    top: 20px;
+    /* position: absolute; */
+    /* left: 20px;
+    top: 20px; */
     font-size: 25px;
     font-weight: bold;
+    padding-left: 20px;
 }
 
 .dataUpload .uploadHistory .uploadBtn{
@@ -125,7 +129,7 @@
     border-radius: 5px;
     border: 1px solid #cccccc;
     /* padding: 10px 0px 10px 0px; */
-    margin: 10px;
+    /* margin: 10px; */
 }
 
 .table3 .tableHeader{
@@ -217,11 +221,12 @@
 }
 
 .dataUpload .info{
-    position: absolute;
-    top: 62px;
+    /* position: absolute; */
+    /* top: 62px; */
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
 }
 
 .dataUpload .info .infoBox{
@@ -243,21 +248,26 @@
 }
 
 .treeListContainer{
-    height: calc(100% - 40px);
-    padding: 20px 20px 20px 20px;
+    height: calc(100% - 20px);
+    padding: 10px 20px 20px 20px;
     width: calc(100% - 40px);
-    font-family: 'NEO_R' ;
+    font-family: 'NEO_R';
 }
 
 .dataUpload .uploadHistory .pagination{
     height: 30px;
-    position: absolute;
+    /* position: absolute; */
     right: 155px;
     top: 200px;
     font-size: 14px;
     display: flex;
-    justify-content: center;
+    justify-content: end;
     align-items: center;
+    width: calc(100% - 160px);
+    /* height: 55px; */
+    margin-top: 55px;
+    /* margin-bottom: 20px; */
+    padding-right: 160px;
 }
 
 .dataUpload .uploadHistory .pagination .optionTitle{
@@ -496,6 +506,7 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .inputSearch .inputLine{
@@ -534,4 +545,20 @@
 
 .no-border-radius .ant-select-selector {
     border-radius: 0px 5px 5px 0px !important;
+}
+
+.inputLine .inputValue .checkboxContainer{
+    border: 1px solid #cccccc;
+    border-radius: 0px 5px 5px 0px;
+    padding-top: 3.5px;
+    padding-bottom: 3.5px;
+    padding-left: 10px;
+    padding-right: 5px;
+}
+
+.treeListContainer .dataList .pagination{
+    margin-top: 0px;
+    margin-bottom: 10px;
+    padding-right: 0;
+    width: 100%;
 }

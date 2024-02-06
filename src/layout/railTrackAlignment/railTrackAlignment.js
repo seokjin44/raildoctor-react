@@ -284,10 +284,7 @@ function RailTrackAlignment( props ) {
                   <div className="td no">No.</div>
                   <div className="td regDate">측정일자</div>
                   <div className="td track">Track</div>
-{/*                   <div className="td rail">Rail</div>
-                  <div className="td station">Station/tag</div> */}
                   <div className="td weld">Type of weld</div>
-{/*                   <div className="td weld">누적통과톤수</div> */}
                   <div className="td viewBtn"></div>
                 </div>
               </div>

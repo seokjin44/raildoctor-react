@@ -73,7 +73,7 @@
     background-color: green;
 }
 
-.checkboxContainer {
+.wear3DContainer .checkboxContainer {
     display: flex;
     justify-content: flex-start;
     align-items: center;

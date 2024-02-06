@@ -9,7 +9,7 @@
 .customTable2 .theader{
     background-color: #FAFAFA;
     border-bottom: 2px solid #cccccc;
-    border-radius: 5px 5px 0px 0px;
+    border-top: 1px solid #cccccc;
     padding-top: 10px;
     padding-bottom: 10px;
 }
@@ -46,6 +46,7 @@
 
 .customTable2 .tbody .tr {
     margin-bottom: 5px;
+    height: 32px;
 }
 
 .customTable2 .tbody.scroll{

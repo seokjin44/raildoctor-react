@@ -9,7 +9,7 @@ import 'dayjs/locale/ko';
 import { Select } from 'antd';
 import { Box, Modal } from "@mui/material";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
-import { BOXSTYLE, INSTRUMENTATIONPOINT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_CORNER_WEAR, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_KP, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, UP_TRACK, STRING_CORNER_PREDIC_WEAR, STRING_VERTICAL_PREDIC_WEAR } from "../../constant";
+import { BOXSTYLE, INSTRUMENTATIONPOINT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_CORNER_WEAR, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_SELECT_WEAR_CORRELATION_MGT, STRING_SELECT_WEAR_CORRELATION_RAILVAL, STRING_TRACK_SIDE_LEFT, STRING_TRACK_SIDE_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_KP, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, UP_TRACK, STRING_CORNER_PREDIC_WEAR, STRING_VERTICAL_PREDIC_WEAR, TRACK_GEO_LOADING_TEXT, MEASURE_DATA_LOADING_TEXT } from "../../constant";
 import AlertIcon from "../../assets/icon/decision/3876149_alert_emergency_light_protection_security_icon.png";
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
@@ -17,6 +17,7 @@ import axios from 'axios';
 import qs from 'qs';
 import { convertToCustomFormat, convertToNumber2, dateFormat, filterArrays, findRange, getInchonSpeedData, getRailroadSection, getRoute, getSeoulSpeedData, getTrackText, mgtToM, nonData, numberWithCommas, trackLeftRightToString, trackNumberToString, trackToString, wearModelTableBody, wearModelTableHeader1, wearModelTableHeader2, zeroToNull } from "../../util";
 import lodash, { isEmpty } from "lodash";
+import LoadingImg from "../../assets/icon/loading/loading.png";
 
 let route = getRoute();
 const { TextArea } = Input;
@@ -69,6 +70,7 @@ function WearMaintenance( props ) {
   const [leftRemaining, setLeftRemaining] = useState({});
   const [rightRemaining, setRightRemaining] = useState({});
   const [trackGeo, setTrackGeo] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleClose = () => {
     setOpen(false);
@@ -556,6 +558,7 @@ function WearMaintenance( props ) {
       return;
     }
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
+    setLoading(true);
     axios.get('https://raildoctor.suredatalab.kr/api/railwears/kp',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
@@ -588,6 +591,7 @@ function WearMaintenance( props ) {
       setUpTrackMeasurePoint([...new Set(response.data.t2)]);
       setDownTrackMeasurePoint([...new Set(response.data.t1)]);
       setDataExits(dataExits_);
+      setLoading(false);
     })
     .catch(error => console.error('Error fetching data:', error));
   }, [railroadSection])
@@ -602,6 +606,7 @@ function WearMaintenance( props ) {
   return (
     <div className="wearMaintenance" >
       <div className="railStatusContainer">
+        { (loading) ? <div className="loading"><img src={LoadingImg} alt="로딩" />{MEASURE_DATA_LOADING_TEXT}</div> : null }
         <RailStatus 
           resizeOn={resizeOn}
           railroadSection={railroadSection} 
