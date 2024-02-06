@@ -200,6 +200,7 @@
 .tabPanel .profileData{
     margin-bottom: 10px;
     height: 293px;
+    width: calc(100% - 14px);
 }
 
 .tabPanel .profileData .table .tableHeader{

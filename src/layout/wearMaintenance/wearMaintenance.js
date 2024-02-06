@@ -879,7 +879,7 @@ function WearMaintenance( props ) {
                   <div className="demoImgContainer">
                     <TrackSpeed 
                       data={trackSpeedData} 
-                      kp={convertToNumber2(selectKP.name)} 
+                      kp={{kp : convertToNumber2(selectKP.name)}} 
                       findClosest={(e)=>{setTrackSpeedFindClosest(e)}}
                     ></TrackSpeed>
                   </div>

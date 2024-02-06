@@ -7,7 +7,7 @@ export const monitoringSelectDates = atom({
 
 export const monitoringKP = atom({
     key: 'monitoringKP', // 고유한 키
-    default: 0, // 초기값
+    default: {kp : 0, changeEvent : "" }, // 초기값
 });
   
 export const monitoringInputKP = atom({

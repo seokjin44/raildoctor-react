@@ -109,6 +109,12 @@ export const TRACK_DEVIATION_TARGET = "TARGET"; //목표
 export const TRACK_DEVIATION_CAUTION = "CAUTION"; //주의
 export const TRACK_DEVIATION_REPAIR = "REPAIR"; //보수
 
+export const MONITORING_KP_CHANGE_EVENT_PATH_CLICK = "pathClick";
+export const MONITORING_KP_CHANGE_EVENT_INPUT = "input";
+export const MONITORING_KP_CHANGE_EVENT_SEARCH = "search";
+export const MONITORING_KP_CHANGE_EVENT_MAP_DRAG = "mapDrag";
+export const MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL = "scroll";
+
 export const colors = [
   "#FF5733", "#33FF57", "#5733FF", "#FF33A6", 
   "#33FFC1", "#FFC133", "#3314FF", "#FF3370", 

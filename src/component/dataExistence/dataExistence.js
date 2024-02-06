@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./dataExistence.css"
 import { Box, Modal, Tab } from "@mui/material";
-import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK, colors } from "../../constant";
+import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK, colors } from "../../constant";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -18,6 +18,8 @@ import axios from 'axios';
 import qs from 'qs';
 import classNames from "classnames";
 import Papa from 'papaparse';
+import { Button } from "antd";
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 let colorIndex = 1;
 let railMinValue = 99999;
@@ -104,6 +106,7 @@ function DataExistence( props ) {
   
   //레일프로파일
   const [profiles, setProfiles] = useState([]);
+  const [profileData, setProfileData] = useState({});
 
   //레일조도
   const [roughnessChartData, setRoughnessChartData] = useState([]);
@@ -159,15 +162,17 @@ function DataExistence( props ) {
   },[ props.railroadSection ]);
 
   useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-    scrollContainer.removeEventListener('scroll', handleScroll);
-    scrollMove(props.kp);
-    clearTimeout(setTimeoutID);
+/*     const scrollContainer = scrollContainerRef.current;
+    scrollContainer.removeEventListener('scroll', handleScroll); */
+    if( props.kp.changeEvent !== MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL ){
+      scrollMove(props.kp);
+    }
+/*     clearTimeout(setTimeoutID);
     setTimeoutID = setTimeout( ()=>{
       scrollContainer.addEventListener('scroll', handleScroll);
       setTimeoutID = -1;
     }, 200 )
-    console.log(setTimeoutID);
+    console.log(setTimeoutID); */
   },[ props.kp ]);
 
   const scrollMove = ( kp ) => {
@@ -625,6 +630,7 @@ function DataExistence( props ) {
                 })
                 .then(response => {
                   setProfileOpen(true);
+                  setProfileData(profileData);
                   console.log(response.data);
                   response.data.profiles.sort((a, b) => new Date(b.measureTs) - new Date(a.measureTs));
                   setProfiles(response.data.profiles);
@@ -876,7 +882,9 @@ function DataExistence( props ) {
                   </div>
                 </div>
               </div>
-              <div className="directBtn" onClick={()=>{navigate("/cumulativeThroughput");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+              <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/cumulativeThroughput");}} >
+                데이터 상세보기
+              </Button>
             </div>
           
         </Box>
@@ -914,7 +922,10 @@ function DataExistence( props ) {
                 </div>
               </div>
             </div>
-            <div className="directBtn" onClick={()=>{navigate("/wearMaintenance");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+            <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/wearMaintenance");}} >
+              데이터 상세보기
+            </Button>
+
           </div>
         </Box>
       </Modal>
@@ -927,119 +938,145 @@ function DataExistence( props ) {
         >
         <Box sx={BOXSTYLE} >
           <div className="popupTitle"><img src={PopupIcon} />레일프로파일 상세요약</div>
-          <div className="tabPanel" style={{width:"945px", height:"600px", paddingBottom : 0}}>
-            <div className="profileData">
-                <div className="table" >
-                  <div className="tableHeader" style={{ fontSize: "13px"}}>
-                    <div className="tr">
-                      <div className="td measurementDate colspan3"><div className="colspan3">측정일</div></div>
-                      <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div>
-                      <div className="td mamo rowspan7"><div className="rowspan7">좌레일</div></div>
-                      <div className="td mamo rowspan7"></div>
-                      <div className="td mamo rowspan7"></div>
-                      <div className="td mamo rowspan7"></div>
-                      <div className="td mamo rowspan7"></div>
-                      <div className="td mamo rowspan7"></div>
-                      <div className="td mamo"></div>
-                    </div>
-                    <div className="tr">
-                      <div className="td measurementDate colspan3"></div>
-                      <div className="td ton colspan3"></div>
-                      <div className="td mamo rowspan2"><div className="rowspan2">좌측</div></div>
-                      <div className="td mamo rowspan2"></div>
-                      <div className="td mamo colspan2"><div className="colspan2">직마모(0º)</div></div>
-                      <div className="td mamo rowspan2"><div className="rowspan2">우측</div></div>
-                      <div className="td mamo rowspan2 "></div>
-                      <div className="td mamo">면적</div>
-                      <div className="td mamo">마모율</div>
-                    </div>
-                    <div className="tr" style={{ height: "37px"}}>
-                      <div className="td measurementDate"></div>
-                      <div className="td ton colspan3"></div>
-                      <div className="td mamo">측마모(-90º)</div>
-                      <div className="td mamo">편마모(-45º)</div>
-                      <div className="td mamo"></div>
-                      <div className="td mamo">측마모(+45º)</div>
-                      <div className="td mamo">측마모(+90º)</div>
-                      <div className="td mamo">AW(㎟)</div>
-                      <div className="td mamo">AWP(%)</div>
+          <div className="tabPanel" style={{width:"945px", height:"645px", paddingBottom : 0}}>
+            <div className="contentBox" style={{height: "calc(100% - 50px)"}}>
+              <div className="containerTitle">그래프
+                <div className="dataOptionBox">
+                  <div className="dataOption" style={{right: "250px"}}>
+                    <div className="value">
+                        위치 : {convertToCustomFormat(profileData.kp*1000)}
                     </div>
                   </div>
-                  <div className="tableBody">
-                    {
-                      profiles.map( (profile, i) => {
-                        return <div key={`down${i}`} className="tr">
-                        <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
-                        <div className="td ton ">{numberWithCommas(nonData(profile.accumulateLeft))}</div>
-                        <div className="td mamo">{nonData(profile.llSideWear)}</div> 
-                        <div className="td mamo">{nonData(profile.llCornerWear)}</div> 
-                        <div className="td mamo">{nonData(profile.lVerticalWear)}</div> 
-                        <div className="td mamo">{nonData(profile.lrCornerWear)}</div> 
-                        <div className="td mamo">{nonData(profile.lrSideWear)}</div> 
-                        <div className="td mamo">{nonData(profile.lWearArea)}</div> 
-                        <div className="td mamo">{nonData(profile.lWearRate)}</div> 
+                  <div className="dataOption">
+                    <div className="value">
+                      측정기간 : {formatDateTime(new Date(profileData.measureTs))}
+                    </div>
+                  </div>
+                  <div className="dataOption">
+                    <div className="value">
+                      {getTrackText("상하선", route)} : {trackToString2(profileData.railTrack, route)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="componentBox chartBox flex paut" style={{ flexDirection: "column", padding: "5px" }}>
+                <div className="profileData">
+                    <div className="table" >
+                      <div className="tableHeader" style={{ fontSize: "13px"}}>
+                        <div className="tr">
+                          <div className="td measurementDate colspan3"><div className="colspan3">측정일</div></div>
+                          <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div>
+                          <div className="td mamo rowspan7"><div className="rowspan7">좌레일</div></div>
+                          <div className="td mamo rowspan7"></div>
+                          <div className="td mamo rowspan7"></div>
+                          <div className="td mamo rowspan7"></div>
+                          <div className="td mamo rowspan7"></div>
+                          <div className="td mamo rowspan7"></div>
+                          <div className="td mamo"></div>
+                        </div>
+                        <div className="tr">
+                          <div className="td measurementDate colspan3"></div>
+                          <div className="td ton colspan3"></div>
+                          <div className="td mamo rowspan2"><div className="rowspan2">좌측</div></div>
+                          <div className="td mamo rowspan2"></div>
+                          <div className="td mamo colspan2"><div className="colspan2">직마모(0º)</div></div>
+                          <div className="td mamo rowspan2"><div className="rowspan2">우측</div></div>
+                          <div className="td mamo rowspan2 "></div>
+                          <div className="td mamo">면적</div>
+                          <div className="td mamo">마모율</div>
+                        </div>
+                        <div className="tr" style={{ height: "37px"}}>
+                          <div className="td measurementDate"></div>
+                          <div className="td ton colspan3"></div>
+                          <div className="td mamo">측마모(-90º)</div>
+                          <div className="td mamo">편마모(-45º)</div>
+                          <div className="td mamo"></div>
+                          <div className="td mamo">측마모(+45º)</div>
+                          <div className="td mamo">측마모(+90º)</div>
+                          <div className="td mamo">AW(㎟)</div>
+                          <div className="td mamo">AWP(%)</div>
+                        </div>
                       </div>
-                      })
-                    }
-                  </div>
-                </div>
-            </div>
-            <div className="profileData">
-              <div className="table" >
-                <div className="tableHeader" style={{ fontSize: "13px"}}>
-                  <div className="tr">
-                    <div className="td measurementDate colspan3"><div className="colspan3">측정일</div></div>
-                    <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div>
-                    <div className="td mamo rowspan7"><div className="rowspan7">우레일</div></div>
-                    <div className="td mamo rowspan7"></div>
-                    <div className="td mamo rowspan7"></div>
-                    <div className="td mamo rowspan7"></div>
-                    <div className="td mamo rowspan7"></div>
-                    <div className="td mamo rowspan7"></div>
-                    <div className="td mamo"></div>
-                  </div>
-                  <div className="tr">
-                    <div className="td measurementDate colspan3"></div>
-                    <div className="td ton colspan3"></div>
-                    <div className="td mamo rowspan2"><div className="rowspan2">좌측</div></div>
-                    <div className="td mamo rowspan2"></div>
-                    <div className="td mamo colspan2"><div className="colspan2">직마모(0º)</div></div>
-                    <div className="td mamo rowspan2"><div className="rowspan2">우측</div></div>
-                    <div className="td mamo rowspan2 "></div>
-                    <div className="td mamo">면적</div>
-                    <div className="td mamo">마모율</div>
-                  </div>
-                  <div className="tr" style={{ height: "37px"}}>
-                    <div className="td measurementDate"></div>
-                    <div className="td ton "></div>
-                    <div className="td mamo">측마모(-90º)</div>
-                    <div className="td mamo">편마모(-45º)</div>
-                    <div className="td mamo"></div>
-                    <div className="td mamo">측마모(+45º)</div>
-                    <div className="td mamo">측마모(+90º)</div>
-                    <div className="td mamo">AW(㎟)</div>
-                    <div className="td mamo">AWP(%)</div>
-                  </div>
-                </div>
-                <div className="tableBody">
-                  {
-                    profiles.map( (profile, i) => {
-                      return <div key={`up${i}`} className="tr">
-                      <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
-                      <div className="td ton ">{numberWithCommas(nonData(profile.accumulateRight))}</div>
-                      <div className="td mamo">{nonData(profile.rlSideWear)}</div> 
-                      <div className="td mamo">{nonData(profile.rlCornerWear)}</div> 
-                      <div className="td mamo">{nonData(profile.rVerticalWear)}</div> 
-                      <div className="td mamo">{nonData(profile.rrCornerWear)}</div> 
-                      <div className="td mamo">{nonData(profile.rrSideWear)}</div> 
-                      <div className="td mamo">{nonData(profile.rWearArea)}</div> 
-                      <div className="td mamo">{nonData(profile.rWearRate)}</div> 
+                      <div className="tableBody">
+                        {
+                          profiles.map( (profile, i) => {
+                            return <div key={`down${i}`} className="tr">
+                            <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
+                            <div className="td ton ">{numberWithCommas(nonData(profile.accumulateLeft))}</div>
+                            <div className="td mamo">{nonData(profile.llSideWear)}</div> 
+                            <div className="td mamo">{nonData(profile.llCornerWear)}</div> 
+                            <div className="td mamo">{nonData(profile.lVerticalWear)}</div> 
+                            <div className="td mamo">{nonData(profile.lrCornerWear)}</div> 
+                            <div className="td mamo">{nonData(profile.lrSideWear)}</div> 
+                            <div className="td mamo">{nonData(profile.lWearArea)}</div> 
+                            <div className="td mamo">{nonData(profile.lWearRate)}</div> 
+                          </div>
+                          })
+                        }
+                      </div>
                     </div>
-                    })
-                  }
+                </div>
+                <div className="profileData">
+                  <div className="table" >
+                    <div className="tableHeader" style={{ fontSize: "13px"}}>
+                      <div className="tr">
+                        <div className="td measurementDate colspan3"><div className="colspan3">측정일</div></div>
+                        <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div>
+                        <div className="td mamo rowspan7"><div className="rowspan7">우레일</div></div>
+                        <div className="td mamo rowspan7"></div>
+                        <div className="td mamo rowspan7"></div>
+                        <div className="td mamo rowspan7"></div>
+                        <div className="td mamo rowspan7"></div>
+                        <div className="td mamo rowspan7"></div>
+                        <div className="td mamo"></div>
+                      </div>
+                      <div className="tr">
+                        <div className="td measurementDate colspan3"></div>
+                        <div className="td ton colspan3"></div>
+                        <div className="td mamo rowspan2"><div className="rowspan2">좌측</div></div>
+                        <div className="td mamo rowspan2"></div>
+                        <div className="td mamo colspan2"><div className="colspan2">직마모(0º)</div></div>
+                        <div className="td mamo rowspan2"><div className="rowspan2">우측</div></div>
+                        <div className="td mamo rowspan2 "></div>
+                        <div className="td mamo">면적</div>
+                        <div className="td mamo">마모율</div>
+                      </div>
+                      <div className="tr" style={{ height: "37px"}}>
+                        <div className="td measurementDate"></div>
+                        <div className="td ton "></div>
+                        <div className="td mamo">측마모(-90º)</div>
+                        <div className="td mamo">편마모(-45º)</div>
+                        <div className="td mamo"></div>
+                        <div className="td mamo">측마모(+45º)</div>
+                        <div className="td mamo">측마모(+90º)</div>
+                        <div className="td mamo">AW(㎟)</div>
+                        <div className="td mamo">AWP(%)</div>
+                      </div>
+                    </div>
+                    <div className="tableBody">
+                      {
+                        profiles.map( (profile, i) => {
+                          return <div key={`up${i}`} className="tr">
+                          <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
+                          <div className="td ton ">{numberWithCommas(nonData(profile.accumulateRight))}</div>
+                          <div className="td mamo">{nonData(profile.rlSideWear)}</div> 
+                          <div className="td mamo">{nonData(profile.rlCornerWear)}</div> 
+                          <div className="td mamo">{nonData(profile.rVerticalWear)}</div> 
+                          <div className="td mamo">{nonData(profile.rrCornerWear)}</div> 
+                          <div className="td mamo">{nonData(profile.rrSideWear)}</div> 
+                          <div className="td mamo">{nonData(profile.rWearArea)}</div> 
+                          <div className="td mamo">{nonData(profile.rWearRate)}</div> 
+                        </div>
+                        })
+                      }
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+            <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/railProfile");}} >
+              데이터 상세보기
+            </Button>
           </div>
         </Box>
       </Modal>
@@ -1094,7 +1131,9 @@ function DataExistence( props ) {
                 </ResponsiveContainer>
               </div>
             </div>
-            <div className="directBtn" onClick={()=>{navigate("/MeasuringTemperatureHumidity");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+            <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/MeasuringTemperatureHumidity");}} >
+              데이터 상세보기
+            </Button>
           </div>
         </Box>
       </Modal>
@@ -1160,7 +1199,6 @@ function DataExistence( props ) {
                 }
               </div>
             </div>
-            {/* <div className="directBtn" onClick={()=>{navigate("/MeasuringTemperatureHumidity");}}>데이터 상세보기<img src={ArrowIcon} /></div> */}
           </div>
         </Box>
       </Modal>
@@ -1173,8 +1211,8 @@ function DataExistence( props ) {
         >
         <Box sx={BOXSTYLE} >
           <div className="popupTitle"><img src={PopupIcon} />레일조도 상세요약</div>
-          <div className="tabPanel" style={{width:"945px", height:"600px", paddingBottom : 0}}>
-            <div className="contentBox" style={{height: "calc(100%)"}}>
+          <div className="tabPanel" style={{width:"945px", height:"600px", padding: "5px"}}>
+            <div className="contentBox" style={{height: "calc(100% - 50px)"}}>
               <div className="containerTitle">그래프
                 <div className="dataOptionBox">
                   <div className="dataOption" style={{right: "250px"}}>
@@ -1217,7 +1255,9 @@ function DataExistence( props ) {
               </ResponsiveContainer>
               </div>
             </div>
-            {/* <div className="directBtn" onClick={()=>{navigate("/MeasuringTemperatureHumidity");}}>데이터 상세보기<img src={ArrowIcon} /></div> */}
+            <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/railRoughness");}} >
+              데이터 상세보기
+            </Button>
           </div>
         </Box>
       </Modal>
@@ -1241,7 +1281,7 @@ function DataExistence( props ) {
               </TabList>
             </Box>
             <TabPanel value="1">
-            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px", paddingBottom: "30px"}}>
               <div className="contentBox" style={{width:"100%", height: "100%"}}>
                 <div className="containerTitle">
                   Chart
@@ -1289,11 +1329,13 @@ function DataExistence( props ) {
                 </ResponsiveContainer>
                 </div>
               </div>
-              <div className="directBtn" onClick={()=>{navigate("/trackDeviation");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+              <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/trackDeviation");}} >
+                데이터 상세보기
+              </Button>
             </div>
             </TabPanel>
             <TabPanel value="2">
-            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px", paddingBottom: "30px"}}>
               <div className="contentBox" style={{width:"100%", height: "100%"}}>
                 <div className="containerTitle">
                   Chart
@@ -1341,11 +1383,13 @@ function DataExistence( props ) {
                 </ResponsiveContainer>
                 </div>
               </div>
-              <div className="directBtn" onClick={()=>{navigate("/trackDeviation");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+              <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/trackDeviation");}} >
+                데이터 상세보기
+              </Button>
             </div>
             </TabPanel>
             <TabPanel value="3">
-            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px", paddingBottom: "30px"}}>
               <div className="contentBox" style={{width:"100%", height: "100%"}}>
                 <div className="containerTitle">
                   Chart
@@ -1392,11 +1436,13 @@ function DataExistence( props ) {
                 </ResponsiveContainer>
                 </div>
               </div>
-              <div className="directBtn" onClick={()=>{navigate("/trackDeviation");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+              <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/trackDeviation");}} >
+                데이터 상세보기
+              </Button>
             </div>
             </TabPanel>
             <TabPanel value="4">
-            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px", paddingBottom: "30px"}}>
               <div className="contentBox" style={{width:"100%", height: "100%"}}>
                 <div className="containerTitle">
                   Chart
@@ -1443,11 +1489,13 @@ function DataExistence( props ) {
                 </ResponsiveContainer>
                 </div>
               </div>
-              <div className="directBtn" onClick={()=>{navigate("/trackDeviation");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+              <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/trackDeviation");}} >
+                데이터 상세보기
+              </Button>
             </div>
             </TabPanel>
             <TabPanel value="5">
-            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px", paddingBottom: "30px"}}>
               <div className="contentBox" style={{width:"100%", height: "100%"}}>
                 <div className="containerTitle">
                   Chart
@@ -1494,7 +1542,9 @@ function DataExistence( props ) {
                 </ResponsiveContainer>
                 </div>
               </div>
-              <div className="directBtn" onClick={()=>{navigate("/trackDeviation");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+              <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/trackDeviation");}} >
+                데이터 상세보기
+              </Button>
             </div>
             </TabPanel>
           </TabContext>
@@ -1522,7 +1572,7 @@ function DataExistence( props ) {
               </TabList>
             </Box>
             <TabPanel value="1">
-              <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
+              <div className="tabPanel" style={{width:"1000px", height:"500px", paddingBottom: "30px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
@@ -1618,11 +1668,13 @@ function DataExistence( props ) {
                       </ResponsiveContainer>
                     </div>
                 </div>
-                <div className="directBtn" onClick={()=>{navigate("/trackGeometryMeasurement");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+                <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/trackGeometryMeasurement");}} >
+                  데이터 상세보기
+                </Button>
               </div>
             </TabPanel>
             <TabPanel value="2">
-            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px", paddingBottom: "30px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
@@ -1718,11 +1770,13 @@ function DataExistence( props ) {
                       </ResponsiveContainer>
                     </div>
                 </div>
-                <div className="directBtn" onClick={()=>{navigate("/trackGeometryMeasurement");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+                <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/trackGeometryMeasurement");}} >
+                  데이터 상세보기
+                </Button>
               </div>
             </TabPanel>
             <TabPanel value="3">
-            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px", paddingBottom: "30px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
@@ -1818,11 +1872,13 @@ function DataExistence( props ) {
                       </ResponsiveContainer>
                     </div>
                 </div>
-                <div className="directBtn" onClick={()=>{navigate("/trackGeometryMeasurement");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+                <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/trackGeometryMeasurement");}} >
+                  데이터 상세보기
+                </Button>
               </div>
             </TabPanel>
             <TabPanel value="4">
-            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px", paddingBottom: "30px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
@@ -1918,11 +1974,13 @@ function DataExistence( props ) {
                       </ResponsiveContainer>
                     </div>
                 </div>
-                <div className="directBtn" onClick={()=>{navigate("/trackGeometryMeasurement");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+                <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/trackGeometryMeasurement");}} >
+                  데이터 상세보기
+                </Button>
               </div>
             </TabPanel>
             <TabPanel value="5">
-            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px", paddingBottom: "30px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
@@ -2018,11 +2076,13 @@ function DataExistence( props ) {
                       </ResponsiveContainer>
                     </div>
                 </div>
-                <div className="directBtn" onClick={()=>{navigate("/trackGeometryMeasurement");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+                <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/trackGeometryMeasurement");}} >
+                  데이터 상세보기
+                </Button>
               </div>
             </TabPanel>
             <TabPanel value="6">
-            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px", paddingBottom: "30px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
@@ -2118,11 +2178,13 @@ function DataExistence( props ) {
                       </ResponsiveContainer>
                     </div>
                 </div>
-                <div className="directBtn" onClick={()=>{navigate("/trackGeometryMeasurement");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+                <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/trackGeometryMeasurement");}} >
+                  데이터 상세보기
+                </Button>
               </div>
             </TabPanel>
             <TabPanel value="7">
-            <div className="tabPanel" style={{width:"1000px", height:"500px"}}>
+            <div className="tabPanel" style={{width:"1000px", height:"500px", paddingBottom: "30px"}}>
                 <div className="contentBox" style={{height:"100%"}}>
                     <div className="containerTitle">Chart
                     <div className="dataOption" style={{right: "242px"}}>
@@ -2218,7 +2280,9 @@ function DataExistence( props ) {
                       </ResponsiveContainer>
                     </div>
                 </div>
-                <div className="directBtn" onClick={()=>{navigate("/trackGeometryMeasurement");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+                <Button className="directBtn" type="primary" icon={<ExclamationCircleOutlined />} onClick={()=>{navigate("/trackGeometryMeasurement");}} >
+                  데이터 상세보기
+                </Button>
               </div>
             </TabPanel>
         </TabContext>            

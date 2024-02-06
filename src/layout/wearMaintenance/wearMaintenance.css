@@ -705,7 +705,7 @@
     position: absolute;
     top: 8px;
     border: 0;
-    width: calc(100% - 10px);
+    width: calc(100% - 0px);
     height: calc(100% - 20px);
     background: #00000094;
     border-radius: 7px;

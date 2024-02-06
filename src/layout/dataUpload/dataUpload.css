@@ -373,6 +373,9 @@
     width: 80px;
     font-size: 15px;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .dataUploadPopup{

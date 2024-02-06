@@ -433,7 +433,7 @@
     position: absolute;
     right: 30px;
     bottom: 10px;
-    background-color: #44546A;
+    /* background-color: #44546A; */
     padding: 5px;
     border-radius: 5px;
     display: flex;

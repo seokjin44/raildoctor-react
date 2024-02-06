@@ -6,7 +6,7 @@ import { DatePicker, Input, Radio } from 'antd';
 import * as PDFJS from "pdfjs-dist/build/pdf";
 import * as pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 import RailStatus from "../../component/railStatus/railStatus";
-import { CHART_RENDERING_TEXT, PICTURE_RENDERING_TEXT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_UP_TRACK } from "../../constant";
+import { CHART_RENDERING_TEXT, MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL, MONITORING_KP_CHANGE_EVENT_INPUT, MONITORING_KP_CHANGE_EVENT_MAP_DRAG, MONITORING_KP_CHANGE_EVENT_PATH_CLICK, MONITORING_KP_CHANGE_EVENT_SEARCH, PICTURE_RENDERING_TEXT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_UP_TRACK } from "../../constant";
 import classNames from "classnames";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import DataExistence from "../../component/dataExistence/dataExistence";
@@ -100,7 +100,7 @@ function Monitoring( props ) {
     console.log(select);
     //getInstrumentationPoint(select);
     //setSelectedPath(select);
-    setKP(select.beginKp);
+    setKP({kp : select.beginKp, changeEvent : MONITORING_KP_CHANGE_EVENT_PATH_CLICK});
     setInputKp(Math.floor(select.beginKp));
   }
 
@@ -126,13 +126,13 @@ function Monitoring( props ) {
     /* let find = findPictureAndPosition( parseInt(kp) / 1000 );
     setViewRailMap(find); */
     trackMapMove(scales);
-    getTrackGeo(kp);
+    getTrackGeo(kp.kp);
   },[kp]);
 
   const trackMapMove = ( scales_ ) => {
     try{
-      let pos = findPositionInPictureList(parseInt(kp)/1000, pictureList, scales_).position;
-      setKPMarker({x : findPositionInPictureList(parseInt(kp)/1000, pictureList, scales_).position, y : 0});
+      let pos = findPositionInPictureList(parseInt(kp.kp)/1000, pictureList, scales_).position;
+      setKPMarker({x : findPositionInPictureList(parseInt(kp.kp)/1000, pictureList, scales_).position, y : 0});
       containerRef.current.scrollLeft = pos - (containerRef.current.offsetWidth / 2);
     }catch(e){
 
@@ -350,7 +350,7 @@ function Monitoring( props ) {
                     placeholder="KP" 
                     onKeyDown={(e)=>{
                       if(e.key==="Enter"){
-                        setKP(e.target.value);
+                        setKP({kp : e.target.value, changeEvent : MONITORING_KP_CHANGE_EVENT_INPUT});
                       }
                     }}
                     onChange={(e)=>{
@@ -379,7 +379,7 @@ function Monitoring( props ) {
               <div className="dataOption">
                 <button className="search" onClick={()=>{
                   console.log("Search");
-                  setKP(inputKp);
+                  setKP({kp : inputKp, changeEvent : MONITORING_KP_CHANGE_EVENT_SEARCH});
                 }} >
                   조회
                 </button>
@@ -415,7 +415,9 @@ function Monitoring( props ) {
                 }
                 <Draggable axis="x" 
                   onDrag={handleDrag} 
-                  onStop={()=>{setKP(inputKp)}}
+                  onStop={()=>{
+                    setKP({kp : inputKp, changeEvent : MONITORING_KP_CHANGE_EVENT_MAP_DRAG})
+                  }}
                   position={kpMarker}>
                   <div className="kpMarker" ></div>
                 </Draggable>
@@ -427,7 +429,7 @@ function Monitoring( props ) {
             <div className="containerTitle bothEnds">
               <div>속도정보</div>
               <div className="selectKPInfo">
-                선택된 KP : {convertToCustomFormat(kp)}
+                선택된 KP : {convertToCustomFormat(kp.kp)}
                 {
                   trackSpeedFindClosest.map( closest => {
                     return <>
@@ -484,7 +486,7 @@ function Monitoring( props ) {
                     kp={kp}
                     setKP={(kp)=>{
                       setInputKp(kp);
-                      setKP(kp);
+                      setKP({kp : kp, changeEvent : MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL});
                     }}
                     accumulateWeights={accumulateWeights}
                     railroadSection={railroadSection} 
@@ -532,7 +534,7 @@ function Monitoring( props ) {
               {
                 pictureList.map( (pic, index) => {
                   return <img className="map" key={index} alt="선로열람도" src={`https://raildoctor.suredatalab.kr${pic.fileName}`} onLoad={() => {
-                    let pos = zoomFindPositionInPictureList(parseInt(kp)/1000, pictureList).position;
+                    let pos = zoomFindPositionInPictureList(parseInt(kp.kp)/1000, pictureList).position;
                     setZoomImgKPMarker(pos);
                     zoomImgcontainerRef.current.scrollLeft = pos - (zoomImgcontainerRef.current.offsetWidth / 2);
                   }} />

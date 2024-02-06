@@ -341,11 +341,13 @@ function CumulativeThroughput( props ) {
                     style={RANGEPICKERSTYLE}
                     onChange={(e)=>{
                       if(e === null){
-                        setSelectDate(moment());
+                        setSelectDate(moment().startOf('day'));
                         return;
                       }
                       console.log(e.$d);
-                      setSelectDate(e.$d);
+                      const selectedDate = new Date(e.$d);
+                      const utcDate = new Date(Date.UTC(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), 0, 0, 0));
+                      setSelectDate(utcDate);
                     }}
                   />
                 </div>

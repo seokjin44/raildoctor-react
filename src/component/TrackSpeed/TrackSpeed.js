@@ -60,9 +60,9 @@ class TrackSpeed extends React.Component {
 	  if( !this.railCanvas.current ){ return; }
 	  let canvas = this.railCanvas.current;
 	  let ctx = this.railCanvas.current.getContext("2d");
-	  if (prevProps.kp !== this.props.kp) {
+	  if (prevProps.kp.kp !== this.props.kp.kp) {
 		console.log("componentDidUpdate");
-		this.kpChange(ctx, canvas, this.props.kp);
+		this.kpChange(ctx, canvas, this.props.kp.kp);
 		this.drawYAxis();  
 		let legend = this.drawLegend();
 		this.drawLine();
@@ -72,7 +72,7 @@ class TrackSpeed extends React.Component {
 		let trackData = [...this.props.data];
 		for(let track of trackData) {
 			//상본선 1, 하본선 -1
-			let data = findClosestX(track.data, this.props.kp);
+			let data = findClosestX(track.data, this.props.kp.kp);
 			if(track.trackType === 1) {
 				upTrackCloset.kp = data.x;
 				upTrackCloset.speed = data.y;
@@ -95,7 +95,7 @@ class TrackSpeed extends React.Component {
 
 	  if (!isEqual(prevProps.data, this.props.data)) {
 		ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-		this.kpChange(ctx, canvas, this.props.kp);
+		this.kpChange(ctx, canvas, this.props.kp.kp);
 		this.drawYAxis();  
 		let legend = this.drawLegend();
 		this.drawLine();
@@ -105,7 +105,7 @@ class TrackSpeed extends React.Component {
 		let trackData = [...this.props.data];
 		for(let track of trackData) {
 			//상본선 1, 하본선 -1
-			let data = findClosestX(track.data, this.props.kp);
+			let data = findClosestX(track.data, this.props.kp.kp);
 			if(track.trackType === 1) {
 				upTrackCloset.kp = data.x;
 				upTrackCloset.speed = data.y;
