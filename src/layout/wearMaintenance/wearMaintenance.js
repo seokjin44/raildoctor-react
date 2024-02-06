@@ -30,6 +30,8 @@ function WearMaintenance( props ) {
     "endKp": 0,
   });
   const [selectKP, setSelectKP] = useState({
+    beginKp : 0,
+    endKP : 0,
     name : "",
     trackType : UP_TRACK
   });
@@ -617,7 +619,16 @@ function WearMaintenance( props ) {
                     <div className="searchOption selectBox">
                       <div className="title flex textBold">계측 위치</div>
                       <div className="flex">
-                          <Input placeholder="KP" value={selectKP.name} style={RANGEPICKERSTYLE} />
+                          <Input placeholder="KP" 
+                            onChange={(e)=>{
+                              const numericValue = e.target.value.replace(/[^0-9]/g, '');
+                              const selectKP_ = lodash.cloneDeep(selectKP);
+                              selectKP_.beginKp = numericValue;
+                              setSelectKP(selectKP_);
+                            }}
+                            value={selectKP.beginKp} 
+                            style={RANGEPICKERSTYLE} 
+                          />
                       </div>
                     </div>
                     <div className="searchOption" style={{padding: "15px 15px 6px 15px"}}>

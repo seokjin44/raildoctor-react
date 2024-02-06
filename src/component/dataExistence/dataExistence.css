@@ -9,7 +9,7 @@
 
 .monitoringContainer .datafinder{
     position: relative;
-    height: 360px;
+    height: 400px;
     display: flex;
     justify-content: left;
     align-items: center;
@@ -167,6 +167,11 @@
     top: -75px;
 }
 
+.monitoringContainer .datafinder .dataList .line .dataBar.dataBarRailFile .detailBtn .tooltip{
+    height: 40px;
+    top: -75px;
+}
+
 .monitoringContainer .datafinder .dataList .line .dataBar.railRoughnesses .detailBtn .tooltip{
     height: 51px;
     top: -89px;
@@ -186,4 +191,26 @@
 
 .tabPanel .dataOptionBox .dataOption{
     position: static;
+}
+
+.tabPanel .profileData .table{
+    justify-content: flex-start;
+}
+
+.tabPanel .profileData{
+    margin-bottom: 10px;
+    height: 293px;
+}
+
+.tabPanel .profileData .table .tableHeader{
+    overflow-y: auto;
+}
+
+.tabPanel .profileData .table .tableHeader::-webkit-scrollbar-thumb,
+.tabPanel .profileData .table .tableHeader::-webkit-scrollbar-track {
+    background-color: #00000000;
+}
+
+.tabPanel .profileData .table .tableBody{
+    overflow-y: scroll;
 }

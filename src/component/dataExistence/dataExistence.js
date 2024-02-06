@@ -13,7 +13,7 @@ import { LineChart, Line, XAxis,
   YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer,
   ScatterChart, Scatter, Bar, BarChart } from 'recharts';
-import { convertObjectToArray, convertToCustomFormat, dateFormat, formatDateTime, formatTime, getRoute, getTrackText, intervalSample, numberWithCommas, tempDataName, trackDataName, trackToString, trackToString2, transposeObjectToArray } from "../../util";
+import { convertObjectToArray, convertToCustomFormat, dateFormat, formatDateTime, formatTime, getRoute, getTrackText, intervalSample, nonData, numberWithCommas, tempDataName, trackDataName, trackToString, trackToString2, transposeObjectToArray } from "../../util";
 import axios from 'axios';
 import qs from 'qs';
 import classNames from "classnames";
@@ -33,6 +33,8 @@ function DataExistence( props ) {
   const [temperatureOpen, setTemperatureOpen] = useState(false);
   const [pautOpen, setPautOpen] = useState(false);
   const [roughnessOpen, setRoughnessOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+
   /* const [railMinValue, setRailMinValue] = useState(99999); */
   const [railMaxValue, setRailMaxValue] = useState(0);
 
@@ -98,7 +100,10 @@ function DataExistence( props ) {
   const [railwearsTooltipIndex, setRailwearsTooltipIndex ] = useState(-1);
   const [railstraightsIndex, setRailstraightsIndex ] = useState(-1);
   const [railbehaviorsIndex, setRailbehaviorsIndex ] = useState(-1);
+  const [railProfileIndex, setRailProfileIndex ] = useState(-1);
   
+  //레일프로파일
+  const [profiles, setProfiles] = useState([]);
 
   //레일조도
   const [roughnessChartData, setRoughnessChartData] = useState([]);
@@ -196,6 +201,9 @@ function DataExistence( props ) {
         </div>
         <div className="line"  >
           <div className="dataName">온/습도 측정</div>
+        </div>
+        <div className="line"  >
+          <div className="dataName">레일프로파일</div>
         </div>
         <div className="line"  >
           <div className="dataName">레일직진도</div>
@@ -596,6 +604,49 @@ function DataExistence( props ) {
           </div>
         </div>
         <div className="line" style={{width:kptoPixel}} >
+          {/* <div className="dataName">레일프로파일</div> */}
+          <div className="dataBar dataBarRailFile">
+            {props.railProfile.map( (profileData, i) => {
+              return <div key={`railProfile${i}`} style={{left:`${(profileData.kp*1000) - railMinValue}px`}} 
+              className={classNames("detailBtn",{ onTooltip : railProfileIndex === i})} 
+              onMouseOver={()=>{setRailProfileIndex(i)}}
+              onMouseOut={()=>{setRailProfileIndex(-1)}}
+              onClick={()=>{
+                console.log(profileData);
+                axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles`,{
+                  paramsSerializer: params => {
+                    return qs.stringify(params, { format: 'RFC3986' })
+                  },
+                  params : {
+                    railroad : route,
+                    measure_kp : profileData.kp,
+                    rail_track : profileData.railTrack
+                  }
+                })
+                .then(response => {
+                  setProfileOpen(true);
+                  console.log(response.data);
+                  response.data.profiles.sort((a, b) => new Date(b.measureTs) - new Date(a.measureTs));
+                  setProfiles(response.data.profiles);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+              }}>
+                <div className="tooltip">
+                  <div className="tooltipLine">
+                    KP : {convertToCustomFormat(profileData.kp*1000)}
+                  </div>
+                  <div className="tooltipLine">
+                    TS : {formatDateTime(new Date(profileData.measureTs))}
+                  </div>
+                  <div className="tooltipLine">
+                    {getTrackText("상하선", route)} : {trackToString2(profileData.railTrack, route)}
+                  </div>
+                </div>
+              </div>
+            })}
+          </div>
+        </div>
+        <div className="line" style={{width:kptoPixel}} >
           {/* <div className="dataName">레일직진도</div> */}
           <div className="dataBar railstraights">
             {props.railstraights.map( (straightsData, i) => {
@@ -864,6 +915,131 @@ function DataExistence( props ) {
               </div>
             </div>
             <div className="directBtn" onClick={()=>{navigate("/wearMaintenance");}}>데이터 상세보기<img src={ArrowIcon} /></div>
+          </div>
+        </Box>
+      </Modal>
+
+      <Modal
+          open={profileOpen}
+          onClose={(e)=>{setProfileOpen(false)}}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+        <Box sx={BOXSTYLE} >
+          <div className="popupTitle"><img src={PopupIcon} />레일프로파일 상세요약</div>
+          <div className="tabPanel" style={{width:"945px", height:"600px", paddingBottom : 0}}>
+            <div className="profileData">
+                <div className="table" >
+                  <div className="tableHeader" style={{ fontSize: "13px"}}>
+                    <div className="tr">
+                      <div className="td measurementDate colspan3"><div className="colspan3">측정일</div></div>
+                      <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div>
+                      <div className="td mamo rowspan7"><div className="rowspan7">좌레일</div></div>
+                      <div className="td mamo rowspan7"></div>
+                      <div className="td mamo rowspan7"></div>
+                      <div className="td mamo rowspan7"></div>
+                      <div className="td mamo rowspan7"></div>
+                      <div className="td mamo rowspan7"></div>
+                      <div className="td mamo"></div>
+                    </div>
+                    <div className="tr">
+                      <div className="td measurementDate colspan3"></div>
+                      <div className="td ton colspan3"></div>
+                      <div className="td mamo rowspan2"><div className="rowspan2">좌측</div></div>
+                      <div className="td mamo rowspan2"></div>
+                      <div className="td mamo colspan2"><div className="colspan2">직마모(0º)</div></div>
+                      <div className="td mamo rowspan2"><div className="rowspan2">우측</div></div>
+                      <div className="td mamo rowspan2 "></div>
+                      <div className="td mamo">면적</div>
+                      <div className="td mamo">마모율</div>
+                    </div>
+                    <div className="tr" style={{ height: "37px"}}>
+                      <div className="td measurementDate"></div>
+                      <div className="td ton colspan3"></div>
+                      <div className="td mamo">측마모(-90º)</div>
+                      <div className="td mamo">편마모(-45º)</div>
+                      <div className="td mamo"></div>
+                      <div className="td mamo">측마모(+45º)</div>
+                      <div className="td mamo">측마모(+90º)</div>
+                      <div className="td mamo">AW(㎟)</div>
+                      <div className="td mamo">AWP(%)</div>
+                    </div>
+                  </div>
+                  <div className="tableBody">
+                    {
+                      profiles.map( (profile, i) => {
+                        return <div key={`down${i}`} className="tr">
+                        <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
+                        <div className="td ton ">{numberWithCommas(nonData(profile.accumulateLeft))}</div>
+                        <div className="td mamo">{nonData(profile.llSideWear)}</div> 
+                        <div className="td mamo">{nonData(profile.llCornerWear)}</div> 
+                        <div className="td mamo">{nonData(profile.lVerticalWear)}</div> 
+                        <div className="td mamo">{nonData(profile.lrCornerWear)}</div> 
+                        <div className="td mamo">{nonData(profile.lrSideWear)}</div> 
+                        <div className="td mamo">{nonData(profile.lWearArea)}</div> 
+                        <div className="td mamo">{nonData(profile.lWearRate)}</div> 
+                      </div>
+                      })
+                    }
+                  </div>
+                </div>
+            </div>
+            <div className="profileData">
+              <div className="table" >
+                <div className="tableHeader" style={{ fontSize: "13px"}}>
+                  <div className="tr">
+                    <div className="td measurementDate colspan3"><div className="colspan3">측정일</div></div>
+                    <div className="td ton colspan3"><div className="colspan3">누적통과톤수</div></div>
+                    <div className="td mamo rowspan7"><div className="rowspan7">우레일</div></div>
+                    <div className="td mamo rowspan7"></div>
+                    <div className="td mamo rowspan7"></div>
+                    <div className="td mamo rowspan7"></div>
+                    <div className="td mamo rowspan7"></div>
+                    <div className="td mamo rowspan7"></div>
+                    <div className="td mamo"></div>
+                  </div>
+                  <div className="tr">
+                    <div className="td measurementDate colspan3"></div>
+                    <div className="td ton colspan3"></div>
+                    <div className="td mamo rowspan2"><div className="rowspan2">좌측</div></div>
+                    <div className="td mamo rowspan2"></div>
+                    <div className="td mamo colspan2"><div className="colspan2">직마모(0º)</div></div>
+                    <div className="td mamo rowspan2"><div className="rowspan2">우측</div></div>
+                    <div className="td mamo rowspan2 "></div>
+                    <div className="td mamo">면적</div>
+                    <div className="td mamo">마모율</div>
+                  </div>
+                  <div className="tr" style={{ height: "37px"}}>
+                    <div className="td measurementDate"></div>
+                    <div className="td ton "></div>
+                    <div className="td mamo">측마모(-90º)</div>
+                    <div className="td mamo">편마모(-45º)</div>
+                    <div className="td mamo"></div>
+                    <div className="td mamo">측마모(+45º)</div>
+                    <div className="td mamo">측마모(+90º)</div>
+                    <div className="td mamo">AW(㎟)</div>
+                    <div className="td mamo">AWP(%)</div>
+                  </div>
+                </div>
+                <div className="tableBody">
+                  {
+                    profiles.map( (profile, i) => {
+                      return <div key={`up${i}`} className="tr">
+                      <div className="td measurementDate">{dateFormat(new Date(profile.measureTs))}</div>
+                      <div className="td ton ">{numberWithCommas(nonData(profile.accumulateRight))}</div>
+                      <div className="td mamo">{nonData(profile.rlSideWear)}</div> 
+                      <div className="td mamo">{nonData(profile.rlCornerWear)}</div> 
+                      <div className="td mamo">{nonData(profile.rVerticalWear)}</div> 
+                      <div className="td mamo">{nonData(profile.rrCornerWear)}</div> 
+                      <div className="td mamo">{nonData(profile.rrSideWear)}</div> 
+                      <div className="td mamo">{nonData(profile.rWearArea)}</div> 
+                      <div className="td mamo">{nonData(profile.rWearRate)}</div> 
+                    </div>
+                    })
+                  }
+                </div>
+              </div>
+            </div>
           </div>
         </Box>
       </Modal>

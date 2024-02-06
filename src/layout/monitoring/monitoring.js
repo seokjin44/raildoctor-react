@@ -54,6 +54,7 @@ function Monitoring( props ) {
   const [temperatures, setTemperatures] = useState([]);
   const [railstraights, setRailstraights] = useState([]);
   const [railroughnesses, setRailroughnesses] = useState([]);
+  const [railProfile, setRailProfile] = useState([]);
 
   const [railroadSection, setRailroadSection] = useState([]);
   const [paut, setPaut] = useState([]);
@@ -193,6 +194,7 @@ function Monitoring( props ) {
       setPaut(response.data.pauts);
       setRailstraights(response.data.railstraights);
       setRailroughnesses(response.data.railroughnesses);
+      setRailProfile(response.data.railprofiles);
     })
     .catch(error => console.error('Error fetching data:', error));
 /*     axios.get(`https://raildoctor.suredatalab.kr/api/pauts`,{
@@ -492,6 +494,7 @@ function Monitoring( props ) {
                     temperatures={temperatures}
                     railstraights={railstraights}
                     railroughnesses={railroughnesses}
+                    railProfile={railProfile}
                     paut={paut}
                 ></DataExistence>
                 }

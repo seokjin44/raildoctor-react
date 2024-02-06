@@ -225,6 +225,14 @@ class PlaceInfo extends React.Component {
 		let downTrackNumTick = parseInt(trackLength / tick); */
 
 		//상선
+		let viewUpPointcount = 0;
+		// 배열의 각 요소에 대해 반복
+		this.props.upTrackMeasurePoint.forEach(obj => {
+			let location = obj * 1000;
+			if(!( location < trackBeginKP || trackEndKP < location )){
+				viewUpPointcount++; // 조건을 만족하면 카운트 증가
+			}
+		});
 		for(let i = 1 ; i < this.props.upTrackMeasurePoint.length; i++) {
 			let location = this.props.upTrackMeasurePoint[i] * 1000;
 			if( location < trackBeginKP || trackEndKP < location ){continue;}
@@ -247,6 +255,9 @@ class PlaceInfo extends React.Component {
 			context.stroke();
 
 			let fontColor = "rgba(0, 0, 0, 0.25)";
+			if( viewUpPointcount > 30 ){
+					fontColor = "#00000000";
+			}
 			if( this.state.hoverPoint?.name === point.name &&
 				this.state.hoverPoint?.trackType === UP_TRACK ){
 				fontColor = "black";
@@ -273,6 +284,15 @@ class PlaceInfo extends React.Component {
 		}
 
 		//하선
+		let viewDownPointcount = 0;
+		// 배열의 각 요소에 대해 반복
+		this.props.downTrackMeasurePoint.forEach(obj => {
+		  let location = obj * 1000;
+		  if(!( location < trackBeginKP || trackEndKP < location )){
+			viewDownPointcount++; // 조건을 만족하면 카운트 증가
+		  }
+		});
+
 		for(let i = 1 ; i < this.props.downTrackMeasurePoint.length; i++) {
 			let location = this.props.downTrackMeasurePoint[i] * 1000;
 			if( location < trackBeginKP || trackEndKP < location ){continue;}
@@ -295,6 +315,10 @@ class PlaceInfo extends React.Component {
 			context.stroke();
 
 			let fontColor = "rgba(0, 0, 0, 0.25)";
+			if( viewDownPointcount > 30 ){
+					fontColor = "#00000000";
+			}
+
 			if( this.state.hoverPoint?.name === point.name &&
 				this.state.hoverPoint?.trackType === DOWN_TRACK ){
 				fontColor = "black";
