@@ -7,7 +7,7 @@ import { Checkbox, Input, Select, DatePicker } from "antd";
 import { CHART_FORMAT_RAW, CHART_RENDERING_TEXT, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, colors } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertObjectToArray, convertObjectToArray_, convertToCSV, convertToCustomFormat, deleteNonObj, deleteObjData, downloadCSV, findRange, getRailroadSection, getRoute, getTrackText, nonData, tempDataName, transformDataKeys } from "../../util";
+import { convertObjectToArray, convertObjectToArray_, convertToCSV, convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, downloadCSV, findRange, formatTime, getRailroadSection, getRoute, getTrackText, nonData, tempDataName, transformDataKeys } from "../../util";
 import CloseIcon from "../../assets/icon/211650_close_circled_icon.svg";
 import EmptyImg from "../../assets/icon/empty/empty5.png";
 import { isEmpty } from "lodash";
@@ -39,10 +39,35 @@ function MeasuringTemperatureHumidity( props ) {
   
   const [trackGeo, setTrackGeo] = useState({});
   const [loading, setLoading] = useState(false);
+  const [dataExitsDate, setDataExitsDate] = useState({});
+  
+  const disabledDate = (current) => {
+    return !dataExitsDate[dateFormat(current.$d)];
+  };
 
   const handleChange = (value) => {
     console.log(`selected ${value}`);
     setSelectDeviceID(value);
+    axios.get('https://raildoctor.suredatalab.kr/api/temperatures/ts',{
+      paramsSerializer: params => {
+        return qs.stringify(params, { format: 'RFC3986' })
+      },
+      params : {
+        deviceId : value
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      let dataExitsDate_ = {};
+      for( let ts of response.data.listTs ){
+        if( !dataExitsDate_[ dateFormat(new Date(ts)) ] ){
+          dataExitsDate_[ dateFormat(new Date(ts)) ] = [];
+        }
+        dataExitsDate_[ dateFormat(new Date(ts)) ].push(formatTime(new Date(ts)));
+      }
+      setDataExitsDate(dataExitsDate_);
+    })
+    .catch(error => console.error('Error fetching data:', error));
   };
 
   const setSearchRange = (date) => {
@@ -322,6 +347,7 @@ function MeasuringTemperatureHumidity( props ) {
                 <div className="title">조회기간 </div>
                 <div className="date">
                   <RangePicker 
+                    disabledDate={disabledDate}
                     style={RANGEPICKERSTYLE}
                     onChange={setSearchRange}
                   />

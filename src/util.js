@@ -1062,9 +1062,11 @@ export const curPagingCheck = (val, total) => {
 export const getTrackText = (val, route) => {
     let replaceText = val;
     if( route === STRING_ROUTE_SEOUL ){
-        replaceText = replaceText.replace('상선', '내선');
-        replaceText = replaceText.replace('하선', '외선');
-        replaceText = replaceText.replace('상하선', '내외선');
+        // 겹치는 텍스트 패턴을 고려하여 일시적인 플레이스홀더 사용
+        replaceText = replaceText.replace(/상하선/g, 'TEMP_PLACEHOLDER'); // '상하선'을 일시적인 플레이스홀더로 치환
+        replaceText = replaceText.replace(/상선/g, '외선');
+        replaceText = replaceText.replace(/하선/g, '내선');
+        replaceText = replaceText.replace(/TEMP_PLACEHOLDER/g, '내외선'); // 일시적인 플레이스홀더를 최종 텍스트로 치환
     }
     return replaceText;
 }

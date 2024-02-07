@@ -9,7 +9,7 @@ import { DatePicker, Input, Radio, Select } from "antd";
 import { RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
-import { convertToCustomFormat, findRange, formatDateTime, getQuarterStartAndEndDate, getRailroadSection, getRoute, getTrackText, nonData } from "../../util";
+import { convertToCustomFormat, dateFormat, findRange, formatDateTime, formatTime, getQuarterStartAndEndDate, getRailroadSection, getRoute, getTrackText, nonData } from "../../util";
 
 const { RangePicker } = DatePicker;
 let route = getRoute();
@@ -28,7 +28,12 @@ function RailTrackAlignment( props ) {
   const [railroadSection, setRailroadSection] = useState([]);
   
   const [trackGeo, setTrackGeo] = useState({});
-  
+  const [dataExitsDate, setDataExitsDate] = useState({});
+
+  const disabledDate = (current) => {
+    return !dataExitsDate[dateFormat(current.$d)];
+  };
+
   const pathClick = (select) => {
     console.log(select);
     setSelectedPath(select);
@@ -206,7 +211,31 @@ function RailTrackAlignment( props ) {
                     style={{
                       width: 200,
                     }}
-                    onChange={(val)=>{setSelectKP(val)}}
+                    onChange={(val)=>{
+                      axios.get('https://raildoctor.suredatalab.kr/api/railstraights/ts',{
+                        paramsSerializer: params => {
+                          return qs.stringify(params, { format: 'RFC3986' })
+                        },
+                        params : {
+                          railroad : route,
+                          kp : val,
+                          rail_track : selectTrack
+                        }
+                      })
+                      .then(response => {
+                        console.log(response.data);
+                        let dataExitsDate_ = {};
+                        for( let ts of response.data.listTs ){
+                          if( !dataExitsDate_[ dateFormat(new Date(ts)) ] ){
+                            dataExitsDate_[ dateFormat(new Date(ts)) ] = [];
+                          }
+                          dataExitsDate_[ dateFormat(new Date(ts)) ].push(formatTime(new Date(ts)));
+                        }
+                        setDataExitsDate(dataExitsDate_);
+                      })
+                      .catch(error => console.error('Error fetching data:', error));
+                      setSelectKP(val)
+                    }}
                     options={kpOptions}
                   />
                 </div>
@@ -221,6 +250,7 @@ function RailTrackAlignment( props ) {
                 <div className="date">
                   <DatePicker 
                     picker="quarter"
+                    disabledDate={disabledDate}
                     style={RANGEPICKERSTYLE}
                     onChange={(date)=>{
                       let quarter = getQuarterStartAndEndDate( date.$d );

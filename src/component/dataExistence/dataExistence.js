@@ -162,7 +162,6 @@ function DataExistence( props ) {
   },[ props.railroadSection ]);
 
   useEffect(() => {
-    console.log(props.kp);
     if( props.kp.changeEvent !== MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL ){
       scrollMove(props.kp.kp);
     }

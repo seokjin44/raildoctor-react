@@ -295,7 +295,7 @@ class PlaceGauge extends React.Component {
 				trackType: 1,
 				name: this.naming(start)
 			}
-			let boxWidth = (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX) - this.state.padding - 10;
+			let boxWidth = (endPoint.x * this.state.scaleX) - (startPoint.x * this.state.scaleX);
 			if( boxWidth < 0 ){ continue; }
 			if( railTrack === STRING_UP_TRACK_RIGHT2 ){
 				let y = this.state.canvas.height / 2 - this.state.padding + lineSpacing;
