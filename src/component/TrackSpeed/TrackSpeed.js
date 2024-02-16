@@ -52,8 +52,6 @@ class TrackSpeed extends React.Component {
 	componentDidMount(){
 		this.init();
 		this.drawLine();
-		let x = this.state.x + this.state.width;
-		console.log((x/2)/this.KP1toPixel1Width);
 	}
 
 	componentDidUpdate(prevProps, prevState){
@@ -61,7 +59,6 @@ class TrackSpeed extends React.Component {
 	  let canvas = this.railCanvas.current;
 	  let ctx = this.railCanvas.current.getContext("2d");
 	  if (prevProps.kp.kp !== this.props.kp.kp) {
-		console.log("componentDidUpdate");
 		this.kpChange(ctx, canvas, this.props.kp.kp);
 		this.drawYAxis();  
 		let legend = this.drawLegend();
@@ -137,13 +134,10 @@ class TrackSpeed extends React.Component {
 	}
 
 	kpChange(ctx, canvas, kp){
-		console.log('kp has changed');
 
 		let cneterKP = ((this.state.x + this.state.width)/2) / this.KP1toPixel1Width;
 		let move = (kp - cneterKP) * this.state.scaleX + this.state.x;
-		let curKP = (( ((this.state.x + this.state.width)/2) + move ) );
-		console.log(curKP);
-		console.log(curKP * ( 1 / this.KP1toPixel1Width ));
+		/* let curKP = (( ((this.state.x + this.state.width)/2) + move ) ); */
 
 		ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
 		ctx.save(); // Save the current state of the context
@@ -181,7 +175,6 @@ class TrackSpeed extends React.Component {
 		document.getElementById("track-speed-container-" + this.state.id).appendChild(canvas); */
 		
 		let rangeX = this.railCanvas.current.width / this.KP1toPixel1Width;
-		console.log("[TrackSpeed] rangeX :::: "+rangeX);
 
 		// user defined properties    
 		this.state.unitsPerTickX = 20;  
@@ -382,9 +375,7 @@ class TrackSpeed extends React.Component {
 		if(!this.railCanvas.current){return}
 		let context = this.railCanvas.current.getContext("2d");  
 		context.save();  
-		console.log("drawLine");
 		let trackData = [...this.props.data];
-		console.log("drawLine ::: ",trackData);
 		for(let track of trackData) {
 			let arrowCoordinates = [];
 

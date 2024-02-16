@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./dataExistence.css"
 import { Box, Modal, Tab } from "@mui/material";
-import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK, colors } from "../../constant";
+import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL, MONITORING_KP_CHANGE_EVENT_MAP_DRAG, MONITORING_KP_CHANGE_EVENT_SEARCH, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK, colors } from "../../constant";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -24,10 +24,8 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 let colorIndex = 1;
 let railMinValue = 99999;
 let route = getRoute();
-let setTimeoutID = -1;
 function DataExistence( props ) {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
   const [accOpen, setAccOpen] = useState(false);
   const [railbehaviorOpen, setRailbehaviorOpen] = useState(false);
   const [railtwistOpen, setRailtwistOpen] = useState(false);
@@ -120,9 +118,6 @@ function DataExistence( props ) {
   };
 
   const handleScroll = () => {
-    if( setTimeoutID > 0 ){
-      return;
-    }
     const scrollContainer = scrollContainerRef.current;
     const scrollLeft = scrollContainer.scrollLeft;
     const containerWidth = scrollContainer.clientWidth;

@@ -170,34 +170,46 @@ function DataUpload( props ) {
   }
 
   const statusBtn = ( data ) => {
+    let elems = [];
+    elems.push(<div className="stateBtn" onClick={()=>{
+      console.log(data);
+      axios.get(`https://raildoctor.suredatalab.kr/resources${data.excelFilePath}`, {responseType: 'blob'})
+      .then(response => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', data.fileName); // 다운로드 파일 이름 설정
+        document.body.appendChild(link);
+        link.click();
+  
+        // Clean up and remove the link
+        document.body.removeChild(link);
+      })
+      .catch(error => console.error('Error fetching data:', error));   
+    }} >파일다운로드</div>)
     if( data.state === UPLOAD_STATE_UPLOADED ){
         //return "업로드 완료"
-        return "";
     }else if( data.state === UPLOAD_STATE_CONVERTING ){
         //return "변환 중"
-        return "";
     }else if( data.state === UPLOAD_STATE_CONVERT_FAIL ){
         //return "변환 실패"
-        return "";
     }else if( data.state === UPLOAD_STATE_CONVERT_SUCCESS ){
         //return "변환 성공"
-        return <div className="stateBtn" onClick={()=>{
+        elems.push(<div className="stateBtn" onClick={()=>{
           axios.post(`https://raildoctor.suredatalab.kr/api/data/${data.datumId}`)
           .then(response => {
             console.log(response.data);
           })
           .catch(error => console.error('Error fetching data:', error));   
-        }} >데이터 반영</div>
+        }} >데이터 반영</div>)
     }else if( data.state === UPLOAD_STATE_APPLYING ){
         //return "시스템에 반영 중"
-        return "";
     }else if( data.state === UPLOAD_STATE_APPLY_FAIL ){
         //return "반영 실패"
-        return "";
     }else if( data.state === UPLOAD_STATE_APPLY_SUCCESS ){
         //return "반영 성공";
-        return "";
     }
+    return <>{elems}</>;
   }
 
   const onChange = (checkedValues) => {
@@ -274,7 +286,7 @@ function DataUpload( props ) {
                   axios.get(`https://raildoctor.suredatalab.kr/api/data/${active}`)
                   .then(response => {
                     console.log(response.data);
-                    fetch(`https://raildoctor.suredatalab.kr/resources/${response.data.filePath}`)
+                    fetch(`https://raildoctor.suredatalab.kr/resources${response.data.filePath}`)
                     .then(response => response.blob())
                     .then(blob => {
                       const path = response.data.filePath;
@@ -423,6 +435,25 @@ function DataUpload( props ) {
                         setAddRailbehaviorsSensorList([]);
                         }} style={{marginLeft : "10px"}} type="primary" icon={<AppstoreAddOutlined />}>
                         측정세트추가
+                      </Button>
+                      <Button type="primary" icon={<DownloadOutlined />} style={{marginLeft : "10px"}}
+                        onClick={()=>{
+                          axios.get(`https://raildoctor.suredatalab.kr/api/data/${active}`)
+                          .then(response => {
+                            console.log(response.data);
+                            fetch(`https://raildoctor.suredatalab.kr/resources${response.data.filePath}`)
+                            .then(response => response.blob())
+                            .then(blob => {
+                              const path = response.data.filePath;
+                              const filename = path.split('/').pop(); // "22테스트44.xlsx"
+                              saveAs(blob, filename);
+                            })
+                            .catch(e => console.error(e));
+                          })
+                          .catch(error => console.error('Error fetching data:', error));   
+                        }}
+                      >
+                        가이드
                       </Button>
                     </div>
                   </div>

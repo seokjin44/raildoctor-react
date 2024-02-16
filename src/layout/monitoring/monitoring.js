@@ -484,9 +484,15 @@ function Monitoring( props ) {
                   :
                   <DataExistence 
                     kp={kp}
-                    setKP={(kp)=>{
-                      setInputKp(kp);
-                      setKP({kp : kp, changeEvent : MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL});
+                    setKP={(changeKP)=>{
+                      console.log("DataExistence kp ::: ", kp );
+                      if( kp.changeEvent !== MONITORING_KP_CHANGE_EVENT_SEARCH &&
+                          kp.changeEvent !== MONITORING_KP_CHANGE_EVENT_MAP_DRAG ){
+                            setKP({kp : changeKP, changeEvent : MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL});
+                      }else{
+                        setKP({kp : changeKP, changeEvent : ""});
+                      }
+                      setInputKp(changeKP);
                     }}
                     accumulateWeights={accumulateWeights}
                     railroadSection={railroadSection} 

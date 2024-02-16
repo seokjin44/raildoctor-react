@@ -565,3 +565,14 @@
     padding-right: 0;
     width: 100%;
 }
+
+.treeListContainer .customTable2 .theader .tr .td.btn,
+.treeListContainer .customTable2 .tbody .tr .td.btn{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.treeListContainer .customTable2 .tbody .tr .td.btn .stateBtn{
+    margin-right: 5px;
+}
