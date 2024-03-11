@@ -96,7 +96,7 @@ function WearMaintenance( props ) {
       railroad_name : route
     }
     console.log(param);
-    axios.get('https://raildoctor.suredatalab.kr/api/railwears/time_and_weight',{
+    axios.get(URL_ROOT+'/api/railwears/time_and_weight',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
       },
@@ -132,7 +132,7 @@ function WearMaintenance( props ) {
       railroad_name : route
     }
     console.log(param);
-    axios.get('https://raildoctor.suredatalab.kr/api/railwears/time_and_weight',{
+    axios.get(URL_ROOT+'/api/railwears/time_and_weight',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
       },
@@ -163,7 +163,7 @@ function WearMaintenance( props ) {
   }
 
   const getTrackGeo = ( kp_ ) => {
-    axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
+    axios.get(URL_ROOT+'/api/railroads/rails',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -270,7 +270,7 @@ function WearMaintenance( props ) {
       prediction_method : selectModel
     }
     console.log(param);
-    axios.get('https://raildoctor.suredatalab.kr/api/railwears/graph_data',{
+    axios.get(URL_ROOT+'/api/railwears/graph_data',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
       },
@@ -302,7 +302,7 @@ function WearMaintenance( props ) {
       prediction_method : selectModel
     }
     console.log(param);
-    axios.get('https://raildoctor.suredatalab.kr/api/railwears/graph_data',{
+    axios.get(URL_ROOT+'/api/railwears/graph_data',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
       },
@@ -330,7 +330,7 @@ function WearMaintenance( props ) {
       prediction_method : selectModel
     }
     console.log(param);
-    axios.get('https://raildoctor.suredatalab.kr/api/railwears/predictions',{
+    axios.get(URL_ROOT+'/api/railwears/predictions',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
       },
@@ -559,7 +559,7 @@ function WearMaintenance( props ) {
     }
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
     setLoading(true);
-    axios.get('https://raildoctor.suredatalab.kr/api/railwears/kp',{
+    axios.get(URL_ROOT+'/api/railwears/kp',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },

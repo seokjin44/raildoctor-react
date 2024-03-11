@@ -49,7 +49,7 @@ function RailRoughness( props ) {
     }
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
     let route = getRoute();
-    axios.get('https://raildoctor.suredatalab.kr/api/railroughnesses/locations',{
+    axios.get(URL_ROOT+'/api/railroughnesses/locations',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },

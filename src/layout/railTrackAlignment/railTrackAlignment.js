@@ -100,7 +100,7 @@ function RailTrackAlignment( props ) {
       return;
     }
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
-    axios.get('https://raildoctor.suredatalab.kr/api/railstraights/locations',{
+    axios.get(URL_ROOT+'/api/railstraights/locations',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -135,7 +135,7 @@ function RailTrackAlignment( props ) {
   }, [railroadSection])
 
   useEffect(()=>{
-    axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
+    axios.get(URL_ROOT+'/api/railroads/rails',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -212,7 +212,7 @@ function RailTrackAlignment( props ) {
                       width: 200,
                     }}
                     onChange={(val)=>{
-                      axios.get('https://raildoctor.suredatalab.kr/api/railstraights/ts',{
+                      axios.get(URL_ROOT+'/api/railstraights/ts',{
                         paramsSerializer: params => {
                           return qs.stringify(params, { format: 'RFC3986' })
                         },
@@ -278,7 +278,7 @@ function RailTrackAlignment( props ) {
                     track_ = STRING_DOWN_TRACK_RIGHT;
                   }
                   let route = getRoute();
-                  axios.get('https://raildoctor.suredatalab.kr/api/railstraights/straights',{
+                  axios.get(URL_ROOT+'/api/railstraights/straights',{
                     paramsSerializer: params => {
                       return qs.stringify(params, { format: 'RFC3986' })
                     },
@@ -331,7 +331,7 @@ function RailTrackAlignment( props ) {
                         report.file.map( file => {
                           if(file.originName.indexOf("QI") > -1){
                             return <div className="viewBtn" onClick={()=>{
-                              axios.get('https://raildoctor.suredatalab.kr/api/railstraights/files',{
+                              axios.get(URL_ROOT+'/api/railstraights/files',{
                                 paramsSerializer: params => {
                                   return qs.stringify(params, { format: 'RFC3986' })
                                 },
@@ -352,7 +352,7 @@ function RailTrackAlignment( props ) {
                             }} >QI</div>
                           }else{
                             return <div className="viewBtn" onClick={()=>{
-                              axios.get('https://raildoctor.suredatalab.kr/api/railstraights/files',{
+                              axios.get(URL_ROOT+'/api/railstraights/files',{
                                 paramsSerializer: params => {
                                   return qs.stringify(params, { format: 'RFC3986' })
                                 },

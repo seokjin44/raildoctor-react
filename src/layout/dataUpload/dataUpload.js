@@ -105,7 +105,7 @@ function DataUpload( props ) {
 
 
     console.log(param);
-    axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/measuresets',{
+    axios.get(URL_ROOT+'/api/railbehaviors/measuresets',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat' })
       },
@@ -120,7 +120,7 @@ function DataUpload( props ) {
   }
 
   const getList = (category) => {
-    axios.get('https://raildoctor.suredatalab.kr/api/data',{
+    axios.get(URL_ROOT+'/api/data',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat' })
       },
@@ -142,7 +142,7 @@ function DataUpload( props ) {
   }
 
   const getDataStatistics = (category) => {
-    axios.get('https://raildoctor.suredatalab.kr/api/data/statistics',{
+    axios.get(URL_ROOT+'/api/data/statistics',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat' })
       },
@@ -159,7 +159,7 @@ function DataUpload( props ) {
     .catch(error => console.error('Error fetching data:', error));
 
     let currentDate = new Date();
-    axios.get('https://raildoctor.suredatalab.kr/api/data/statistics',{
+    axios.get(URL_ROOT+'/api/data/statistics',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat' })
       },

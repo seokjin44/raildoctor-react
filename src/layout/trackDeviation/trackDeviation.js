@@ -338,7 +338,7 @@ function TrackDeviation( props ) {
       return;
     }
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
-    axios.get('https://raildoctor.suredatalab.kr/api/railtwists/kp',{
+    axios.get(URL_ROOT+'/api/railtwists/kp',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },

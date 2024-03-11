@@ -113,7 +113,7 @@ function TrackGeometryMeasurement( props ) {
       }
     }
     console.log(param);
-    axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/locations', param )
+    axios.get(URL_ROOT+'/api/railbehaviors/locations', param )
     .then(response => {
       console.log(response.data);
       let dataArr = [];
@@ -375,7 +375,7 @@ function TrackGeometryMeasurement( props ) {
         return qs.stringify(params, { format: 'RFC3986' })
       }
     }
-    axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/locations', param )
+    axios.get(URL_ROOT+'/api/railbehaviors/locations', param )
     .then(response => {
       let dataArr = [];
       railroadSection.forEach( data => {
@@ -429,7 +429,7 @@ function TrackGeometryMeasurement( props ) {
   const getMeasureDates = (sensorId) => {
     setLoading(true);
     let dates = getYearStartEnd( calendarDate.getFullYear() );
-    axios.get('https://raildoctor.suredatalab.kr/api/railbehaviors/dates',{
+    axios.get(URL_ROOT+'/api/railbehaviors/dates',{
       params : {
         sensorId : sensorId,
         beginTs : new Date("2000-01-01").toISOString(),

@@ -5,7 +5,7 @@ import 'dayjs/locale/ko';
 import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Brush, Line } from 'recharts';
 
 import Papa from 'papaparse';
-import { CHART_RENDERING_TEXT,  DATA_LOADING_TEXT, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE, colors } from "../../constant";
+import { CHART_RENDERING_TEXT,  DATA_LOADING_TEXT, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE, URL_ROOT, colors } from "../../constant";
 import { DatePicker, Input } from "antd";
 import PlaceGauge from "../../component/PlaceGauge/PlaceGauge";
 import axios from 'axios';
@@ -72,7 +72,7 @@ function LWD( props ) {
   const pathClick = (select) => {
     setSelectedPath(select);
     let dataExitsDate_ ={};
-    axios.get('https://raildoctor.suredatalab.kr/api/lwds/ts',{
+    axios.get(URL_ROOT+'/api/lwds/ts',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -109,7 +109,7 @@ function LWD( props ) {
     /* for( let series of chartseries_ ){ */
     for( let i = 0; i < chartseries_.length; i++ ){
       let series = chartseries_[i];
-      axios.get('https://raildoctor.suredatalab.kr/api/lwds/adj',{
+      axios.get(URL_ROOT+'/api/lwds/adj',{
         paramsSerializer: params => {
           return qs.stringify(params, { format: 'RFC3986' })
         },
@@ -130,7 +130,7 @@ function LWD( props ) {
           });
           setLWDChartData(transformedData);
           deleteNonObj(chartDataObj);
-          axios.get('https://raildoctor.suredatalab.kr/api/lwds',{
+          axios.get(URL_ROOT+'/api/lwds',{
             paramsSerializer: params => {
               return qs.stringify(params, { format: 'RFC3986' })
             },
@@ -177,7 +177,7 @@ function LWD( props ) {
     let chartseries_ = [...chartseries];
     for( let i = 0; i < chartseries_.length; i++ ){
       let series = chartseries_[i];
-      axios.get('https://raildoctor.suredatalab.kr/api/lwds/adj',{
+      axios.get(URL_ROOT+'/api/lwds/adj',{
         paramsSerializer: params => {
           return qs.stringify(params, { format: 'RFC3986' })
         },
@@ -198,7 +198,7 @@ function LWD( props ) {
           });
           setLWDChartData(transformedData);
           deleteNonObj(chartDataObj);
-          axios.get('https://raildoctor.suredatalab.kr/api/lwds',{
+          axios.get(URL_ROOT+'/api/lwds',{
             paramsSerializer: params => {
               return qs.stringify(params, { format: 'RFC3986' })
             },
@@ -258,7 +258,7 @@ function LWD( props ) {
       return;
     }
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
-    axios.get('https://raildoctor.suredatalab.kr/api/lwds/kp',{
+    axios.get(URL_ROOT+'/api/lwds/kp',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -350,7 +350,7 @@ function LWD( props ) {
                     alert("측정일자를 찾을 수 없습니다. 측정분기와 측정일자가 선택되어있는지 확인해주세요.");
                     return;
                   }
-                  axios.get('https://raildoctor.suredatalab.kr/api/lwds',{
+                  axios.get(URL_ROOT+'/api/lwds',{
                     paramsSerializer: params => {
                       return qs.stringify(params, { format: 'RFC3986' })
                     },

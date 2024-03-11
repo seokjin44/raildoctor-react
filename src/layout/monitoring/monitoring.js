@@ -106,7 +106,7 @@ function Monitoring( props ) {
 
   const getTrackGeo = ( kp_ ) => {
     let route = getRoute();
-    axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
+    axios.get(URL_ROOT+'/api/railroads/rails',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },

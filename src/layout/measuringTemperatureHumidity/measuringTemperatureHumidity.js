@@ -48,7 +48,7 @@ function MeasuringTemperatureHumidity( props ) {
   const handleChange = (value) => {
     console.log(`selected ${value}`);
     setSelectDeviceID(value);
-    axios.get('https://raildoctor.suredatalab.kr/api/temperatures/ts',{
+    axios.get(URL_ROOT+'/api/temperatures/ts',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -245,7 +245,7 @@ function MeasuringTemperatureHumidity( props ) {
   useEffect(()=>{
     for( let sensor of sensorList ){
       if( sensor.deviceId === selectDeviceID ){
-        axios.get('https://raildoctor.suredatalab.kr/api/railroads/rails',{
+        axios.get(URL_ROOT+'/api/railroads/rails',{
           paramsSerializer: params => {
             return qs.stringify(params, { format: 'RFC3986' })
           },
@@ -269,7 +269,7 @@ function MeasuringTemperatureHumidity( props ) {
       return;
     }
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
-    axios.get('https://raildoctor.suredatalab.kr/api/temperatures/locations',{
+    axios.get(URL_ROOT+'/api/temperatures/locations',{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },

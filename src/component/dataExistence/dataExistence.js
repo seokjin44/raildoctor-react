@@ -297,7 +297,7 @@ function DataExistence( props ) {
                 }
                 console.log(param);
                 setSelectKP({trackType : (data.railTrack===STRING_UP_TRACK) ? UP_TRACK : DOWN_TRACK });
-                axios.get('https://raildoctor.suredatalab.kr/api/railwears/graph_data',{
+                axios.get(URL_ROOT+'/api/railwears/graph_data',{
                   paramsSerializer: params => {
                     return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
                   },
@@ -649,7 +649,7 @@ function DataExistence( props ) {
               onMouseOut={()=>{setRailstraightsIndex(-1)}}
               onClick={()=>{
                 console.log(straightsData);
-                axios.get('https://raildoctor.suredatalab.kr/api/railstraights/files',{
+                axios.get(URL_ROOT+'/api/railstraights/files',{
                   paramsSerializer: params => {
                     return qs.stringify(params, { format: 'RFC3986' })
                   },
