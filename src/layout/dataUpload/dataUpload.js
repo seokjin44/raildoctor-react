@@ -53,12 +53,21 @@ function DataUpload( props ) {
   const [ addRailbehaviorsRoute, setAddRailbehaviorsRoute ] = useState(route);
   const [ addRailbehaviorsDisplayName, setAddRailbehaviorsDisplayName ] = useState("");
   const [ addRailbehaviorsMeasureType, setAddRailbehaviorsMeasureType ] = useState(STRING_SHORT_MEASURE);
-  const [ addRailbehaviorsDateRange, setAddRailbehaviorsDateRange ] = useState(null);
+  /* const [ addRailbehaviorsDateRange, setAddRailbehaviorsDateRange ] = useState(null); */
+  const [ addRailbehaviorsStartDate, setAddRailbehaviorsStartDate ] = useState(null);
+  const [ addRailbehaviorsEndDate, setAddRailbehaviorsEndDate ] = useState(null);
+
   const [ addRailbehaviorsT2BeginKp, setAddRailbehaviorsT2BeginKp ] = useState("");
   const [ addRailbehaviorsT2EndKp, setAddRailbehaviorsT2EndKp ] = useState("");
   const [ addRailbehaviorsT1BeginKp, setAddRailbehaviorsT1BeginKp ] = useState("");
   const [ addRailbehaviorsT1EndKp, setAddRailbehaviorsT1EndKp ] = useState("");
   const [ addRailbehaviorsSensorList, setAddRailbehaviorsSensorList ] = useState([]);
+
+  // 종료일 DatePicker에서 선택할 수 없는 날짜를 정의하는 함수
+  const disabledEndDate = (current) => {
+    // 시작일이 선택되지 않았거나 현재 날짜가 시작일 이전이면 true를 반환하여 날짜를 비활성화
+    return !addRailbehaviorsStartDate || current.isBefore(addRailbehaviorsStartDate, 'day');
+  };
 
   const activeChange = ( category ) => {
     setActive(category);
@@ -427,7 +436,8 @@ function DataUpload( props ) {
                         setAddRailbehaviorsRoute(railbehaviorsRoute);
                         setAddRailbehaviorsDisplayName("");
                         setAddRailbehaviorsMeasureType(STRING_SHORT_MEASURE);
-                        setAddRailbehaviorsDateRange(null);
+                        setAddRailbehaviorsStartDate(null);
+                        setAddRailbehaviorsEndDate(null);
                         setAddRailbehaviorsT2BeginKp("");
                         setAddRailbehaviorsT2EndKp("");
                         setAddRailbehaviorsT1BeginKp("");
@@ -611,7 +621,8 @@ function DataUpload( props ) {
                   setAddRailbehaviorsRoute(railbehaviorsRoute);
                   setAddRailbehaviorsDisplayName("");
                   setAddRailbehaviorsMeasureType(STRING_SHORT_MEASURE);
-                  setAddRailbehaviorsDateRange(null);
+                  setAddRailbehaviorsStartDate(null);
+                  setAddRailbehaviorsEndDate(null);
                   setAddRailbehaviorsT2BeginKp("");
                   setAddRailbehaviorsT2EndKp("");
                   setAddRailbehaviorsT1BeginKp("");
@@ -728,9 +739,25 @@ function DataUpload( props ) {
             <div className="inputLine">
               <div className="inputTitle">측정기간</div>
               <div className="inputValue">
-                <RangePicker 
+                {/* <RangePicker 
                   value={addRailbehaviorsDateRange}
-                  onChange={(e)=>{setAddRailbehaviorsDateRange(e)}} />
+                  onChange={(e)=>{setAddRailbehaviorsDateRange(e)}} /> */}
+                <DatePicker style={{marginRight:"7px"}} 
+                    value={addRailbehaviorsStartDate}
+                    onChange={(value) => {
+                      setAddRailbehaviorsStartDate(value);
+                      // 시작일 변경 시, 선택된 종료일이 새로운 시작일 이전인 경우 종료일을 초기화
+                      if (addRailbehaviorsEndDate && addRailbehaviorsEndDate.isBefore(value, 'day')) {
+                        setAddRailbehaviorsEndDate(null);
+                      }
+                    }}
+                /> - 
+                <DatePicker style={{marginLeft:"7px"}}
+                    value={addRailbehaviorsEndDate}
+                    onChange={setAddRailbehaviorsEndDate}
+                    disabledDate={disabledEndDate}
+                    disabled={!addRailbehaviorsStartDate} // 시작일이 없으면 종료일 DatePicker 비활성화
+                />
               </div>
             </div>
             <div className="inputLine">
@@ -769,6 +796,10 @@ function DataUpload( props ) {
                         alert("각 가속도(최대), 가속도(최소), 레일응력(최소), 레일응력(최대), 윤중(최대), 횡압, 수직변위, 수평변위, 속도는 중복되면 안됩니다.");
                         return;
                       }
+                      if( !addRailbehaviorsStartDate ){
+                        alert("날짜가 입력되지 않았습니다.");
+                        return;
+                      }
                       axios.post(`https://raildoctor.suredatalab.kr/api/railbehaviors/measuresets`,
                       {
                         "railroadId": addRailbehaviorsRoute,
@@ -778,8 +809,8 @@ function DataUpload( props ) {
                         "t2Begin": addRailbehaviorsT2BeginKp / 1000,
                         "t2End": addRailbehaviorsT2EndKp / 1000,
                         "measureType": addRailbehaviorsMeasureType,
-                        "beginTs": addRailbehaviorsDateRange[0].$d.toISOString(),
-                        "endTs": addRailbehaviorsDateRange[1].$d.toISOString(),
+                        "beginTs": addRailbehaviorsStartDate.$d.toISOString(),
+                        "endTs": ( addRailbehaviorsEndDate ) ? addRailbehaviorsEndDate.$d.toISOString() : null,
                         "sensors": addRailbehaviorsSensorList,
                         "removeOnSuccess": true
                       }

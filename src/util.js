@@ -28,6 +28,10 @@ export const formatTime = (date) => {
 }
 
 export const formatDateTime = (date) => {
+    console.log(date);
+    if( !date || isNaN(date.getTime()) || date === undefined || date === null ){
+        return "";
+    }
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -1270,12 +1274,15 @@ export const checkUniqueness = (arr) => {
     let values = [];
   
     // 배열을 순회하며 각 객체의 a, b, c 속성 값들을 values 배열에 추가합니다.
+    // 이때, 빈 문자열("")은 추가하지 않습니다.
     arr.forEach(obj => {
-      values.push(
-            obj.accMax, obj.accMin, obj.stressMin,
-            obj.stress, obj.wlMax, obj.lf,
-            obj.vd, obj.hd, obj.speed,
-        );
+        // 객체의 각 속성 값을 배열로 변환하여 순회합니다.
+        [obj.accMax, obj.accMin, obj.stressMin, obj.stress, obj.wlMax, obj.lf, obj.vd, obj.hd, obj.speed].forEach(value => {
+            // 빈 문자열이 아닌 값을 values 배열에 추가합니다.
+            if (value !== "") {
+                values.push(value);
+            }
+        });
     });
   
     // Set 객체를 사용하여 고유한 값들만 남깁니다.
@@ -1284,4 +1291,4 @@ export const checkUniqueness = (arr) => {
     // 만약 고유한 값들의 수(uniqueValues.size)가 원래 값들의 수(values.length)와 같다면,
     // 모든 값들은 고유합니다. 그렇지 않다면 중복된 값이 존재합니다.
     return uniqueValues.size === values.length;
-  }
+}
