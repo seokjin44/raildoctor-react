@@ -4,7 +4,7 @@ import RailStatus from "../../component/railStatus/railStatus";
 import 'dayjs/locale/ko';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Checkbox, Input, Select, DatePicker } from "antd";
-import { CHART_FORMAT_RAW, CHART_RENDERING_TEXT, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, colors } from "../../constant";
+import { CHART_FORMAT_RAW, CHART_RENDERING_TEXT, RANGEPICKERSTYLE, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_RAIL_TEMPERATURE, STRING_TEMPERATURE, URL_ROOT, colors } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
 import { convertObjectToArray, convertObjectToArray_, convertToCSV, convertToCustomFormat, dateFormat, deleteNonObj, deleteObjData, downloadCSV, findRange, formatTime, getRailroadSection, getRoute, getTrackText, nonData, tempDataName, transformDataKeys } from "../../util";
@@ -125,7 +125,7 @@ function MeasuringTemperatureHumidity( props ) {
     }
     
     let chartseries_ = [...chartseries];
-    axios.get(`https://raildoctor.suredatalab.kr/api/temperatures/period/${selectDeviceID}?begin=${searchRangeDate[0].$d.toISOString()}&end=${searchRangeDate[1].$d.toISOString()}`,{
+    axios.get(URL_ROOT+`/api/temperatures/period/${selectDeviceID}?begin=${searchRangeDate[0].$d.toISOString()}&end=${searchRangeDate[1].$d.toISOString()}`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       }

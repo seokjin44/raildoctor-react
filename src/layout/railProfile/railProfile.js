@@ -20,7 +20,7 @@ import {
   BarController,
 } from 'chart.js';
 import faker from 'faker';
-import { RADIO_STYLE, STRING_DOWN_TRACK, STRING_UP_TRACK } from "../../constant";
+import { RADIO_STYLE, STRING_DOWN_TRACK, STRING_UP_TRACK, URL_ROOT } from "../../constant";
 import { Input, DatePicker, Radio, Select } from "antd";
 import ImgSlider from "../../component/imgSlider/imgSlider";
 import { convertToCustomFormat, dateFormat, findJustSmallerKey, findRange, getRailroadSection, getRoute, getTrackText, nonData, numberWithCommas } from "../../util";
@@ -137,7 +137,7 @@ function RailProfile( props ) {
     setSelectRightProfileDate(val);
     if( profilesMap.get(val) ){
       let profile = profilesMap.get(val);
-      axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/pictures/${profile.profileId}`,{
+      axios.get(URL_ROOT+`/api/railprofiles/pictures/${profile.profileId}`,{
         paramsSerializer: params => {
           return qs.stringify(params, { format: 'RFC3986' })
         }
@@ -157,7 +157,7 @@ function RailProfile( props ) {
     setSelectRightProfileDate(val);
     if( profilesMap.get(val) ){
       let profile = profilesMap.get(val);
-      axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/pictures/${profile.profileId}`,{
+      axios.get(URL_ROOT+`/api/railprofiles/pictures/${profile.profileId}`,{
         paramsSerializer: params => {
           return qs.stringify(params, { format: 'RFC3986' })
         }
@@ -179,7 +179,7 @@ function RailProfile( props ) {
     }else if( profile.imageLeft ){
       /* let get = findJustSmallerKey(profilesMap, new Date(profile.measureTs).getTime());
       console.log(get); */
-      return <img className="profileImg" src={`https://raildoctor.suredatalab.kr${profile.imageLeft.fileName}`} />;
+      return <img className="profileImg" src={URL_ROOT+`${profile.imageLeft.fileName}`} />;
     }
     return <div className="profileImg" >
       이미지가 없습니다.
@@ -192,7 +192,7 @@ function RailProfile( props ) {
         날짜를 선택해주세요.
       </div>;
     }else if( profile.imageRight ){
-      return <img className="profileImg" src={`https://raildoctor.suredatalab.kr${profile.imageRight.fileName}`} />;
+      return <img className="profileImg" src={URL_ROOT+`${profile.imageRight.fileName}`} />;
     }
     return <div className="profileImg" >
       이미지가 없습니다.
@@ -204,7 +204,7 @@ function RailProfile( props ) {
       return;
     }
     console.log(railroadSection[0].displayName, railroadSection[railroadSection.length-1].displayName);
-    axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/locations`,{
+    axios.get(URL_ROOT+`/api/railprofiles/locations`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -324,7 +324,7 @@ function RailProfile( props ) {
               </div> */}
               <div className="dataOption">
                 <button className="search" onClick={()=>{
-                  axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles`,{
+                  axios.get(URL_ROOT+`/api/railprofiles/profiles`,{
                     paramsSerializer: params => {
                       return qs.stringify(params, { format: 'RFC3986' })
                     },
@@ -453,7 +453,7 @@ function RailProfile( props ) {
                         }
 
                         // 이제 base64FormattedString을 서버에 업로드합니다.
-                        axios.post(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles/images`,
+                        axios.post(URL_ROOT+`/api/railprofiles/profiles/images`,
                           {
                             meta : {
                               profileId:leftTrackProfile.profileId,
@@ -609,7 +609,7 @@ function RailProfile( props ) {
                         }
                   
                         // 이제 base64FormattedString을 서버에 업로드합니다.
-                        axios.post(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles/images`,
+                        axios.post(URL_ROOT+`/api/railprofiles/profiles/images`,
 /*                           paramsSerializer: params => {
                             return qs.stringify(params, { format: 'RFC3986' })
                           }, */

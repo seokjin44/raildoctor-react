@@ -11,7 +11,7 @@ import qs from 'qs';
 import { checkUniqueness, convertBytesToMB, convertToCustomFormat, curPagingCheck, curPagingText, dataUploadTitle, flattenTreeData, formatDateTime, getRoute, measureTypeText, trackToString, trackToString2, uploadState, uploadStateBtn } from "../../util";
 import { useRef } from "react";
 import { Button, Checkbox, DatePicker, Input, Modal, Pagination, Select } from "antd";
-import { BOXSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_LONG_MEASURE, STRING_ROUTE_GYEONGBU, STRING_ROUTE_INCHON, STRING_ROUTE_OSONG, STRING_ROUTE_SEOUL, STRING_SHORT_MEASURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, UPLOAD_CATEGORY_ACCUMULATEWEIGHTS, UPLOAD_CATEGORY_RAILBEHAVIORS, UPLOAD_CATEGORY_RAILPROFILES, UPLOAD_CATEGORY_RAILROUGHNESS, UPLOAD_CATEGORY_RAILSTRAIGHTS, UPLOAD_CATEGORY_RAILTWISTS, UPLOAD_CATEGORY_RAILWEARS, UPLOAD_CATEGORY_TEMPERATURES, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED } from "../../constant";
+import { BOXSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_LONG_MEASURE, STRING_ROUTE_GYEONGBU, STRING_ROUTE_INCHON, STRING_ROUTE_OSONG, STRING_ROUTE_SEOUL, STRING_SHORT_MEASURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, UPLOAD_CATEGORY_ACCUMULATEWEIGHTS, UPLOAD_CATEGORY_RAILBEHAVIORS, UPLOAD_CATEGORY_RAILPROFILES, UPLOAD_CATEGORY_RAILROUGHNESS, UPLOAD_CATEGORY_RAILSTRAIGHTS, UPLOAD_CATEGORY_RAILTWISTS, UPLOAD_CATEGORY_RAILWEARS, UPLOAD_CATEGORY_TEMPERATURES, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED, URL_ROOT } from "../../constant";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
 import Search from "antd/es/input/Search";
 import { SearchOutlined, DeleteOutlined, AppstoreAddOutlined, PlusCircleOutlined, DownloadOutlined, UploadOutlined } from '@ant-design/icons';
@@ -182,7 +182,7 @@ function DataUpload( props ) {
     let elems = [];
     elems.push(<div className="stateBtn" onClick={()=>{
       console.log(data);
-      axios.get(`https://raildoctor.suredatalab.kr/resources${data.excelFilePath}`, {responseType: 'blob'})
+      axios.get(URL_ROOT+`/resources${data.excelFilePath}`, {responseType: 'blob'})
       .then(response => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
@@ -205,7 +205,7 @@ function DataUpload( props ) {
     }else if( data.state === UPLOAD_STATE_CONVERT_SUCCESS ){
         //return "변환 성공"
         elems.push(<div className="stateBtn" onClick={()=>{
-          axios.post(`https://raildoctor.suredatalab.kr/api/data/${data.datumId}`)
+          axios.post(URL_ROOT+`/api/data/${data.datumId}`)
           .then(response => {
             console.log(response.data);
           })
@@ -292,10 +292,10 @@ function DataUpload( props ) {
             (active !== UPLOAD_CATEGORY_RAILBEHAVIORS) ? 
               <Button type="primary" icon={<DownloadOutlined />} style={{width:"160px", top:"165px", right: "20px", position: "absolute"}}
                 onClick={()=>{
-                  axios.get(`https://raildoctor.suredatalab.kr/api/data/${active}`)
+                  axios.get(URL_ROOT+`/api/data/${active}`)
                   .then(response => {
                     console.log(response.data);
-                    fetch(`https://raildoctor.suredatalab.kr/resources${response.data.filePath}`)
+                    fetch(URL_ROOT+`/resources${response.data.filePath}`)
                     .then(response => response.blob())
                     .then(blob => {
                       const path = response.data.filePath;
@@ -448,10 +448,10 @@ function DataUpload( props ) {
                       </Button>
                       <Button type="primary" icon={<DownloadOutlined />} style={{marginLeft : "10px"}}
                         onClick={()=>{
-                          axios.get(`https://raildoctor.suredatalab.kr/api/data/${active}`)
+                          axios.get(URL_ROOT+`/api/data/${active}`)
                           .then(response => {
                             console.log(response.data);
-                            fetch(`https://raildoctor.suredatalab.kr/resources${response.data.filePath}`)
+                            fetch(URL_ROOT+`/resources${response.data.filePath}`)
                             .then(response => response.blob())
                             .then(blob => {
                               const path = response.data.filePath;
@@ -508,7 +508,7 @@ function DataUpload( props ) {
                             <div className="td button2">
                               <Button onClick={(e)=>{
                                 console.log(data);
-                                axios.get(`https://raildoctor.suredatalab.kr/api/railbehaviors/measuresets/${data.measureSetId}`)
+                                axios.get(URL_ROOT+`/api/railbehaviors/measuresets/${data.measureSetId}`)
                                 .then(response => {
                                   console.log(response.data);
                                   data.sensors = response.data.entities;
@@ -521,7 +521,7 @@ function DataUpload( props ) {
                               </Button>
                               <Button type="primary" danger icon={<DeleteOutlined />}
                                 onClick={()=>{
-                                  axios.delete(`https://raildoctor.suredatalab.kr/api/railbehaviors/measuresets/${data.measureSetId}`)
+                                  axios.delete(URL_ROOT+`/api/railbehaviors/measuresets/${data.measureSetId}`)
                                   .then(response => {
                                     console.log(response.data);
                                     getRailbehaviorsMeasureList();
@@ -670,7 +670,7 @@ function DataUpload( props ) {
                           </Button>
                           <Button type="primary" danger icon={<DeleteOutlined />}
                             onClick={()=>{
-                              axios.delete(`https://raildoctor.suredatalab.kr/api/railbehaviors/measuresets/${data.measureSetId}`)
+                              axios.delete(URL_ROOT+`/api/railbehaviors/measuresets/${data.measureSetId}`)
                               .then(response => {
                                 console.log(response.data);
                                 getRailbehaviorsMeasureList();
@@ -800,7 +800,7 @@ function DataUpload( props ) {
                         alert("날짜가 입력되지 않았습니다.");
                         return;
                       }
-                      axios.post(`https://raildoctor.suredatalab.kr/api/railbehaviors/measuresets`,
+                      axios.post(URL_ROOT+`/api/railbehaviors/measuresets`,
                       {
                         "railroadId": addRailbehaviorsRoute,
                         "displayName": addRailbehaviorsDisplayName,
@@ -1125,7 +1125,7 @@ function DataUpload( props ) {
               const base64String = reader.result;
               const base64FormattedString = base64String.split(',')[1];
               let route = getRoute();
-              axios.post(`https://raildoctor.suredatalab.kr/api/data`,
+              axios.post(URL_ROOT+`/api/data`,
                 {
                   meta : {
                     railroadId:"",

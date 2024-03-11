@@ -200,3 +200,6 @@ export const EMPTY_MEASURE_OBJ = {
     vd: "",
     wlMax: ""}
 };
+
+//export const URL_ROOT = "https://raildoctor.suredatalab.kr";
+export const URL_ROOT = "";

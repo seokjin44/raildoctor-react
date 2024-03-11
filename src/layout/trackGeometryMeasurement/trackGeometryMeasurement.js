@@ -6,7 +6,7 @@ import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarC
   ScatterChart, Scatter, Label
 } from 'recharts';
 import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
-import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, EMPTY_MEASURE_OBJ, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE, STRING_ACC_KEY, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_LATERAL_LOAD_KEY, STRING_LONG_MEASURE, STRING_SHORT_MEASURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, TRACK_GEO_LOADING_TEXT, colors } from "../../constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_TODAY, EMPTY_MEASURE_OBJ, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE, STRING_ACC_KEY, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_LATERAL_LOAD_KEY, STRING_LONG_MEASURE, STRING_SHORT_MEASURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, TRACK_GEO_LOADING_TEXT, URL_ROOT, colors } from "../../constant";
 import PlacePosition from "../../component/PlacePosition/PlacePosition";
 import axios from 'axios';
 import qs from 'qs';
@@ -576,7 +576,7 @@ function TrackGeometryMeasurement( props ) {
                           return ;
                         }
                       }
-                      axios.get(`https://raildoctor.suredatalab.kr/api/railbehaviors/data/${selectPoint}?measureDate=${measureDate}&data=${findDatas}`,{
+                      axios.get(URL_ROOT+`/api/railbehaviors/data/${selectPoint}?measureDate=${measureDate}&data=${findDatas}`,{
                         paramsSerializer: params => {
                           return qs.stringify(params, { format: 'RFC3986' })
                         }

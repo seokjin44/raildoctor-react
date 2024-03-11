@@ -6,7 +6,7 @@ import { DatePicker, Input, Radio } from 'antd';
 import * as PDFJS from "pdfjs-dist/build/pdf";
 import * as pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 import RailStatus from "../../component/railStatus/railStatus";
-import { CHART_RENDERING_TEXT, MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL, MONITORING_KP_CHANGE_EVENT_INPUT, MONITORING_KP_CHANGE_EVENT_MAP_DRAG, MONITORING_KP_CHANGE_EVENT_PATH_CLICK, MONITORING_KP_CHANGE_EVENT_SEARCH, PICTURE_RENDERING_TEXT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_UP_TRACK } from "../../constant";
+import { CHART_RENDERING_TEXT, MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL, MONITORING_KP_CHANGE_EVENT_INPUT, MONITORING_KP_CHANGE_EVENT_MAP_DRAG, MONITORING_KP_CHANGE_EVENT_PATH_CLICK, MONITORING_KP_CHANGE_EVENT_SEARCH, PICTURE_RENDERING_TEXT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_ROUTE_INCHON, STRING_ROUTE_SEOUL, STRING_UP_TRACK, URL_ROOT } from "../../constant";
 import classNames from "classnames";
 import TrackSpeed from "../../component/TrackSpeed/TrackSpeed";
 import DataExistence from "../../component/dataExistence/dataExistence";
@@ -149,7 +149,7 @@ function Monitoring( props ) {
       getSeoulSpeedData(setTrackSpeedData);
     }
     
-    axios.get(`https://raildoctor.suredatalab.kr/api/railroads/railroadmap`,{
+    axios.get(URL_ROOT+`/api/railroads/railroadmap`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -160,7 +160,7 @@ function Monitoring( props ) {
     .then(response => {
       let maxHeight = 0;
       console.log(response.data);
-      /* "https://raildoctor.suredatalab.kr/resources/data/railroads/railroadmap/c1e7c0a1-e425-4793-9e91-933f003b1cb9.jpeg" */
+      /* URL_ROOT+"/resources/data/railroads/railroadmap/c1e7c0a1-e425-4793-9e91-933f003b1cb9.jpeg" */
       let pictureList_ = response.data.entities;
       pictureList_.forEach( item => {if(maxHeight < item.height){maxHeight=item.height}});
       setpictureList(pictureList_);
@@ -172,7 +172,7 @@ function Monitoring( props ) {
   const getExistData = ( date ) => {
     let route = getRoute();
     let quarter = getQuarterStartAndEndDate( date.$d );
-    axios.get(`https://raildoctor.suredatalab.kr/api/statistics/data`,{
+    axios.get(URL_ROOT+`/api/statistics/data`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -197,7 +197,7 @@ function Monitoring( props ) {
       setRailProfile(response.data.railprofiles);
     })
     .catch(error => console.error('Error fetching data:', error));
-/*     axios.get(`https://raildoctor.suredatalab.kr/api/pauts`,{
+/*     axios.get(URL_ROOT+`/api/pauts`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -410,7 +410,7 @@ function Monitoring( props ) {
               <div className="boxProto track">
                 {
                   pictureList.map( (pic, index) => {
-                    return <img className="map" key={index} alt="선로열람도" src={`https://raildoctor.suredatalab.kr${pic.fileName}`} onLoad={() => handleImageLoad(index)} />
+                    return <img className="map" key={index} alt="선로열람도" src={URL_ROOT+`${pic.fileName}`} onLoad={() => handleImageLoad(index)} />
                   })
                 }
                 <Draggable axis="x" 
@@ -539,7 +539,7 @@ function Monitoring( props ) {
             }}></div>
               {
                 pictureList.map( (pic, index) => {
-                  return <img className="map" key={index} alt="선로열람도" src={`https://raildoctor.suredatalab.kr${pic.fileName}`} onLoad={() => {
+                  return <img className="map" key={index} alt="선로열람도" src={URL_ROOT+`${pic.fileName}`} onLoad={() => {
                     let pos = zoomFindPositionInPictureList(parseInt(kp.kp)/1000, pictureList).position;
                     setZoomImgKPMarker(pos);
                     zoomImgcontainerRef.current.scrollLeft = pos - (zoomImgcontainerRef.current.offsetWidth / 2);

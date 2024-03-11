@@ -6,7 +6,7 @@ import ReportIcon from "../../assets/icon/1291748_magnify_magnifying glass_marke
 
 import faker from 'faker';
 import { DatePicker, Input, Radio, Select } from "antd";
-import { RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
+import { RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, URL_ROOT } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
 import { convertToCustomFormat, dateFormat, findRange, formatDateTime, formatTime, getQuarterStartAndEndDate, getRailroadSection, getRoute, getTrackText, nonData } from "../../util";
@@ -344,7 +344,7 @@ function RailTrackAlignment( props ) {
                                 console.log(response.data);
                                 for( let file_ of response.data.file ){
                                   if( file_.originName.indexOf(file.originName) > -1 ){
-                                    window.open(`https://raildoctor.suredatalab.kr/resources${file_.filePath}`);
+                                    window.open(URL_ROOT+`/resources${file_.filePath}`);
                                   }
                                 }
                               })
@@ -365,7 +365,7 @@ function RailTrackAlignment( props ) {
                                 console.log(response.data);
                                 for( let file_ of response.data.file ){
                                   if( file_.originName.indexOf(file.originName) > -1 ){
-                                    window.open(`https://raildoctor.suredatalab.kr/resources${file_.filePath}`);
+                                    window.open(URL_ROOT+`/resources${file_.filePath}`);
                                   }
                                 }
                               })

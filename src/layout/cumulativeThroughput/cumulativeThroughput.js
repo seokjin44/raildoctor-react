@@ -4,7 +4,7 @@ import RailStatus from "../../component/railStatus/railStatus";
 import { useEffect, useRef, useState } from "react";
 import { DatePicker, Input } from 'antd';
 import { Radio } from 'antd';
-import { KP_SEARCH_RANGE, KP_SEARCH_SINGLE, PICTURE_RENDERING_TEXT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_PATH, STRING_STATION, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT } from "../../constant";
+import { KP_SEARCH_RANGE, KP_SEARCH_SINGLE, PICTURE_RENDERING_TEXT, RADIO_STYLE, RANGEPICKERSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_PATH, STRING_STATION, STRING_TRACK_DIR_LEFT, STRING_TRACK_DIR_RIGHT, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, URL_ROOT } from "../../constant";
 import axios from 'axios';
 import qs from 'qs';
 import { convertToCustomFormat, dateFormat, formatDateTime, getRailroadSection, getRoute, getTrackText, getYear2Length, nonData, numberWithCommas } from "../../util";
@@ -66,7 +66,7 @@ function CumulativeThroughput( props ) {
     window.addEventListener('resize', resizeChange);
 
     getRailroadSection(setRailroadSection);
-    axios.get(`https://raildoctor.suredatalab.kr/api/railroads/railroadmap`,{
+    axios.get(URL_ROOT+`/api/railroads/railroadmap`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -77,7 +77,7 @@ function CumulativeThroughput( props ) {
     .then(response => {
       let maxHeight = 0;
       console.log(response.data);
-      /* "https://raildoctor.suredatalab.kr/resources/data/railroads/railroadmap/c1e7c0a1-e425-4793-9e91-933f003b1cb9.jpeg" */
+      /* URL_ROOT+"/resources/data/railroads/railroadmap/c1e7c0a1-e425-4793-9e91-933f003b1cb9.jpeg" */
       let pictureList_ = response.data.entities;
       pictureList_.forEach( item => {if(maxHeight < item.height){maxHeight=item.height}});
       setpictureList(pictureList_);
@@ -264,7 +264,7 @@ function CumulativeThroughput( props ) {
       kp : (kp_ / 1000)
     }
     console.log(param);
-    axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remaining`,{
+    axios.get(URL_ROOT+`/api/accumulateweights/remaining`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -305,7 +305,7 @@ function CumulativeThroughput( props ) {
       end_kp : (endKp / 1000)
     }
     console.log(param);
-    axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remainings`,{
+    axios.get(URL_ROOT+`/api/accumulateweights/remainings`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -508,7 +508,7 @@ function CumulativeThroughput( props ) {
           <div ref={containerRef} className={classNames("boxProto track",{"hide" : mapHide})} id="trackMapContainer" >
           {
             pictureList.map( (pic, index) => {
-              return <img className="map" key={index} alt="선로열람도" src={`https://raildoctor.suredatalab.kr${pic.fileName}`} onLoad={() => handleImageLoad(index)} />
+              return <img className="map" key={index} alt="선로열람도" src={URL_ROOT+`${pic.fileName}`} onLoad={() => handleImageLoad(index)} />
             })
           }
           <Draggable axis="x" onDrag={handleDrag} position={kpMarker}>
@@ -710,7 +710,7 @@ function CumulativeThroughput( props ) {
               }}></div>
               {
                 pictureList.map( (pic, index) => {
-                  return <img className="map" key={index} alt="선로열람도" src={`https://raildoctor.suredatalab.kr${pic.fileName}`} onLoad={() => {
+                  return <img className="map" key={index} alt="선로열람도" src={URL_ROOT+`${pic.fileName}`} onLoad={() => {
                     let pos = zoomFindPositionInPictureList(parseInt(kp)/1000, pictureList).position;
                     setZoomImgKPMarker(pos);
                     zoomImgcontainerRef.current.scrollLeft = pos - (zoomImgcontainerRef.current.offsetWidth / 2);

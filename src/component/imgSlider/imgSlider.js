@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./imgSlider.css";
 import { getFileExtension } from "../../util";
+import { URL_ROOT } from "../../constant";
 
 function ImgSlider( props ) {
   const [current, setCurrent] = useState(0);
@@ -25,7 +26,7 @@ function ImgSlider( props ) {
           <div className="sliderBtn left" onClick={prevSlide}></div>
           {props.imgUrlList.map((image, index) => (
             <div className={index === current ? 'slide active' : 'slide'} key={index}>
-              {index === current && <img src={`https://raildoctor.suredatalab.kr/resources/data/railprofiles/photos/${image.imageId}.${getFileExtension(image.fileName)}`} alt={`image ${index}`} />}
+              {index === current && <img src={URL_ROOT+`/resources/data/railprofiles/photos/${image.imageId}.${getFileExtension(image.fileName)}`} alt={`image ${index}`} />}
             </div>
           ))}
           <div className="sliderBtn right" onClick={nextSlide}></div>

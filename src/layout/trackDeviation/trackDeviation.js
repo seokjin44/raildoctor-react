@@ -5,7 +5,7 @@ import 'dayjs/locale/ko';
 import CloseIcon from "../../assets/icon/decision/211651_close_round_icon.png";
 import Box from '@mui/material/Box';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { BOXSTYLE, RADIO_STYLE, RANGEPICKERSTYLE, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_DOWN_TRACK, STRING_HEIGHT, STRING_RAIL_DISTANCE, STRING_UP_TRACK } from "../../constant";
+import { BOXSTYLE, RADIO_STYLE, RANGEPICKERSTYLE, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_DOWN_TRACK, STRING_HEIGHT, STRING_RAIL_DISTANCE, STRING_UP_TRACK, URL_ROOT } from "../../constant";
 import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import { Modal } from "@mui/material";
 import axios from 'axios';
@@ -71,7 +71,7 @@ function TrackDeviation( props ) {
       railroad_name : route
     }
     console.log(param);
-    axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/ts`,{
+    axios.get(URL_ROOT+`/api/railtwists/ts`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat' })
       },
@@ -112,7 +112,7 @@ function TrackDeviation( props ) {
     }
     console.log(param);
     let dataExitsDate_ ={};
-    axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/ts`,{
+    axios.get(URL_ROOT+`/api/railtwists/ts`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat' })
       },
@@ -203,7 +203,7 @@ function TrackDeviation( props ) {
         railroad_name : route,
       };
       console.log(param);
-      axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/graph_data`,{
+      axios.get(URL_ROOT+`/api/railtwists/graph_data`,{
         paramsSerializer: params => {
           return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
         },
@@ -257,7 +257,7 @@ function TrackDeviation( props ) {
       railroad_name : route,
     };
     console.log(param);
-    axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/report`,{
+    axios.get(URL_ROOT+`/api/railtwists/report`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
       },

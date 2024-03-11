@@ -11,7 +11,7 @@ import Papa from 'papaparse';
 import Box from '@mui/material/Box';
 import { Modal } from "@mui/material";
 import TextArea from "antd/es/input/TextArea";
-import { BOXSTYLE,  CHART_RENDERING_TEXT,  DATA_LOADING_TEXT,  DUMMY_RANGE, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE } from "../../constant";
+import { BOXSTYLE,  CHART_RENDERING_TEXT,  DATA_LOADING_TEXT,  DUMMY_RANGE, INSTRUMENTATIONPOINT, RANGEPICKERSTYLE, URL_ROOT } from "../../constant";
 import { DatePicker, Input, Select } from "antd";
 import PlaceGauge from "../../component/PlaceGauge/PlaceGauge";
 import axios from 'axios';
@@ -201,7 +201,7 @@ function RailRoughness( props ) {
                   let roughnessChartData_ = [];
                   /* for( let rect of findRects  ){ */
                   setDataloading(true);
-                    axios.get("https://raildoctor.suredatalab.kr/"+findRects[0].dataFile, { responseType: 'text' })
+                    axios.get(URL_ROOT+"/"+findRects[0].dataFile, { responseType: 'text' })
                     .then(response => {
                       setDataloading(false);
                       setLoading(true);

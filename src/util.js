@@ -1,4 +1,4 @@
-import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_LATERAL_LOAD_KEY, STRING_LONG_MEASURE, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_ROUTE_GYEONGBU, STRING_ROUTE_INCHON, STRING_ROUTE_OSONG, STRING_ROUTE_SEOUL, STRING_SHORT_MEASURE, STRING_SPEED_KEY, STRING_STATION, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, STRING_WHEEL_LOAD_KEY, TRACK_DEVIATION_CAUTION, TRACK_DEVIATION_REPAIR, TRACK_DEVIATION_TARGET, UPLOAD_CATEGORY_ACCUMULATEWEIGHTS, UPLOAD_CATEGORY_RAILBEHAVIORS, UPLOAD_CATEGORY_RAILPROFILES, UPLOAD_CATEGORY_RAILROUGHNESS, UPLOAD_CATEGORY_RAILSTRAIGHTS, UPLOAD_CATEGORY_RAILTWISTS, UPLOAD_CATEGORY_RAILWEARS, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED, UP_TRACK } from "./constant";
+import { CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, STRING_ACC_KEY, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_HD_KEY, STRING_HUMIDITY, STRING_KMA_TEMPERATURE, STRING_LATERAL_LOAD_KEY, STRING_LONG_MEASURE, STRING_PATH, STRING_RAIL_TEMPERATURE, STRING_ROUTE_GYEONGBU, STRING_ROUTE_INCHON, STRING_ROUTE_OSONG, STRING_ROUTE_SEOUL, STRING_SHORT_MEASURE, STRING_SPEED_KEY, STRING_STATION, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, STRING_VD_KEY, STRING_VERTICAL_WEAR, STRING_WEAR_MODEL_CAT_BOOST, STRING_WEAR_MODEL_LGBM, STRING_WEAR_MODEL_LOGI_LASSO, STRING_WEAR_MODEL_LOGI_STEPWISE, STRING_WEAR_MODEL_LR_LASSO, STRING_WEAR_MODEL_LR_STEPWISE, STRING_WEAR_MODEL_RANDOM_FOREST, STRING_WEAR_MODEL_SVR, STRING_WEAR_MODEL_XGB, STRING_WHEEL_LOAD_KEY, TRACK_DEVIATION_CAUTION, TRACK_DEVIATION_REPAIR, TRACK_DEVIATION_TARGET, UPLOAD_CATEGORY_ACCUMULATEWEIGHTS, UPLOAD_CATEGORY_RAILBEHAVIORS, UPLOAD_CATEGORY_RAILPROFILES, UPLOAD_CATEGORY_RAILROUGHNESS, UPLOAD_CATEGORY_RAILSTRAIGHTS, UPLOAD_CATEGORY_RAILTWISTS, UPLOAD_CATEGORY_RAILWEARS, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED, UP_TRACK, URL_ROOT } from "./constant";
 import axios from 'axios';
 import qs from 'qs';
 import Papa from 'papaparse';
@@ -504,7 +504,7 @@ export const getRailroadSection = ( setRailroadSection ) =>{
     if( route === STRING_ROUTE_SEOUL ){
         param['railTrack'] = STRING_UP_TRACK;
     }
-    axios.get(`https://raildoctor.suredatalab.kr/api/railroads/structures`,{
+    axios.get(URL_ROOT+`/api/railroads/structures`,{
       paramsSerializer: params => {
         return qs.stringify(params, { format: 'RFC3986' })
       },
@@ -557,8 +557,8 @@ export const getRailroadSection = ( setRailroadSection ) =>{
 export const getInchonSpeedData = ( setTrackSpeedData ) => {
     let speedData = [{trackType: 1, trackName : "상본선", data : []}, {trackType: -1, trackName : "하본선", data : []}];
     axios.all([
-        axios.get("https://raildoctor.suredatalab.kr/resources/data/railroads/operatingspeed/incheon_1_t1.csv", { responseType: 'text' }),
-        axios.get("https://raildoctor.suredatalab.kr/resources/data/railroads/operatingspeed/incheon_1_t2.csv", { responseType: 'text' })
+        axios.get(URL_ROOT+"/resources/data/railroads/operatingspeed/incheon_1_t1.csv", { responseType: 'text' }),
+        axios.get(URL_ROOT+"/resources/data/railroads/operatingspeed/incheon_1_t2.csv", { responseType: 'text' })
       ])
       .then(axios.spread((response1, response2) => {
         // 두 요청이 모두 완료됐을 때 실행됩니다.
@@ -618,8 +618,8 @@ export const getInchonSpeedData = ( setTrackSpeedData ) => {
 export const getSeoulSpeedData = ( setTrackSpeedData ) => {
     let speedData = [{trackType: 1, trackName : "내선순환", data : []}, {trackType: -1, trackName : "외선순환", data : []}];
     axios.all([
-        axios.get("https://raildoctor.suredatalab.kr/resources/data/railroads/operatingspeed/seoul_2_t1.csv", { responseType: 'text' }),
-        axios.get("https://raildoctor.suredatalab.kr/resources/data/railroads/operatingspeed/seoul_2_t2.csv", { responseType: 'text' })
+        axios.get(URL_ROOT+"/resources/data/railroads/operatingspeed/seoul_2_t1.csv", { responseType: 'text' }),
+        axios.get(URL_ROOT+"/resources/data/railroads/operatingspeed/seoul_2_t2.csv", { responseType: 'text' })
       ])
       .then(axios.spread((response1, response2) => {
         // 두 요청이 모두 완료됐을 때 실행됩니다.

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./dataExistence.css"
 import { Box, Modal, Tab } from "@mui/material";
-import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL, MONITORING_KP_CHANGE_EVENT_MAP_DRAG, MONITORING_KP_CHANGE_EVENT_SEARCH, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK, colors } from "../../constant";
+import { BOXSTYLE, CHART_FORMAT_DAILY, CHART_FORMAT_MONTHLY, CHART_FORMAT_RAW, CHART_FORMAT_TODAY, DOWN_TRACK, MONITORING_KP_CHANGE_EVENT_DATA_EX_SCROLL, MONITORING_KP_CHANGE_EVENT_MAP_DRAG, MONITORING_KP_CHANGE_EVENT_SEARCH, STRING_ACC_KEY, STRING_CANT, STRING_DIRECTION, STRING_DISTORTION, STRING_HD_KEY, STRING_HEIGHT, STRING_HUMIDITY, STRING_LATERAL_LOAD_KEY, STRING_RAIL_DISTANCE, STRING_RAIL_TEMPERATURE, STRING_SPEED_KEY, STRING_STRESS_KEY, STRING_TEMPERATURE, STRING_UP_TRACK, STRING_VD_KEY, STRING_WHEEL_LOAD_KEY, UP_TRACK, URL_ROOT, colors } from "../../constant";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -234,7 +234,7 @@ function DataExistence( props ) {
               onMouseOut={()=>{setAccumulateWeightsTooltipIndex(-1)}}
               onClick={()=>{
                 setRemainingData(data);
-                axios.get(`https://raildoctor.suredatalab.kr/api/accumulateweights/remaining`,{
+                axios.get(URL_ROOT+`/api/accumulateweights/remaining`,{
                   paramsSerializer: params => {
                     return qs.stringify(params, { format: 'RFC3986' })
                   },
@@ -352,7 +352,7 @@ function DataExistence( props ) {
                     railroad_name : route,
                   };
                   console.log(param);
-                  axios.get(`https://raildoctor.suredatalab.kr/api/railtwists/graph_data`,{
+                  axios.get(URL_ROOT+`/api/railtwists/graph_data`,{
                     paramsSerializer: params => {
                       return qs.stringify(params, { format: 'RFC3986', arrayFormat: 'repeat'  })
                     },
@@ -407,7 +407,7 @@ function DataExistence( props ) {
               onClick={()=>{
                 setRailbehaviorOpen(true);
                 setRailbehaviorData(railbehaviorsData);
-                axios.get(`https://raildoctor.suredatalab.kr/api/railbehaviors/measuresets/${railbehaviorsData.measureId}`,{
+                axios.get(URL_ROOT+`/api/railbehaviors/measuresets/${railbehaviorsData.measureId}`,{
                   paramsSerializer: params => {
                     return qs.stringify(params, { format: 'RFC3986' })
                   }
@@ -431,7 +431,7 @@ function DataExistence( props ) {
                   for(let sensor of response.data.entities){
                     let colorCode = getColor(colorIndex++);
                     for( let option of dataOption ){
-                      axios.get(`https://raildoctor.suredatalab.kr/api/railbehaviors/data/${sensor.sensorId}`,{
+                      axios.get(URL_ROOT+`/api/railbehaviors/data/${sensor.sensorId}`,{
                         paramsSerializer: params => {
                           return qs.stringify(params, { format: 'RFC3986' })
                         },
@@ -535,7 +535,7 @@ function DataExistence( props ) {
                 begin.setDate(begin.getDate() - 3);
                 end.setDate(end.getDate() + 3);
 
-                axios.get(`https://raildoctor.suredatalab.kr/api/temperatures/period/${tempData.measureId}?begin=${begin.toISOString()}&end=${end.toISOString()}`,{
+                axios.get(URL_ROOT+`/api/temperatures/period/${tempData.measureId}?begin=${begin.toISOString()}&end=${end.toISOString()}`,{
                   paramsSerializer: params => {
                     return qs.stringify(params, { format: 'RFC3986' })
                   }
@@ -605,7 +605,7 @@ function DataExistence( props ) {
               onMouseOut={()=>{setRailProfileIndex(-1)}}
               onClick={()=>{
                 console.log(profileData);
-                axios.get(`https://raildoctor.suredatalab.kr/api/railprofiles/profiles`,{
+                axios.get(URL_ROOT+`/api/railprofiles/profiles`,{
                   paramsSerializer: params => {
                     return qs.stringify(params, { format: 'RFC3986' })
                   },
@@ -662,7 +662,7 @@ function DataExistence( props ) {
                   console.log(response.data);
                   for( let file_ of response.data.file ){
                     /* if( file_.originName.indexOf(file.originName) > -1 ){ */
-                      window.open(`https://raildoctor.suredatalab.kr/resources${file_.filePath}`);
+                      window.open(URL_ROOT+`/resources${file_.filePath}`);
                     /* } */
                   }
                 })
@@ -694,7 +694,7 @@ function DataExistence( props ) {
               onClick={()=>{
                 console.log(roughnessesData);
                 setRoughnessData(roughnessesData);
-                axios.get("https://raildoctor.suredatalab.kr/resources/data/railroughness/"+roughnessesData.fileName, { responseType: 'text' })
+                axios.get(URL_ROOT+"/resources/data/railroughness/"+roughnessesData.fileName, { responseType: 'text' })
                     .then(response => {
                       let roughnessChartData_ = [];
                       const csvData = response.data;
@@ -761,7 +761,7 @@ function DataExistence( props ) {
                 console.log(data);
                 setPautOpen(true);
                 setPautImgIndex(0);
-                axios.get(`https://raildoctor.suredatalab.kr/api/pauts/${data.measureId}`,{
+                axios.get(URL_ROOT+`/api/pauts/${data.measureId}`,{
                   paramsSerializer: params => {
                     return qs.stringify(params, { format: 'RFC3986' })
                   }
@@ -1175,7 +1175,7 @@ function DataExistence( props ) {
                     {(pautData.images.length > 1) ? <div className="leftBtn" onClick={()=>{
                       if(pautImgIndex>0){setPautImgIndex(pautImgIndex-1)}
                     }}></div> : null }
-                    <img src={`https://raildoctor.suredatalab.kr${pautData.images[pautImgIndex].filePath}`}  />
+                    <img src={URL_ROOT+`${pautData.images[pautImgIndex].filePath}`}  />
                     {(pautData.images.length > 1) ? <div className="rightBtn" onClick={()=>{
                       if(pautImgIndex<pautData.images.length-1){
                         setPautImgIndex(pautImgIndex+1)
