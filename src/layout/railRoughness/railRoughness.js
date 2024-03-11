@@ -201,7 +201,7 @@ function RailRoughness( props ) {
                   let roughnessChartData_ = [];
                   /* for( let rect of findRects  ){ */
                   setDataloading(true);
-                    axios.get(URL_ROOT+"/"+findRects[0].dataFile, { responseType: 'text' })
+                    axios.get(URL_ROOT+findRects[0].dataFile, { responseType: 'text' })
                     .then(response => {
                       setDataloading(false);
                       setLoading(true);
