@@ -10,7 +10,7 @@ import axios from 'axios';
 import qs from 'qs';
 import { checkUniqueness, convertBytesToMB, convertToCustomFormat, curPagingCheck, curPagingText, dataUploadTitle, flattenTreeData, formatDateTime, getRoute, measureTypeText, trackToString, trackToString2, uploadState, uploadStateBtn } from "../../util";
 import { useRef } from "react";
-import { Button, Checkbox, DatePicker, Input, Modal, Pagination, Select } from "antd";
+import { Button, Checkbox, DatePicker, Input, Modal, Pagination, Select, Switch } from "antd";
 import { BOXSTYLE, STRING_DOWN_TRACK, STRING_DOWN_TRACK_LEFT, STRING_DOWN_TRACK_RIGHT, STRING_LONG_MEASURE, STRING_ROUTE_GYEONGBU, STRING_ROUTE_INCHON, STRING_ROUTE_OSONG, STRING_ROUTE_SEOUL, STRING_SHORT_MEASURE, STRING_UP_TRACK, STRING_UP_TRACK_LEFT, STRING_UP_TRACK_RIGHT, UPLOAD_CATEGORY_ACCUMULATEWEIGHTS, UPLOAD_CATEGORY_RAILBEHAVIORS, UPLOAD_CATEGORY_RAILPROFILES, UPLOAD_CATEGORY_RAILROUGHNESS, UPLOAD_CATEGORY_RAILSTRAIGHTS, UPLOAD_CATEGORY_RAILTWISTS, UPLOAD_CATEGORY_RAILWEARS, UPLOAD_CATEGORY_TEMPERATURES, UPLOAD_STATE_APPLYING, UPLOAD_STATE_APPLY_FAIL, UPLOAD_STATE_APPLY_SUCCESS, UPLOAD_STATE_CONVERTING, UPLOAD_STATE_CONVERT_FAIL, UPLOAD_STATE_CONVERT_SUCCESS, UPLOAD_STATE_UPLOADED, URL_ROOT } from "../../constant";
 import PopupIcon from "../../assets/icon/9044869_popup_icon.png";
 import Search from "antd/es/input/Search";
@@ -62,6 +62,7 @@ function DataUpload( props ) {
   const [ addRailbehaviorsT1BeginKp, setAddRailbehaviorsT1BeginKp ] = useState("");
   const [ addRailbehaviorsT1EndKp, setAddRailbehaviorsT1EndKp ] = useState("");
   const [ addRailbehaviorsSensorList, setAddRailbehaviorsSensorList ] = useState([]);
+  const [ addRailbehaviorsRemoveOnSuccess, setAddRailbehaviorsRemoveOnSuccess ] = useState(false);
 
   // 종료일 DatePicker에서 선택할 수 없는 날짜를 정의하는 함수
   const disabledEndDate = (current) => {
@@ -224,6 +225,11 @@ function DataUpload( props ) {
   const onChange = (checkedValues) => {
     console.log('checked = ', checkedValues);
     setRailbehaviorsMeasureType(checkedValues);
+  };
+
+  const switchOnChange = (checked) => {
+    console.log(`switch to ${checked}`);
+    setAddRailbehaviorsRemoveOnSuccess(checked);
   };
 
   const onShowSizeChange = (current, pageSize) => {
@@ -442,6 +448,7 @@ function DataUpload( props ) {
                         setAddRailbehaviorsT2EndKp("");
                         setAddRailbehaviorsT1BeginKp("");
                         setAddRailbehaviorsT1EndKp("");
+                        setAddRailbehaviorsRemoveOnSuccess(false);
                         setAddRailbehaviorsSensorList([]);
                         }} style={{marginLeft : "10px"}} type="primary" icon={<AppstoreAddOutlined />}>
                         측정세트추가
@@ -627,6 +634,7 @@ function DataUpload( props ) {
                   setAddRailbehaviorsT2EndKp("");
                   setAddRailbehaviorsT1BeginKp("");
                   setAddRailbehaviorsT1EndKp("");
+                  setAddRailbehaviorsRemoveOnSuccess(false);
                   setAddRailbehaviorsSensorList([]);
                   }} style={{marginLeft : "10px"}} type="primary" icon={<AppstoreAddOutlined />}>
                   측정세트추가
@@ -812,7 +820,7 @@ function DataUpload( props ) {
                         "beginTs": addRailbehaviorsStartDate.$d.toISOString(),
                         "endTs": ( addRailbehaviorsEndDate ) ? addRailbehaviorsEndDate.$d.toISOString() : null,
                         "sensors": addRailbehaviorsSensorList,
-                        "removeOnSuccess": true
+                        "removeOnSuccess": addRailbehaviorsRemoveOnSuccess
                       }
                     )
                     .then(response => {
@@ -833,6 +841,13 @@ function DataUpload( props ) {
                   }} style={{marginLeft : "10px"}} type="primary" icon={<AppstoreAddOutlined />}>
                   측정세트등록
                 </Button>
+              </div>
+            </div>
+            <div className="inputLine">
+              <div className="inputTitle">원본파일삭제</div>
+              <div className="inputValue">
+                <Switch checked={addRailbehaviorsRemoveOnSuccess} onChange={switchOnChange} />
+                <span style={{marginLeft : "5px", color : "rgb(0 0 0 / 45%)"}}>* 데이터 import 작업 후 원본파일을 유지할지 여부를 선택합니다</span>
               </div>
             </div>
             <div className="devisionLine"></div>
