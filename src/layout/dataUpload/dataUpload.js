@@ -818,6 +818,7 @@ function DataUpload( props ) {
                     .then(response => {
                       console.log(response.data);
                       alert("등록되었습니다.");
+                      getRailbehaviorsMeasureList();
                       setAddOpen(false);
                     })
                     .catch(error => {
@@ -825,6 +826,7 @@ function DataUpload( props ) {
                         alert("측정지점이름이 중복되었습니다. 변경 후 다시 시도해주세요.")
                         console.error('Conflict error (409):', error.response.data);
                       } else {
+                        alert("측정세트등록 과정에서 에러가 발생했습니다. Error : " + error.response.status );
                         console.error('Error fetching data:', error);
                       }
                     });   
@@ -1067,7 +1069,7 @@ function DataUpload( props ) {
                 <div className="valueName">{trackToString(STRING_UP_TRACK, railbehaviorsRoute)}</div> 
                 {convertToCustomFormat(railbehaviorsViewData.t2Begin*1000)} ~ {convertToCustomFormat(railbehaviorsViewData.t2End*1000)}
                 <div className="valueName">{trackToString(STRING_DOWN_TRACK, railbehaviorsRoute)}</div> 
-                {convertToCustomFormat(railbehaviorsViewData.t1Begin*1000)} ~ {convertToCustomFormat(railbehaviorsViewData.t1Begin*1000)}
+                {convertToCustomFormat(railbehaviorsViewData.t1Begin*1000)} ~ {convertToCustomFormat(railbehaviorsViewData.t1End*1000)}
               </div>
             </div>
             <div className="devisionLine"></div>
